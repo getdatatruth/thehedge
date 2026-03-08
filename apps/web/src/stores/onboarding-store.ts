@@ -1,0 +1,110 @@
+import { create } from 'zustand';
+import type { FamilyStyle, SchoolStatus, LearningStyle } from '@/types/database';
+
+export interface ChildData {
+  name: string;
+  dateOfBirth: string;
+  interests: string[];
+  schoolStatus: SchoolStatus;
+  senFlags: string[];
+  learningStyle: LearningStyle | null;
+}
+
+export interface OnboardingState {
+  step: number;
+  // Step 1: Family basics
+  familyName: string;
+  country: string;
+  county: string;
+  // Step 2: Children
+  children: ChildData[];
+  // Step 3: Family style
+  familyStyle: FamilyStyle;
+  // Step 4: Availability
+  ideaTimes: string[];
+  weekendPlanning: boolean;
+  holidayPlanning: boolean;
+  // Step 5: Practical details
+  hasOutdoorSpace: boolean;
+  carActivities: boolean;
+  messComfort: 'none' | 'low' | 'medium' | 'high';
+}
+
+interface OnboardingActions {
+  setStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  updateField: <K extends keyof OnboardingState>(
+    key: K,
+    value: OnboardingState[K]
+  ) => void;
+  addChild: () => void;
+  removeChild: (index: number) => void;
+  updateChild: (index: number, data: Partial<ChildData>) => void;
+  reset: () => void;
+}
+
+const initialState: OnboardingState = {
+  step: 1,
+  familyName: '',
+  country: 'IE',
+  county: '',
+  children: [
+    {
+      name: '',
+      dateOfBirth: '',
+      interests: [],
+      schoolStatus: 'mainstream',
+      senFlags: [],
+      learningStyle: null,
+    },
+  ],
+  familyStyle: 'balanced',
+  ideaTimes: [],
+  weekendPlanning: true,
+  holidayPlanning: true,
+  hasOutdoorSpace: false,
+  carActivities: false,
+  messComfort: 'medium',
+};
+
+export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
+  (set) => ({
+    ...initialState,
+
+    setStep: (step) => set({ step }),
+    nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 5) })),
+    prevStep: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
+
+    updateField: (key, value) => set({ [key]: value }),
+
+    addChild: () =>
+      set((state) => ({
+        children: [
+          ...state.children,
+          {
+            name: '',
+            dateOfBirth: '',
+            interests: [],
+            schoolStatus: 'mainstream' as SchoolStatus,
+            senFlags: [],
+            learningStyle: null,
+          },
+        ],
+      })),
+
+    removeChild: (index) =>
+      set((state) => ({
+        children: state.children.filter((_, i) => i !== index),
+      })),
+
+    updateChild: (index, data) =>
+      set((state) => ({
+        children: state.children.map((child, i) =>
+          i === index ? { ...child, ...data } : child
+        ),
+      })),
+
+    reset: () => set(initialState),
+  })
+);
