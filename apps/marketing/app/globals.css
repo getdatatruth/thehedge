@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+:root {
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-lora: 'Lora', Georgia, serif;
+  --font-dm: 'DM Sans', system-ui, sans-serif;
+
+  --cream: #F9F5EE;
+  --cream-dark: #EDE8DD;
+  --green-deep: #2C4A2E;
+  --green-mid: #4A7C4E;
+  --green-light: #7BAE7F;
+  --green-mist: #C8DFC9;
+  --earth: #8B6B4A;
+  --earth-light: #C4A882;
+  --bark: #3D2B1F;
+  --moss: #5C7A3E;
+  --gold: #C8962A;
+  --sky: #8BBDD9;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-dm);
+  color: var(--bark);
+  background: var(--cream);
+}
+
+h1, h2, h3, h4 { font-family: var(--font-playfair); }
+
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(44, 74, 46, 0.15);
+}
+
+.blob-1 { border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; }
+.blob-2 { border-radius: 40% 60% 30% 70% / 60% 40% 60% 40%; }
+.blob-3 { border-radius: 70% 30% 50% 50% / 40% 70% 30% 60%; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(1deg); }
+  66% { transform: translateY(-4px) rotate(-1deg); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
