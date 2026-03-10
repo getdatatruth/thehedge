@@ -5,31 +5,75 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'Blog — Family Learning Guides for Irish Families',
-  description: 'Practical guides, seasonal activity ideas, homeschooling advice, and Irish family life. Written by The Hedge team and Irish families across all 32 counties.',
+  title: 'Blog — Family Activity Guides, Homeschool Tips & Irish Seasonal Ideas',
+  description: 'Practical guides for Irish families: seasonal activity ideas, homeschooling in Ireland, outdoor learning, and making the most of wherever you live in Ireland.',
   alternates: { canonical: 'https://thehedge.ie/blog' },
 };
 
-const featured = {
-  slug: 'aears-assessment-guide-ireland',
-  cat: 'Homeschool',
-  date: 'October 2025',
-  title: 'The Complete Guide to AEARS Assessments in Ireland',
-  excerpt: 'Everything Irish homeschooling families need to know about the Tusla AEARS assessment process — what assessors look for, how to prepare your learning log, and how The Hedge makes it easier.',
-  readTime: '12 min read',
-  gradient: 'linear-gradient(135deg, #1C3520, #3D6142)',
-};
-
-const articles = [
-  { slug: 'winter-activities-ireland', cat: 'Seasonal', date: 'Nov 2025', title: '40 Winter Activities for Irish Families', excerpt: 'From storm-watching on the Burren to making sloe gin jam in the kitchen — our favourite winter activities for Irish families when the days are short.', readTime: '8 min', gradient: 'linear-gradient(135deg, #2a4a5e, #3d7a8a)' },
-  { slug: 'homeschool-ireland-beginners', cat: 'Homeschool', date: 'Oct 2025', title: "Starting to Homeschool in Ireland: A Beginner's Guide", excerpt: "The practical, honest guide we wish we'd had when we started. Tusla notification, AEARS, curriculum choices, and finding your community.", readTime: '15 min', gradient: 'linear-gradient(135deg, #3D6142, #5E8B52)' },
-  { slug: 'screen-free-weekends', cat: 'Family Life', date: 'Oct 2025', title: 'How to Plan a Screen-Free Weekend (Without the Meltdowns)', excerpt: "Honest advice from families who've done it. What works, what doesn't, and how The Hedge makes screen-free weekends genuinely enjoyable for everyone.", readTime: '6 min', gradient: 'linear-gradient(135deg, #8B6B4A, #C4623A)' },
-  { slug: 'nature-journalling-kids', cat: 'Activities', date: 'Sep 2025', title: "Nature Journalling with Children: A Beginner's Guide", excerpt: 'Nature journalling is one of the richest, simplest activities you can do with children of any age. Here\'s how to start — and keep going.', readTime: '7 min', gradient: 'linear-gradient(135deg, #1C3520, #5E8B52)' },
-  { slug: 'irish-seasons-activities', cat: 'Irish Heritage', date: 'Sep 2025', title: 'The Four Seasons of the Irish Year: Activities for Each', excerpt: 'Samhain, Imbolc, Bealtaine, Lúnasa — the original Irish calendar offers a rich framework for family learning rooted in the land.', readTime: '10 min', gradient: 'linear-gradient(135deg, #C9922E, #8B6B4A)' },
-  { slug: 'outdoor-learning-wet-weather', cat: 'Practical', date: 'Aug 2025', title: 'Outdoor Learning in Irish Weather (Yes, Even the Rain)', excerpt: "You can't wait for perfect weather in Ireland — you'd wait forever. Here's how to make outdoor learning work in drizzle, mist, and full-on Atlantic rain.", readTime: '9 min', gradient: 'linear-gradient(135deg, #2a3a5e, #3D6142)' },
+const posts = [
+  {
+    cat: 'Seasonal Guide',
+    date: '12 March 2026',
+    title: 'The complete Irish spring activity guide',
+    titleEm: 'spring',
+    excerpt: "When the days start to lengthen and the first primroses appear in the hedgerows, Ireland comes alive with possibilities for families. Here's everything you can do with children this spring — from lambing season to St. Brigid's Day crafts.",
+    readTime: '8 min read',
+    slug: 'irish-spring-activity-guide',
+    bg: 'linear-gradient(135deg,#2C4A2E,#4A7C4E)',
+  },
+  {
+    cat: 'Homeschool',
+    date: '5 March 2026',
+    title: 'Tusla AEARS: what Irish homeschoolers actually need to submit',
+    titleEm: 'AEARS',
+    excerpt: "The AEARS process can feel mysterious — especially for families new to home education. We've put together a clear, plain-English guide to exactly what evidence Tusla assessors look for and how to prepare it without stress.",
+    readTime: '12 min read',
+    slug: 'tusla-aears-guide',
+    bg: 'linear-gradient(135deg,#1C3520,#3D6142)',
+  },
+  {
+    cat: 'Nature & Outdoors',
+    date: '28 Feb 2026',
+    title: '30 outdoor activities for Irish children this March',
+    titleEm: 'March',
+    excerpt: "March is underrated. The evenings are getting longer, the countryside is waking up, and there's still enough cold in the air to make it feel like an adventure. Here are 30 activities you can do with children across Ireland this month.",
+    readTime: '10 min read',
+    slug: '30-outdoor-activities-march',
+    bg: 'linear-gradient(135deg,#3D6142,#5E8B52)',
+  },
+  {
+    cat: 'Science',
+    date: '21 Feb 2026',
+    title: 'Kitchen science experiments that actually work',
+    titleEm: 'actually work',
+    excerpt: "We tested 40 kitchen science experiments with children aged 4–12 across Ireland. Half of them were disappointingly boring or required ingredients nobody has. Here are the 12 that genuinely delighted children — and why they work.",
+    readTime: '9 min read',
+    slug: 'kitchen-science-experiments',
+    bg: 'linear-gradient(135deg,#C4623A,#9E4A2A)',
+  },
+  {
+    cat: 'Arts & Creativity',
+    date: '14 Feb 2026',
+    title: "Nature journalling with children: a beginner's guide",
+    titleEm: "beginner's guide",
+    excerpt: "Nature journalling is one of the most sustainable creative habits you can give a child. It costs almost nothing, works in any season, and produces something genuinely beautiful. Here's how to start — even if neither you nor your child can draw.",
+    readTime: '7 min read',
+    slug: 'nature-journalling-beginners-guide',
+    bg: 'linear-gradient(135deg,#6B4F35,#9E7B5A)',
+  },
+  {
+    cat: 'Irish Language',
+    date: '8 Feb 2026',
+    title: "Bringing Irish into everyday family life (without it feeling like homework)",
+    titleEm: 'everyday',
+    excerpt: "For most Irish families, the language lives inside school gates and rarely escapes. But Irish is full of beautiful words for the natural world — and learning them together, in context, is far more effective than any worksheet.",
+    readTime: '8 min read',
+    slug: 'irish-language-family-life',
+    bg: 'linear-gradient(135deg,#1A1612,#3D2B1F)',
+  },
 ];
 
-const categories = ['All','Seasonal','Homeschool','Activities','Irish Heritage','Family Life','Practical'];
+const categories = ['All','Seasonal Guides','Homeschool','Nature & Outdoors','Science','Arts & Creativity','Irish Language','Food & Cooking'];
 
 export default function Blog() {
   return (
@@ -38,66 +82,64 @@ export default function Blog() {
       <main className="page-pad">
         <div className="page-hero">
           <div className="container">
-            <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">Guides & ideas</span></div>
+            <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">Guides &amp; ideas</span></div>
             <h1>The Hedge <em>journal</em></h1>
-            <p className="page-hero-desc">Practical guides, seasonal ideas, and honest writing about family learning in Ireland. No fluff, no American templates.</p>
+            <p className="page-hero-desc">Seasonal activity guides, homeschooling in Ireland, outdoor learning, and practical ideas for making family life richer — wherever you live in Ireland.</p>
           </div>
         </div>
 
-        <section className="section" aria-labelledby="featured-heading">
+        <section className="section" aria-labelledby="blog-title">
           <div className="container">
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Featured article</span></div>
-            <h2 className="section-title" id="featured-heading" style={{marginBottom:24}}>Essential <em>reading</em></h2>
-            <Link href={`/blog/${featured.slug}`} className="blog-card" style={{display:'block',borderRadius:20,overflow:'hidden',textDecoration:'none'}}>
-              <div style={{height:220,background:featured.gradient,display:'flex',alignItems:'flex-end',padding:'28px 32px'}}>
-                <span style={{fontSize:11,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',background:'rgba(245,240,228,0.15)',color:'var(--parchment)',padding:'4px 10px',borderRadius:3}}>{featured.cat}</span>
-              </div>
-              <div style={{padding:'28px 28px 32px'}}>
-                <div style={{display:'flex',gap:12,marginBottom:12}}>
-                  <span style={{fontSize:11,color:'var(--clay)'}}>{featured.date}</span>
-                  <span style={{fontSize:11,color:'var(--clay)'}}>· {featured.readTime}</span>
-                </div>
-                <h3 style={{fontFamily:'var(--font-display)',fontSize:'clamp(22px,4vw,34px)',fontWeight:400,color:'var(--ink)',lineHeight:1.15,marginBottom:12}}>{featured.title}</h3>
-                <p style={{fontSize:14,color:'var(--clay)',lineHeight:1.65,marginBottom:16}}>{featured.excerpt}</p>
-                <span style={{fontSize:13,fontWeight:600,color:'var(--forest)',display:'flex',alignItems:'center',gap:5}}>Read article <Icon id="arrow-r" size={14} /></span>
-              </div>
-            </Link>
+            {/* Categories */}
+            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:40}} role="navigation" aria-label="Blog categories">
+              {categories.map((c,i) => (
+                <button key={c} style={{padding:'7px 14px',borderRadius:4,border:i===0?'1.5px solid var(--forest)':'1px solid var(--stone)',background:i===0?'var(--forest)':'transparent',color:i===0?'var(--parchment)':'var(--clay)',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'var(--font-heading)'}}>{c}</button>
+              ))}
+            </div>
+
+            <h2 className="section-title" id="blog-title" style={{marginBottom:32}}>Latest <em>articles</em></h2>
+            <div className="blog-grid">
+              {posts.map(p => (
+                <article key={p.slug} className="blog-card" itemScope itemType="https://schema.org/Article">
+                  <div className="blog-img-placeholder" style={{background:p.bg}}>
+                    <Icon id="leaf" size={32} color="rgba(255,255,255,0.15)" />
+                  </div>
+                  <div className="blog-content">
+                    <div className="blog-meta">
+                      <span className="blog-cat" itemProp="articleSection">{p.cat}</span>
+                      <span className="blog-date"><time itemProp="datePublished">{p.date}</time></span>
+                      <span style={{fontSize:11,color:'var(--clay)'}}>{p.readTime}</span>
+                    </div>
+                    <h2 className="blog-title" itemProp="headline">{p.title.replace(p.titleEm, '')}<em>{p.titleEm}</em></h2>
+                    <p className="blog-excerpt" itemProp="description">{p.excerpt}</p>
+                    <Link href={`/blog/${p.slug}`} className="blog-read" aria-label={`Read: ${p.title}`}>
+                      Read article <Icon id="arrow-r" size={12} />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="section section-linen" aria-labelledby="all-posts-heading">
-          <div className="container">
-            <h2 className="section-title" id="all-posts-heading" style={{marginBottom:28}}>All <em>articles</em></h2>
-            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:32}} role="list" aria-label="Blog categories">
-              {categories.map((c,i) => (
-                <span key={c} style={{padding:'7px 16px',borderRadius:4,border:`1px solid ${i===0?'var(--forest)':'var(--stone)'}`,background:i===0?'var(--forest)':'transparent',color:i===0?'var(--parchment)':'var(--clay)',fontSize:13,fontWeight:i===0?700:500,display:'inline-block'}}>
-                  {c}
-                </span>
-              ))}
+        {/* NEWSLETTER */}
+        <section className="section section-forest" aria-labelledby="nl-title">
+          <div className="container" style={{maxWidth:600,textAlign:'center'}}>
+            <div className="eyebrow eyebrow-sage" style={{justifyContent:'center'}}><div className="eyebrow-line" /><span className="eyebrow-text">Stay in the loop</span></div>
+            <h2 className="section-title section-title-light" id="nl-title">New guides <em>every fortnight</em></h2>
+            <p style={{fontFamily:'var(--font-serif)',fontSize:16,color:'rgba(189,212,176,0.75)',lineHeight:1.7,marginBottom:28}}>Seasonal activity ideas, homeschool guides, and platform updates — delivered to Irish families every fortnight. No spam, ever.</p>
+            <div style={{display:'flex',gap:10,flexDirection:'column',maxWidth:440,margin:'0 auto'}}>
+              <input type="email" placeholder="your@email.ie" style={{background:'rgba(245,240,228,0.08)',border:'1px solid rgba(245,240,228,0.15)',color:'var(--parchment)',borderRadius:4,padding:'14px 18px',fontSize:14,fontFamily:'var(--font-heading)',outline:'none',width:'100%'}} />
+              <button style={{background:'var(--sage)',color:'var(--forest)',border:'none',borderRadius:4,padding:'14px 22px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'var(--font-heading)'}}>Subscribe — it&apos;s free</button>
             </div>
-            <div className="blog-grid">
-              {articles.map(a => (
-                <Link key={a.slug} href={`/blog/${a.slug}`} className="blog-card">
-                  <div className="blog-img-placeholder" style={{background:a.gradient,height:160}} />
-                  <div className="blog-content">
-                    <div className="blog-meta">
-                      <span className="blog-cat">{a.cat}</span>
-                      <span className="blog-date">{a.date} · {a.readTime}</span>
-                    </div>
-                    <h3 className="blog-title">{a.title}</h3>
-                    <p className="blog-excerpt">{a.excerpt}</p>
-                    <span className="blog-read">Read article <Icon id="arrow-r" size={13} /></span>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <p style={{fontSize:11,color:'rgba(143,175,126,0.4)',marginTop:12}}>Unsubscribe any time. We&apos;ll never share your email.</p>
           </div>
         </section>
 
         <div className="cta-band">
           <div className="container">
-            <h2>Put the ideas <em>into practice</em></h2>
-            <p>The Hedge turns these ideas into personalised daily plans for your family, automatically.</p>
+            <h2>Put the ideas into <em>practice</em></h2>
+            <p>The Hedge delivers personalised activity ideas for your family every morning — based on your children, your weather, and your world.</p>
             <div className="actions">
               <Link href="https://app.thehedge.ie/signup" className="btn-light">Start free today <Icon id="arrow-r" size={16} /></Link>
             </div>

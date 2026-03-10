@@ -10,6 +10,7 @@ const links = [
   { href: '/pricing', label: 'Pricing' },
   { href: '/community', label: 'Community' },
   { href: '/blog', label: 'Blog' },
+  { href: '/about', label: 'About' },
 ];
 
 export default function Nav({ active = '' }: { active?: string }) {

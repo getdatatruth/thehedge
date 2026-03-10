@@ -1,3 +1,4 @@
+import React from 'react';
 export const SVGDefs = () => (
   <svg width="0" height="0" style={{position:'absolute'}}>
     <defs>
@@ -86,10 +87,10 @@ export const SVGDefs = () => (
   </svg>
 );
 
-export const Icon = ({ id, size = 18, color = 'currentColor', className = '' }: {
-  id: string; size?: number; color?: string; className?: string;
+export const Icon = ({ id, size = 18, color = 'currentColor', className = '', style }: {
+  id: string; size?: number; color?: string; className?: string; style?: React.CSSProperties;
 }) => (
-  <svg width={size} height={size} style={{color}} className={className} aria-hidden="true">
+  <svg width={size} height={size} style={{color, ...style}} className={className} aria-hidden="true">
     <use href={`#ic-${id}`} />
   </svg>
 );

@@ -1,30 +1,59 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Nav from '../../components/Nav';
+import FAQ from '../../components/FAQ';
 import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
   title: 'How The Hedge Works — Setup in 2 Minutes',
-  description: 'See how The Hedge creates personalised daily activity plans for your Irish family — powered by your location, weather, and your children\'s ages and interests.',
+  description: 'See exactly how The Hedge works: tell us about your family, we check the weather, your daily brief arrives every morning. Free to start.',
   alternates: { canonical: 'https://thehedge.ie/how-it-works' },
 };
 
 const steps = [
-  { num: '01', id: 'users', title: 'Create your family profile', body: 'Tell us your children\'s names, ages, and what they love. Do they go wild for dinosaurs? Obsessed with cooking? Prefer building to drawing? The Hedge uses this to filter and personalise every single suggestion from day one.', detail: 'Takes about 2 minutes. You can edit it any time.' },
-  { num: '02', id: 'map', title: 'We pin your county', body: 'The Hedge connects to live weather data for your exact county — not just "Ireland". A sunny morning in Cork is different to a blustery afternoon in Donegal. Your activity feed reflects that, every morning.', detail: 'Covers all 32 counties of Ireland.' },
-  { num: '03', id: 'cal', title: 'Your morning brief arrives', body: 'Before 8am every day, your activity feed is ready. Three to five ideas for today: two outdoor (if weather permits), two indoor, and one wild card. Each with full instructions, age notes, and a list of what you need.', detail: 'No prep required. Just open the app.' },
-  { num: '04', id: 'spark', title: 'The AI learns your family', body: 'Every time you mark an activity done, rate it, or skip it, The Hedge learns. Over time, suggestions become uncannily accurate — not just age-appropriate, but your-family-appropriate.', detail: 'The longer you use it, the better it gets.' },
-  { num: '05', id: 'book', title: 'Log, reflect, remember', body: 'Every completed activity is saved to your family\'s timeline. A beautiful record of what you did, when, and what your children discovered. Homeschoolers can export this as an AEARS-ready learning log.', detail: 'Your family\'s story, beautifully kept.' },
-  { num: '06', id: 'leaf', title: 'Plan your week ahead', body: 'Use the weekly planner to map out your days in advance. Drag in activities, block out commitments, and see a full picture of the week ahead — balanced across subjects, energy levels, and weather forecasts.', detail: 'On Family and Educator plans.' },
+  {
+    n:'01', id:'users',
+    title:'Create your family profile',
+    time:'Takes 2 minutes',
+    body:"Tell us your children's names and ages, what they love (nature, art, science, sport), and what space you have — garden, apartment, access to the countryside. That's it. The Hedge handles everything else.",
+    details:["Children's ages 2–16 supported","Multi-child households handled gracefully","Update anytime as interests change","Optional: dietary, learning, and accessibility notes"],
+  },
+  {
+    n:'02', id:'sun',
+    title:'We check your weather every morning',
+    time:'Automatic, every day',
+    body:"Each morning, The Hedge pulls live weather data from Open-Meteo for your specific county. 16°C and sunny in Wicklow? Outdoor adventure it is. 8°C and horizontal rain in Mayo? We&apos;ve got a full day of indoor magic ready.",
+    details:["Live forecast data for all 32 counties","Adjusts for morning vs afternoon changes","Season-aware: activities shift as the year progresses","Met Éireann data integration"],
+  },
+  {
+    n:'03', id:'spark',
+    title:'Your daily brief lands every morning',
+    time:'Ready when you wake up',
+    body:"Open The Hedge and see three perfectly matched activity ideas — one outdoor, one creative, one learning-focused. Each with a clear description, age guidance, and everything you&apos;ll need from around the house.",
+    details:["3 tailored suggestions every morning","Outdoor, creative, and learning categories","Step-by-step instructions included","What you&apos;ll need, sourced from home"],
+  },
+  {
+    n:'04', id:'cal',
+    title:'Plan your week ahead',
+    time:'Optional but powerful',
+    body:"The weekly planner lets you drag activities into specific days, see a balanced view across all subjects and energy types, and share the week with a partner. Homeschool families can align to the NCCA curriculum automatically.",
+    details:["Drag-and-drop weekly calendar","Balance across subjects and energy levels","Share with co-parents","NCCA curriculum alignment (Educator plan)"],
+  },
+  {
+    n:'05', id:'leaf',
+    title:'Log it. Keep it forever.',
+    time:'One tap, done',
+    body:"Tap to mark an activity done and it joins your family&apos;s timeline — a rolling, searchable record of everything you&apos;ve made, explored, and learned together. The kind of thing you&apos;ll want to show your children when they&apos;re older.",
+    details:["One-tap activity logging","Photo attachment supported","Searchable timeline","AEARS-compliant reports (Educator plan)"],
+  },
 ];
 
 const faqs = [
-  { q: 'How long does setup take?', a: 'Most families are up and running in under 3 minutes. We ask about your children\'s ages, what they enjoy, and your county. That\'s it. You can always add more detail later.' },
-  { q: 'Does it work for single-child families?', a: 'Absolutely. The Hedge works just as well for one child as for four. Activities are always tailored to the specific age and interests you\'ve set.' },
-  { q: 'What if I live in a rural area?', a: 'The Hedge was built in West Cork — rural Ireland is in our DNA. Many of our best activities are designed for families with access to fields, hedgerows, beaches, and bogs.' },
-  { q: 'Can I use it for weekend planning only?', a: 'Yes. You can set your planning preferences to weekends only, school holidays only, or every day. It\'s completely flexible.' },
-  { q: 'Is The Hedge only for young children?', a: 'We cover ages 2–14. Activities are filtered by age and get more complex as children grow. Teenagers will find The Hedge genuinely interesting, not babyish.' },
+  { q:"How long does setup take?", a:"Most families are set up and receiving their first brief within 2–3 minutes. We ask for the essentials only — children's ages, a few interest categories, your county. You can fill in more detail later." },
+  { q:"What if I don't have a garden?", a:"No problem at all. The Hedge knows whether you have outdoor space and adjusts accordingly. Apartment families get a completely different mix — community parks, indoor projects, sensory play, and urban exploration activities." },
+  { q:"Can I use it for multiple children of different ages?", a:"Absolutely — this is one of The Hedge's strengths. You tell us each child's age and interests separately, and we suggest activities that work across the age range, as well as age-specific suggestions for one-on-one time." },
+  { q:"What if I want to skip a suggestion?", a:"Just swipe it away. The Hedge will generate a replacement. The more you skip and select, the better our suggestions get — the AI learns your family's preferences over time." },
 ];
 
 export default function HowItWorks() {
@@ -34,29 +63,33 @@ export default function HowItWorks() {
       <main className="page-pad">
         <div className="page-hero">
           <div className="container">
-            <div className="page-hero-eyebrow">
-              <div className="page-hero-eyebrow-line" />
-              <span className="page-hero-eyebrow-text">Simple by design</span>
-            </div>
-            <h1>How The Hedge <em>works</em></h1>
-            <p className="page-hero-desc">From your first morning cup of tea to a full year of family memories — here&apos;s exactly what happens when you join The Hedge.</p>
+            <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">Getting started</span></div>
+            <h1>Up and running in <em>2 minutes</em></h1>
+            <p className="page-hero-desc">No lengthy onboarding, no complicated setup. Tell us about your family and your first activity brief arrives tomorrow morning.</p>
           </div>
         </div>
 
-        <section className="section" aria-labelledby="steps-heading">
+        {/* STEPS */}
+        <section className="section" aria-labelledby="steps-title">
           <div className="container">
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Step by step</span></div>
-            <h2 className="section-title" id="steps-heading">Six steps to your <em>family&apos;s rhythm</em></h2>
-            <div className="steps" style={{marginTop:32}}>
-              {steps.map(s => (
-                <div className="step" key={s.num}>
-                  <div className="step-num">{s.num}</div>
-                  <div>
-                    <div className="step-ic"><Icon id={s.id} size={16} color="var(--moss)" /></div>
-                    <div className="step-title">{s.title}</div>
-                    <div className="step-body">{s.body}</div>
-                    <div style={{fontSize:12,color:'var(--terracotta)',fontWeight:600,marginTop:8,display:'flex',alignItems:'center',gap:5}}>
-                      <Icon id="check" size={11} color="var(--terracotta)" />{s.detail}
+            <h2 className="section-title" id="steps-title" style={{marginBottom:48}}>Five steps to <em>a richer family life</em></h2>
+            <div style={{display:'grid',gap:0}}>
+              {steps.map((s, i) => (
+                <div key={s.n} style={{display:'grid',gap:24,padding:'48px 0',borderBottom:'1px solid var(--stone)',gridTemplateColumns:'1fr'}} aria-label={`Step ${s.n}: ${s.title}`}>
+                  <div style={{display:'flex',gap:20,alignItems:'flex-start'}}>
+                    <div style={{fontFamily:'var(--font-display)',fontSize:'clamp(48px,8vw,80px)',fontWeight:300,color:'var(--stone)',lineHeight:1,flexShrink:0,minWidth:'1ch'}}>{s.n}</div>
+                    <div style={{flex:1}}>
+                      <div style={{display:'inline-flex',alignItems:'center',gap:6,background:'rgba(61,97,66,0.08)',borderRadius:4,padding:'4px 10px',fontSize:11,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--terracotta)',marginBottom:12}}>{s.time}</div>
+                      <h3 style={{fontFamily:'var(--font-display)',fontSize:'clamp(24px,4vw,36px)',fontWeight:400,color:'var(--ink)',marginBottom:12,lineHeight:1.1}}>{s.title}</h3>
+                      <p style={{fontFamily:'var(--font-serif)',fontSize:'clamp(15px,2vw,17px)',color:'var(--clay)',lineHeight:1.7,marginBottom:20}} dangerouslySetInnerHTML={{__html:s.body}} />
+                      <ul style={{listStyle:'none',display:'flex',flexDirection:'column',gap:8}}>
+                        {s.details.map(d => (
+                          <li key={d} style={{display:'flex',gap:8,alignItems:'center',fontSize:14,color:'var(--umber)'}}>
+                            <Icon id="check" size={14} color="var(--moss)" />
+                            {d}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>
@@ -65,31 +98,48 @@ export default function HowItWorks() {
           </div>
         </section>
 
-        <section className="section section-linen" aria-labelledby="faq-heading">
-          <div className="container" style={{maxWidth:720}}>
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Questions answered</span></div>
-            <h2 className="section-title" id="faq-heading">Frequently asked <em>questions</em></h2>
-            <div className="faq" role="list">
-              {faqs.map((f, i) => (
-                <details key={i} className="faq-item" role="listitem">
-                  <summary className="faq-q">
-                    <span className="faq-q-text">{f.q}</span>
-                    <div className="faq-icon"><Icon id="plus" size={12} color="var(--parchment)" /></div>
-                  </summary>
-                  <div className="faq-a"><div className="faq-a-inner">{f.a}</div></div>
-                </details>
+        {/* WHAT YOU GET */}
+        <section className="section section-linen" aria-labelledby="wug-title">
+          <div className="container">
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">What&apos;s in every brief</span></div>
+            <h2 className="section-title" id="wug-title">Everything you need, <em>nothing you don&apos;t</em></h2>
+            <div style={{display:'grid',gap:14,gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',marginTop:32}}>
+              {[
+                { id:'spark', title:'Personalised for your family', body:"Not generic. Every suggestion uses your children's ages, interests, what you've done recently, and what the weather is doing." },
+                { id:'sun', title:'Weather-matched daily', body:"Automatically adjusts between outdoor and indoor based on your local forecast — without you having to touch a setting." },
+                { id:'leaf', title:'Rooted in Irish nature', body:"Seasonal activities that match what's actually happening in Ireland right now — berries in autumn, lambs in spring, winter stargazing." },
+                { id:'book', title:'Curriculum-connected', body:"Every activity links to at least one NCCA strand. Perfect for homeschoolers, but visible for all families who want to know the learning behind the fun." },
+                { id:'cal', title:'Ready to use immediately', body:"Step-by-step instructions, suggested timing, and a list of what you'll need — nearly always things already in your home." },
+                { id:'users', title:'Scales as they grow', body:"Update your children's ages and interests any time. The Hedge adapts every suggestion accordingly — no manual reconfiguration." },
+              ].map(c => (
+                <div key={c.title} style={{background:'white',borderRadius:14,padding:'24px 20px',border:'1px solid var(--stone)'}}>
+                  <div style={{width:38,height:38,borderRadius:9,background:'rgba(61,97,66,0.08)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:14}}>
+                    <Icon id={c.id} size={18} color="var(--moss)" />
+                  </div>
+                  <div style={{fontSize:15,fontWeight:700,color:'var(--ink)',marginBottom:7}}>{c.title}</div>
+                  <div style={{fontSize:13,color:'var(--clay)',lineHeight:1.65}}>{c.body}</div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
+        {/* FAQ */}
+        <section className="section" aria-labelledby="hiw-faq-title">
+          <div className="container" style={{maxWidth:760}}>
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Questions</span></div>
+            <h2 className="section-title" id="hiw-faq-title">A few more <em>answers</em></h2>
+            <FAQ items={faqs} />
+          </div>
+        </section>
+
         <div className="cta-band">
           <div className="container">
-            <h2>Ready to see it <em>in action?</em></h2>
-            <p>Start for free — no credit card needed. Your first morning brief will arrive tomorrow.</p>
+            <h2>Ready to get <em>started?</em></h2>
+            <p>Create your family profile and your first activity brief arrives tomorrow morning. Free, always.</p>
             <div className="actions">
-              <Link href="https://app.thehedge.ie/signup" className="btn-light">Create your family profile <Icon id="arrow-r" size={16} /></Link>
-              <Link href="/pricing" className="btn-ghost" style={{color:'var(--mist)'}}>See pricing <Icon id="arrow-r" size={14} /></Link>
+              <Link href="https://app.thehedge.ie/signup" className="btn-light">Start free — 2 minutes <Icon id="arrow-r" size={16} /></Link>
+              <Link href="/pricing" className="btn-ghost" style={{color:'var(--mist)'}}>See pricing</Link>
             </div>
           </div>
         </div>
