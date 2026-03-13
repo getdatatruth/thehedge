@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/stores/onboarding-store';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -14,10 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
 
 export function StepPractical() {
-  const router = useRouter();
-  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +24,7 @@ export function StepPractical() {
     messComfort,
     updateField,
     prevStep,
-    // Full state for submission
+    nextStep,
     familyName,
     country,
     county,
@@ -43,71 +40,32 @@ export function StepPractical() {
     setError(null);
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setError('You must be signed in to complete onboarding.');
-        setLoading(false);
-        return;
-      }
-
-      // Create family
-      const { data: family, error: familyError } = await supabase
-        .from('families')
-        .insert({
-          name: familyName,
+      const res = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          familyName,
           country,
-          county: county || null,
-          family_style: familyStyle,
-          onboarding_completed: true,
-        })
-        .select()
-        .single();
+          county,
+          children,
+          familyStyle,
+          ideaTimes,
+          weekendPlanning,
+          holidayPlanning,
+          hasOutdoorSpace,
+          carActivities,
+          messComfort,
+        }),
+      });
 
-      if (familyError) throw familyError;
+      const data = await res.json();
 
-      // Update user profile with family_id
-      const { error: userError } = await supabase
-        .from('users')
-        .upsert({
-          id: user.id,
-          family_id: family.id,
-          name: user.user_metadata?.name || user.email?.split('@')[0] || 'User',
-          email: user.email!,
-          role: 'owner',
-          notification_prefs: {
-            morning_idea: true,
-            weekend_plan: weekendPlanning,
-            weekly_summary: true,
-            community: true,
-          },
-        });
-
-      if (userError) throw userError;
-
-      // Create children
-      if (children.length > 0) {
-        const childInserts = children.map((child) => ({
-          family_id: family.id,
-          name: child.name,
-          date_of_birth: child.dateOfBirth,
-          interests: child.interests,
-          school_status: child.schoolStatus,
-          sen_flags: child.senFlags,
-          learning_style: child.learningStyle,
-        }));
-
-        const { error: childrenError } = await supabase
-          .from('children')
-          .insert(childInserts);
-
-        if (childrenError) throw childrenError;
+      if (!res.ok) {
+        throw new Error(data.error || 'Something went wrong. Please try again.');
       }
 
-      router.push('/dashboard');
-      router.refresh();
+      // Move to completion step
+      nextStep();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Something went wrong. Please try again.'
@@ -119,16 +77,16 @@ export function StepPractical() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-green-800">
+        <h2 className="font-display text-xl font-semibold text-ink">
           Nearly there! A few practical bits.
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-clay mt-1 font-serif">
           So we suggest activities that actually work for you.
         </p>
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center gap-3 rounded-lg border border-stone-200 p-4">
+        <div className="flex items-center gap-3 rounded-[14px] border border-stone p-4">
           <Checkbox
             id="outdoor"
             checked={hasOutdoorSpace}
@@ -136,12 +94,12 @@ export function StepPractical() {
               updateField('hasOutdoorSpace', checked === true)
             }
           />
-          <Label htmlFor="outdoor">
+          <Label htmlFor="outdoor" className="text-umber">
             We have outdoor space (garden, yard, balcony)
           </Label>
         </div>
 
-        <div className="flex items-center gap-3 rounded-lg border border-stone-200 p-4">
+        <div className="flex items-center gap-3 rounded-[14px] border border-stone p-4">
           <Checkbox
             id="car"
             checked={carActivities}
@@ -149,20 +107,20 @@ export function StepPractical() {
               updateField('carActivities', checked === true)
             }
           />
-          <Label htmlFor="car">
+          <Label htmlFor="car" className="text-umber">
             We spend time in the car (include car-friendly ideas)
           </Label>
         </div>
 
         <div className="space-y-2">
-          <Label>How do you feel about mess?</Label>
+          <Label className="text-umber">How do you feel about mess?</Label>
           <Select
             value={messComfort}
             onValueChange={(v) =>
               updateField('messComfort', v as 'none' | 'low' | 'medium' | 'high')
             }
           >
-            <SelectTrigger>
+            <SelectTrigger className="border-stone">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -180,19 +138,26 @@ export function StepPractical() {
       </div>
 
       {error && (
-        <p className="text-sm text-red-600">{error}</p>
+        <p className="text-sm text-rust">{error}</p>
       )}
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={prevStep}>
+        <Button variant="ghost" onClick={prevStep} className="text-clay" disabled={loading}>
           Back
         </Button>
         <Button
           onClick={handleComplete}
           disabled={loading}
-          className="bg-green-700 hover:bg-green-800"
+          className="btn-primary"
         >
-          {loading ? 'Setting up your family...' : 'Start exploring'}
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Setting up your family...
+            </>
+          ) : (
+            'Start exploring'
+          )}
         </Button>
       </div>
     </div>

@@ -50,10 +50,10 @@ export function StepFamilyStyle() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-green-800">
+        <h2 className="font-display text-xl font-semibold text-ink">
           What&apos;s your family style?
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-clay mt-1 font-serif">
           This helps us suggest the right activities. You can change this later.
         </p>
       </div>
@@ -63,36 +63,37 @@ export function StepFamilyStyle() {
           <button
             key={value}
             onClick={() => updateField('familyStyle', value)}
-            className={`flex items-start gap-4 rounded-lg border p-4 text-left transition-colors ${
+            className={`flex items-start gap-4 rounded-[14px] border p-4 text-left transition-all ${
               familyStyle === value
-                ? 'border-green-600 bg-green-50 ring-1 ring-green-600'
-                : 'border-stone-200 hover:border-green-300 hover:bg-stone-50'
+                ? 'border-moss bg-forest/5 ring-1 ring-moss'
+                : 'border-stone hover:border-moss/50 hover:bg-linen'
             }`}
           >
             <div
-              className={`rounded-lg p-2 ${
+              className={`rounded-[14px] p-2 ${
                 familyStyle === value
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-stone-100 text-stone-500'
+                  ? 'bg-forest/10 text-forest'
+                  : 'bg-linen text-clay'
               }`}
             >
               <Icon className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-medium">{label}</p>
-              <p className="text-sm text-muted-foreground">{description}</p>
+              <p className="font-medium text-umber">{label}</p>
+              <p className="text-sm text-clay font-serif">{description}</p>
             </div>
           </button>
         ))}
       </div>
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={prevStep}>
+        <Button variant="ghost" onClick={prevStep} className="text-clay">
           Back
         </Button>
         <Button
           onClick={nextStep}
-          className="bg-green-700 hover:bg-green-800"
+          disabled={!familyStyle}
+          className="btn-primary"
         >
           Next
         </Button>

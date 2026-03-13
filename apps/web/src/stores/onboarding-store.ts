@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { FamilyStyle, SchoolStatus, LearningStyle } from '@/types/database';
 
 export interface ChildData {
@@ -69,42 +70,61 @@ const initialState: OnboardingState = {
 };
 
 export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
-  (set) => ({
-    ...initialState,
+  persist(
+    (set) => ({
+      ...initialState,
 
-    setStep: (step) => set({ step }),
-    nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 5) })),
-    prevStep: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
+      setStep: (step) => set({ step }),
+      nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 6) })),
+      prevStep: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
 
-    updateField: (key, value) => set({ [key]: value }),
+      updateField: (key, value) => set({ [key]: value }),
 
-    addChild: () =>
-      set((state) => ({
-        children: [
-          ...state.children,
-          {
-            name: '',
-            dateOfBirth: '',
-            interests: [],
-            schoolStatus: 'mainstream' as SchoolStatus,
-            senFlags: [],
-            learningStyle: null,
-          },
-        ],
-      })),
+      addChild: () =>
+        set((state) => ({
+          children: [
+            ...state.children,
+            {
+              name: '',
+              dateOfBirth: '',
+              interests: [],
+              schoolStatus: 'mainstream' as SchoolStatus,
+              senFlags: [],
+              learningStyle: null,
+            },
+          ],
+        })),
 
-    removeChild: (index) =>
-      set((state) => ({
-        children: state.children.filter((_, i) => i !== index),
-      })),
+      removeChild: (index) =>
+        set((state) => ({
+          children: state.children.filter((_, i) => i !== index),
+        })),
 
-    updateChild: (index, data) =>
-      set((state) => ({
-        children: state.children.map((child, i) =>
-          i === index ? { ...child, ...data } : child
-        ),
-      })),
+      updateChild: (index, data) =>
+        set((state) => ({
+          children: state.children.map((child, i) =>
+            i === index ? { ...child, ...data } : child
+          ),
+        })),
 
-    reset: () => set(initialState),
-  })
+      reset: () => set(initialState),
+    }),
+    {
+      name: 'hedge-onboarding',
+      partialize: (state) => ({
+        step: state.step,
+        familyName: state.familyName,
+        country: state.country,
+        county: state.county,
+        children: state.children,
+        familyStyle: state.familyStyle,
+        ideaTimes: state.ideaTimes,
+        weekendPlanning: state.weekendPlanning,
+        holidayPlanning: state.holidayPlanning,
+        hasOutdoorSpace: state.hasOutdoorSpace,
+        carActivities: state.carActivities,
+        messComfort: state.messComfort,
+      }),
+    }
+  )
 );

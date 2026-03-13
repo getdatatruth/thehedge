@@ -89,6 +89,7 @@ export const families = pgTable('families', {
   familyStyle: familyStyleEnum('family_style').default('balanced'),
   timezone: text('timezone').notNull().default('Europe/Dublin'),
   stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
   subscriptionTier: subscriptionTierEnum('subscription_tier').notNull().default('free'),
   subscriptionStatus: subscriptionStatusEnum('subscription_status').notNull().default('active'),
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
@@ -268,6 +269,25 @@ export const communityMemberships = pgTable('community_memberships', {
   role: communityMemberRoleEnum('role').notNull().default('member'),
   joinedAt: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// ─── Collections ─────────────────────────────────────
+
+export const collections = pgTable('collections', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: text('title').notNull(),
+  slug: text('slug').notNull(),
+  description: text('description'),
+  emoji: text('emoji'),
+  activityIds: jsonb('activity_ids').$type<string[]>().notNull().default([]),
+  featured: boolean('featured').notNull().default(false),
+  seasonal: boolean('seasonal').notNull().default(false),
+  eventDate: text('event_date'),
+  published: boolean('published').notNull().default(true),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('collections_slug_idx').on(table.slug),
+]);
 
 export const events = pgTable('events', {
   id: uuid('id').primaryKey().defaultRandom(),

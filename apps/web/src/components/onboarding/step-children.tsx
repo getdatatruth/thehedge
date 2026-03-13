@@ -40,10 +40,10 @@ export function StepChildren() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-green-800">
+        <h2 className="font-display text-xl font-semibold text-ink">
           Your children
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-clay mt-1 font-serif">
           So we can personalise ideas to their ages and interests.
         </p>
       </div>
@@ -51,10 +51,10 @@ export function StepChildren() {
       {children.map((child, index) => (
         <div
           key={index}
-          className="space-y-4 rounded-lg border border-stone-200 bg-white p-4"
+          className="space-y-4 rounded-[14px] border border-stone bg-linen p-4"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-green-800">
+            <h3 className="text-sm font-medium text-forest">
               Child {index + 1}
             </h3>
             {children.length > 1 && (
@@ -62,6 +62,7 @@ export function StepChildren() {
                 variant="ghost"
                 size="sm"
                 onClick={() => removeChild(index)}
+                className="text-clay hover:text-rust"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -70,36 +71,38 @@ export function StepChildren() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label>Name</Label>
+              <Label className="text-umber">Name</Label>
               <Input
                 placeholder="Child's name"
                 value={child.name}
                 onChange={(e) =>
                   updateChild(index, { name: e.target.value })
                 }
+                className="border-stone focus:border-moss"
               />
             </div>
             <div className="space-y-2">
-              <Label>Date of birth</Label>
+              <Label className="text-umber">Date of birth</Label>
               <Input
                 type="date"
                 value={child.dateOfBirth}
                 onChange={(e) =>
                   updateChild(index, { dateOfBirth: e.target.value })
                 }
+                className="border-stone focus:border-moss"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>School status</Label>
+            <Label className="text-umber">School status</Label>
             <Select
               value={child.schoolStatus}
               onValueChange={(v) =>
                 updateChild(index, { schoolStatus: v as SchoolStatus })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="border-stone">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -111,7 +114,7 @@ export function StepChildren() {
           </div>
 
           <div className="space-y-2">
-            <Label>What do they love?</Label>
+            <Label className="text-umber">What do they love?</Label>
             <div className="flex flex-wrap gap-2">
               {INTEREST_OPTIONS.map((interest) => (
                 <Badge
@@ -119,10 +122,10 @@ export function StepChildren() {
                   variant={
                     child.interests.includes(interest) ? 'default' : 'outline'
                   }
-                  className={`cursor-pointer transition-colors ${
+                  className={`cursor-pointer rounded px-3 py-1 transition-all ${
                     child.interests.includes(interest)
-                      ? 'bg-green-700 hover:bg-green-800'
-                      : 'hover:bg-green-50'
+                      ? 'bg-forest text-parchment hover:bg-moss border-0'
+                      : 'border-stone text-clay hover:bg-forest/5'
                   }`}
                   onClick={() => toggleInterest(index, interest)}
                 >
@@ -137,20 +140,20 @@ export function StepChildren() {
       <Button
         variant="outline"
         onClick={addChild}
-        className="w-full border-dashed"
+        className="w-full border-dashed border-stone text-clay hover:bg-forest/5 hover:border-moss"
       >
         <Plus className="mr-2 h-4 w-4" />
         Add another child
       </Button>
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={prevStep}>
+        <Button variant="ghost" onClick={prevStep} className="text-clay">
           Back
         </Button>
         <Button
           onClick={nextStep}
           disabled={!canProceed}
-          className="bg-green-700 hover:bg-green-800"
+          className="btn-primary"
         >
           Next
         </Button>

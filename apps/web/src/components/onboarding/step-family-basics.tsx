@@ -30,32 +30,33 @@ export function StepFamilyBasics() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-green-800">
+        <h2 className="font-display text-xl font-semibold text-ink">
           Tell us about your family
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-clay mt-1 font-serif">
           Just the basics to get you started.
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="familyName">Family name</Label>
+          <Label htmlFor="familyName" className="text-umber">Family name</Label>
           <Input
             id="familyName"
             placeholder="e.g. The O'Briens"
             value={familyName}
             onChange={(e) => updateField('familyName', e.target.value)}
+            className="border-stone focus:border-moss"
           />
         </div>
 
         <div className="space-y-2">
-          <Label>Country</Label>
+          <Label className="text-umber">Country</Label>
           <Select
             value={country}
             onValueChange={(v) => { if (v) updateField('country', v); }}
           >
-            <SelectTrigger>
+            <SelectTrigger className="border-stone">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -68,12 +69,12 @@ export function StepFamilyBasics() {
 
         {country === 'IE' && (
           <div className="space-y-2">
-            <Label>County</Label>
+            <Label className="text-umber">County</Label>
             <Select
               value={county}
               onValueChange={(v) => { if (v) updateField('county', v); }}
             >
-              <SelectTrigger>
+              <SelectTrigger className="border-stone">
                 <SelectValue placeholder="Select your county" />
               </SelectTrigger>
               <SelectContent>
@@ -92,7 +93,7 @@ export function StepFamilyBasics() {
         <Button
           onClick={nextStep}
           disabled={!canProceed}
-          className="bg-green-700 hover:bg-green-800"
+          className="btn-primary"
         >
           Next
         </Button>

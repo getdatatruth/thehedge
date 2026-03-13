@@ -33,10 +33,10 @@ export function StepAvailability() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-green-800">
+        <h2 className="font-display text-xl font-semibold text-ink">
           When do you need ideas?
         </h2>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-clay mt-1 font-serif">
           We&apos;ll suggest activities at the right times.
         </p>
       </div>
@@ -46,22 +46,22 @@ export function StepAvailability() {
           <button
             key={value}
             onClick={() => toggleTime(value)}
-            className={`flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
+            className={`flex w-full items-center gap-3 rounded-[14px] border p-4 text-left transition-all ${
               ideaTimes.includes(value)
-                ? 'border-green-600 bg-green-50'
-                : 'border-stone-200 hover:border-green-300'
+                ? 'border-moss bg-forest/5'
+                : 'border-stone hover:border-moss/50'
             }`}
           >
             <Checkbox checked={ideaTimes.includes(value)} />
             <div>
-              <p className="font-medium">{label}</p>
-              <p className="text-sm text-muted-foreground">{description}</p>
+              <p className="font-medium text-umber">{label}</p>
+              <p className="text-sm text-clay font-serif">{description}</p>
             </div>
           </button>
         ))}
       </div>
 
-      <div className="space-y-4 rounded-lg border border-stone-200 p-4">
+      <div className="space-y-4 rounded-[14px] border border-stone p-4">
         <div className="flex items-center gap-3">
           <Checkbox
             id="weekend"
@@ -70,7 +70,7 @@ export function StepAvailability() {
               updateField('weekendPlanning', checked === true)
             }
           />
-          <Label htmlFor="weekend">
+          <Label htmlFor="weekend" className="text-umber">
             Send me a weekend plan every Thursday
           </Label>
         </div>
@@ -82,19 +82,19 @@ export function StepAvailability() {
               updateField('holidayPlanning', checked === true)
             }
           />
-          <Label htmlFor="holiday">
+          <Label htmlFor="holiday" className="text-umber">
             Send me holiday activity plans
           </Label>
         </div>
       </div>
 
       <div className="flex justify-between">
-        <Button variant="ghost" onClick={prevStep}>
+        <Button variant="ghost" onClick={prevStep} className="text-clay">
           Back
         </Button>
         <Button
           onClick={nextStep}
-          className="bg-green-700 hover:bg-green-800"
+          className="btn-primary"
         >
           Next
         </Button>
