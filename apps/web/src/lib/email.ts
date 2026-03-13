@@ -9,7 +9,13 @@ import {
   dataExportTemplate,
 } from './email-templates';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || key === 're_your-key') {
+    throw new Error('RESEND_API_KEY is not configured');
+  }
+  return new Resend(key);
+}
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'The Hedge <hello@thehedge.ie>';
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://thehedge.ie';
@@ -24,7 +30,7 @@ function replaceUrls(html: string): string {
 export async function sendWelcomeEmail(to: string, familyName: string) {
   const html = replaceUrls(welcomeTemplate(familyName));
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `Welcome to The Hedge, ${familyName}!`,
@@ -38,7 +44,7 @@ export async function sendActivityReminder(
 ) {
   const html = replaceUrls(activityReminderTemplate(activities));
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: "Today's activity ideas from The Hedge",
@@ -59,7 +65,7 @@ export async function sendWeeklySummary(
 ) {
   const html = replaceUrls(weeklySummaryTemplate(stats));
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `Your week: ${stats.activitiesCompleted} activities, ${stats.totalMinutes} minutes`,
@@ -72,7 +78,7 @@ export async function sendPasswordReset(to: string, resetLink: string) {
   // The Hedge branding for a consistent experience
   const html = replaceUrls(passwordResetTemplate(resetLink));
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: 'Reset your password - The Hedge',
@@ -90,7 +96,7 @@ export async function sendNotification(
     notificationTemplate(title, body, actionUrl ? `${APP_URL}${actionUrl}` : undefined)
   );
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: `${title} - The Hedge`,
@@ -101,7 +107,7 @@ export async function sendNotification(
 export async function sendAccountDeletedEmail(to: string, familyName: string) {
   const html = replaceUrls(accountDeletedTemplate(familyName));
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: 'Your account has been deleted - The Hedge',
@@ -112,7 +118,7 @@ export async function sendAccountDeletedEmail(to: string, familyName: string) {
 export async function sendDataExportEmail(to: string, familyName: string) {
   const html = replaceUrls(dataExportTemplate(familyName));
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM_EMAIL,
     to,
     subject: 'Your data export is ready - The Hedge',
