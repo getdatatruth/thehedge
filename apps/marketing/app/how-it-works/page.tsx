@@ -6,7 +6,7 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'How The Hedge Works — Setup in 2 Minutes',
+  title: 'How The Hedge Works - Setup in 2 Minutes',
   description: 'See exactly how The Hedge works: tell us about your family, we check the weather, your daily brief arrives every morning. Free to start.',
   alternates: { canonical: 'https://thehedge.ie/how-it-works' },
 };
@@ -16,7 +16,7 @@ const steps = [
     n:'01', id:'users',
     title:'Create your family profile',
     time:'Takes 2 minutes',
-    body:"Tell us your children's names and ages, what they love (nature, art, science, sport), and what space you have — garden, apartment, access to the countryside. That's it. The Hedge handles everything else.",
+    body:"Tell us your children's names and ages, what they love (nature, art, science, sport), and what space you have - garden, apartment, access to the countryside. That's it. The Hedge handles everything else.",
     details:["Children's ages 2–16 supported","Multi-child households handled gracefully","Update anytime as interests change","Optional: dietary, learning, and accessibility notes"],
   },
   {
@@ -30,7 +30,7 @@ const steps = [
     n:'03', id:'spark',
     title:'Your daily brief lands every morning',
     time:'Ready when you wake up',
-    body:"Open The Hedge and see three perfectly matched activity ideas — one outdoor, one creative, one learning-focused. Each with a clear description, age guidance, and everything you&apos;ll need from around the house.",
+    body:"Open The Hedge and see three perfectly matched activity ideas - one outdoor, one creative, one learning-focused. Each with a clear description, age guidance, and everything you&apos;ll need from around the house.",
     details:["3 tailored suggestions every morning","Outdoor, creative, and learning categories","Step-by-step instructions included","What you&apos;ll need, sourced from home"],
   },
   {
@@ -44,16 +44,16 @@ const steps = [
     n:'05', id:'leaf',
     title:'Log it. Keep it forever.',
     time:'One tap, done',
-    body:"Tap to mark an activity done and it joins your family&apos;s timeline — a rolling, searchable record of everything you&apos;ve made, explored, and learned together. The kind of thing you&apos;ll want to show your children when they&apos;re older.",
+    body:"Tap to mark an activity done and it joins your family&apos;s timeline - a rolling, searchable record of everything you&apos;ve made, explored, and learned together. The kind of thing you&apos;ll want to show your children when they&apos;re older.",
     details:["One-tap activity logging","Photo attachment supported","Searchable timeline","AEARS-compliant reports (Educator plan)"],
   },
 ];
 
 const faqs = [
-  { q:"How long does setup take?", a:"Most families are set up and receiving their first brief within 2–3 minutes. We ask for the essentials only — children's ages, a few interest categories, your county. You can fill in more detail later." },
-  { q:"What if I don't have a garden?", a:"No problem at all. The Hedge knows whether you have outdoor space and adjusts accordingly. Apartment families get a completely different mix — community parks, indoor projects, sensory play, and urban exploration activities." },
-  { q:"Can I use it for multiple children of different ages?", a:"Absolutely — this is one of The Hedge's strengths. You tell us each child's age and interests separately, and we suggest activities that work across the age range, as well as age-specific suggestions for one-on-one time." },
-  { q:"What if I want to skip a suggestion?", a:"Just swipe it away. The Hedge will generate a replacement. The more you skip and select, the better our suggestions get — the AI learns your family's preferences over time." },
+  { q:"How long does setup take?", a:"Most families are set up and receiving their first brief within 2–3 minutes. We ask for the essentials only - children's ages, a few interest categories, your county. You can fill in more detail later." },
+  { q:"What if I don't have a garden?", a:"No problem at all. The Hedge knows whether you have outdoor space and adjusts accordingly. Apartment families get a completely different mix - community parks, indoor projects, sensory play, and urban exploration activities." },
+  { q:"Can I use it for multiple children of different ages?", a:"Absolutely - this is one of The Hedge's strengths. You tell us each child's age and interests separately, and we suggest activities that work across the age range, as well as age-specific suggestions for one-on-one time." },
+  { q:"What if I want to skip a suggestion?", a:"Just swipe it away. The Hedge will generate a replacement. The more you skip and select, the better our suggestions get - the AI learns your family's preferences over time." },
 ];
 
 export default function HowItWorks() {
@@ -106,11 +106,11 @@ export default function HowItWorks() {
             <div style={{display:'grid',gap:14,gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',marginTop:32}}>
               {[
                 { id:'spark', title:'Personalised for your family', body:"Not generic. Every suggestion uses your children's ages, interests, what you've done recently, and what the weather is doing." },
-                { id:'sun', title:'Weather-matched daily', body:"Automatically adjusts between outdoor and indoor based on your local forecast — without you having to touch a setting." },
-                { id:'leaf', title:'Rooted in Irish nature', body:"Seasonal activities that match what's actually happening in Ireland right now — berries in autumn, lambs in spring, winter stargazing." },
+                { id:'sun', title:'Weather-matched daily', body:"Automatically adjusts between outdoor and indoor based on your local forecast - without you having to touch a setting." },
+                { id:'leaf', title:'Rooted in Irish nature', body:"Seasonal activities that match what's actually happening in Ireland right now - berries in autumn, lambs in spring, winter stargazing." },
                 { id:'book', title:'Curriculum-connected', body:"Every activity links to at least one NCCA strand. Perfect for homeschoolers, but visible for all families who want to know the learning behind the fun." },
-                { id:'cal', title:'Ready to use immediately', body:"Step-by-step instructions, suggested timing, and a list of what you'll need — nearly always things already in your home." },
-                { id:'users', title:'Scales as they grow', body:"Update your children's ages and interests any time. The Hedge adapts every suggestion accordingly — no manual reconfiguration." },
+                { id:'cal', title:'Ready to use immediately', body:"Step-by-step instructions, suggested timing, and a list of what you'll need - nearly always things already in your home." },
+                { id:'users', title:'Scales as they grow', body:"Update your children's ages and interests any time. The Hedge adapts every suggestion accordingly - no manual reconfiguration." },
               ].map(c => (
                 <div key={c.title} style={{background:'white',borderRadius:14,padding:'24px 20px',border:'1px solid var(--stone)'}}>
                   <div style={{width:38,height:38,borderRadius:9,background:'rgba(61,97,66,0.08)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:14}}>
@@ -138,7 +138,7 @@ export default function HowItWorks() {
             <h2>Ready to get <em>started?</em></h2>
             <p>Create your family profile and your first activity brief arrives tomorrow morning. Free, always.</p>
             <div className="actions">
-              <Link href="https://app.thehedge.ie/signup" className="btn-light">Start free — 2 minutes <Icon id="arrow-r" size={16} /></Link>
+              <Link href="https://app.thehedge.ie/signup" className="btn-light">Start free - 2 minutes <Icon id="arrow-r" size={16} /></Link>
               <Link href="/pricing" className="btn-ghost" style={{color:'var(--mist)'}}>See pricing</Link>
             </div>
           </div>

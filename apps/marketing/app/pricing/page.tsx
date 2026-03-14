@@ -6,7 +6,7 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'Pricing — Free, Family €6.99/mo, Educator €14.99/mo',
+  title: 'Pricing - Free, Family €6.99/mo, Educator €14.99/mo',
   description: 'Simple, fair pricing for Irish families. Free plan available. Family plan from €6.99/month. Educator plan with homeschool tools from €14.99/month. No contracts.',
   alternates: { canonical: 'https://thehedge.ie/pricing' },
 };
@@ -89,10 +89,10 @@ const plans = [
 ];
 
 const faqs = [
-  { q:"Is there really a free plan?", a:"Yes, genuinely free — not a trial. Our free plan gives you 1–2 activity ideas per day from a curated library, and 5 AI-personalised suggestions per week. No credit card required to sign up." },
-  { q:"What's included in the free trial?", a:"The 14-day free trial on paid plans gives you full access to every feature on your chosen plan — no restrictions. At the end of 14 days, you can continue by adding a payment method, or drop back to the free plan automatically." },
+  { q:"Is there really a free plan?", a:"Yes, genuinely free - not a trial. Our free plan gives you 1–2 activity ideas per day from a curated library, and 5 AI-personalised suggestions per week. No credit card required to sign up." },
+  { q:"What's included in the free trial?", a:"The 14-day free trial on paid plans gives you full access to every feature on your chosen plan - no restrictions. At the end of 14 days, you can continue by adding a payment method, or drop back to the free plan automatically." },
   { q:"Can I switch plans?", a:"Yes, any time. You can upgrade, downgrade, or cancel from your account settings. If you downgrade mid-cycle, you keep the current plan until the end of the billing period." },
-  { q:"Do you offer annual billing?", a:"Yes — pay annually and get roughly 2 months free on both paid plans. Annual pricing: Family €59.99/year (saves €23.89), Educator €134.99/year (saves €44.89)." },
+  { q:"Do you offer annual billing?", a:"Yes - pay annually and get roughly 2 months free on both paid plans. Annual pricing: Family €59.99/year (saves €23.89), Educator €134.99/year (saves €44.89)." },
   { q:"What payment methods do you accept?", a:"We accept all major credit and debit cards (Visa, Mastercard, Amex) via Stripe. All transactions are processed securely. We do not store card details." },
   { q:"Is there a family or group discount?", a:"We're working on group pricing for homeschool co-ops and parent groups. Get in touch at hello@thehedge.ie if you're enquiring for a group." },
 ];

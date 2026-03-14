@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { PlansClient } from './plans-client';
 
 export const metadata = {
-  title: 'Education Plans — The Hedge',
+  title: 'Education Plans - The Hedge',
 };
 
 export default async function PlansPage() {

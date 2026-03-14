@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { getWeather, getSeason } from '@/lib/weather';
 
 export const metadata = {
-  title: 'Ask The Hedge — HedgeAI',
+  title: 'Ask The Hedge - HedgeAI',
 };
 
 export default async function ChatPage() {

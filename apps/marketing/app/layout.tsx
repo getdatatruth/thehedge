@@ -3,11 +3,11 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://thehedge.ie'),
-  title: { default: 'The Hedge — Family Learning Platform for Irish Families', template: '%s | The Hedge' },
-  description: "Personalised, screen-free activities for Irish families — shaped by your children's ages, today's weather, and your world. Inspired by Ireland's hedge schools.",
+  title: { default: 'The Hedge - Family Learning Platform for Irish Families', template: '%s | The Hedge' },
+  description: "Personalised, screen-free activities for Irish families - shaped by your children's ages, today's weather, and your world. Inspired by Ireland's hedge schools.",
   keywords: ['family activities Ireland','homeschool Ireland','children activities Cork','family learning platform','hedge school Ireland','NCCA curriculum','AEARS homeschool'],
   authors: [{ name: 'The Hedge', url: 'https://thehedge.ie' }],
-  openGraph: { type: 'website', locale: 'en_IE', url: 'https://thehedge.ie', siteName: 'The Hedge', title: 'The Hedge — Family Learning Platform', description: "Personalised activities for Irish families, inspired by Ireland's hedge schools." },
+  openGraph: { type: 'website', locale: 'en_IE', url: 'https://thehedge.ie', siteName: 'The Hedge', title: 'The Hedge - Family Learning Platform', description: "Personalised activities for Irish families, inspired by Ireland's hedge schools." },
   twitter: { card: 'summary_large_image', title: 'The Hedge', description: "Screen-free family activities for Irish families." },
   robots: { index: true, follow: true },
 };

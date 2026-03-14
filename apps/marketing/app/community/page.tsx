@@ -6,7 +6,7 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'Community — Connect with Irish Families | The Hedge',
+  title: 'Community - Connect with Irish Families | The Hedge',
   description: 'Join The Hedge community. County-based groups, homeschool networks, seasonal activity sharing, and a growing network of Irish families learning together.',
   alternates: { canonical: 'https://thehedge.ie/community' },
 };

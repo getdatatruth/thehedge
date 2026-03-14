@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   // Category breakdown
   const categoryCount: Record<string, number> = {};
   for (const log of allLogs) {
-    // We'd need the activity category — simplified version
+    // We'd need the activity category - simplified version
     categoryCount['uncategorized'] = (categoryCount['uncategorized'] || 0) + 1;
   }
 

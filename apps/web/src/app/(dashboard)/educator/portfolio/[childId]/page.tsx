@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { PortfolioClient } from './portfolio-client';
 
 export const metadata = {
-  title: 'Portfolio — The Hedge',
+  title: 'Portfolio - The Hedge',
 };
 
 export default async function PortfolioPage({ params }: { params: Promise<{ childId: string }> }) {

@@ -3,7 +3,7 @@ import Nav from '../../components/Nav';
 import Footer from '../../components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Terms of Use — The Hedge',
+  title: 'Terms of Use - The Hedge',
   description: 'Terms of use for The Hedge family learning platform.',
   alternates: { canonical: 'https://thehedge.ie/terms' },
 };

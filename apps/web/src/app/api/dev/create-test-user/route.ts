@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
-// DEV ONLY — creates a test user with email confirmed, family, and children
+// DEV ONLY - creates a test user with email confirmed, family, and children
 export async function POST(request: Request) {
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'Not available in production' }, { status: 403 });

@@ -285,7 +285,7 @@ export function FavouritesClient() {
 
       {/* Content */}
       {favourites.length === 0 ? (
-        /* Empty state — no favourites at all */
+        /* Empty state - no favourites at all */
         <div className="flex min-h-[400px] items-center justify-center rounded-[14px] border border-dashed border-stone bg-linen/50">
           <div className="text-center px-6 max-w-sm">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-terracotta/8 mx-auto mb-5">

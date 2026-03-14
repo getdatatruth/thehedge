@@ -3,7 +3,7 @@ import { BrowseClient } from './browse-client';
 import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 
 export const metadata = {
-  title: 'Browse — The Hedge',
+  title: 'Browse - The Hedge',
 };
 
 export default async function BrowsePage() {

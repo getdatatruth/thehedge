@@ -1,0 +1,3 @@
+[  350004ms] [ERROR] Base UI: A component that acts as a button expected a native <button> because the `nativeButton` prop is true. Rendering a non-<button> removes native button semantics, which can impact forms and accessibility. Use a real <button> in the `render` prop, or set `nativeButton` to `false`.
+    at ActivityDetailClient (http://localhost:3000/_next/static/chunks/Projects_TheHedge_apps_web_src_b56da339._.js:2307:268)
+    at ActivityDetailPage (about://React/Server/file:///Users/adamoflynn/Projects/TheHedge/apps/web/.next/dev/server/chunks/ssr/%5Broot-of-the-server%5D__f920a726._.js?95:2136:302) @ http://localhost:3000/_next/static/chunks/f28f1_next_dist_cf0b2ee8._.js:3127

@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { BillingClient } from './billing-client';
 
 export const metadata = {
-  title: 'Billing — The Hedge',
+  title: 'Billing - The Hedge',
 };
 
 export default async function BillingPage() {

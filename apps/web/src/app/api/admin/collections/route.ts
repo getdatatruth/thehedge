@@ -9,7 +9,7 @@ export async function OPTIONS() {
 
 /**
  * GET /api/admin/collections
- * List all collections (admin view — includes unpublished).
+ * List all collections (admin view - includes unpublished).
  */
 export async function GET(request: NextRequest) {
   const auth = await requireAdmin(request);

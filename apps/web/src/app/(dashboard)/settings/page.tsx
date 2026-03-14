@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { SettingsClient } from './settings-client';
 
 export const metadata = {
-  title: 'Settings — The Hedge',
+  title: 'Settings - The Hedge',
 };
 
 export default async function SettingsPage() {

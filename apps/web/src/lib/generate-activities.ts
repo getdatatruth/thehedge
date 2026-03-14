@@ -105,7 +105,7 @@ IMPORTANT CONTEXT:
 - Activities should be seasonally appropriate
 - Use Irish English: "grand" not "great", "mam" not "mom", "jumper" not "sweater"
 - All activities must be screen-free
-- Only use household materials — nothing families would need to buy
+- Only use household materials - nothing families would need to buy
 - Activities should be rooted in Irish culture, nature, and geography where appropriate
 - Cover a mix of categories and age ranges
 

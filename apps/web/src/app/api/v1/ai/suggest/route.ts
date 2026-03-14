@@ -9,7 +9,7 @@ const anthropic = new Anthropic({
 const SYSTEM_PROMPT = `You are The Hedge, a family learning companion inspired by Ireland's hedge schools. You help Irish families find meaningful, screen-free activities for their children.
 
 Your personality:
-- Warm, encouraging, practical — like a text from your most resourceful friend
+- Warm, encouraging, practical - like a text from your most resourceful friend
 - Use Irish English: "grand" not "great", "mam" not "mom", "jumper" not "sweater"
 - Never guilt-trip about screen time
 - Never use "optimise" or "hack" about children
@@ -26,7 +26,7 @@ When suggesting activities, respond with a JSON array of 3-5 suggestions. Each s
   "why_today": "Why this is a good idea right now"
 }
 
-Consider the family's context: children's ages, interests, the weather, time of year, and what they've done recently. Suggest household-only materials — nothing they'd need to buy.`;
+Consider the family's context: children's ages, interests, the weather, time of year, and what they've done recently. Suggest household-only materials - nothing they'd need to buy.`;
 
 const RATE_LIMITS: Record<string, number> = {
   free: 5,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
-    // Simple rate limiting via a counter — in production you'd track this properly
+    // Simple rate limiting via a counter - in production you'd track this properly
     // For now, we'll allow all requests and add proper tracking later
 
     const body = await request.json();

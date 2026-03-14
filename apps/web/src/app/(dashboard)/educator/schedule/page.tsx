@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ScheduleClient } from './schedule-client';
 
 export const metadata = {
-  title: 'Schedule — The Hedge',
+  title: 'Schedule - The Hedge',
 };
 
 function getWeekDates(weekOffset = 0): { start: string; end: string; dates: string[] } {

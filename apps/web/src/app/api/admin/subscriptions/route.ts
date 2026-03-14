@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       tierDistribution: { free: 0, family: 0, educator: 0 } as Record<string, number>,
       statusDistribution: { active: 0, trialing: 0, past_due: 0, cancelled: 0 } as Record<string, number>,
       stripeConnected: 0,
-      monthlyRevenue: 0, // Placeholder — needs Stripe API
+      monthlyRevenue: 0, // Placeholder - needs Stripe API
       discountCodes: discountCodes.length,
       activeDiscounts: discountCodes.filter((d) => d.active).length,
     };

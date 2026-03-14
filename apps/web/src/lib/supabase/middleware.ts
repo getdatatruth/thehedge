@@ -55,7 +55,7 @@ export async function updateSession(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith('/api/')
   ) || pathname.startsWith('/admin');
 
-  // Not authenticated — redirect to login (unless on a public route)
+  // Not authenticated - redirect to login (unless on a public route)
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -63,7 +63,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Authenticated — check onboarding status and subscription tier
+  // Authenticated - check onboarding status and subscription tier
   if (user && !isPublicRoute && pathname !== '/onboarding') {
     const { data: profile } = await supabase
       .from('users')
@@ -114,7 +114,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Authenticated user on login/signup — redirect to dashboard
+  // Authenticated user on login/signup - redirect to dashboard
   if (user && (pathname === '/login' || pathname === '/signup')) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';

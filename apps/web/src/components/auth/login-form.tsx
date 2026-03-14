@@ -154,7 +154,7 @@ export function LoginForm() {
               />
             </div>
             <p className="text-xs text-clay/70 font-serif">
-              We&apos;ll send you a link to sign in — no password needed.
+              We&apos;ll send you a link to sign in - no password needed.
             </p>
             {error && (
               <p className="text-sm text-rust bg-rust/5 rounded px-3 py-2">{error}</p>

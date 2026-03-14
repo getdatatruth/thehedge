@@ -38,9 +38,9 @@ const activities: Activity[] = [
     slug: 'frogspawn-safari',
     description: 'Head to your nearest pond, ditch, or boggy patch to spot frogspawn in early spring. Learn about the life cycle of Irish frogs while getting mucky boots.',
     instructions: { steps: [
-      'Find a local pond, stream, or ditch — frogspawn appears from February to April.',
+      'Find a local pond, stream, or ditch - frogspawn appears from February to April.',
       'Look for jelly-like clumps of eggs in shallow, still water near the edges.',
-      'Observe closely — can you see the tiny black dots (embryos) inside each egg?',
+      'Observe closely - can you see the tiny black dots (embryos) inside each egg?',
       'Gently scoop a small amount into a clear jar to examine, then return it carefully.',
       'Talk about the life cycle: egg → tadpole → froglet → frog.',
       'Draw or photograph what you found to add to your nature journal.',
@@ -66,12 +66,12 @@ const activities: Activity[] = [
   {
     title: 'Cloud Detective Walk',
     slug: 'cloud-detective-walk',
-    description: 'Become a cloud detective on your next walk. Learn to identify different cloud types and predict what the weather might do next — a skill Irish people have practised for centuries.',
+    description: 'Become a cloud detective on your next walk. Learn to identify different cloud types and predict what the weather might do next - a skill Irish people have practised for centuries.',
     instructions: { steps: [
-      'Head outside on a day with visible clouds — most Irish days!',
+      'Head outside on a day with visible clouds - most Irish days!',
       'Lie on a blanket or stand in an open area with a clear view of the sky.',
       'Look for three main types: fluffy cumulus (fair weather), flat stratus (grey blanket), and wispy cirrus (high and thin).',
-      'Play "cloud shapes" — what animals or objects can you spot in the clouds?',
+      'Play "cloud shapes" - what animals or objects can you spot in the clouds?',
       'Notice which direction the clouds are moving. Wind from the west usually brings rain in Ireland.',
       'Make predictions: will it rain later? Will the sun come out?',
       'Draw the clouds you see and label them in your journal.'
@@ -97,12 +97,12 @@ const activities: Activity[] = [
     description: 'Build a miniature fairy house using natural materials from your garden or local park. Combines engineering thinking with Irish folklore imagination.',
     instructions: { steps: [
       'Collect natural materials: sticks, bark, leaves, pebbles, moss, acorn caps, feathers.',
-      'Choose a sheltered spot at the base of a tree or in a hedge — fairies like privacy!',
-      'Start with a base — lay flat sticks or bark to make a floor.',
+      'Choose a sheltered spot at the base of a tree or in a hedge - fairies like privacy!',
+      'Start with a base - lay flat sticks or bark to make a floor.',
       'Build walls by leaning sticks together or stacking flat stones.',
       'Create a roof using large leaves, bark, or overlapping sticks.',
       'Add details: a pebble path, moss carpet, acorn cap bowls, leaf door.',
-      'Leave a small offering — a shiny pebble or berry — to welcome the fairies.',
+      'Leave a small offering - a shiny pebble or berry - to welcome the fairies.',
       'Visit tomorrow to see if anyone has "moved in"!'
     ]},
     category: 'nature',
@@ -125,11 +125,11 @@ const activities: Activity[] = [
     slug: 'hedgerow-treasure-hunt',
     description: 'Ireland\'s hedgerows are bursting with life. Go on a sensory treasure hunt to find, smell, and identify what\'s growing in your local hedge.',
     instructions: { steps: [
-      'Walk along any local hedgerow — country roads, park boundaries, or garden edges.',
+      'Walk along any local hedgerow - country roads, park boundaries, or garden edges.',
       'Make a checklist: something soft, something prickly, something that smells, something red, something with seeds.',
       'Identify common hedgerow plants: hawthorn (May blossom), blackberry, elder, ivy, ferns.',
-      'Gently touch different leaves — which are smooth? Fuzzy? Waxy?',
-      'Listen carefully — can you hear birds, insects, or rustling?',
+      'Gently touch different leaves - which are smooth? Fuzzy? Waxy?',
+      'Listen carefully - can you hear birds, insects, or rustling?',
       'Collect one fallen item from each plant (never pick living plants without permission).',
       'At home, press your finds between heavy books or tape them into a journal.'
     ]},
@@ -153,13 +153,13 @@ const activities: Activity[] = [
     slug: 'night-sky-stargazing',
     description: 'On a clear evening, wrap up warm and explore the night sky together. Ireland\'s dark skies are perfect for spotting constellations, planets, and maybe even the Milky Way.',
     instructions: { steps: [
-      'Check the forecast for a clear night — winter evenings are best in Ireland.',
+      'Check the forecast for a clear night - winter evenings are best in Ireland.',
       'Head to your garden or a dark spot away from streetlights after sunset.',
-      'Let your eyes adjust to the dark for 10-15 minutes — no phones!',
-      'Look for the Plough (part of Ursa Major) — it\'s visible all year from Ireland.',
+      'Let your eyes adjust to the dark for 10-15 minutes - no phones!',
+      'Look for the Plough (part of Ursa Major) - it\'s visible all year from Ireland.',
       'Follow the Plough\'s pointer stars to find Polaris, the North Star.',
-      'In winter, look for Orion\'s Belt — three bright stars in a row.',
-      'Watch for satellites crossing the sky — they look like slowly moving stars.',
+      'In winter, look for Orion\'s Belt - three bright stars in a row.',
+      'Watch for satellites crossing the sky - they look like slowly moving stars.',
       'Talk about what you see. Wonder together about how far away the stars are.'
     ]},
     category: 'nature',
@@ -182,16 +182,16 @@ const activities: Activity[] = [
   {
     title: 'Kitchen Volcano',
     slug: 'kitchen-volcano',
-    description: 'The classic baking soda and vinegar eruption — but with proper science talk about acids, bases, and chemical reactions. Messy, exciting, and genuinely educational.',
+    description: 'The classic baking soda and vinegar eruption - but with proper science talk about acids, bases, and chemical reactions. Messy, exciting, and genuinely educational.',
     instructions: { steps: [
       'Place a small cup or jar on a tray or in the sink to catch the overflow.',
       'Add 2-3 tablespoons of baking soda to the cup.',
       'Add a squeeze of washing-up liquid and a few drops of food colouring (red or orange looks volcanic!).',
-      'Pour in white vinegar — about the same amount as baking soda — and watch it erupt!',
+      'Pour in white vinegar - about the same amount as baking soda - and watch it erupt!',
       'Talk about what\'s happening: baking soda (a base) reacts with vinegar (an acid) to create carbon dioxide gas.',
-      'The bubbles are CO2 — the same gas we breathe out and that makes fizzy drinks bubbly.',
+      'The bubbles are CO2 - the same gas we breathe out and that makes fizzy drinks bubbly.',
       'Experiment: does more vinegar make a bigger eruption? What about warm vs cold vinegar?',
-      'Try adding the vinegar slowly vs quickly — what changes?'
+      'Try adding the vinegar slowly vs quickly - what changes?'
     ]},
     category: 'kitchen',
     age_min: 3, age_max: 10,
@@ -215,16 +215,16 @@ const activities: Activity[] = [
   {
     title: 'Irish Soda Bread Baking',
     slug: 'irish-soda-bread-baking',
-    description: 'Bake a traditional Irish soda bread together — one of the simplest and most satisfying things you can make. No yeast, no kneading, and ready in under an hour.',
+    description: 'Bake a traditional Irish soda bread together - one of the simplest and most satisfying things you can make. No yeast, no kneading, and ready in under an hour.',
     instructions: { steps: [
       'Preheat the oven to 200°C. Lightly flour a baking tray.',
       'Mix 450g plain flour, 1 tsp salt, and 1 tsp bicarbonate of soda in a large bowl.',
       'Make a well in the centre and pour in about 350ml buttermilk.',
-      'Mix with a wooden spoon or your hands until it just comes together — don\'t overwork it.',
+      'Mix with a wooden spoon or your hands until it just comes together - don\'t overwork it.',
       'Turn onto a floured surface and shape into a round about 5cm thick.',
-      'Cut a deep cross on top — traditionally to "let the fairies out" or to help it cook evenly.',
+      'Cut a deep cross on top - traditionally to "let the fairies out" or to help it cook evenly.',
       'Bake for 30-35 minutes. It\'s ready when it sounds hollow when tapped on the bottom.',
-      'Let it cool on a wire rack. Eat warm with real Irish butter — nothing better.'
+      'Let it cool on a wire rack. Eat warm with real Irish butter - nothing better.'
     ]},
     category: 'kitchen',
     age_min: 4, age_max: 12,
@@ -246,10 +246,10 @@ const activities: Activity[] = [
   {
     title: 'Rainbow Fruit Kebabs',
     slug: 'rainbow-fruit-kebabs',
-    description: 'Thread a rainbow onto a skewer. Sort fruit by colour, practise counting, and learn about healthy eating — then eat your creation.',
+    description: 'Thread a rainbow onto a skewer. Sort fruit by colour, practise counting, and learn about healthy eating - then eat your creation.',
     instructions: { steps: [
       'Wash and prepare fruit: strawberries, oranges, banana, kiwi, blueberries, grapes.',
-      'Lay out the fruit in colour groups — red, orange, yellow, green, blue, purple.',
+      'Lay out the fruit in colour groups - red, orange, yellow, green, blue, purple.',
       'Give each child a wooden skewer (trim sharp ends for younger children) or a straw.',
       'Thread fruit in rainbow order: one of each colour.',
       'Count how many pieces on each kebab. Who has the most?',
@@ -275,16 +275,16 @@ const activities: Activity[] = [
   {
     title: 'Invisible Ink Secret Messages',
     slug: 'invisible-ink-secret-messages',
-    description: 'Write secret messages using lemon juice that only appear when heated. Part spy craft, part kitchen science — kids absolutely love this.',
+    description: 'Write secret messages using lemon juice that only appear when heated. Part spy craft, part kitchen science - kids absolutely love this.',
     instructions: { steps: [
       'Squeeze lemon juice into a small bowl. Add a few drops of water.',
       'Dip a cotton bud, paintbrush, or toothpick into the lemon juice.',
       'Write a secret message or draw a picture on white paper.',
-      'Let the paper dry completely — the message should be invisible.',
+      'Let the paper dry completely - the message should be invisible.',
       'To reveal: hold the paper near a warm lamp or radiator (adult supervision).',
       'Alternatively, an adult can carefully use a hairdryer on high heat.',
       'The lemon juice turns brown when heated because the acid weakens the paper fibres.',
-      'Try with other liquids: milk, apple juice, honey-water — which works best?'
+      'Try with other liquids: milk, apple juice, honey-water - which works best?'
     ]},
     category: 'kitchen',
     age_min: 5, age_max: 12,
@@ -312,10 +312,10 @@ const activities: Activity[] = [
       'Spread tomato sauce on each base.',
       'Before adding toppings, draw lines with sauce to divide into halves.',
       'Ask: "If we cut this in half, how many pieces do we get? What\'s each piece called?"',
-      'Now try quarters — cut the halves in half. "What fraction is each piece?"',
-      'Let children choose toppings for each section — different toppings in each fraction.',
+      'Now try quarters - cut the halves in half. "What fraction is each piece?"',
+      'Let children choose toppings for each section - different toppings in each fraction.',
       'Bake for 8-10 minutes until cheese is melted and bubbly.',
-      'When eating: "You ate 2 out of 4 slices — that\'s 2/4, or half!"'
+      'When eating: "You ate 2 out of 4 slices - that\'s 2/4, or half!"'
     ]},
     category: 'kitchen',
     age_min: 5, age_max: 10,
@@ -343,11 +343,11 @@ const activities: Activity[] = [
     instructions: { steps: [
       'Gather liquids: honey, golden syrup, milk, washing-up liquid, water, vegetable oil.',
       'Add food colouring to the water so you can see it clearly.',
-      'Slowly pour honey into a tall clear glass — this is the densest liquid.',
-      'Carefully pour golden syrup down the side of the glass — it should float on the honey.',
+      'Slowly pour honey into a tall clear glass - this is the densest liquid.',
+      'Carefully pour golden syrup down the side of the glass - it should float on the honey.',
       'Continue layering: milk, then coloured water, then washing-up liquid, then oil on top.',
       'Pour each one very slowly down the side of the glass to keep layers separate.',
-      'Try dropping small objects in: a grape, a coin, a piece of cork — where do they settle?',
+      'Try dropping small objects in: a grape, a coin, a piece of cork - where do they settle?',
       'Discuss: heavier (denser) liquids sink, lighter ones float. Just like in the sea!'
     ]},
     category: 'science',
@@ -407,7 +407,7 @@ const activities: Activity[] = [
       'Each person picks a raindrop at the top of the window.',
       'Race! Which raindrop reaches the bottom first?',
       'Notice: bigger drops move faster. Why? (They\'re heavier, so gravity pulls them more.)',
-      'Watch what happens when two drops merge — does the new drop speed up?',
+      'Watch what happens when two drops merge - does the new drop speed up?',
       'Put on wellies and waterproofs. Go outside and catch rain in different containers.',
       'Measure how much rain falls in 10 minutes using a jar with markings.',
       'Jump in puddles. Because you\'re in Ireland and it\'s basically the law.'
@@ -431,7 +431,7 @@ const activities: Activity[] = [
   {
     title: 'Shadow Drawing',
     slug: 'shadow-drawing',
-    description: 'Use the sun to cast shadows of toys and objects, then trace around them. Come back later to see how the shadow has moved — an introduction to how the Earth rotates.',
+    description: 'Use the sun to cast shadows of toys and objects, then trace around them. Come back later to see how the shadow has moved - an introduction to how the Earth rotates.',
     instructions: { steps: [
       'On a sunny day, place toys or interesting objects on a large sheet of paper outside.',
       'Position them so they cast clear shadows on the paper.',
@@ -468,7 +468,7 @@ const activities: Activity[] = [
       'Before testing each one, hold it up and ask: "Will it sink or float? Why?"',
       'Place each object gently in the water. Sort into two groups.',
       'Surprise test: an orange floats with its skin on, but sinks when peeled! (The skin has tiny air pockets.)',
-      'Try making a ball of plasticine — it sinks. Now flatten it into a boat shape — it floats!',
+      'Try making a ball of plasticine - it sinks. Now flatten it into a boat shape - it floats!',
       'Discuss: it\'s not just about weight, it\'s about shape and how much water is pushed aside.',
       'Let them free-play and experiment with their own ideas.'
     ]},
@@ -493,16 +493,16 @@ const activities: Activity[] = [
   {
     title: 'Nature Paintbrush Art',
     slug: 'nature-paintbrush-art',
-    description: 'Collect natural items — leaves, twigs, feathers, flowers — and use them as paintbrushes to create wild, textured art. No shop-bought brushes allowed!',
+    description: 'Collect natural items - leaves, twigs, feathers, flowers - and use them as paintbrushes to create wild, textured art. No shop-bought brushes allowed!',
     instructions: { steps: [
       'Go outside and collect items to paint with: leaves, pine needles, twigs, feathers, grass, flowers.',
       'Set up paint pots (any paint or make your own with flour, water, and food colouring).',
       'Tape a large sheet of paper to the table or ground.',
-      'Experiment: dip a leaf in paint and press it — what pattern does it make?',
+      'Experiment: dip a leaf in paint and press it - what pattern does it make?',
       'Try dragging a pine branch, stamping with a flower, flicking a twig.',
       'Which natural brush makes the thinnest line? The fattest? The most interesting texture?',
       'Create a full picture using only nature brushes.',
-      'Display your masterpiece — every one will look completely different!'
+      'Display your masterpiece - every one will look completely different!'
     ]},
     category: 'art',
     age_min: 3, age_max: 10,
@@ -524,16 +524,16 @@ const activities: Activity[] = [
   {
     title: 'Celtic Knot Drawing',
     slug: 'celtic-knot-drawing',
-    description: 'Learn to draw a simple Celtic knot pattern — the kind found on Irish high crosses and the Book of Kells. Start simple, then get as complex as you like.',
+    description: 'Learn to draw a simple Celtic knot pattern - the kind found on Irish high crosses and the Book of Kells. Start simple, then get as complex as you like.',
     instructions: { steps: [
       'Start with a piece of graph paper or draw a grid of dots.',
-      'Begin with the simplest knot: draw a pretzel shape — two loops crossing over each other.',
-      'The key rule: the line goes over, then under, then over, then under — alternating at every crossing.',
+      'Begin with the simplest knot: draw a pretzel shape - two loops crossing over each other.',
+      'The key rule: the line goes over, then under, then over, then under - alternating at every crossing.',
       'Practise the basic pretzel until it feels comfortable.',
       'Try a longer knot: draw a figure-eight shape, then weave the crossings over-under.',
       'For a true Celtic look, make the line thicker and add a parallel line to create a "ribbon" effect.',
-      'Colour the spaces between the ribbons — traditional colours are gold, green, red, and blue.',
-      'Look up the Book of Kells for inspiration — Ireland\'s greatest artwork is full of these patterns.'
+      'Colour the spaces between the ribbons - traditional colours are gold, green, red, and blue.',
+      'Look up the Book of Kells for inspiration - Ireland\'s greatest artwork is full of these patterns.'
     ]},
     category: 'art',
     age_min: 6, age_max: 12,
@@ -554,12 +554,12 @@ const activities: Activity[] = [
   {
     title: 'Cardboard Box World',
     slug: 'cardboard-box-world',
-    description: 'Transform a cardboard box into anything — a spaceship, a castle, a submarine, a shop. The only limit is imagination (and sellotape supply).',
+    description: 'Transform a cardboard box into anything - a spaceship, a castle, a submarine, a shop. The only limit is imagination (and sellotape supply).',
     instructions: { steps: [
       'Find the biggest cardboard box you have (delivery boxes are perfect).',
       'Ask: "What should this become?" Let the children decide together.',
       'Gather supplies: markers, paint, scissors (adult help), tape, string, old magazines.',
-      'Plan the design — where will the door be? Windows? Controls?',
+      'Plan the design - where will the door be? Windows? Controls?',
       'Cut and shape with adult help. Tape sections together.',
       'Decorate: paint, draw, stick on magazine cut-outs, add buttons from bottle caps.',
       'Add details: a steering wheel from a paper plate, dials drawn on, a flag from a stick and paper.',
@@ -587,7 +587,7 @@ const activities: Activity[] = [
     slug: 'leaf-rubbing-gallery',
     description: 'Collect autumn leaves with interesting shapes and create beautiful rubbings with crayons. Frame them for a seasonal gallery wall.',
     instructions: { steps: [
-      'Collect leaves with strong veins and interesting shapes — oak, sycamore, beech, holly.',
+      'Collect leaves with strong veins and interesting shapes - oak, sycamore, beech, holly.',
       'Place a leaf vein-side up under a sheet of thin paper.',
       'Hold the paper firmly and rub the side of a crayon gently over the leaf.',
       'Watch the leaf\'s shape and veins magically appear on the paper!',
@@ -616,7 +616,7 @@ const activities: Activity[] = [
   {
     title: 'Story Stones',
     slug: 'story-stones',
-    description: 'Paint simple pictures on smooth stones — a sun, a dragon, a castle, a tree. Then take turns drawing stones from a bag to build a story together.',
+    description: 'Paint simple pictures on smooth stones - a sun, a dragon, a castle, a tree. Then take turns drawing stones from a bag to build a story together.',
     instructions: { steps: [
       'Collect smooth, flat stones from the garden, beach, or a riverbank.',
       'Wash and dry the stones thoroughly.',
@@ -679,7 +679,7 @@ const activities: Activity[] = [
   {
     title: 'Garden Mini Olympics',
     slug: 'garden-mini-olympics',
-    description: 'Set up your own Olympic Games in the garden. Long jump, sprint, target throw, and more — complete with medal ceremony and national anthems.',
+    description: 'Set up your own Olympic Games in the garden. Long jump, sprint, target throw, and more - complete with medal ceremony and national anthems.',
     instructions: { steps: [
       'Agree on 5-6 events: sprint (mark a start and finish), standing long jump, ball throw for distance, egg-and-spoon race, hula hoop endurance, sack race (pillowcase).',
       'Make a score sheet with each person\'s name.',
@@ -710,13 +710,13 @@ const activities: Activity[] = [
   {
     title: 'Animal Movement Game',
     slug: 'animal-movement-game',
-    description: 'Call out an animal and everyone has to move like it — frog jumps, bear crawls, flamingo balances. A brilliant way to burn energy while learning about animals.',
+    description: 'Call out an animal and everyone has to move like it - frog jumps, bear crawls, flamingo balances. A brilliant way to burn energy while learning about animals.',
     instructions: { steps: [
       'Clear a space indoors or play in the garden.',
       'One person is the caller. They shout an animal name.',
       'Everyone moves like that animal: frog (jump), crab (walk sideways), bear (crawl on all fours).',
       'Snake (slither on tummy), flamingo (balance on one leg), kangaroo (big jumps), eagle (arms out, run).',
-      'The caller shouts "FREEZE!" — everyone stops. Last to freeze is the next caller.',
+      'The caller shouts "FREEZE!" - everyone stops. Last to freeze is the next caller.',
       'Add Irish animals: salmon (swimming motion), hare (fast hopping), badger (low crawl).',
       'Talk about where each animal lives in Ireland.',
       'Get increasingly silly: sloth (very slow motion), cheetah (sprint on the spot).'
@@ -738,7 +738,7 @@ const activities: Activity[] = [
     slug: 'yoga-animal-adventure',
     description: 'A calming yoga session where every pose is an animal. Tree pose becomes "tall Irish oak," cobra becomes "Connemara serpent." Wind down after a busy day.',
     instructions: { steps: [
-      'Find a soft surface — carpet, rug, or grass. Bare feet work best.',
+      'Find a soft surface - carpet, rug, or grass. Bare feet work best.',
       'Start standing: "We\'re going on an adventure through an Irish forest..."',
       'Tree pose: stand on one leg, other foot against your calf, arms up like branches. "You\'re a tall oak tree."',
       'Cat-cow: on all fours, arch and round your back. "You\'re a farm cat stretching."',
@@ -767,11 +767,11 @@ const activities: Activity[] = [
     description: 'The noble Irish art of puddle jumping, elevated to a competitive sport. Categories: biggest splash, longest jump over, most creative landing.',
     instructions: { steps: [
       'Wait for rain (shouldn\'t take long in Ireland). Put on wellies and waterproofs.',
-      'Find an area with good puddles — a park path, a lane, or your driveway.',
-      'Event 1 — Biggest Splash: take turns jumping into the same puddle. Whoever makes the biggest splash wins.',
-      'Event 2 — Long Jump: find a puddle and try to jump OVER it without landing in it.',
-      'Event 3 — Creative Landing: jump into a puddle in the most creative way possible. Judged on style.',
-      'Event 4 — Ripple Count: gently throw a pebble into a calm puddle. Count the ripples.',
+      'Find an area with good puddles - a park path, a lane, or your driveway.',
+      'Event 1 - Biggest Splash: take turns jumping into the same puddle. Whoever makes the biggest splash wins.',
+      'Event 2 - Long Jump: find a puddle and try to jump OVER it without landing in it.',
+      'Event 3 - Creative Landing: jump into a puddle in the most creative way possible. Judged on style.',
+      'Event 4 - Ripple Count: gently throw a pebble into a calm puddle. Count the ripples.',
       'Bonus: find a puddle that reflects the sky. What can you see in it?',
       'Go home for hot chocolate. Hang wellies to dry. Champions are crowned.'
     ]},
@@ -852,7 +852,7 @@ const activities: Activity[] = [
   {
     title: 'Poetry Picnic',
     slug: 'poetry-picnic',
-    description: 'Pack a blanket and some biscuits, head to the garden or park, and write poems together. Acrostics, haiku, rhyming couplets — or just silly limericks.',
+    description: 'Pack a blanket and some biscuits, head to the garden or park, and write poems together. Acrostics, haiku, rhyming couplets - or just silly limericks.',
     instructions: { steps: [
       'Pack a blanket, snacks, pencils, and paper. Head to the garden, park, or even the living room floor.',
       'Start with an acrostic: write your name down the side of the page, then write a word or phrase for each letter.',
@@ -880,7 +880,7 @@ const activities: Activity[] = [
     screen_free: true, premium: false, created_by: 'system', published: true,
   },
   {
-    title: 'Cupla Focal — Daily Irish',
+    title: 'Cupla Focal - Daily Irish',
     slug: 'cupla-focal-daily-irish',
     description: 'Learn a handful of Irish words and phrases as a family. Stick them around the house and use them in everyday life. Tá sé go hiontach!',
     instructions: { steps: [
@@ -889,7 +889,7 @@ const activities: Activity[] = [
       'Stick them in relevant places: "Doras" (door) on the door, "Fuinneog" (window) on the window.',
       'Try to use them in conversation: "Will you close the doras, please?"',
       'Colours: dearg (red), glas (green), gorm (blue), bán (white), dubh (black).',
-      'Animals: madra (dog), cat (cat — same!), capall (horse), bó (cow), éan (bird).',
+      'Animals: madra (dog), cat (cat - same!), capall (horse), bó (cow), éan (bird).',
       'Family: Mamó (granny), Daideo (grandad), deartháir (brother), deirfiúr (sister).',
       'By Friday, test each other. Can everyone remember all 5? Add 5 more next week.'
     ]},
@@ -920,7 +920,7 @@ const activities: Activity[] = [
       'Draw a comic strip about a funny thing that happened.',
       'Write a weather forecast for tomorrow (check outside and make your prediction).',
       'Add a "what\'s on" section: upcoming family events, birthdays, plans.',
-      'Read the newspaper aloud at dinner. Keep copies — they\'ll be treasures someday.'
+      'Read the newspaper aloud at dinner. Keep copies - they\'ll be treasures someday.'
     ]},
     category: 'literacy',
     age_min: 6, age_max: 12,
@@ -946,7 +946,7 @@ const activities: Activity[] = [
     instructions: { steps: [
       'Go on a conker hunt under horse chestnut trees in September/October.',
       'Collect as many as you can in a bag or bucket.',
-      'At home: sort by size — small, medium, large. How many in each group?',
+      'At home: sort by size - small, medium, large. How many in each group?',
       'Counting: line them up and count. Can you count by 2s? 5s? 10s?',
       'Addition: "I have 5 conkers. You give me 3 more. How many now?"',
       'Subtraction: "I had 8 conkers but a squirrel took 3. How many left?"',
@@ -972,7 +972,7 @@ const activities: Activity[] = [
   {
     title: 'Shape Detectives',
     slug: 'shape-detectives',
-    description: 'Hunt for 2D and 3D shapes around your house and neighbourhood. Circles on clocks, rectangles on doors, cylinders in the kitchen — shapes are everywhere.',
+    description: 'Hunt for 2D and 3D shapes around your house and neighbourhood. Circles on clocks, rectangles on doors, cylinders in the kitchen - shapes are everywhere.',
     instructions: { steps: [
       'Start indoors. Can you find a circle? (Clock, plate, coin.) A rectangle? (Door, book, screen.)',
       'Make a checklist: circle, square, rectangle, triangle, oval, hexagon, star.',
@@ -1001,13 +1001,13 @@ const activities: Activity[] = [
   {
     title: 'Kitchen Measuring Challenge',
     slug: 'kitchen-measuring-challenge',
-    description: 'Get into the kitchen and measure everything — pour water between containers, weigh fruit on scales, compare lengths with a ruler. Real-world maths that sticks.',
+    description: 'Get into the kitchen and measure everything - pour water between containers, weigh fruit on scales, compare lengths with a ruler. Real-world maths that sticks.',
     instructions: { steps: [
       'Set up stations around the kitchen table.',
-      'Station 1 — Capacity: fill a jug and pour into different cups. How many cups fill the jug?',
-      'Station 2 — Weight: use kitchen scales to weigh fruit. Which is heavier: an apple or a banana?',
-      'Station 3 — Length: measure objects with a ruler. How long is a fork? A banana? Your hand?',
-      'Station 4 — Estimation: before measuring, guess first. "How many spoons of rice fill this cup?"',
+      'Station 1 - Capacity: fill a jug and pour into different cups. How many cups fill the jug?',
+      'Station 2 - Weight: use kitchen scales to weigh fruit. Which is heavier: an apple or a banana?',
+      'Station 3 - Length: measure objects with a ruler. How long is a fork? A banana? Your hand?',
+      'Station 4 - Estimation: before measuring, guess first. "How many spoons of rice fill this cup?"',
       'Record all your measurements. Were your estimates close?',
       'For older children: convert between units. 1 litre = 1000ml. 1kg = 1000g.',
       'Final challenge: can you pour exactly 250ml into a cup without a measuring jug?'
@@ -1041,7 +1041,7 @@ const activities: Activity[] = [
       'Give the map to the other players. Can they use the coordinates to find the treasure?',
       'Make it harder: instead of an X, give clues. "Start at A1. Go 3 squares east and 2 squares north."',
       'Take turns hiding and seeking. Each person makes their own map.',
-      'Talk about how real maps work — compass directions, scale, and grid references.'
+      'Talk about how real maps work - compass directions, scale, and grid references.'
     ]},
     category: 'maths',
     age_min: 5, age_max: 12,
@@ -1062,7 +1062,7 @@ const activities: Activity[] = [
   {
     title: 'Shop Play with Real Money',
     slug: 'shop-play-real-money',
-    description: 'Set up a pretend shop using real (or pretend) coins and household items with price tags. Practice addition, subtraction, and making change — essential life maths.',
+    description: 'Set up a pretend shop using real (or pretend) coins and household items with price tags. Practice addition, subtraction, and making change - essential life maths.',
     instructions: { steps: [
       'Gather household items to "sell": tins, fruit, books, toys.',
       'Write price tags for each item. Start simple: 5c, 10c, 20c, 50c, €1.',
@@ -1070,7 +1070,7 @@ const activities: Activity[] = [
       'Take turns being shopkeeper and customer.',
       'Customer: choose items, add up the total, and pay.',
       'Shopkeeper: count the money, check it\'s right, and give change.',
-      '"That\'s 30c and 20c — so 50c altogether. You gave me €1, so your change is 50c."',
+      '"That\'s 30c and 20c - so 50c altogether. You gave me €1, so your change is 50c."',
       'For older children: add bigger prices, use notes, calculate percentages for a "sale".'
     ]},
     category: 'maths',
@@ -1097,10 +1097,10 @@ const activities: Activity[] = [
     slug: 'tie-your-own-laces',
     description: 'The bunny ears method makes shoe-tying manageable for little fingers. A life skill milestone that deserves celebration when mastered.',
     instructions: { steps: [
-      'Start with a shoe off the foot — it\'s easier to learn on a table.',
+      'Start with a shoe off the foot - it\'s easier to learn on a table.',
       'Use two different coloured laces if possible, so you can see each one clearly.',
       'Step 1: Cross the laces over to make an X. Pull one under and through. Pull tight.',
-      'Step 2 — Bunny Ears: make a loop (ear) with each lace. Hold one in each hand.',
+      'Step 2 - Bunny Ears: make a loop (ear) with each lace. Hold one in each hand.',
       'Step 3: Cross the bunny ears over each other, just like step 1.',
       'Step 4: Push one ear under and through the hole. Pull both ears to tighten.',
       'Practise slowly 5 times. Then try it on your foot.',
@@ -1129,7 +1129,7 @@ const activities: Activity[] = [
       'Stand in the doorway and look at the layout. Where is the bed? The window? The wardrobe?',
       'Draw the room shape first (probably a rectangle). Add the door and window.',
       'Add furniture as simple shapes: bed = rectangle, desk = square, rug = circle.',
-      'Label everything. Add a compass rose (N, S, E, W) — which way is the window facing?',
+      'Label everything. Add a compass rose (N, S, E, W) - which way is the window facing?',
       'For a challenge: map the whole house, or your walk to the shop/school.',
       'Use a key: star for "my favourite spot", heart for "where the dog sleeps", etc.',
       'Compare your map with the real room. Did you get the sizes roughly right?'
@@ -1151,7 +1151,7 @@ const activities: Activity[] = [
     screen_free: true, premium: false, created_by: 'system', published: true,
   },
   {
-    title: 'Tell the Time — Clock Making',
+    title: 'Tell the Time - Clock Making',
     slug: 'tell-the-time-clock-making',
     description: 'Make a clock face from a paper plate and learn to tell the time. Move the hands to different times throughout the day and talk about what happens at each.',
     instructions: { steps: [
@@ -1159,8 +1159,8 @@ const activities: Activity[] = [
       'Write the numbers 1-12 around the edge, like a real clock. (Tip: start with 12, 3, 6, 9 first.)',
       'Cut two arrows from card: a short fat one (hour hand) and a long thin one (minute hand).',
       'Attach them to the centre with a brass paper fastener or a blob of blu-tack.',
-      'Start with o\'clock times: set to 8 o\'clock — "What happens at 8? School time!"',
-      'Move to half past: "The long hand points to 6. It\'s half past 3 — home time!"',
+      'Start with o\'clock times: set to 8 o\'clock - "What happens at 8? School time!"',
+      'Move to half past: "The long hand points to 6. It\'s half past 3 - home time!"',
       'Play a game: call out a time and race to set your clocks. Or set a time and guess what activity it might be.',
       'Carry the clock around for a day. At each real time, match it on your paper clock.'
     ]},
@@ -1252,8 +1252,8 @@ const activities: Activity[] = [
       'Find a quiet spot. Lie down on your back on a soft surface.',
       'Place a small stuffed animal or toy on your tummy.',
       'Close your eyes (or look at the ceiling softly).',
-      'Breathe in slowly through your nose — watch your buddy rise up.',
-      'Breathe out slowly through your mouth — watch your buddy gently fall.',
+      'Breathe in slowly through your nose - watch your buddy rise up.',
+      'Breathe out slowly through your mouth - watch your buddy gently fall.',
       'Try to make your buddy move as slowly and smoothly as possible.',
       'Count together: breathe in for 4 counts, hold for 2, out for 4.',
       'Do 5-10 breaths. Notice how your body feels afterwards. Calmer? More relaxed?'
@@ -1277,14 +1277,14 @@ const activities: Activity[] = [
     slug: 'gratitude-jar',
     description: 'Start a family gratitude practice. Each evening, everyone writes one thing they\'re grateful for on a slip of paper and drops it in the jar. Read them all at month\'s end.',
     instructions: { steps: [
-      'Find a clean glass jar — a big one. Decorate it together if you like.',
+      'Find a clean glass jar - a big one. Decorate it together if you like.',
       'Cut colourful paper into small strips.',
       'Each evening (before bed or after dinner), everyone writes one thing they\'re grateful for.',
       'For pre-writers: they tell you and you write it, or they draw a picture.',
       'Fold the paper and drop it in the jar.',
       'Examples: "I\'m grateful for the sunny walk we had." "I\'m grateful my friend shared their lunch."',
       'At the end of the month (or whenever the jar is full), open it and read them all together.',
-      'It\'s amazing to see what you\'ve appreciated. Keep the jar going — it becomes a beautiful family ritual.'
+      'It\'s amazing to see what you\'ve appreciated. Keep the jar going - it becomes a beautiful family ritual.'
     ]},
     category: 'calm',
     age_min: 3, age_max: 12,
@@ -1309,7 +1309,7 @@ const activities: Activity[] = [
     instructions: { steps: [
       'Find a quiet outdoor spot: your garden, a park bench, a woodland clearing.',
       'Sit comfortably. Place a piece of paper on a clipboard or book, with a pencil.',
-      'Draw an X in the centre of the paper — this is you.',
+      'Draw an X in the centre of the paper - this is you.',
       'Close your eyes for 2 minutes. Just listen.',
       'When you hear a sound, open your eyes and mark it on the paper in the direction it came from.',
       'Use symbols: a musical note for birdsong, wavy lines for wind, a square for a car, etc.',
@@ -1336,11 +1336,11 @@ const activities: Activity[] = [
     slug: 'sensory-calm-box',
     description: 'Build a personalised calm-down box filled with sensory items: stress ball, lavender bag, smooth stone, glitter jar. A go-to toolkit for big feelings.',
     instructions: { steps: [
-      'Find a small box, tin, or bag — this will be your calm box.',
+      'Find a small box, tin, or bag - this will be your calm box.',
       'Together, choose items that help you feel calm. Ideas:',
       'Touch: a smooth stone, a piece of soft fabric, a stress ball (fill a balloon with flour).',
       'Smell: a cotton ball with lavender oil, a sachet of herbs, a favourite hand cream.',
-      'See: a glitter jar (fill a jar with water, glitter glue, and glitter — shake and watch it settle).',
+      'See: a glitter jar (fill a jar with water, glitter glue, and glitter - shake and watch it settle).',
       'Hear: a small bell, a shell to hold to your ear.',
       'Include a card with 3 breathing exercises written on it.',
       'Keep the box in a special place. When big feelings come, go to your calm box first.'
@@ -1366,7 +1366,7 @@ const activities: Activity[] = [
   {
     title: 'Cloud Watching & Daydreaming',
     slug: 'cloud-watching-daydreaming',
-    description: 'Sometimes the best activity is no activity at all. Lie on a blanket, watch the clouds, and let your mind wander. Protect boredom — it\'s where creativity begins.',
+    description: 'Sometimes the best activity is no activity at all. Lie on a blanket, watch the clouds, and let your mind wander. Protect boredom - it\'s where creativity begins.',
     instructions: { steps: [
       'Spread a blanket in the garden, park, or beach.',
       'Lie on your backs and look up at the sky.',
@@ -1432,7 +1432,7 @@ const activities: Activity[] = [
       'For younger children: draw a big, colourful picture and dictate a message for a grown-up to write.',
       'Include something fun: a joke, a riddle, a sticker, a pressed leaf.',
       'Fold it up. Put it in an envelope. Write the address (grown-up helps with this).',
-      'Walk to the post box together. Let the child post it — this is a big moment!',
+      'Walk to the post box together. Let the child post it - this is a big moment!',
       'Wait for a reply. Check the letterbox every day. The anticipation is half the joy.',
       'When a reply comes, read it together and start the next letter.'
     ]},
@@ -1462,9 +1462,9 @@ const activities: Activity[] = [
       'Deeper questions: "What are you most proud of?" "What would you change about the world?" "What makes you feel loved?"',
       'The interviewer asks, the interviewee answers, everyone listens without interrupting.',
       'After 3-4 questions, swap roles.',
-      'Record answers in a notebook or on a phone — these are treasures.',
+      'Record answers in a notebook or on a phone - these are treasures.',
       'For younger children, use simpler questions: "What\'s your favourite colour/food/game?"',
-      'Make it a monthly tradition. Compare answers over time — how do they change?'
+      'Make it a monthly tradition. Compare answers over time - how do they change?'
     ]},
     category: 'social',
     age_min: 4, age_max: 12,
@@ -1492,7 +1492,7 @@ const activities: Activity[] = [
       'Sort as you go if possible: recyclables in one bag, general waste in another.',
       'Take a "before and after" photo of the area you cleaned.',
       'At the end, count or weigh what you collected.',
-      'Wash hands thoroughly when you get home. Feel proud — you made your community better!'
+      'Wash hands thoroughly when you get home. Feel proud - you made your community better!'
     ]},
     category: 'social',
     age_min: 4, age_max: 12,
@@ -1512,7 +1512,7 @@ const activities: Activity[] = [
   {
     title: 'Cultural Celebration Explorer',
     slug: 'cultural-celebration-explorer',
-    description: 'Learn about a cultural celebration from around the world — Diwali, Chinese New Year, Eid, Hanukkah — and do an activity inspired by it. Builds empathy and curiosity.',
+    description: 'Learn about a cultural celebration from around the world - Diwali, Chinese New Year, Eid, Hanukkah - and do an activity inspired by it. Builds empathy and curiosity.',
     instructions: { steps: [
       'Choose a celebration that\'s coming up or one that interests your family.',
       'Talk about where it comes from, who celebrates it, and why it matters.',

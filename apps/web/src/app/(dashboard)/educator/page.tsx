@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { EducatorDashboardClient } from './educator-dashboard-client';
 
 export const metadata = {
-  title: 'Educator — The Hedge',
+  title: 'Educator - The Hedge',
 };
 
 function getWeekBounds(): { start: string; end: string } {

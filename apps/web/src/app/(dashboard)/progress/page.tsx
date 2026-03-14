@@ -9,7 +9,7 @@ import {
 } from '@/lib/badges';
 
 export const metadata = {
-  title: 'Progress & Badges — The Hedge',
+  title: 'Progress & Badges - The Hedge',
 };
 
 export default async function ProgressPage() {

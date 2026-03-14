@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Check, X, TreePine, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Pricing — The Hedge',
+  title: 'Pricing - The Hedge',
 };
 
 const TIERS = [
@@ -163,7 +163,7 @@ export default function PricingPage() {
               { q: 'Can I switch plans?', a: 'Yes, upgrade or downgrade anytime. Changes take effect immediately.' },
               { q: 'Is there a contract?', a: 'No contracts. Cancel anytime with one click. No questions asked.' },
               { q: 'What happens when my trial ends?', a: 'You\'ll be moved to the Free plan automatically. No surprise charges.' },
-              { q: 'Do you offer family discounts?', a: 'Each plan covers your entire family — unlimited children, one price.' },
+              { q: 'Do you offer family discounts?', a: 'Each plan covers your entire family - unlimited children, one price.' },
               { q: 'Is my data safe?', a: 'We use Supabase (EU region) for all data storage. Your data stays in the EU and is encrypted.' },
             ].map((faq) => (
               <div key={faq.q} className="card-elevated p-5">

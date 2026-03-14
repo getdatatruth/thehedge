@@ -70,7 +70,7 @@ export default function Nav({ active = '' }: { active?: string }) {
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</Link>
           ))}
           <Link href="https://app.thehedge.ie/signup" className="nav-cta" onClick={() => setOpen(false)}>
-            Start free today — it&apos;s free
+            Start free today - it&apos;s free
           </Link>
         </nav>
       </div>

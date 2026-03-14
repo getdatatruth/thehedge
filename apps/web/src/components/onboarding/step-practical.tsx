@@ -130,7 +130,7 @@ export function StepPractical() {
                 Sure, a bit of mess is grand
               </SelectItem>
               <SelectItem value="high">
-                Go wild — the messier the better
+                Go wild - the messier the better
               </SelectItem>
             </SelectContent>
           </Select>

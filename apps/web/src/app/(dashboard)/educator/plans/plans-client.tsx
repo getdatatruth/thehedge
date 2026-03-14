@@ -62,7 +62,7 @@ interface ActivityLog {
 const APPROACHES = [
   { value: 'structured', label: 'Structured', description: 'Timetabled, textbook-led approach' },
   { value: 'relaxed', label: 'Relaxed', description: 'Flexible schedule, interest-led learning' },
-  { value: 'child_led', label: 'Child-led', description: 'Unschooling — follow the child\'s interests' },
+  { value: 'child_led', label: 'Child-led', description: 'Unschooling - follow the child\'s interests' },
   { value: 'blended', label: 'Blended', description: 'Mix of structured and child-led approaches' },
   { value: 'exploratory', label: 'Exploratory', description: 'Project-based, experiential learning' },
 ];

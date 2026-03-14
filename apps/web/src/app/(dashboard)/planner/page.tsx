@@ -4,7 +4,7 @@ import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 import { getWeather } from '@/lib/weather';
 
 export const metadata = {
-  title: 'Weekly Plan — The Hedge',
+  title: 'Weekly Plan - The Hedge',
 };
 
 function getWeekDates(weekOffset = 0) {

@@ -20,13 +20,13 @@ export async function generateMetadata({ params }: PageProps) {
   if (!data) {
     const mock = MOCK_ACTIVITIES.find((a) => a.slug === slug);
     return {
-      title: mock ? `${mock.title} — The Hedge` : 'Activity — The Hedge',
+      title: mock ? `${mock.title} - The Hedge` : 'Activity - The Hedge',
       description: mock?.description,
     };
   }
 
   return {
-    title: `${data.title} — The Hedge`,
+    title: `${data.title} - The Hedge`,
     description: data.description,
   };
 }
@@ -105,7 +105,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
           a.parent_activity_id === activity.parent_activity_id))
   );
 
-  // Find "try next" suggestions — same category, different activity
+  // Find "try next" suggestions - same category, different activity
   const tryNext = MOCK_ACTIVITIES.filter(
     (a) =>
       a.slug !== activity.slug &&

@@ -14,13 +14,13 @@ const STYLES: {
   {
     value: 'active',
     label: 'Active & Outdoors',
-    description: 'Always on the move — walks, sports, adventure.',
+    description: 'Always on the move - walks, sports, adventure.',
     icon: Trees,
   },
   {
     value: 'creative',
     label: 'Creative & Crafty',
-    description: 'Art, building, making — mess is welcome.',
+    description: 'Art, building, making - mess is welcome.',
     icon: Palette,
   },
   {
@@ -38,7 +38,7 @@ const STYLES: {
   {
     value: 'balanced',
     label: 'A bit of everything',
-    description: 'Mix it up — variety is grand.',
+    description: 'Mix it up - variety is grand.',
     icon: Scale,
   },
 ];

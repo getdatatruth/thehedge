@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="ft-inner">
         <div className="ft-nl">
           <div className="ft-nl-title">Stay in the loop</div>
-          <div className="ft-nl-body">Activity ideas, seasonal guides & platform updates — delivered to Irish families every fortnight.</div>
+          <div className="ft-nl-body">Activity ideas, seasonal guides & platform updates - delivered to Irish families every fortnight.</div>
           <form className="ft-nl-form" onSubmit={e => e.preventDefault()}>
             <input className="ft-nl-input" type="email" placeholder="your@email.ie" aria-label="Email address" />
             <button type="submit" className="ft-nl-btn">Subscribe</button>

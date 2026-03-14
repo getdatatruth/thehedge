@@ -1,5 +1,5 @@
 // ─── Audit Log ─────────────────────────────────────────
-// In-memory store for now — can be migrated to a DB table later.
+// In-memory store for now - can be migrated to a DB table later.
 
 export interface AuditEvent {
   id: string;

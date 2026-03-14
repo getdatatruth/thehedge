@@ -311,7 +311,7 @@ export function ActivityDetailClient({
           <div className="mt-5 flex items-center gap-3 rounded-[14px] bg-moss/8 border border-moss/15 px-4 py-3 animate-scale-in">
             <Sparkles className="h-5 w-5 text-moss" />
             <p className="text-sm font-medium text-moss">
-              All steps complete — tap &quot;We did this!&quot; below to log it.
+              All steps complete - tap &quot;We did this!&quot; below to log it.
             </p>
           </div>
         )}
@@ -349,7 +349,7 @@ export function ActivityDetailClient({
             <p className="text-sm font-semibold text-umber mb-1">Parent tip</p>
             <p className="text-[13px] text-clay/60 font-serif leading-relaxed">
               Let your child lead the pace. If they want to spend longer on one step, that&apos;s
-              great — curiosity-driven learning sticks better than rushing through.
+              great - curiosity-driven learning sticks better than rushing through.
             </p>
           </div>
         </div>

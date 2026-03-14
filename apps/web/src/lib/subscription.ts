@@ -122,7 +122,7 @@ export async function getUsageCount(
   // Map feature to table/query
   if (feature === 'ai_suggestions') {
     // Count chat messages from the family this period
-    // Uses activity_logs as a proxy — in production you'd have a usage_tracking table
+    // Uses activity_logs as a proxy - in production you'd have a usage_tracking table
     const { count } = await supabase
       .from('activity_logs')
       .select('*', { count: 'exact', head: true })
@@ -133,7 +133,7 @@ export async function getUsageCount(
   }
 
   if (feature === 'browse_activities') {
-    // For browse, we don't typically track — return 0
+    // For browse, we don't typically track - return 0
     return 0;
   }
 
@@ -181,7 +181,7 @@ export async function getEffectiveTier(familyId: string): Promise<{
   if (status === 'trialing' && trialEndsAt) {
     const now = new Date();
     if (now > trialEndsAt) {
-      // Trial expired — downgrade to free
+      // Trial expired - downgrade to free
       await supabase
         .from('families')
         .update({

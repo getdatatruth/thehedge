@@ -5,7 +5,7 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'Features — 1,200+ Screen-Free Activities for Irish Families',
+  title: 'Features - 1,200+ Screen-Free Activities for Irish Families',
   description: 'Explore The Hedge\'s full feature set: AI-powered activity suggestions, weather-aware planning, NCCA curriculum mapping, AEARS logging, and a library of 1,200+ Irish activities.',
   alternates: { canonical: 'https://thehedge.ie/features' },
 };
@@ -17,8 +17,8 @@ const featureGroups = [
     features: [
       { id: 'leaf', title: 'Nature & Outdoor Activities', body: '240+ outdoor activities across all Irish seasons. Rock pooling in Connemara, bog walks in Roscommon, coastal foraging in Cork. Every activity designed for real Irish environments.' },
       { id: 'flask', title: 'Science & Discovery', body: 'Kitchen chemistry, garden experiments, cloud identification, and citizen science projects. Learning through curiosity, not worksheets.' },
-      { id: 'palette', title: 'Arts & Creativity', body: 'Painting, printmaking, weaving, pottery, nature journalling, seasonal crafts. Activities that produce something real — and beautiful — to keep.' },
-      { id: 'calc', title: 'Maths in the Wild', body: 'Measurement, patterns, data collection, shapes in nature. Maths happens everywhere — The Hedge shows children where to find it.' },
+      { id: 'palette', title: 'Arts & Creativity', body: 'Painting, printmaking, weaving, pottery, nature journalling, seasonal crafts. Activities that produce something real - and beautiful - to keep.' },
+      { id: 'calc', title: 'Maths in the Wild', body: 'Measurement, patterns, data collection, shapes in nature. Maths happens everywhere - The Hedge shows children where to find it.' },
       { id: 'book', title: 'Language & Literacy', body: 'Storytelling, letter writing, poetry, read-alouds, oral tradition. English and Irish language activities woven through the weekly plan.' },
       { id: 'clover', title: 'Irish Heritage & Culture', body: 'Folklore, mythology, festivals, traditional crafts, and the Irish language. Rooted in the place you live and the stories your children will carry forever.' },
     ]
@@ -38,14 +38,14 @@ const featureGroups = [
     features: [
       { id: 'cal', title: 'Weekly Planner', body: 'Drag and drop activities into your week. See a balanced view across subjects, energy levels, and outdoor vs indoor. Share with your partner or co-parent.' },
       { id: 'leaf', title: 'Activity Timeline', body: 'A rolling record of everything your family has done. Scrollable, searchable, beautiful. The kind of thing you\'ll want to show your children when they\'re older.' },
-      { id: 'book', title: 'Learning Log (Educator)', body: 'Auto-generated, date-stamped, NCCA-tagged records of every activity. Export as a formatted PDF report — exactly what AEARS assessors want to see.' },
+      { id: 'book', title: 'Learning Log (Educator)', body: 'Auto-generated, date-stamped, NCCA-tagged records of every activity. Export as a formatted PDF report - exactly what AEARS assessors want to see.' },
     ]
   },
   {
     title: 'On the Go',
     sub: 'Available on all your devices',
     features: [
-      { id: 'cpu', title: 'iOS & Android App', body: 'Take The Hedge with you wherever your family goes. Browse activities, log progress, and get AI suggestions — all from your phone. Available on any paid plan.' },
+      { id: 'cpu', title: 'iOS & Android App', body: 'Take The Hedge with you wherever your family goes. Browse activities, log progress, and get AI suggestions - all from your phone. Available on any paid plan.' },
       { id: 'sun', title: 'Offline Access', body: 'Save activities for offline use. Perfect for trips to the woods, the beach, or anywhere signal drops. Your saved activities are always available.' },
       { id: 'palette', title: 'Family Sharing', body: 'Share your account with your partner or co-parent. Both of you see the same planner, timeline, and activity log. Stay on the same page, literally.' },
     ]

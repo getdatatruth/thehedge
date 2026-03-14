@@ -634,7 +634,7 @@ function htmlShell(title: string, childName: string, dateRange: string, generate
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} — ${childName}</title>
+  <title>${title} - ${childName}</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 

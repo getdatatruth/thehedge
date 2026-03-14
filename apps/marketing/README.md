@@ -1,4 +1,4 @@
-# The Hedge — thehedge.ie
+# The Hedge - thehedge.ie
 
 > Where Curious Families Learn
 
@@ -7,7 +7,7 @@
 - **Framework:** Next.js 16 (App Router)
 - **Styling:** Tailwind CSS + CSS variables
 - **Animation:** Framer Motion
-- **Hosting:** Vercel (Dublin region — `dub1`)
+- **Hosting:** Vercel (Dublin region - `dub1`)
 - **Fonts:** Playfair Display · Lora · DM Sans
 
 ## Deploy to Vercel
@@ -67,7 +67,7 @@ the-hedge-web/
 
 ## Adding pages
 
-- `/blog` — content marketing (add to `app/blog/`)
-- `/homeschool` — dedicated homeschool landing
-- `/activities` — public activity library
-- `/app` — post-login dashboard (Phase 2)
+- `/blog` - content marketing (add to `app/blog/`)
+- `/homeschool` - dedicated homeschool landing
+- `/activities` - public activity library
+- `/app` - post-login dashboard (Phase 2)

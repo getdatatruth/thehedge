@@ -1,6 +1,6 @@
-# THE HEDGE — Complete Product & Technical Brief
+# THE HEDGE - Complete Product & Technical Brief
 
-## thehedge.ie — "Where Curious Families Learn"
+## thehedge.ie - "Where Curious Families Learn"
 
 ---
 
@@ -8,17 +8,17 @@
 
 ## 1. The Product
 
-The Hedge is a family learning platform. The name comes from Ireland's hedge schools — the illegal open-air schools of the 18th century where families took education into their own hands when the system wouldn't serve them. That spirit of independence, resourcefulness, and learning by nature is the soul of everything we build.
+The Hedge is a family learning platform. The name comes from Ireland's hedge schools - the illegal open-air schools of the 18th century where families took education into their own hands when the system wouldn't serve them. That spirit of independence, resourcefulness, and learning by nature is the soul of everything we build.
 
 The Hedge serves two audiences with one product:
 
 - **Every family (mainstream):** Parents whose children attend school but who want screen-free ideas, weekend activities, holiday plans, and enrichment beyond homework. The app that answers "What should we do with the kids today?"
-- **Homeschool families:** Parents educating at home who need a complete operating system — curriculum engine, daily plans, Tusla AEARS compliance documentation, progress tracking, and AI-powered guidance.
+- **Homeschool families:** Parents educating at home who need a complete operating system - curriculum engine, daily plans, Tusla AEARS compliance documentation, progress tracking, and AI-powered guidance.
 
 The front door is wide open to everyone. The homeschool features are the deep product for power users. The entry point is a universal parenting need: meaningful, screen-free time with your children.
 
 ### One-Line Pitch
-"The Hedge tells you what to do with your kids today — personalised to their ages, the weather, and what you did yesterday. For homeschool families, it's the complete education system Ireland has been missing."
+"The Hedge tells you what to do with your kids today - personalised to their ages, the weather, and what you did yesterday. For homeschool families, it's the complete education system Ireland has been missing."
 
 ### Brand Voice & Personality
 
@@ -63,7 +63,7 @@ Subset of above who has pulled children from mainstream school or is considering
 
 **Onboarding (15 min):** Extended wizard: children's details, approach (blended), priorities, hours, Tusla status (awaiting assessment). The Hedge generates complete yearly plan for both children mapped to Irish curriculum.
 
-**Daily Use:** Opens app. "Monday — Oisín (9): Maths (fractions with pizza, 30 min), English (creative writing, 30 min), Nature (bird ID walk, 45 min). Aoife (6): Phonics (letter blends, 20 min), Maths (counting with buttons, 20 min), Art (paint a flower, 30 min). Together: Irish vocab game (15 min)."
+**Daily Use:** Opens app. "Monday - Oisín (9): Maths (fractions with pizza, 30 min), English (creative writing, 30 min), Nature (bird ID walk, 45 min). Aoife (6): Phonics (letter blends, 20 min), Maths (counting with buttons, 20 min), Art (paint a flower, 30 min). Together: Irish vocab game (15 min)."
 
 **Tusla Assessment:** 3 weeks before, taps "Prepare for Assessment." Complete portfolio PDF generated: curriculum coverage, sample work, progress notes, education plan. Walks in confident. Assessor impressed.
 
@@ -71,7 +71,7 @@ Subset of above who has pulled children from mainstream school or is considering
 
 ## 4. Complete Feature Specification
 
-### 4.1 Mobile App (iOS & Android) — The Daily Companion
+### 4.1 Mobile App (iOS & Android) - The Daily Companion
 
 - **Today's Ideas:** 3–5 personalised activity cards. Based on children's ages, weather (Open-Meteo API), season, time, recent history, family prefs. Each card: title, time, materials (household), age range, learning outcomes, mess level, energy level.
 - **Quick filters:** "15 minutes" / "Raining" / "In the car" / "No mess" / "Calm" / "Active" / "Screen-free"
@@ -86,17 +86,17 @@ Subset of above who has pulled children from mainstream school or is considering
 - **Calendar sync:** Apple Calendar, Google Calendar.
 - **Family timeline:** Scrollable feed with photos. Memory log + homeschool evidence.
 
-### 4.2 Web Platform (thehedge.ie) — The Command Centre
+### 4.2 Web Platform (thehedge.ie) - The Command Centre
 
 - **Full content library:** Browse, search, filter all activities
 - **Favourites & collections:** Custom groups ("Rainy days", "Car journeys")
 - **Family dashboard:** Recent activity, patterns, seasonal suggestions
-- **Educator suite (Educator tier):** Full planning — yearly/termly/weekly/daily. Curriculum alignment. Drag-and-drop.
+- **Educator suite (Educator tier):** Full planning - yearly/termly/weekly/daily. Curriculum alignment. Drag-and-drop.
 - **Tusla compliance centre (Educator tier):** Application guide, plan generator, portfolio, coverage dashboard, assessment prep.
 - **Community hub:** County groups, forums, events, co-ops, mentors, swaps.
 - **AI assistant:** Full conversational with family context.
 
-### 4.3 iPad App — The Child's Space
+### 4.3 iPad App - The Child's Space
 
 - **My Activities:** Visual, age-appropriate view. Icons for young children, list for older.
 - **Interactive exercises:** Maths, phonics, reading, science. Curriculum-aligned, adaptive.
@@ -149,7 +149,7 @@ Tusla assesses "certain minimum education" covering: intellectual development (l
 The Hedge automates:
 - **Application guidance:** Step-by-step AEARS form walkthrough
 - **Education plan document:** Auto-generated PDF
-- **Portfolio builder:** Evidence from daily logs — photos, work samples, progress notes
+- **Portfolio builder:** Evidence from daily logs - photos, work samples, progress notes
 - **Coverage dashboard:** Traffic light (green/amber/red) by curriculum area
 - **Assessment prep:** What to expect, checklist, AI review 3 weeks before
 - **Attendance record:** Auto-logged from plan completion
@@ -160,7 +160,7 @@ The Hedge automates:
 ## 7. SEN & Community
 
 ### SEN Support
-- SEN-aware profiles (dyslexia, ADHD, autism, etc.) — activities adapt
+- SEN-aware profiles (dyslexia, ADHD, autism, etc.) - activities adapt
 - Adapted content: visual supports, simplified instructions, alternative outputs
 - Professional directory: EPs, SLTs, OTs, specialist tutors
 - IEP planning for Educator tier
@@ -397,12 +397,12 @@ the-hedge/
 |---------|------|----------------|-------------------|
 | Daily ideas | 1-2/day | 5+/day | Unlimited |
 | Content library | Limited | Full | Full |
-| Weekend/holiday plans | — | Yes | Yes |
+| Weekend/holiday plans | - | Yes | Yes |
 | AI assistant | 5/week | 30/week | Unlimited |
-| iPad child app | — | Yes | Yes |
+| iPad child app | - | Yes | Yes |
 | Community | Read only | Full | Full + mentor |
-| Curriculum engine | — | — | Full |
-| Tusla compliance | — | — | Full |
+| Curriculum engine | - | - | Full |
+| Tusla compliance | - | - | Full |
 | SEN support | Basic | Adapted | Full + IEP |
 
 Annual: Family €59.99/yr. Educator €134.99/yr. All tiers cover unlimited children.

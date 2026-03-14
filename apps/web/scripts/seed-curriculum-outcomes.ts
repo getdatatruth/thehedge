@@ -20,7 +20,7 @@ interface CurriculumOutcome {
 
 const outcomes: CurriculumOutcome[] = [
   // ═══════════════════════════════════════════════════════════
-  // AISTEAR THEMES — Early Childhood (ages 0-6)
+  // AISTEAR THEMES - Early Childhood (ages 0-6)
   // ═══════════════════════════════════════════════════════════
 
   // ─── Well-being ────────────────────────────────────────────
@@ -188,7 +188,7 @@ const outcomes: CurriculumOutcome[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
-  // NCCA PRIMARY CURRICULUM — Junior Classes (ages 4-8)
+  // NCCA PRIMARY CURRICULUM - Junior Classes (ages 4-8)
   // ═══════════════════════════════════════════════════════════
 
   // ─── Language: English ─────────────────────────────────────
@@ -454,7 +454,7 @@ const outcomes: CurriculumOutcome[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
-  // NCCA PRIMARY CURRICULUM — Senior Classes (ages 8-12)
+  // NCCA PRIMARY CURRICULUM - Senior Classes (ages 8-12)
   // ═══════════════════════════════════════════════════════════
 
   // ─── Language: English (Senior) ────────────────────────────

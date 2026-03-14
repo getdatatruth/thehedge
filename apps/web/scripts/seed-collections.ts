@@ -85,7 +85,7 @@ async function main() {
     {
       title: 'Spring Has Sprung',
       slug: 'spring-has-sprung',
-      description: 'Activities perfect for the new season — frogspawn, flowers, and fresh air.',
+      description: 'Activities perfect for the new season - frogspawn, flowers, and fresh air.',
       emoji: '🌱',
       activity_ids: resolveActivityIds(['act-1', 'act-2', 'act-12', 'act-14']),
       featured: true,
@@ -129,7 +129,7 @@ async function main() {
     {
       title: 'Outdoor Adventures',
       slug: 'outdoor-adventures',
-      description: 'Get outside and explore — whatever the weather.',
+      description: 'Get outside and explore - whatever the weather.',
       emoji: '🏕️',
       activity_ids: resolveActivityIds(['act-1', 'act-2', 'act-4', 'act-12']),
       featured: false,

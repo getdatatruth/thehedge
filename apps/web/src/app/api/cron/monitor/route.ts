@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
     const issues: string[] = [];
     for (const service of health.services || []) {
       if (service.status === 'down') {
-        issues.push(`DOWN: ${service.name} — ${service.error || 'no details'}`);
+        issues.push(`DOWN: ${service.name} - ${service.error || 'no details'}`);
       } else if (service.status === 'degraded') {
-        issues.push(`DEGRADED: ${service.name} — ${service.error || `${service.latency_ms}ms`}`);
+        issues.push(`DEGRADED: ${service.name} - ${service.error || `${service.latency_ms}ms`}`);
       }
     }
 
@@ -46,9 +46,9 @@ export async function GET(request: NextRequest) {
       alerted: issues.length > 0,
     });
   } catch (error) {
-    // The health endpoint itself is unreachable — critical failure
+    // The health endpoint itself is unreachable - critical failure
     const message = error instanceof Error ? error.message : 'Health endpoint unreachable';
-    await sendAlerts('critical', [`CRITICAL: Health endpoint failed — ${message}`], new Date().toISOString());
+    await sendAlerts('critical', [`CRITICAL: Health endpoint failed - ${message}`], new Date().toISOString());
 
     return NextResponse.json(
       { error: 'Health check failed', message },
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 }
 
 async function sendAlerts(status: string, issues: string[], timestamp: string) {
-  const subject = `[The Hedge] Platform ${status.toUpperCase()} — ${issues.length} issue(s)`;
+  const subject = `[The Hedge] Platform ${status.toUpperCase()} - ${issues.length} issue(s)`;
   const body = [
     `Platform Status: ${status.toUpperCase()}`,
     `Time: ${timestamp}`,

@@ -5,7 +5,7 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'About The Hedge — Built in West Cork, Ireland',
+  title: 'About The Hedge - Built in West Cork, Ireland',
   description: "The Hedge is a family learning platform built in West Cork, Ireland. We're inspired by Ireland's hedge school tradition and the belief that children learn best through doing.",
   alternates: { canonical: 'https://thehedge.ie/about' },
 };
@@ -15,7 +15,7 @@ const values = [
   { id:'sun', title:'Screen-free by design', body:"Every activity we suggest is something to do, not something to watch. We believe children learn best through making, moving, exploring, and being in the real world." },
   { id:'book', title:'Learning is everywhere', body:"The hedge school tradition understood that learning doesn't need four walls and a bell. It happens in kitchens, gardens, fields, and beaches. We help families find it everywhere." },
   { id:'shield', title:'Privacy first', body:"We will never sell your family's data, serve you ads, or use your children's information to train AI models. EU data storage, GDPR compliant, always." },
-  { id:'users', title:'For every family', body:"Whether you homeschool, use mainstream school, live in a city apartment, or on a farm in Connaught — The Hedge works for you. Irish family life is diverse, and we reflect that." },
+  { id:'users', title:'For every family', body:"Whether you homeschool, use mainstream school, live in a city apartment, or on a farm in Connaught - The Hedge works for you. Irish family life is diverse, and we reflect that." },
   { id:'spark', title:'Honest about what we are', body:"We're a small team building something we genuinely believe in. We're not venture-backed, not chasing virality, and not optimising for engagement. We're optimising for families having better days." },
 ];
 
@@ -55,10 +55,10 @@ export default function About() {
             <h2 className="section-title" id="story-title">The hedge school <em>tradition</em></h2>
             <div style={{display:'flex',flexDirection:'column',gap:20}}>
               {[
-                "In 18th-century Ireland, when formal education was suppressed under the Penal Laws, Irish communities created their own — holding lessons outdoors, beneath hedgerows and in ditches, with whatever teacher was available and whatever materials they had to hand. Education, stubbornly happening despite everything.",
+                "In 18th-century Ireland, when formal education was suppressed under the Penal Laws, Irish communities created their own - holding lessons outdoors, beneath hedgerows and in ditches, with whatever teacher was available and whatever materials they had to hand. Education, stubbornly happening despite everything.",
                 "These hedge schools weren't perfect. But they were real. They were community-driven, they worked with the landscape, and they understood that learning happens wherever you decide it does.",
-                "That spirit is what The Hedge is built on. Not the idea that children need a building, a curriculum, or a screen to learn — but that curiosity, guided gently, flowers in the most ordinary places. A kitchen. A garden. A walk along a lane in Kerry in November.",
-                "We built The Hedge in West Cork because that's where we live, and because West Cork felt like the right kind of place to build something like this — somewhere with a long memory of learning the hard way, in the real world, outside.",
+                "That spirit is what The Hedge is built on. Not the idea that children need a building, a curriculum, or a screen to learn - but that curiosity, guided gently, flowers in the most ordinary places. A kitchen. A garden. A walk along a lane in Kerry in November.",
+                "We built The Hedge in West Cork because that's where we live, and because West Cork felt like the right kind of place to build something like this - somewhere with a long memory of learning the hard way, in the real world, outside.",
               ].map((para, i) => (
                 <p key={i} style={{fontFamily:'var(--font-serif)',fontSize:'clamp(16px,2.5vw,19px)',color:'var(--clay)',lineHeight:1.75}}>{para}</p>
               ))}
@@ -112,7 +112,7 @@ export default function About() {
           <div className="container" style={{maxWidth:640}}>
             <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Get in touch</span></div>
             <h2 className="section-title" id="contact-title">We love hearing <em>from families</em></h2>
-            <p className="section-body">Questions, feedback, stories about what your children made last Tuesday — we want to hear it all. We&apos;re a small team and we read every email.</p>
+            <p className="section-body">Questions, feedback, stories about what your children made last Tuesday - we want to hear it all. We&apos;re a small team and we read every email.</p>
             <div style={{display:'flex',flexDirection:'column',gap:12}}>
               {[
                 { id:'msg', label:'General enquiries', email:'hello@thehedge.ie' },

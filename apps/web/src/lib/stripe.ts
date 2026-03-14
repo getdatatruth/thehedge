@@ -14,7 +14,7 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-// Stripe Price IDs — monthly and annual for each tier
+// Stripe Price IDs - monthly and annual for each tier
 export const PRICE_IDS = {
   family: {
     monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY || 'price_1TAn1DRqzN6VBgZy8YhOkUUK',

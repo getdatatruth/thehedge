@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { TuslaClient } from './tusla-client';
 
 export const metadata = {
-  title: 'Tusla Registration & Compliance — The Hedge',
+  title: 'Tusla Registration & Compliance - The Hedge',
 };
 
 export default async function TuslaPage() {

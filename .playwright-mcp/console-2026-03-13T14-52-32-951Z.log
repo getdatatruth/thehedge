@@ -1,0 +1,4 @@
+[   29104ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.location call. @ https://vercel.com/_next/static/chunks/64db15ba0d8982c8.js?dpl=dpl_7RZP3Smkn56xq72i7Y9cXmHv8XpH:203
+[   29105ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.location call. @ https://vercel.com/_next/static/chunks/64db15ba0d8982c8.js?dpl=dpl_7RZP3Smkn56xq72i7Y9cXmHv8XpH:203
+[   29239ms] [WARNING] Deprecated API for given entry type. @ https://vercel.com/_next/static/chunks/7564c4d5375ace26.js?dpl=dpl_7RZP3Smkn56xq72i7Y9cXmHv8XpH:18
+[   29419ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://vercel.com/api/jwt:0

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { NotificationsClient } from './notifications-client';
 
 export const metadata = {
-  title: 'Notifications — The Hedge',
+  title: 'Notifications - The Hedge',
 };
 
 export default async function NotificationsPage() {

@@ -11,8 +11,8 @@ export async function OPTIONS() {
  * List published collections with their activities resolved.
  *
  * Query params:
- *   featured=true  — only featured collections
- *   seasonal=true  — only seasonal collections
+ *   featured=true  - only featured collections
+ *   seasonal=true  - only seasonal collections
  */
 export async function GET(request: NextRequest) {
   const { supabase, user, error } = await createApiClient(request);

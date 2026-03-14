@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { CommunityClient } from './community-client';
 
 export const metadata = {
-  title: 'Community — The Hedge',
+  title: 'Community - The Hedge',
 };
 
 export default async function CommunityPage() {

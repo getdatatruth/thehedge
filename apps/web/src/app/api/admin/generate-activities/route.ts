@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         count = Math.min(Math.max(1, body.count), 10);
       }
     } catch {
-      // No body or invalid JSON — use default count
+      // No body or invalid JSON - use default count
     }
 
     const result = await generateActivities(count);

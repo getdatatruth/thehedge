@@ -5,7 +5,7 @@ import { TodayClient } from './today-client';
 import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 
 export const metadata = {
-  title: 'Today — The Hedge',
+  title: 'Today - The Hedge',
 };
 
 function getWeekDates() {

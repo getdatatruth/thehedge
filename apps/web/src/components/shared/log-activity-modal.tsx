@@ -73,7 +73,7 @@ export function LogActivityModal({
         }
       }
     } catch {
-      // Silently fail — children selection is optional
+      // Silently fail - children selection is optional
     } finally {
       setChildrenLoading(false);
     }

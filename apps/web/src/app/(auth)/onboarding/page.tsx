@@ -1,7 +1,7 @@
 import { OnboardingWizard } from '@/components/onboarding/onboarding-wizard';
 
 export const metadata = {
-  title: 'Set up your family — The Hedge',
+  title: 'Set up your family - The Hedge',
   description: 'Tell us about your family so we can personalise your experience',
 };
 

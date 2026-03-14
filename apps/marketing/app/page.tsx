@@ -6,24 +6,24 @@ import Footer from '../components/Footer';
 import { Icon } from '../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'The Hedge — Personalised Family Activities for Irish Families',
+  title: 'The Hedge - Personalised Family Activities for Irish Families',
   description: "Ireland's family learning platform. AI-powered, weather-aware activity ideas for your children every morning. Screen-free. Irish. Built for real family life.",
   alternates: { canonical: 'https://thehedge.ie' },
-  openGraph: { title: 'The Hedge — Family Learning Platform for Irish Families', description: "Personalised daily activities for Irish families, shaped by your weather, your children, and your world." }
+  openGraph: { title: 'The Hedge - Family Learning Platform for Irish Families', description: "Personalised daily activities for Irish families, shaped by your weather, your children, and your world." }
 };
 
 const testimonials = [
   { quote: "It knows when it's wet and cold in Donegal and suggests indoor activities automatically. No other app even knows what county we're in.", name: 'Sinéad McGuinness', role: 'Mam of 2, Donegal', plan: 'Family', initials: 'SM' },
-  { quote: "We've done things this year I'd never have thought of — a fairy door trail in our garden, pressing autumn leaves, making Irish butter. The kids ask for it every morning.", name: 'Ciarán Ó Briain', role: 'Dad of 3, Galway', plan: 'Family', initials: 'CÓ', forest: true },
+  { quote: "We've done things this year I'd never have thought of - a fairy door trail in our garden, pressing autumn leaves, making Irish butter. The kids ask for it every morning.", name: 'Ciarán Ó Briain', role: 'Dad of 3, Galway', plan: 'Family', initials: 'CÓ', forest: true },
   { quote: "As a homeschooler, the AEARS logging alone is worth the subscription. It would have taken me hours each week to do manually.", name: 'Laura Hennessy', role: 'Homeschool parent, Tipperary', plan: 'Educator', initials: 'LH' },
 ];
 
 const faqs = [
-  { q: "What age children is The Hedge designed for?", a: "The Hedge works for children aged 2–16. When you set up your family profile, you tell us your children's ages and the platform adjusts every suggestion accordingly — simpler sensory play for toddlers, more complex projects for older children. Multi-age families are very much catered for." },
-  { q: "Do I need a subscription to use it?", a: "No — we have a free plan that gives you 1–2 activity ideas per day from a curated library. The Family plan (€6.99/month) unlocks the full AI personalisation engine, weather integration, the weekly planner, and unlimited activity history. The Educator plan adds homeschool-specific tools." },
+  { q: "What age children is The Hedge designed for?", a: "The Hedge works for children aged 2–16. When you set up your family profile, you tell us your children's ages and the platform adjusts every suggestion accordingly - simpler sensory play for toddlers, more complex projects for older children. Multi-age families are very much catered for." },
+  { q: "Do I need a subscription to use it?", a: "No - we have a free plan that gives you 1–2 activity ideas per day from a curated library. The Family plan (€6.99/month) unlocks the full AI personalisation engine, weather integration, the weekly planner, and unlimited activity history. The Educator plan adds homeschool-specific tools." },
   { q: "How does the weather integration work?", a: "The Hedge pulls live weather data from Open-Meteo for your specific county every morning. If rain is forecast, it automatically surfaces indoor activities. If there's a rare sunny spell, it prioritises outdoor and nature activities. You never have to manually adjust for the weather." },
   { q: "Is The Hedge only for homeschooling families?", a: "Not at all. The majority of our families use mainstream schools. The Hedge helps with after-school activities, weekends, school holidays, and summer. For homeschooling families, we have a dedicated Educator plan with curriculum mapping and AEARS-compliant logging." },
-  { q: "Is my data stored in Ireland / the EU?", a: "Yes. All data is stored in the EU — specifically in Frankfurt, Germany — and we are fully GDPR compliant. We do not sell data to third parties or use it for advertising." },
+  { q: "Is my data stored in Ireland / the EU?", a: "Yes. All data is stored in the EU - specifically in Frankfurt, Germany - and we are fully GDPR compliant. We do not sell data to third parties or use it for advertising." },
   { q: "Can I use The Hedge on my phone?", a: "Yes. The web app works beautifully on all mobile devices. A dedicated iOS app is in development and coming soon for Family and Educator subscribers." },
 ];
 
@@ -58,7 +58,7 @@ export default function Home() {
             <h1 className="hero-headline">
               What will your<br />family do<br /><em>today?</em>
             </h1>
-            <p className="hero-body">Personalised activities for Irish families — shaped by your children, your weather, and your world.</p>
+            <p className="hero-body">Personalised activities for Irish families - shaped by your children, your weather, and your world.</p>
             <p className="hero-sub">For homeschooling families and mainstream families who want something <strong>richer than a screen</strong> for their children every day.</p>
             <div className="actions fade-up-2">
               <Link href="https://app.thehedge.ie/signup" className="btn-primary">
@@ -115,7 +115,7 @@ export default function Home() {
               </div>
               <div style={{padding:'12px 20px',borderTop:'1px solid rgba(245,240,228,0.08)'}}>
                 <div style={{background:'var(--terracotta)',borderRadius:8,padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:12,color:'white',fontWeight:600}}>Get started — it&apos;s free</span>
+                  <span style={{fontSize:12,color:'white',fontWeight:600}}>Get started - it&apos;s free</span>
                   <Icon id="arrow-r" size={14} color="white" />
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default function Home() {
             <div style={{maxWidth:540}}>
               <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">As easy as it gets</span></div>
               <h2 className="section-title" id="hiw-title">How The Hedge <em>works</em></h2>
-              <p className="section-body">From your first morning to your hundredth adventure — it gets better the more you use it.</p>
+              <p className="section-body">From your first morning to your hundredth adventure - it gets better the more you use it.</p>
               <div className="steps">
                 {[
                   { n:'01', id:'users', title:'Tell us about your family', body:'A quick 2-minute setup. Children\'s ages, what they love, your outdoor space. The Hedge does the rest.' },
@@ -192,7 +192,7 @@ export default function Home() {
                   ))}
                 </div>
                 <div style={{marginTop:16,padding:'12px 14px',background:'rgba(61,97,66,0.06)',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:12,color:'var(--clay)'}}>Get started — it&apos;s free</span>
+                  <span style={{fontSize:12,color:'var(--clay)'}}>Get started - it&apos;s free</span>
                   <Link href="https://app.thehedge.ie/signup" style={{fontSize:12,fontWeight:700,color:'var(--forest)',display:'flex',alignItems:'center',gap:4}}>
                     Try it now <Icon id="arrow-r" size={12} />
                   </Link>
@@ -211,7 +211,7 @@ export default function Home() {
               {[
                 { icon:'users', title:'Mainstream families', body:'After school, weekends, school holidays, summer. The Hedge gives you an endless supply of ideas that are better than the TV and more interesting than "go play outside".' },
                 { icon:'book', title:'Homeschooling families', body:'Full NCCA curriculum mapping, weekly planners, and AEARS-compliant learning logs. Everything you need to run a rich, evidenced home education.' },
-                { icon:'leaf', title:'Nature & outdoor families', body:'Half your activities are outdoors by default. Foraging, nature journalling, garden science, bog walks, beach explorations — all tailored to your county and season.' },
+                { icon:'leaf', title:'Nature & outdoor families', body:'Half your activities are outdoors by default. Foraging, nature journalling, garden science, bog walks, beach explorations - all tailored to your county and season.' },
               ].map(c => (
                 <div key={c.title} style={{background:'white',borderRadius:16,padding:'28px 24px',border:'1px solid var(--stone)'}}>
                   <div style={{width:40,height:40,borderRadius:10,background:'rgba(61,97,66,0.08)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>
@@ -289,12 +289,12 @@ export default function Home() {
                 <span style={{fontSize:9,fontWeight:700,background:'rgba(143,175,126,0.2)',color:'var(--sage)',padding:'4px 10px',borderRadius:3,letterSpacing:'0.1em',textTransform:'uppercase'}}>AEARS Ready</span>
               </div>
               <div className="sched-body">
-                <div className="sched-lbl">Wednesday — curriculum blocks</div>
+                <div className="sched-lbl">Wednesday - curriculum blocks</div>
                 {[
-                  { s:'Mathematics', a:"Measuring the garden — area & perimeter in the real world", cls:'sb-g', ic:'si-math', o:'Measures strand' },
+                  { s:'Mathematics', a:"Measuring the garden - area & perimeter in the real world", cls:'sb-g', ic:'si-math', o:'Measures strand' },
                   { s:'English', a:"Write a letter to a hedgehog who needs a home", cls:'sb-l', ic:'si-eng', o:'Writing strand' },
-                  { s:'Science', a:"Plant a winter container garden — life cycles", cls:'sb-g', ic:'si-nat', o:'Living things' },
-                  { s:'Irish', a:"Ainmhithe an ghairdín — garden animals in Irish", cls:'sb-l', ic:'si-irish', o:'Labhairt' },
+                  { s:'Science', a:"Plant a winter container garden - life cycles", cls:'sb-g', ic:'si-nat', o:'Living things' },
+                  { s:'Irish', a:"Ainmhithe an ghairdín - garden animals in Irish", cls:'sb-l', ic:'si-irish', o:'Labhairt' },
                 ].map(b => (
                   <div key={b.s} className={`sched-blk ${b.cls}`}>
                     <div className={`subj-ic ${b.ic}`}><Icon id={b.ic === 'si-math' ? 'calc' : b.ic === 'si-eng' ? 'pen' : b.ic === 'si-nat' ? 'leaf' : 'clover'} size={12} color="var(--forest)" /></div>
@@ -365,7 +365,7 @@ export default function Home() {
             <p>Join 2,400+ Irish families who wake up knowing exactly what to do with their children today.</p>
             <div className="actions">
               <Link href="https://app.thehedge.ie/signup" className="btn-light">
-                Start free — no card needed <Icon id="arrow-r" size={16} />
+                Start free - no card needed <Icon id="arrow-r" size={16} />
               </Link>
               <Link href="/pricing" className="btn-ghost" style={{color:'var(--mist)'}}>
                 Compare plans

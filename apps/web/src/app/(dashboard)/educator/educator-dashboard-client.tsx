@@ -362,7 +362,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
                   </div>
                   <p className="text-[10px] text-clay/40 font-serif capitalize">
                     Priority: {areaConfig?.priority || 'medium'}
-                    {areaConfig?.notes ? ` — ${areaConfig.notes}` : ''}
+                    {areaConfig?.notes ? ` - ${areaConfig.notes}` : ''}
                   </p>
                 </div>
               );

@@ -1106,7 +1106,7 @@ export function PlannerClient({
                           );
                         })}
 
-                        {/* Empty slot — add button */}
+                        {/* Empty slot - add button */}
                         {slotBlocks.length === 0 && !past && (
                           <button
                             onClick={() =>
@@ -1122,7 +1122,7 @@ export function PlannerClient({
                     );
                   })}
 
-                  {/* Empty day — no plan at all */}
+                  {/* Empty day - no plan at all */}
                   {!plan && (
                     <div className="flex flex-col items-center justify-center h-[120px] text-center gap-2">
                       <p className="text-[11px] text-clay/30 italic font-serif">

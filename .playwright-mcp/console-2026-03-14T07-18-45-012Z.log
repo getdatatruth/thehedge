@@ -1,0 +1,3 @@
+[    3600ms] [WARNING] Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://www.youtube.com') does not match the recipient window's origin ('https://www.google.com'). @ https://www.youtube.com/s/player/74edf1a3/www-widgetapi.vflset/www-widgetapi.js:209
+[    4813ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://github.com/github-copilot/chat/entitlement:0
+[    4975ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://github.com/github-copilot/chat/token:0

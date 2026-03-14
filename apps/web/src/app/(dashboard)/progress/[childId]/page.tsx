@@ -9,7 +9,7 @@ import {
 } from '@/lib/badges';
 
 export const metadata = {
-  title: 'Child Progress — The Hedge',
+  title: 'Child Progress - The Hedge',
 };
 
 export default async function ChildProgressPage({ params }: { params: Promise<{ childId: string }> }) {

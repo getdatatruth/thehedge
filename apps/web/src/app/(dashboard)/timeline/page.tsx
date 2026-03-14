@@ -5,7 +5,7 @@ import { Star, Calendar, Clock } from 'lucide-react';
 import { TimelineClient } from './timeline-client';
 
 export const metadata = {
-  title: 'Timeline — The Hedge',
+  title: 'Timeline - The Hedge',
 };
 
 export default async function TimelinePage() {

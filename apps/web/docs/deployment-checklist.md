@@ -1,4 +1,4 @@
-# The Hedge — Vercel Deployment Checklist
+# The Hedge - Vercel Deployment Checklist
 
 ## 1. Vercel Project Setup
 
@@ -80,7 +80,7 @@ Mark variables as available for **Production**, **Preview**, and **Development**
 ### Stripe Price IDs
 
 The webhook route has hardcoded price-to-tier mapping in `PRICE_TO_TIER`. After creating your live Stripe products/prices, update:
-- `src/app/api/stripe/webhooks/route.ts` — `PRICE_TO_TIER` map
+- `src/app/api/stripe/webhooks/route.ts` - `PRICE_TO_TIER` map
 - Vercel env vars: `STRIPE_PRICE_FAMILY`, `STRIPE_PRICE_EDUCATOR`
 
 ## 4. DNS / Domain Setup
@@ -133,29 +133,29 @@ The following crons are configured in `vercel.json`:
 Run through these checks after the first production deploy:
 
 ### Core Functionality
-- [ ] Visit `https://thehedge.ie` — landing page loads
-- [ ] Visit `https://thehedge.ie/api/health` — returns `{ "status": "healthy" }` with all services green
-- [ ] Sign up a new account — email confirmation works
-- [ ] Complete onboarding wizard — redirects to dashboard
-- [ ] Browse activities — search and category filters work
-- [ ] Log an activity — appears in timeline
-- [ ] Test HedgeAI chat — Claude responses work
+- [ ] Visit `https://thehedge.ie` - landing page loads
+- [ ] Visit `https://thehedge.ie/api/health` - returns `{ "status": "healthy" }` with all services green
+- [ ] Sign up a new account - email confirmation works
+- [ ] Complete onboarding wizard - redirects to dashboard
+- [ ] Browse activities - search and category filters work
+- [ ] Log an activity - appears in timeline
+- [ ] Test HedgeAI chat - Claude responses work
 
 ### Stripe / Billing
-- [ ] Visit settings > billing — subscription page loads
+- [ ] Visit settings > billing - subscription page loads
 - [ ] Start a test checkout (use Stripe test mode first if needed)
 - [ ] Verify webhook receives events: check Stripe Dashboard > Webhooks > endpoint > Recent attempts
 - [ ] Test subscription upgrade/downgrade flow
 
 ### Cron & Monitoring
-- [ ] Check Vercel > Project > Cron Jobs — both crons should appear
-- [ ] Manually trigger `/api/cron/monitor` — verify it returns health status
+- [ ] Check Vercel > Project > Cron Jobs - both crons should appear
+- [ ] Manually trigger `/api/cron/monitor` - verify it returns health status
 - [ ] Check that monitoring alerts fire correctly (trigger a degraded state if possible)
 
 ### Edge Cases
-- [ ] Unauthenticated user accessing `/dashboard` — redirects to `/login`
-- [ ] Authenticated user accessing `/login` — redirects to `/dashboard`
-- [ ] User without completed onboarding accessing `/dashboard` — redirects to `/onboarding`
+- [ ] Unauthenticated user accessing `/dashboard` - redirects to `/login`
+- [ ] Authenticated user accessing `/login` - redirects to `/dashboard`
+- [ ] User without completed onboarding accessing `/dashboard` - redirects to `/onboarding`
 
 ## 9. Production Readiness Notes
 

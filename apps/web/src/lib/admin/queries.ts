@@ -404,7 +404,7 @@ export async function getAnalytics() {
     tierDistribution[f.subscription_tier || 'free'] = (tierDistribution[f.subscription_tier || 'free'] || 0) + 1;
   });
 
-  // Weekly signup counts (last 10 weeks) — batch query
+  // Weekly signup counts (last 10 weeks) - batch query
   const tenWeeksAgo = new Date();
   tenWeeksAgo.setDate(tenWeeksAgo.getDate() - 70);
   tenWeeksAgo.setHours(0, 0, 0, 0);

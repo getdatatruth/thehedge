@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Streak milestone check — count distinct dates in a row ending today
+      // Streak milestone check - count distinct dates in a row ending today
       const { data: recentDates } = await supabase
         .from('activity_logs')
         .select('date')

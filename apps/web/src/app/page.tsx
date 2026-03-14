@@ -96,7 +96,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features — Bento Grid */}
+      {/* Features - Bento Grid */}
       <section className="py-20 sm:py-28">
         <div className="mx-auto max-w-5xl px-6">
           <div className="text-center mb-14">
@@ -264,7 +264,7 @@ export default function HomePage() {
                 initials: 'SM',
               },
               {
-                quote: 'My kids are 3 and 7 — it\'s hard to find activities for both. The Hedge nails it every time.',
+                quote: 'My kids are 3 and 7 - it\'s hard to find activities for both. The Hedge nails it every time.',
                 name: 'Roisin K.',
                 location: 'Galway',
                 initials: 'RK',
@@ -310,7 +310,7 @@ export default function HomePage() {
               </h3>
               <p className="text-clay/70 font-serif leading-relaxed max-w-lg">
                 The Hedge Educator plan gives you curriculum-aligned planning, Tusla compliance
-                tracking, portfolio management, and daily schedules — all in one place.
+                tracking, portfolio management, and daily schedules - all in one place.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link href="/pricing" className="btn-primary">

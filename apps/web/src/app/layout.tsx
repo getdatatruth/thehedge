@@ -20,9 +20,9 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: 'The Hedge — Where Curious Families Learn',
+  title: 'The Hedge - Where Curious Families Learn',
   description:
-    'The Hedge tells you what to do with your kids today — personalised to their ages, the weather, and what you did yesterday.',
+    'The Hedge tells you what to do with your kids today - personalised to their ages, the weather, and what you did yesterday.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
 };
 
