@@ -323,7 +323,7 @@ export default function Home() {
             <div className="price-grid" style={{marginTop:32}}>
               {[
                 { name:'Free', tag:'Just get started', price:'€0', sub:'forever', btn:'pcb-outline', btnTxt:'Get started free', btnHref:'https://app.thehedge.ie/signup', feats:['1–2 ideas per day','Activity library (limited)','5 AI suggestions per week','Basic weekly view'], dark:false },
-                { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full 1,200+ activity library','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iPad app (coming soon)'], dark:false, pop:'Most popular' },
+                { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full 1,200+ activity library','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iOS & Android app'], dark:false, pop:'Most popular' },
                 { name:'Educator', tag:'Built for homeschoolers', price:'€14.99', sub:'/month', btn:'pcb-sage', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=educator', feats:['Everything in Family','NCCA curriculum mapping','AEARS-compliant learning logs','PDF report export','IEP support tools','Priority support'], dark:true },
               ].map(p => (
                 <div key={p.name} className={`pc ${p.dark ? 'pc-forest' : 'pc-paper'}`} style={{position:'relative'}}>

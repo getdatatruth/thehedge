@@ -14,13 +14,24 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-// Replace these with real Stripe Price IDs from your dashboard
+// Stripe Price IDs — monthly and annual for each tier
 export const PRICE_IDS = {
-  family: process.env.STRIPE_PRICE_FAMILY || 'price_family_placeholder',
-  educator: process.env.STRIPE_PRICE_EDUCATOR || 'price_educator_placeholder',
+  family: {
+    monthly: process.env.STRIPE_PRICE_FAMILY_MONTHLY || 'price_1TAn1DRqzN6VBgZy8YhOkUUK',
+    annual: process.env.STRIPE_PRICE_FAMILY_ANNUAL || 'price_1TAn1DRqzN6VBgZyJ7Gkn6vI',
+  },
+  educator: {
+    monthly: process.env.STRIPE_PRICE_EDUCATOR_MONTHLY || 'price_1TAn1ERqzN6VBgZyb4PcuBWp',
+    annual: process.env.STRIPE_PRICE_EDUCATOR_ANNUAL || 'price_1TAn1ERqzN6VBgZy2vOnmtzh',
+  },
 } as const;
 
 export type PlanType = keyof typeof PRICE_IDS;
+export type BillingInterval = 'monthly' | 'annual';
+
+export function getPriceId(plan: PlanType, interval: BillingInterval = 'monthly'): string {
+  return PRICE_IDS[plan][interval];
+}
 
 export async function createCheckoutSession(
   familyId: string,

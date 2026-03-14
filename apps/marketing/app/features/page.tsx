@@ -41,6 +41,15 @@ const featureGroups = [
       { id: 'book', title: 'Learning Log (Educator)', body: 'Auto-generated, date-stamped, NCCA-tagged records of every activity. Export as a formatted PDF report — exactly what AEARS assessors want to see.' },
     ]
   },
+  {
+    title: 'On the Go',
+    sub: 'Available on all your devices',
+    features: [
+      { id: 'cpu', title: 'iOS & Android App', body: 'Take The Hedge with you wherever your family goes. Browse activities, log progress, and get AI suggestions — all from your phone. Available on any paid plan.' },
+      { id: 'sun', title: 'Offline Access', body: 'Save activities for offline use. Perfect for trips to the woods, the beach, or anywhere signal drops. Your saved activities are always available.' },
+      { id: 'palette', title: 'Family Sharing', body: 'Share your account with your partner or co-parent. Both of you see the same planner, timeline, and activity log. Stay on the same page, literally.' },
+    ]
+  },
 ];
 
 export default function Features() {

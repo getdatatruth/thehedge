@@ -5,10 +5,12 @@ import type Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-// Map Stripe price IDs to subscription tiers
+// Map Stripe price IDs to subscription tiers (monthly + annual for each)
 const PRICE_TO_TIER: Record<string, 'family' | 'educator'> = {
-  'price_1TAX0mRqzN6VBgZyqtObkOeW': 'family',
-  'price_1TAX1iRqzN6VBgZyTXTe6gW9': 'educator',
+  'price_1TAn1DRqzN6VBgZy8YhOkUUK': 'family',   // Family monthly €6.99
+  'price_1TAn1DRqzN6VBgZyJ7Gkn6vI': 'family',   // Family annual €59.99
+  'price_1TAn1ERqzN6VBgZyb4PcuBWp': 'educator',  // Educator monthly €14.99
+  'price_1TAn1ERqzN6VBgZy2vOnmtzh': 'educator',  // Educator annual €134.99
 };
 
 function getTierFromPriceId(priceId: string | undefined): 'family' | 'educator' {

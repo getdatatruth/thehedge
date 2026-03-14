@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createCheckoutSession, PRICE_IDS, type PlanType } from '@/lib/stripe';
+import { createCheckoutSession, PRICE_IDS, getPriceId, type PlanType, type BillingInterval } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { plan } = body as { plan: PlanType };
+    const { plan, interval = 'monthly' } = body as { plan: PlanType; interval?: BillingInterval };
 
     if (!plan || !PRICE_IDS[plan]) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No family found' }, { status: 400 });
     }
 
-    const priceId = PRICE_IDS[plan];
+    const priceId = getPriceId(plan, interval);
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || '';
     const successUrl = `${origin}/settings/billing?success=true`;
     const cancelUrl = `${origin}/settings/billing?cancelled=true`;

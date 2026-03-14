@@ -30,7 +30,8 @@ const PLANS = [
   {
     id: 'free',
     name: 'Free',
-    price: '0',
+    monthlyPrice: '0',
+    annualPrice: '0',
     period: 'forever',
     description: 'Get started with the basics',
     features: [
@@ -44,7 +45,8 @@ const PLANS = [
   {
     id: 'family',
     name: 'Family',
-    price: '7.99',
+    monthlyPrice: '6.99',
+    annualPrice: '59.99',
     period: '/month',
     description: 'Everything your family needs',
     popular: true,
@@ -54,13 +56,15 @@ const PLANS = [
       { icon: Calendar, text: 'Weekly planner' },
       { icon: Heart, text: 'Favourites & collections' },
       { icon: Star, text: 'Full timeline with stats' },
+      { icon: Sparkles, text: 'iOS & Android app' },
     ],
     cta: 'Upgrade to Family',
   },
   {
     id: 'educator',
     name: 'Educator',
-    price: '14.99',
+    monthlyPrice: '14.99',
+    annualPrice: '134.99',
     period: '/month',
     description: 'For home educators and co-ops',
     features: [
@@ -95,6 +99,7 @@ export function BillingClient({
 
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [billingInterval, setBillingInterval] = useState<'monthly' | 'annual'>('monthly');
 
   const handleUpgrade = async (plan: string) => {
     if (plan === currentTier || plan === 'free') return;
@@ -106,7 +111,7 @@ export function BillingClient({
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, interval: billingInterval }),
       });
 
       const data = await res.json();
@@ -263,9 +268,33 @@ export function BillingClient({
 
       {/* Plan cards */}
       <div>
-        <h3 className="font-display text-lg font-light text-ink mb-6">
-          Available plans
-        </h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-display text-lg font-light text-ink">
+            Available plans
+          </h3>
+          <div className="flex items-center gap-1 rounded-[4px] border border-stone bg-linen p-0.5">
+            <button
+              onClick={() => setBillingInterval('monthly')}
+              className={`rounded-[3px] px-3 py-1.5 text-xs font-medium transition-all ${
+                billingInterval === 'monthly'
+                  ? 'bg-parchment text-ink shadow-sm'
+                  : 'text-clay/60 hover:text-ink'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setBillingInterval('annual')}
+              className={`rounded-[3px] px-3 py-1.5 text-xs font-medium transition-all ${
+                billingInterval === 'annual'
+                  ? 'bg-parchment text-ink shadow-sm'
+                  : 'text-clay/60 hover:text-ink'
+              }`}
+            >
+              Annual <span className="text-[10px] text-terracotta font-bold ml-1">Save 28%</span>
+            </button>
+          </div>
+        </div>
         <div className="grid gap-6 lg:grid-cols-3">
           {PLANS.map((plan) => {
             const isCurrent = plan.id === currentTier;
@@ -294,10 +323,17 @@ export function BillingClient({
                   </h4>
                   <div className="flex items-baseline gap-1 mt-2">
                     <span className="font-display text-3xl font-light text-ink">
-                      &euro;{plan.price}
+                      &euro;{billingInterval === 'annual' && plan.id !== 'free' ? plan.annualPrice : plan.monthlyPrice}
                     </span>
-                    <span className="text-sm text-clay/50">{plan.period}</span>
+                    <span className="text-sm text-clay/50">
+                      {plan.id === 'free' ? plan.period : billingInterval === 'annual' ? '/year' : '/month'}
+                    </span>
                   </div>
+                  {billingInterval === 'annual' && plan.id !== 'free' && (
+                    <p className="text-[11px] text-terracotta font-medium mt-1">
+                      Save &euro;{plan.id === 'family' ? '23.89' : '44.89'} per year
+                    </p>
+                  )}
                   <p className="text-sm text-clay/60 mt-2 font-serif">
                     {plan.description}
                   </p>
