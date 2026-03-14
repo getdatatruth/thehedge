@@ -22,6 +22,8 @@ import {
   Droplets,
   MessageCircle,
   Eye,
+  GraduationCap,
+  Layers,
 } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
@@ -61,6 +63,13 @@ interface ActivityDetail {
     knowledge: { topic: string; content: string }[];
     conversation_starters: string[];
     watch_for: string[];
+  } | null;
+  curriculum_tags: {
+    outcome_codes: string[];
+    aistear_themes: string[];
+    ncca_areas: string[];
+    educator_quality: string;
+    quality_notes: string;
   } | null;
 }
 
@@ -235,6 +244,58 @@ export default function ActivityDetailScreen() {
                 </View>
               ))}
             </Card>
+          </View>
+        )}
+
+        {/* Curriculum Links */}
+        {activity.curriculum_tags && (activity.curriculum_tags.aistear_themes?.length > 0 || activity.curriculum_tags.ncca_areas?.length > 0) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Curriculum links</Text>
+            <Text style={styles.sectionSubtitle}>
+              How this activity maps to the Irish curriculum
+            </Text>
+
+            {activity.curriculum_tags.aistear_themes?.length > 0 && (
+              <View style={styles.curriculumGroup}>
+                <View style={styles.curriculumLabelRow}>
+                  <View style={[styles.curriculumIcon, { backgroundColor: `${colors.sage}20` }]}>
+                    <Layers size={12} color={colors.sage} />
+                  </View>
+                  <Text style={styles.curriculumLabel}>Aistear</Text>
+                </View>
+                <View style={styles.tagRow}>
+                  {activity.curriculum_tags.aistear_themes.map((theme, i) => (
+                    <View key={i} style={[styles.tag, styles.tagAistear]}>
+                      <Text style={styles.tagTextAistear}>{theme}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {activity.curriculum_tags.ncca_areas?.length > 0 && (
+              <View style={styles.curriculumGroup}>
+                <View style={styles.curriculumLabelRow}>
+                  <View style={[styles.curriculumIcon, { backgroundColor: `${colors.forest}12` }]}>
+                    <GraduationCap size={12} color={colors.forest} />
+                  </View>
+                  <Text style={styles.curriculumLabel}>Primary Curriculum</Text>
+                </View>
+                <View style={styles.tagRow}>
+                  {activity.curriculum_tags.ncca_areas.map((area, i) => (
+                    <View key={i} style={[styles.tag, styles.tagNcca]}>
+                      <Text style={styles.tagTextNcca}>{area}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {activity.curriculum_tags.outcome_codes?.length > 0 && (
+              <Text style={styles.outcomeCodeText}>
+                {activity.curriculum_tags.outcome_codes.length} curriculum outcomes covered
+              </Text>
+            )}
           </View>
         )}
 
@@ -669,6 +730,63 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: colors.ink,
     textTransform: 'capitalize',
+  },
+  curriculumGroup: {
+    gap: spacing.sm,
+  },
+  curriculumLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  curriculumIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  curriculumLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.ink,
+  },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    paddingLeft: 28,
+  },
+  tag: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  tagAistear: {
+    backgroundColor: `${colors.sage}18`,
+    borderWidth: 1,
+    borderColor: `${colors.sage}30`,
+  },
+  tagTextAistear: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.moss,
+  },
+  tagNcca: {
+    backgroundColor: `${colors.forest}10`,
+    borderWidth: 1,
+    borderColor: `${colors.forest}20`,
+  },
+  tagTextNcca: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.forest,
+  },
+  outcomeCodeText: {
+    fontSize: 12,
+    color: `${colors.clay}90`,
+    paddingLeft: 28,
+    marginTop: 2,
   },
   stickyBottom: {
     position: 'absolute',
