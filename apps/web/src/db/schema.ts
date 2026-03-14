@@ -92,6 +92,7 @@ export const families = pgTable('families', {
   stripeSubscriptionId: text('stripe_subscription_id'),
   subscriptionTier: subscriptionTierEnum('subscription_tier').notNull().default('free'),
   subscriptionStatus: subscriptionStatusEnum('subscription_status').notNull().default('active'),
+  trialEndsAt: timestamp('trial_ends_at', { withTimezone: true }),
   onboardingCompleted: boolean('onboarding_completed').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

@@ -153,3 +153,85 @@ export function getTierFeatures(tier: SubscriptionTier): string[] {
 export function isPremiumTier(tier: SubscriptionTier): boolean {
   return tier === 'family' || tier === 'educator';
 }
+
+// ─── Trial-aware helpers ────────────────────────────────
+
+export async function getEffectiveTier(familyId: string): Promise<{
+  tier: SubscriptionTier;
+  status: string;
+  isTrialing: boolean;
+  trialDaysLeft: number | null;
+}> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from('families')
+    .select('subscription_tier, subscription_status, trial_ends_at')
+    .eq('id', familyId)
+    .single();
+
+  if (!data) {
+    return { tier: 'free', status: 'active', isTrialing: false, trialDaysLeft: null };
+  }
+
+  const rawTier = (data.subscription_tier as SubscriptionTier) || 'free';
+  const status = (data.subscription_status as string) || 'active';
+  const trialEndsAt = data.trial_ends_at ? new Date(data.trial_ends_at) : null;
+
+  // If trialing, check if trial has expired
+  if (status === 'trialing' && trialEndsAt) {
+    const now = new Date();
+    if (now > trialEndsAt) {
+      // Trial expired — downgrade to free
+      await supabase
+        .from('families')
+        .update({
+          subscription_tier: 'free',
+          subscription_status: 'active',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', familyId);
+      return { tier: 'free', status: 'active', isTrialing: false, trialDaysLeft: null };
+    }
+    const daysLeft = Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return { tier: rawTier, status, isTrialing: true, trialDaysLeft: daysLeft };
+  }
+
+  // If subscription is cancelled or past_due, treat as free
+  if (status === 'cancelled' || status === 'past_due') {
+    return { tier: 'free', status, isTrialing: false, trialDaysLeft: null };
+  }
+
+  return { tier: rawTier, status, isTrialing: false, trialDaysLeft: null };
+}
+
+export function isTrialActive(trialEndsAt: string | null): boolean {
+  if (!trialEndsAt) return false;
+  return new Date() < new Date(trialEndsAt);
+}
+
+// Which tier is required for a given route prefix
+const ROUTE_TIER_REQUIREMENTS: Record<string, SubscriptionTier> = {
+  '/educator': 'educator',
+  '/planner': 'family',
+  '/favourites': 'family',
+  '/chat': 'free', // free gets limited access, gated by usage limits
+  '/progress': 'free',
+};
+
+// Tier hierarchy for comparison
+const TIER_RANK: Record<SubscriptionTier, number> = {
+  free: 0,
+  family: 1,
+  educator: 2,
+};
+
+export function tierMeetsRequirement(userTier: SubscriptionTier, requiredTier: SubscriptionTier): boolean {
+  return TIER_RANK[userTier] >= TIER_RANK[requiredTier];
+}
+
+export function getRequiredTierForRoute(pathname: string): SubscriptionTier {
+  for (const [prefix, tier] of Object.entries(ROUTE_TIER_REQUIREMENTS)) {
+    if (pathname.startsWith(prefix)) return tier;
+  }
+  return 'free';
+}

@@ -23,6 +23,7 @@ interface BillingClientProps {
   currentTier: string;
   subscriptionStatus: string;
   hasStripeCustomer: boolean;
+  trialDaysLeft?: number | null;
 }
 
 const PLANS = [
@@ -85,10 +86,12 @@ export function BillingClient({
   currentTier,
   subscriptionStatus,
   hasStripeCustomer,
+  trialDaysLeft,
 }: BillingClientProps) {
   const searchParams = useSearchParams();
   const success = searchParams.get('success');
   const cancelled = searchParams.get('cancelled');
+  const upgradePrompt = searchParams.get('upgrade');
 
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -180,6 +183,39 @@ export function BillingClient({
           <p className="text-sm text-clay">
             Checkout was cancelled. No changes were made to your plan.
           </p>
+        </div>
+      )}
+
+      {upgradePrompt && (
+        <div className="card-elevated p-4 border-l-4 border-l-moss bg-sage/5">
+          <p className="text-sm font-medium text-forest">
+            The feature you tried to access requires a{' '}
+            <span className="capitalize">{upgradePrompt}</span> plan. Upgrade
+            below to unlock it.
+          </p>
+        </div>
+      )}
+
+      {subscriptionStatus === 'trialing' && trialDaysLeft !== null && (
+        <div className="card-elevated p-5 border-l-4 border-l-sage bg-sage/5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-forest">
+                {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left in your trial
+              </p>
+              <p className="text-sm text-clay/60 mt-1 font-serif">
+                Subscribe now to keep all your {currentTier === 'educator' ? 'Educator' : 'Family'} features when your trial ends.
+              </p>
+            </div>
+            <button
+              onClick={() => handleUpgrade(currentTier)}
+              disabled={loading === currentTier}
+              className="btn-primary text-sm shrink-0 flex items-center gap-2"
+            >
+              {loading === currentTier && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              Subscribe now
+            </button>
+          </div>
         </div>
       )}
 

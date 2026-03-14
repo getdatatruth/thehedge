@@ -23,30 +23,36 @@ import {
   FolderOpen,
   ChevronsLeft,
   ChevronsRight,
-  Command,
   User,
   ChevronDown,
   HelpCircle,
-  X,
+  Lock,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import type { SubscriptionTier } from '@/types/database';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
   badge?: string;
+  requiredTier?: SubscriptionTier;
 }
+
+const TIER_RANK: Record<SubscriptionTier, number> = {
+  free: 0,
+  family: 1,
+  educator: 2,
+};
 
 const mainNav: NavItem[] = [
   { label: 'Today', href: '/dashboard', icon: Sun },
   { label: 'Browse', href: '/browse', icon: Search },
-  { label: 'Weekly Plan', href: '/planner', icon: CalendarDays },
+  { label: 'Weekly Plan', href: '/planner', icon: CalendarDays, requiredTier: 'family' },
   { label: 'Ask AI', href: '/chat', icon: Sparkles },
-  { label: 'Favourites', href: '/favourites', icon: Heart },
+  { label: 'Favourites', href: '/favourites', icon: Heart, requiredTier: 'family' },
   { label: 'Timeline', href: '/timeline', icon: Clock },
 ];
 
@@ -56,34 +62,63 @@ const familyNav: NavItem[] = [
 ];
 
 const educatorNav: NavItem[] = [
-  { label: 'Curriculum', href: '/educator', icon: GraduationCap },
-  { label: 'Schedule', href: '/educator/schedule', icon: CalendarDays },
-  { label: 'Portfolio', href: '/educator/portfolio', icon: FolderOpen },
-  { label: 'Plans', href: '/educator/plans', icon: BookOpen },
-  { label: 'Tusla', href: '/educator/tusla', icon: ClipboardCheck },
+  { label: 'Curriculum', href: '/educator', icon: GraduationCap, requiredTier: 'educator' },
+  { label: 'Schedule', href: '/educator/schedule', icon: CalendarDays, requiredTier: 'educator' },
+  { label: 'Portfolio', href: '/educator/portfolio', icon: FolderOpen, requiredTier: 'educator' },
+  { label: 'Plans', href: '/educator/plans', icon: BookOpen, requiredTier: 'educator' },
+  { label: 'Tusla', href: '/educator/tusla', icon: ClipboardCheck, requiredTier: 'educator' },
 ];
 
 interface SidebarProps {
-  isEducator?: boolean;
+  subscriptionTier?: SubscriptionTier;
   familyName?: string;
   userName?: string;
   unreadCount?: number;
+  isTrialing?: boolean;
+  trialDaysLeft?: number | null;
 }
 
 function NavLink({
   item,
   pathname,
   collapsed,
+  subscriptionTier,
 }: {
   item: NavItem;
   pathname: string;
   collapsed: boolean;
+  subscriptionTier: SubscriptionTier;
 }) {
+  const isLocked = item.requiredTier && TIER_RANK[subscriptionTier] < TIER_RANK[item.requiredTier];
   const isActive =
     item.href === '/dashboard'
       ? pathname === '/dashboard'
       : pathname.startsWith(item.href);
   const Icon = item.icon;
+
+  if (isLocked) {
+    return (
+      <Link
+        href="/settings/billing"
+        title={collapsed ? `${item.label} (upgrade required)` : undefined}
+        className={`group relative flex items-center gap-3 rounded-md px-2.5 py-2 text-[13px] font-medium transition-all duration-150 text-parchment/25 hover:bg-parchment/4 hover:text-parchment/40 ${collapsed ? 'justify-center px-2' : ''}`}
+      >
+        <Icon
+          className="h-[16px] w-[16px] shrink-0 text-parchment/15"
+          strokeWidth={1.6}
+        />
+        {!collapsed && (
+          <>
+            <span className="flex-1 truncate">{item.label}</span>
+            <Lock className="h-3 w-3 text-parchment/20" />
+          </>
+        )}
+        {collapsed && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2 rounded-full bg-parchment/15" />
+        )}
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -124,11 +159,13 @@ function NavSection({
   pathname,
   label,
   collapsed,
+  subscriptionTier,
 }: {
   items: NavItem[];
   pathname: string;
   label?: string;
   collapsed: boolean;
+  subscriptionTier: SubscriptionTier;
 }) {
   return (
     <div>
@@ -140,7 +177,7 @@ function NavSection({
       {label && collapsed && <div className="mx-2 my-3 h-px bg-parchment/6" />}
       <nav className="space-y-0.5">
         {items.map((item) => (
-          <NavLink key={item.href} item={item} pathname={pathname} collapsed={collapsed} />
+          <NavLink key={item.href} item={item} pathname={pathname} collapsed={collapsed} subscriptionTier={subscriptionTier} />
         ))}
       </nav>
     </div>
@@ -149,27 +186,33 @@ function NavSection({
 
 function SidebarContent({
   pathname,
-  isEducator,
+  subscriptionTier,
   familyName,
   userName,
   collapsed,
   setCollapsed,
   onSignOut,
   unreadCount = 0,
+  isTrialing = false,
+  trialDaysLeft,
 }: {
   pathname: string;
-  isEducator?: boolean;
+  subscriptionTier: SubscriptionTier;
   familyName?: string;
   userName?: string;
   collapsed: boolean;
   setCollapsed: (v: boolean) => void;
   onSignOut: () => void;
   unreadCount?: number;
+  isTrialing?: boolean;
+  trialDaysLeft?: number | null;
 }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const initials = userName
     ? userName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : '?';
+
+  const showEducatorSection = TIER_RANK[subscriptionTier] >= TIER_RANK['educator'];
 
   const notifItems: NavItem[] = [
     {
@@ -232,13 +275,30 @@ function SidebarContent({
 
       {/* ─── Navigation ─── */}
       <div className="flex-1 overflow-y-auto px-2 scrollbar-none">
-        <NavSection items={mainNav} pathname={pathname} collapsed={collapsed} />
-        <NavSection items={familyNav} pathname={pathname} label="Family" collapsed={collapsed} />
-        {isEducator && (
-          <NavSection items={educatorNav} pathname={pathname} label="Educator" collapsed={collapsed} />
+        <NavSection items={mainNav} pathname={pathname} collapsed={collapsed} subscriptionTier={subscriptionTier} />
+        <NavSection items={familyNav} pathname={pathname} label="Family" collapsed={collapsed} subscriptionTier={subscriptionTier} />
+        {showEducatorSection && (
+          <NavSection items={educatorNav} pathname={pathname} label="Educator" collapsed={collapsed} subscriptionTier={subscriptionTier} />
         )}
-        <NavSection items={notifItems} pathname={pathname} collapsed={collapsed} />
+        <NavSection items={notifItems} pathname={pathname} collapsed={collapsed} subscriptionTier={subscriptionTier} />
       </div>
+
+      {/* ─── Trial banner ─── */}
+      {isTrialing && trialDaysLeft !== null && !collapsed && (
+        <div className="mx-2 mb-2">
+          <Link
+            href="/settings/billing"
+            className="block rounded-lg bg-sage/10 border border-sage/20 px-3 py-2.5 transition-colors hover:bg-sage/15"
+          >
+            <p className="text-[11px] font-bold text-sage">
+              {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left in trial
+            </p>
+            <p className="text-[10px] text-parchment/40 mt-0.5">
+              Upgrade to keep your features
+            </p>
+          </Link>
+        </div>
+      )}
 
       {/* ─── User Menu ─── */}
       <div className="relative px-2 pb-3 pt-2">
@@ -322,7 +382,7 @@ function SidebarContent({
   );
 }
 
-export function Sidebar({ isEducator = false, familyName = '', userName = '', unreadCount = 0 }: SidebarProps) {
+export function Sidebar({ subscriptionTier = 'free', familyName = '', userName = '', unreadCount = 0, isTrialing = false, trialDaysLeft = null }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -349,13 +409,15 @@ export function Sidebar({ isEducator = false, familyName = '', userName = '', un
         >
           <SidebarContent
             pathname={pathname}
-            isEducator={isEducator}
+            subscriptionTier={subscriptionTier}
             familyName={familyName}
             userName={userName}
             collapsed={collapsed}
             setCollapsed={setCollapsed}
             onSignOut={handleSignOut}
             unreadCount={unreadCount}
+            isTrialing={isTrialing}
+            trialDaysLeft={trialDaysLeft}
           />
         </div>
       </aside>
@@ -370,13 +432,15 @@ export function Sidebar({ isEducator = false, familyName = '', userName = '', un
             <SheetContent side="left" className="w-[240px] p-0 border-0">
               <SidebarContent
                 pathname={pathname}
-                isEducator={isEducator}
+                subscriptionTier={subscriptionTier}
                 familyName={familyName}
                 userName={userName}
                 collapsed={false}
                 setCollapsed={() => {}}
                 onSignOut={handleSignOut}
                 unreadCount={unreadCount}
+                isTrialing={isTrialing}
+                trialDaysLeft={trialDaysLeft}
               />
             </SheetContent>
           </Sheet>

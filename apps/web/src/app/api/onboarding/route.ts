@@ -55,6 +55,34 @@ export async function POST(request: NextRequest) {
 
     let familyId: string;
 
+    // Determine subscription tier based on plan param and child school status
+    const planParam = user.user_metadata?.plan as string | undefined;
+    const hasHomeschoolChild = children.some(
+      (child: { schoolStatus?: string }) =>
+        child.schoolStatus === 'homeschool' || child.schoolStatus === 'considering'
+    );
+
+    let initialTier: 'free' | 'family' | 'educator' = 'free';
+    let initialStatus: 'active' | 'trialing' = 'active';
+    let trialEndsAt: string | null = null;
+
+    if (planParam === 'educator' || hasHomeschoolChild) {
+      // Homeschool families or those who selected educator plan get a 14-day trial
+      initialTier = 'educator';
+      initialStatus = 'trialing';
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 14);
+      trialEndsAt = trialEnd.toISOString();
+    } else if (planParam === 'family') {
+      // Family plan selection gets a 14-day trial
+      initialTier = 'family';
+      initialStatus = 'trialing';
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 14);
+      trialEndsAt = trialEnd.toISOString();
+    }
+    // Otherwise stays free (no trial needed)
+
     if (existingUser?.family_id) {
       // Update existing family
       const { error: familyError } = await supabase
@@ -65,6 +93,9 @@ export async function POST(request: NextRequest) {
           county: county || null,
           family_style: familyStyle || 'balanced',
           onboarding_completed: true,
+          subscription_tier: initialTier,
+          subscription_status: initialStatus,
+          trial_ends_at: trialEndsAt,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingUser.family_id);
@@ -84,6 +115,9 @@ export async function POST(request: NextRequest) {
           county: county || null,
           family_style: familyStyle || 'balanced',
           onboarding_completed: true,
+          subscription_tier: initialTier,
+          subscription_status: initialStatus,
+          trial_ends_at: trialEndsAt,
         })
         .select('id')
         .single();

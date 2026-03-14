@@ -19,7 +19,7 @@ export default async function BillingPage() {
   const { data: profile } = await supabase
     .from('users')
     .select(
-      'family_id, families(id, name, stripe_customer_id, subscription_tier, subscription_status)'
+      'family_id, families(id, name, stripe_customer_id, subscription_tier, subscription_status, trial_ends_at)'
     )
     .eq('id', user.id)
     .single();
@@ -32,12 +32,25 @@ export default async function BillingPage() {
     ? profile.families[0]
     : profile.families;
 
+  const trialEndsAt = (family as { trial_ends_at?: string | null } | null)?.trial_ends_at || null;
+  let trialDaysLeft: number | null = null;
+  const status = (family?.subscription_status as string) || 'active';
+
+  if (status === 'trialing' && trialEndsAt) {
+    const trialEnd = new Date(trialEndsAt);
+    const now = new Date();
+    if (now < trialEnd) {
+      trialDaysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    }
+  }
+
   return (
     <BillingClient
       familyId={family?.id || ''}
       currentTier={(family?.subscription_tier as string) || 'free'}
-      subscriptionStatus={(family?.subscription_status as string) || 'active'}
+      subscriptionStatus={status}
       hasStripeCustomer={!!family?.stripe_customer_id}
+      trialDaysLeft={trialDaysLeft}
     />
   );
 }
