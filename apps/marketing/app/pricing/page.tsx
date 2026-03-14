@@ -140,7 +140,7 @@ export default function Pricing() {
                   {p.pop && <div className="pc-pop">{p.pop}</div>}
                   <div className="pc-name">{p.name}</div>
                   <div className="pc-tag">{p.tag}</div>
-                  <div className="pc-price" id={`price-${p.name.toLowerCase()}`}>
+                  <div className="pc-price" id={`price-${p.name.toLowerCase()}`} data-monthly={p.monthly} data-annual={p.annual} data-sub={p.sub}>
                     {p.monthly}<small>{p.sub}</small>
                   </div>
                   <a href={p.btnHref} className={`pc-btn ${p.btn}`}>{p.btnTxt}</a>
@@ -231,6 +231,37 @@ export default function Pricing() {
         </div>
       </main>
       <Footer />
+      <script dangerouslySetInnerHTML={{ __html: `
+        (function() {
+          var monthlyBtn = document.getElementById('monthly-btn');
+          var annualBtn = document.getElementById('annual-btn');
+          var prices = document.querySelectorAll('.pc-price[data-monthly]');
+
+          function setInterval(interval) {
+            prices.forEach(function(el) {
+              var m = el.getAttribute('data-monthly');
+              var a = el.getAttribute('data-annual');
+              var sub = el.getAttribute('data-sub');
+              if (m === '€0') return;
+              if (interval === 'annual') {
+                el.innerHTML = a + '<small>/year</small>';
+              } else {
+                el.innerHTML = m + '<small>' + sub + '</small>';
+              }
+            });
+            if (interval === 'annual') {
+              monthlyBtn.classList.remove('on');
+              annualBtn.classList.add('on');
+            } else {
+              annualBtn.classList.remove('on');
+              monthlyBtn.classList.add('on');
+            }
+          }
+
+          monthlyBtn.addEventListener('click', function() { setInterval('monthly'); });
+          annualBtn.addEventListener('click', function() { setInterval('annual'); });
+        })();
+      `}} />
     </>
   );
 }
