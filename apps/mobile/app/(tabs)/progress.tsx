@@ -18,17 +18,13 @@ import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface ProgressData {
-  totalActivities: number;
-  streak: number;
-  badgesEarned: number;
-  categoryBreakdown: Record<string, number>;
-  recentBadges: Array<{
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    earnedAt: string;
-  }>;
+  total_activities: number;
+  total_minutes: number;
+  current_streak: number;
+  this_week: number;
+  average_rating: number | null;
+  unique_days: number;
+  category_breakdown: Record<string, number>;
 }
 
 export default function ProgressScreen() {
@@ -49,7 +45,7 @@ export default function ProgressScreen() {
 
   if (isLoading && !progress) return <LoadingScreen />;
 
-  const breakdown = progress?.categoryBreakdown || {};
+  const breakdown = progress?.category_breakdown || {};
   const totalForBreakdown = Object.values(breakdown).reduce((a, b) => a + b, 0) || 1;
 
   return (
@@ -120,23 +116,23 @@ export default function ProgressScreen() {
           <View style={styles.statCard}>
             <Activity size={20} color={colors.moss} />
             <Text style={styles.statNumber}>
-              {progress?.totalActivities || 0}
+              {progress?.total_activities || 0}
             </Text>
             <Text style={styles.statLabel}>Activities</Text>
           </View>
           <View style={styles.statCard}>
             <Flame size={20} color={colors.terracotta} />
             <Text style={styles.statNumber}>
-              {progress?.streak || 0}
+              {progress?.current_streak || 0}
             </Text>
             <Text style={styles.statLabel}>Day streak</Text>
           </View>
           <View style={styles.statCard}>
             <Trophy size={20} color={colors.amber} />
             <Text style={styles.statNumber}>
-              {progress?.badgesEarned || 0}
+              {progress?.this_week || 0}
             </Text>
-            <Text style={styles.statLabel}>Badges</Text>
+            <Text style={styles.statLabel}>This week</Text>
           </View>
         </View>
 
@@ -167,19 +163,20 @@ export default function ProgressScreen() {
           </Card>
         </View>
 
-        {/* Recent Badges */}
-        {(progress?.recentBadges?.length ?? 0) > 0 && (
+        {/* Total Minutes */}
+        {(progress?.total_minutes ?? 0) > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Recent badges</Text>
-            <View style={styles.badgeGrid}>
-              {progress?.recentBadges?.map((badge) => (
-                <View key={badge.id} style={styles.badgeCard}>
-                  <Text style={styles.badgeIcon}>{badge.icon}</Text>
-                  <Text style={styles.badgeName}>{badge.name}</Text>
-                  <Text style={styles.badgeDesc}>{badge.description}</Text>
-                </View>
-              ))}
-            </View>
+            <Text style={styles.sectionTitle}>Time invested</Text>
+            <Card variant="elevated" padding="lg">
+              <View style={{ alignItems: 'center', gap: 4 }}>
+                <Text style={styles.statNumber}>
+                  {Math.round((progress?.total_minutes || 0) / 60)}h {(progress?.total_minutes || 0) % 60}m
+                </Text>
+                <Text style={{ fontSize: 13, color: colors.clay }}>
+                  across {progress?.unique_days || 0} days
+                </Text>
+              </View>
+            </Card>
           </View>
         )}
       </ScrollView>

@@ -14,6 +14,12 @@ export default function StackLayout() {
       <Stack.Screen name="timeline" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="settings" />
+      <Stack.Screen name="collections" />
+      <Stack.Screen name="community" />
+      <Stack.Screen name="educator/plans" />
+      <Stack.Screen name="educator/portfolio" />
+      <Stack.Screen name="educator/schedule" />
+      <Stack.Screen name="educator/tusla" />
     </Stack>
   );
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Sun, Search, CalendarDays, Sparkles, Trophy, Lock } from 'lucide-react-native';
+import { Sun, Search, CalendarDays, Sparkles, Trophy, GraduationCap, Lock } from 'lucide-react-native';
 import { View, StyleSheet } from 'react-native';
 import { colors } from '@/theme/colors';
 import { useAuthStore } from '@/stores/auth-store';
@@ -77,6 +77,16 @@ export default function TabLayout() {
           title: 'Progress',
           tabBarIcon: ({ color, size }) => (
             <Trophy size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="educator"
+        options={{
+          title: 'Educator',
+          href: effectiveTier === 'educator' ? undefined : null,
+          tabBarIcon: ({ color, size }) => (
+            <GraduationCap size={size} color={color} />
           ),
         }}
       />

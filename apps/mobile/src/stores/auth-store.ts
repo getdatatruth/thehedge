@@ -14,6 +14,7 @@ export interface Family {
   id: string;
   name: string;
   county: string | null;
+  country: string | null;
   latitude: number | null;
   longitude: number | null;
   family_style: string | null;
@@ -21,6 +22,7 @@ export interface Family {
   subscription_status: string | null;
   trial_ends_at: string | null;
   stripe_customer_id: string | null;
+  onboarding_completed: boolean;
 }
 
 export interface UserProfile {

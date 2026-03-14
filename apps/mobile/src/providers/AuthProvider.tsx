@@ -3,6 +3,52 @@ import { supabase } from '@/lib/supabase';
 import { apiGet } from '@/lib/api';
 import { useAuthStore, type UserProfile, type Family, type Child } from '@/stores/auth-store';
 
+// Set to true to bypass Supabase auth and use mock data for UI testing
+const DEV_BYPASS_AUTH = false;
+
+const MOCK_PROFILE: UserProfile = {
+  id: 'dev-user-1',
+  name: 'Adam',
+  email: 'adam@thehedge.ie',
+  role: 'parent',
+  family_id: 'dev-family-1',
+  onboarding_completed: true,
+};
+
+const MOCK_FAMILY: Family = {
+  id: 'dev-family-1',
+  name: "O'Flynn Family",
+  county: 'Dublin',
+  country: 'IE',
+  latitude: 53.3498,
+  longitude: -6.2603,
+  family_style: 'outdoor',
+  subscription_tier: 'family',
+  subscription_status: 'active',
+  trial_ends_at: null,
+  stripe_customer_id: null,
+  onboarding_completed: true,
+};
+
+const MOCK_CHILDREN: Child[] = [
+  {
+    id: 'dev-child-1',
+    name: 'Fiadh',
+    date_of_birth: '2020-06-15',
+    interests: ['nature', 'arts', 'music'],
+    school_status: 'preschool',
+    age: 5,
+  },
+  {
+    id: 'dev-child-2',
+    name: 'Oisin',
+    date_of_birth: '2022-11-03',
+    interests: ['physical', 'science'],
+    school_status: 'home',
+    age: 3,
+  },
+];
+
 interface MeResponse {
   user: UserProfile;
   family: Family;
@@ -22,7 +68,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loadUserData = useCallback(async () => {
     try {
       const { data } = await apiGet<MeResponse>('/me');
-      setProfile(data.user);
+      // onboarding_completed lives on family in the API, merge onto profile for routing
+      setProfile({
+        ...data.user,
+        onboarding_completed: (data.family as any).onboarding_completed ?? true,
+      });
       setFamily(data.family);
 
       // Calculate ages
@@ -40,6 +90,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [setProfile, setFamily, setChildren]);
 
   useEffect(() => {
+    // Dev bypass: skip Supabase, seed mock data, go straight to tabs
+    if (DEV_BYPASS_AUTH) {
+      setSession({ access_token: 'dev-token', user: { id: 'dev-user-1' } } as any);
+      setProfile(MOCK_PROFILE);
+      setFamily(MOCK_FAMILY);
+      setChildren(MOCK_CHILDREN);
+      setLoading(false);
+      setInitialized(true);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);

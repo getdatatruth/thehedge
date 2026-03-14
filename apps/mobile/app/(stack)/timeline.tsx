@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SectionList,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -28,7 +29,12 @@ interface LogEntry {
 
 export default function TimelineScreen() {
   const router = useRouter();
-  const { data: logs, isLoading } = useApiQuery<LogEntry[]>(
+  const {
+    data: logs,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useApiQuery<LogEntry[]>(
     ['timeline'],
     '/activity-logs?limit=100'
   );
@@ -63,6 +69,13 @@ export default function TimelineScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.moss}
+          />
+        }
         renderSectionHeader={({ section }) => (
           <Text style={styles.dateHeader}>{section.title}</Text>
         )}

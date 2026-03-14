@@ -12,14 +12,23 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
-interface PlanActivity {
-  day: string;
+interface PlanDay {
   date: string;
-  title: string;
-  category: string;
-  duration_minutes: number;
-  time_slot: string;
-  completed: boolean;
+  day_name: string;
+  blocks: Array<{
+    id: string;
+    title: string;
+    category: string;
+    duration_minutes: number;
+    time_slot: string;
+    completed: boolean;
+  }>;
+}
+
+interface PlannerData {
+  week_start: string;
+  week_end: string;
+  days: PlanDay[];
 }
 
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -29,7 +38,7 @@ export default function PlanScreen() {
   const effectiveTier = useAuthStore((s) => s.effectiveTier());
   const isFree = effectiveTier === 'free';
 
-  const { data: planActivities, isLoading } = useApiQuery<PlanActivity[]>(
+  const { data: plannerData, isLoading } = useApiQuery<PlannerData>(
     ['planner'],
     '/planner',
     { enabled: !isFree }
@@ -66,15 +75,15 @@ export default function PlanScreen() {
 
   if (isLoading) return <LoadingScreen />;
 
-  // Group by day
-  const grouped = DAY_NAMES.reduce((acc, day) => {
-    acc[day] = (planActivities || []).filter(
-      (a) => a.day.substring(0, 3) === day
-    );
-    return acc;
-  }, {} as Record<string, PlanActivity[]>);
-
+  const days = plannerData?.days || [];
   const today = DAY_NAMES[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+
+  // Build grouped map from API days array
+  const grouped = DAY_NAMES.reduce((acc, day) => {
+    const found = days.find((d) => d.day_name?.substring(0, 3) === day);
+    acc[day] = found?.blocks || [];
+    return acc;
+  }, {} as Record<string, PlanDay['blocks']>);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

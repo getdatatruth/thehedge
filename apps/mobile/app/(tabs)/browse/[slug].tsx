@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -17,65 +17,98 @@ import {
   Check,
   Sparkles,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
-import { useApiQuery, useApiPost } from '@/hooks/use-api';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { useQueryClient } from '@tanstack/react-query';
+import { useApiQuery, useApiPost, useApiDelete } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { LogActivityModal } from '@/components/shared/LogActivityModal';
+import { hapticLight, hapticSuccess } from '@/lib/haptics';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
+
+interface MaterialItem {
+  name: string;
+  household_common: boolean;
+}
 
 interface ActivityDetail {
   id: string;
   title: string;
   slug: string;
   description: string;
-  long_description: string;
+  instructions: { steps: string[]; variations?: string[]; tips?: string[] } | null;
   category: string;
   duration_minutes: number;
   location: string;
-  age_range: string;
-  materials: string[];
-  steps: string[];
+  age_min: number | null;
+  age_max: number | null;
+  materials: MaterialItem[];
   learning_outcomes: string[];
-  variations: string[];
-  tips: string[];
-  is_premium: boolean;
+  energy_level: string;
+  mess_level: string;
+  screen_free: boolean;
+  premium: boolean;
 }
 
 export default function ActivityDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const [checkedMaterials, setCheckedMaterials] = useState<Set<number>>(
     new Set()
   );
+  const [logged, setLogged] = useState(false);
 
   const { data: activity, isLoading } = useApiQuery<ActivityDetail>(
     ['activity', slug],
     `/activities/${slug}`
   );
 
-  const logMutation = useApiPost('/activity-logs', {
+  // Favourites
+  const { data: favIds } = useApiQuery<{ activity_ids: string[] }>(
+    ['favourites-ids'],
+    '/favourites'
+  );
+  const isFavourited = favIds?.activity_ids?.includes(activity?.id || '') || false;
+
+  const addFav = useApiPost('/favourites', {
     onSuccess: () => {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      hapticSuccess();
+      queryClient.invalidateQueries({ queryKey: ['favourites-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['favourites'] });
     },
   });
 
-  const handleLog = () => {
+  const removeFav = useApiDelete<unknown, { activity_id: string }>('/favourites', {
+    onSuccess: () => {
+      hapticLight();
+      queryClient.invalidateQueries({ queryKey: ['favourites-ids'] });
+      queryClient.invalidateQueries({ queryKey: ['favourites'] });
+    },
+  });
+
+  const handleFavourite = () => {
     if (!activity) return;
-    logMutation.mutate({
-      activity_id: activity.id,
-      date: new Date().toISOString().split('T')[0],
-    });
+    if (isFavourited) {
+      removeFav.mutate({ activity_id: activity.id });
+    } else {
+      addFav.mutate({ activity_id: activity.id });
+    }
   };
 
   const toggleMaterial = (index: number) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    hapticLight();
     const next = new Set(checkedMaterials);
     if (next.has(index)) next.delete(index);
     else next.add(index);
     setCheckedMaterials(next);
+  };
+
+  const handleLog = () => {
+    bottomSheetRef.current?.snapToIndex(0);
   };
 
   if (isLoading || !activity) return <LoadingScreen />;
@@ -87,8 +120,12 @@ export default function ActivityDetailScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <ArrowLeft size={20} color={colors.ink} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.heartBtn}>
-          <Heart size={20} color={colors.clay} />
+        <TouchableOpacity style={styles.heartBtn} onPress={handleFavourite}>
+          <Heart
+            size={20}
+            color={isFavourited ? colors.terracotta : colors.clay}
+            fill={isFavourited ? colors.terracotta : 'transparent'}
+          />
         </TouchableOpacity>
       </View>
 
@@ -113,10 +150,14 @@ export default function ActivityDetailScreen() {
               <MapPin size={14} color={colors.clay} />
               <Text style={styles.metaText}>{activity.location}</Text>
             </View>
-            <View style={styles.metaItem}>
-              <Users size={14} color={colors.clay} />
-              <Text style={styles.metaText}>{activity.age_range}</Text>
-            </View>
+            {(activity.age_min || activity.age_max) && (
+              <View style={styles.metaItem}>
+                <Users size={14} color={colors.clay} />
+                <Text style={styles.metaText}>
+                  {activity.age_min || '?'}-{activity.age_max || '?'} yrs
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -147,7 +188,7 @@ export default function ActivityDetailScreen() {
                       checkedMaterials.has(i) && styles.materialChecked,
                     ]}
                   >
-                    {material}
+                    {typeof material === 'string' ? material : material.name}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -156,10 +197,10 @@ export default function ActivityDetailScreen() {
         )}
 
         {/* Steps */}
-        {activity.steps?.length > 0 && (
+        {(activity.instructions?.steps?.length ?? 0) > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>How to do it</Text>
-            {activity.steps.map((step, i) => (
+            {activity.instructions!.steps.map((step, i) => (
               <View key={i} style={styles.stepRow}>
                 <View style={styles.stepNumber}>
                   <Text style={styles.stepNumberText}>{i + 1}</Text>
@@ -186,10 +227,10 @@ export default function ActivityDetailScreen() {
         )}
 
         {/* Variations */}
-        {activity.variations?.length > 0 && (
+        {(activity.instructions?.variations?.length ?? 0) > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Try it differently</Text>
-            {activity.variations.map((variation, i) => (
+            {activity.instructions!.variations!.map((variation, i) => (
               <Card key={i} variant="elevated" padding="md">
                 <Text style={styles.variationText}>{variation}</Text>
               </Card>
@@ -208,15 +249,25 @@ export default function ActivityDetailScreen() {
           size="lg"
           fullWidth
           onPress={handleLog}
-          loading={logMutation.isPending}
           icon={<Check size={18} color={colors.parchment} />}
         >
-          {logMutation.isSuccess ? 'Logged!' : 'Log this activity'}
+          {logged ? 'Logged!' : 'Log this activity'}
         </Button>
       </View>
+
+      {/* Log Activity Bottom Sheet */}
+      <LogActivityModal
+        activityId={activity.id}
+        activityTitle={activity.title}
+        bottomSheetRef={bottomSheetRef}
+        onLogged={() => setLogged(true)}
+      />
     </SafeAreaView>
   );
 }
+
+// Need Button import
+import { Button } from '@/components/ui/Button';
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.parchment },

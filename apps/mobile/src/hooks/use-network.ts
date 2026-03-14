@@ -1,13 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Network from 'expo-network';
+import { useOfflineQueue } from '@/stores/offline-queue';
 
 export function useNetwork() {
   const [isConnected, setIsConnected] = useState(true);
+  const wasDisconnected = useRef(false);
+  const flush = useOfflineQueue((s) => s.flush);
 
   useEffect(() => {
     const check = async () => {
       const state = await Network.getNetworkStateAsync();
-      setIsConnected(state.isConnected ?? true);
+      const connected = state.isConnected ?? true;
+      setIsConnected(connected);
+
+      // Flush offline queue when reconnecting
+      if (connected && wasDisconnected.current) {
+        flush();
+      }
+      wasDisconnected.current = !connected;
     };
 
     check();
@@ -15,7 +25,7 @@ export function useNetwork() {
     // Check periodically
     const interval = setInterval(check, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [flush]);
 
   return { isConnected };
 }

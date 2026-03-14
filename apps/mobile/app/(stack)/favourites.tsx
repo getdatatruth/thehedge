@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -16,21 +17,34 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
-interface FavouriteActivity {
-  id: string;
-  title: string;
-  slug: string;
-  category: string;
-  duration_minutes: number;
-  description: string;
+interface FavouriteItem {
+  activity_id: string;
+  activity: {
+    id: string;
+    title: string;
+    slug: string;
+    category: string;
+    duration_minutes: number;
+    description: string;
+  };
+}
+
+interface FavouritesData {
+  favourites: FavouriteItem[];
 }
 
 export default function FavouritesScreen() {
   const router = useRouter();
-  const { data: favourites, isLoading } = useApiQuery<FavouriteActivity[]>(
+  const {
+    data: favData,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useApiQuery<FavouritesData>(
     ['favourites'],
-    '/favourites'
+    '/favourites?expand=true'
   );
+  const favourites = favData?.favourites || [];
 
   if (isLoading) return <LoadingScreen />;
 
@@ -44,22 +58,29 @@ export default function FavouritesScreen() {
       </View>
 
       <FlatList
-        data={favourites || []}
-        keyExtractor={(item) => item.id}
+        data={favourites}
+        keyExtractor={(item) => item.activity_id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.moss}
+          />
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => router.push(`/(tabs)/browse/${item.slug}` as any)}
+            onPress={() => router.push(`/(tabs)/browse/${item.activity?.slug}` as any)}
           >
             <Card variant="interactive" padding="lg">
               <View style={styles.row}>
                 <View style={styles.info}>
-                  <Badge variant="sage" size="sm">{item.category}</Badge>
-                  <Text style={styles.activityTitle}>{item.title}</Text>
+                  <Badge variant="sage" size="sm">{item.activity?.category}</Badge>
+                  <Text style={styles.activityTitle}>{item.activity?.title}</Text>
                   <View style={styles.meta}>
                     <Clock size={12} color={colors.clay} />
-                    <Text style={styles.metaText}>{item.duration_minutes} min</Text>
+                    <Text style={styles.metaText}>{item.activity?.duration_minutes} min</Text>
                   </View>
                 </View>
                 <ChevronRight size={18} color={colors.stone} />

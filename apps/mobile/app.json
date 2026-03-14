@@ -37,10 +37,10 @@
       "expo-secure-store",
       "expo-font",
       [
-        "expo-notifications",
+        "expo-image-picker",
         {
-          "icon": "./assets/notification-icon.png",
-          "color": "#1C3520"
+          "photosPermission": "The Hedge needs access to your photos to add evidence to portfolios.",
+          "cameraPermission": "The Hedge needs access to your camera to capture activity photos."
         }
       ]
     ],

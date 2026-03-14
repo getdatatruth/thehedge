@@ -19,8 +19,8 @@ import { spacing } from '@/theme/spacing';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(__DEV__ ? 'adam@thehedge.ie' : '');
+  const [password, setPassword] = useState(__DEV__ ? 'River24!?' : '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -44,14 +44,14 @@ export function useApiPut<TData, TBody = unknown>(
   });
 }
 
-export function useApiDelete<TData>(
+export function useApiDelete<TData, TBody = void>(
   path: string,
-  options?: UseMutationOptions<TData, Error, void>
+  options?: UseMutationOptions<TData, Error, TBody>
 ) {
   const queryClient = useQueryClient();
-  return useMutation<TData, Error, void>({
-    mutationFn: async () => {
-      const res = await apiDelete<TData>(path);
+  return useMutation<TData, Error, TBody>({
+    mutationFn: async (body: TBody) => {
+      const res = await apiDelete<TData>(path, body || undefined);
       return res.data;
     },
     ...options,

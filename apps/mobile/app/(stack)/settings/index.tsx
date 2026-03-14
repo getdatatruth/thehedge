@@ -18,6 +18,8 @@ import {
   LogOut,
   ChevronRight,
   Crown,
+  Lock,
+  Shield,
 } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
@@ -51,19 +53,19 @@ export default function SettingsScreen() {
           icon: User,
           label: 'Profile',
           detail: profile?.name || '',
-          onPress: () => {},
+          onPress: () => router.push('/(stack)/settings/profile' as any),
         },
         {
           icon: Users,
           label: 'Children',
           detail: `${children.length} ${children.length === 1 ? 'child' : 'children'}`,
-          onPress: () => {},
+          onPress: () => router.push('/(stack)/settings/children' as any),
         },
         {
           icon: Bell,
           label: 'Notifications',
           detail: '',
-          onPress: () => {},
+          onPress: () => router.push('/(stack)/settings/notifications' as any),
         },
       ],
     },
@@ -75,6 +77,28 @@ export default function SettingsScreen() {
           label: 'Billing & plan',
           detail: effectiveTier.charAt(0).toUpperCase() + effectiveTier.slice(1),
           onPress: () => router.push('/(stack)/settings/billing' as any),
+        },
+      ],
+    },
+    {
+      title: 'Security',
+      items: [
+        {
+          icon: Lock,
+          label: 'Password',
+          detail: '',
+          onPress: () => router.push('/(stack)/settings/password' as any),
+        },
+      ],
+    },
+    {
+      title: 'Data',
+      items: [
+        {
+          icon: Shield,
+          label: 'Data & Privacy',
+          detail: '',
+          onPress: () => router.push('/(stack)/settings/data' as any),
         },
       ],
     },

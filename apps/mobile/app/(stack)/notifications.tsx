@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Bell } from 'lucide-react-native';
@@ -20,7 +20,12 @@ interface Notification {
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const { data: notifications, isLoading } = useApiQuery<Notification[]>(
+  const {
+    data: notifications,
+    isLoading,
+    refetch,
+    isRefetching,
+  } = useApiQuery<Notification[]>(
     ['notifications'],
     '/notifications'
   );
@@ -40,6 +45,13 @@ export default function NotificationsScreen() {
         data={notifications || []}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={refetch}
+            tintColor={colors.moss}
+          />
+        }
         renderItem={({ item }) => (
           <Card variant={item.read ? 'flat' : 'elevated'} padding="lg">
             <View style={styles.notifRow}>

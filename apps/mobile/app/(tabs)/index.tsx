@@ -20,6 +20,8 @@ import {
   Sparkles,
   Bell,
   Settings,
+  Search,
+  Heart,
 } from 'lucide-react-native';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery } from '@/hooks/use-api';
@@ -29,6 +31,14 @@ import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
+
+interface CollectionItem {
+  id: string;
+  title: string;
+  slug: string;
+  emoji: string | null;
+  activity_count: number;
+}
 
 interface DashboardData {
   greeting: string;
@@ -48,6 +58,7 @@ interface DashboardData {
     duration_minutes: number;
   }>;
   familyName: string;
+  featuredCollections?: CollectionItem[];
 }
 
 const WeatherIcon = ({ condition }: { condition: string }) => {
@@ -229,6 +240,43 @@ export default function TodayScreen() {
           )}
         </View>
 
+        {/* Featured Collections */}
+        {(dashboard?.featuredCollections?.length ?? 0) > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Collections</Text>
+              <TouchableOpacity onPress={() => router.push('/(stack)/collections' as any)}>
+                <Text style={styles.seeAll}>See all</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.collectionsRow}
+            >
+              {dashboard!.featuredCollections!.map((col) => (
+                <TouchableOpacity
+                  key={col.id}
+                  onPress={() => router.push('/(stack)/collections' as any)}
+                  style={styles.collectionCard}
+                >
+                  <Card variant="elevated" padding="lg">
+                    <View style={styles.collectionContent}>
+                      {col.emoji && <Text style={styles.collectionEmoji}>{col.emoji}</Text>}
+                      <Text style={styles.collectionTitle} numberOfLines={2}>
+                        {col.title}
+                      </Text>
+                      <Text style={styles.collectionCount}>
+                        {col.activity_count} activities
+                      </Text>
+                    </View>
+                  </Card>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+
         {/* Quick Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Quick actions</Text>
@@ -282,9 +330,6 @@ export default function TodayScreen() {
   );
 }
 
-// Need to import these for the quick actions
-import { Search, Heart } from 'lucide-react-native';
-
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.parchment },
   header: {
@@ -293,8 +338,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
+    zIndex: 1,
   },
-  headerLeft: { flex: 1 },
+  headerLeft: { flex: 1, marginRight: spacing.md },
   headerRight: { flexDirection: 'row', gap: spacing.sm },
   headerButton: {
     width: 40,
@@ -428,6 +474,29 @@ const styles = StyleSheet.create({
   activityDuration: {
     fontSize: 12,
     color: `${colors.clay}80`,
+  },
+  collectionsRow: {
+    gap: spacing.md,
+  },
+  collectionCard: {
+    width: 140,
+  },
+  collectionContent: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  collectionEmoji: {
+    fontSize: 28,
+  },
+  collectionTitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.ink,
+    textAlign: 'center',
+  },
+  collectionCount: {
+    fontSize: 11,
+    color: colors.clay,
   },
   quickActions: {
     flexDirection: 'row',

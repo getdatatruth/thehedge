@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Search, Clock, ChevronRight, Filter } from 'lucide-react-native';
+import { Search, Clock, ChevronRight, SlidersHorizontal } from 'lucide-react-native';
+import BottomSheet from '@gorhom/bottom-sheet';
 import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { FilterSheet, Filters, DEFAULT_FILTERS } from '@/components/shared/FilterSheet';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
@@ -26,6 +28,10 @@ interface Activity {
   category: string;
   duration_minutes: number;
   location: string;
+  age_min?: number;
+  age_max?: number;
+  energy_level?: string;
+  mess_level?: string;
   age_range: string;
   is_premium: boolean;
 }
@@ -57,8 +63,10 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function BrowseScreen() {
   const router = useRouter();
+  const filterSheetRef = useRef<BottomSheet>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 
   const {
     data: activities,
@@ -66,6 +74,16 @@ export default function BrowseScreen() {
     refetch,
     isRefetching,
   } = useApiQuery<Activity[]>(['activities'], '/activities?limit=100');
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.duration !== null) count++;
+    if (filters.location !== null) count++;
+    if (filters.energy !== null) count++;
+    if (filters.mess !== null) count++;
+    if (filters.ageMin !== null) count++;
+    return count;
+  }, [filters]);
 
   const filtered = useMemo(() => {
     if (!activities) return [];
@@ -77,9 +95,24 @@ export default function BrowseScreen() {
         !searchQuery ||
         a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         a.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      const matchesDuration =
+        filters.duration === null || a.duration_minutes <= filters.duration;
+      const matchesLocation =
+        filters.location === null ||
+        a.location?.toLowerCase() === filters.location;
+      const matchesEnergy =
+        filters.energy === null ||
+        a.energy_level?.toLowerCase() === filters.energy;
+      const matchesMess =
+        filters.mess === null ||
+        a.mess_level?.toLowerCase() === filters.mess;
+      const matchesAge =
+        (filters.ageMin === null && filters.ageMax === null) ||
+        ((a.age_min == null || a.age_min <= (filters.ageMax ?? 99)) &&
+         (a.age_max == null || a.age_max >= (filters.ageMin ?? 0)));
+      return matchesCategory && matchesSearch && matchesDuration && matchesLocation && matchesEnergy && matchesMess && matchesAge;
     });
-  }, [activities, selectedCategory, searchQuery]);
+  }, [activities, selectedCategory, searchQuery, filters]);
 
   if (isLoading && !activities) return <LoadingScreen />;
 
@@ -91,16 +124,32 @@ export default function BrowseScreen() {
         <Text style={styles.title}>Browse activities</Text>
       </View>
 
-      {/* Search */}
-      <View style={styles.searchContainer}>
-        <Search size={18} color={colors.clay} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search activities..."
-          placeholderTextColor={`${colors.clay}80`}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+      {/* Search + Filter */}
+      <View style={styles.searchRow}>
+        <View style={styles.searchContainer}>
+          <Search size={18} color={colors.clay} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search activities..."
+            placeholderTextColor={`${colors.clay}80`}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+        <TouchableOpacity
+          style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+          onPress={() => filterSheetRef.current?.snapToIndex(0)}
+        >
+          <SlidersHorizontal
+            size={18}
+            color={activeFilterCount > 0 ? colors.parchment : colors.clay}
+          />
+          {activeFilterCount > 0 && (
+            <View style={styles.filterBadge}>
+              <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* Category Chips */}
@@ -207,6 +256,13 @@ export default function BrowseScreen() {
           </View>
         )}
       />
+
+      {/* Filter Bottom Sheet */}
+      <FilterSheet
+        filters={filters}
+        onChange={setFilters}
+        bottomSheetRef={filterSheetRef}
+      />
     </SafeAreaView>
   );
 }
@@ -231,12 +287,18 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     color: colors.ink,
   },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.md,
+  },
   searchContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginHorizontal: spacing.xl,
-    marginBottom: spacing.md,
     backgroundColor: colors.linen,
     borderWidth: 1,
     borderColor: colors.stone,
@@ -248,6 +310,36 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: colors.ink,
+  },
+  filterBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.sm,
+    backgroundColor: colors.linen,
+    borderWidth: 1,
+    borderColor: colors.stone,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBtnActive: {
+    backgroundColor: colors.forest,
+    borderColor: colors.forest,
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.terracotta,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.white,
   },
   chips: {
     paddingHorizontal: spacing.xl,

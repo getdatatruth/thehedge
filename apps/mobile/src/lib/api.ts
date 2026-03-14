@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 const API_BASE = __DEV__
-  ? 'http://localhost:3000/api/v1'
+  ? 'http://192.168.68.101:3000/api/v1'
   : 'https://app.thehedge.ie/api/v1';
 
 interface ApiResponse<T> {
@@ -82,5 +82,8 @@ export const apiPut = <T>(path: string, body: unknown) =>
     body: JSON.stringify(body),
   });
 
-export const apiDelete = <T>(path: string) =>
-  api<T>(path, { method: 'DELETE' });
+export const apiDelete = <T>(path: string, body?: unknown) =>
+  api<T>(path, {
+    method: 'DELETE',
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
