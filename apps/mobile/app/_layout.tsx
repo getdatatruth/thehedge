@@ -1,10 +1,8 @@
-import 'react-native-reanimated';
 import React, { useEffect, useCallback } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
@@ -68,10 +66,8 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.parchment }}>
       <QueryProvider>
         <AuthProvider>
-          <BottomSheetModalProvider>
-            <StatusBar style="dark" />
-            <RootNavigator />
-          </BottomSheetModalProvider>
+          <StatusBar style="dark" />
+          <RootNavigator />
         </AuthProvider>
       </QueryProvider>
     </GestureHandlerRootView>
