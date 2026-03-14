@@ -142,7 +142,12 @@ export const activities = pgTable('activities', {
   title: text('title').notNull(),
   slug: text('slug').notNull(),
   description: text('description').notNull(),
-  instructions: jsonb('instructions').$type<{ steps: string[] }>().notNull(),
+  instructions: jsonb('instructions').$type<{ steps: string[]; variations?: string[]; tips?: string[] }>().notNull(),
+  parentGuide: jsonb('parent_guide').$type<{
+    knowledge: { topic: string; content: string }[];
+    conversation_starters: string[];
+    watch_for: string[];
+  }>(),
   category: activityCategoryEnum('category').notNull(),
   ageMin: integer('age_min').notNull(),
   ageMax: integer('age_max').notNull(),

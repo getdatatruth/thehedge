@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ChevronRight, Clock } from 'lucide-react-native';
+import { ArrowLeft, ChevronRight, Clock, Leaf, Palette, FlaskConical, Calculator, BookOpen, Music, UtensilsCrossed, TreePine, Footprints, Globe, Shapes, FolderOpen } from 'lucide-react-native';
 import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -17,6 +17,33 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
+
+const COLLECTION_ICON_MAP: Record<string, { icon: any; color: string }> = {
+  nature: { icon: TreePine, color: colors.sage },
+  outdoor: { icon: TreePine, color: colors.sage },
+  science: { icon: FlaskConical, color: colors.moss },
+  art: { icon: Palette, color: colors.terracotta },
+  craft: { icon: Palette, color: colors.terracotta },
+  math: { icon: Calculator, color: colors.umber },
+  language: { icon: BookOpen, color: colors.forest },
+  reading: { icon: BookOpen, color: colors.forest },
+  music: { icon: Music, color: colors.clay },
+  cook: { icon: UtensilsCrossed, color: colors.terracotta },
+  bak: { icon: UtensilsCrossed, color: colors.terracotta },
+  physical: { icon: Footprints, color: colors.moss },
+  movement: { icon: Footprints, color: colors.moss },
+  irish: { icon: Globe, color: colors.forest },
+  sensory: { icon: Shapes, color: colors.sage },
+  play: { icon: Shapes, color: colors.sage },
+};
+
+function getCollectionIcon(title: string) {
+  const lower = title.toLowerCase();
+  for (const [keyword, config] of Object.entries(COLLECTION_ICON_MAP)) {
+    if (lower.includes(keyword)) return config;
+  }
+  return { icon: Leaf, color: colors.moss };
+}
 
 interface Collection {
   id: string;
@@ -59,9 +86,10 @@ export default function CollectionsScreen() {
             <ArrowLeft size={20} color={colors.ink} />
           </TouchableOpacity>
           <View style={styles.headerInfo}>
-            {selectedCollection.emoji && (
-              <Text style={styles.collectionEmoji}>{selectedCollection.emoji}</Text>
-            )}
+            {(() => {
+              const { icon: Icon, color } = getCollectionIcon(selectedCollection.title);
+              return <Icon size={22} color={color} />;
+            })()}
             <Text style={styles.title}>{selectedCollection.title}</Text>
           </View>
         </View>
@@ -127,9 +155,14 @@ export default function CollectionsScreen() {
           >
             <Card variant="elevated" padding="lg">
               <View style={styles.collectionContent}>
-                {item.emoji && (
-                  <Text style={styles.emoji}>{item.emoji}</Text>
-                )}
+                {(() => {
+                  const { icon: Icon, color } = getCollectionIcon(item.title);
+                  return (
+                    <View style={[styles.iconWrap, { backgroundColor: color + '12' }]}>
+                      <Icon size={24} color={color} />
+                    </View>
+                  );
+                })()}
                 <Text style={styles.collectionTitle} numberOfLines={2}>
                   {item.title}
                 </Text>
@@ -142,7 +175,7 @@ export default function CollectionsScreen() {
         )}
         ListEmptyComponent={() => (
           <EmptyState
-            icon={<Text style={{ fontSize: 32 }}>📚</Text>}
+            icon={<FolderOpen size={32} color={`${colors.clay}40`} />}
             title="No collections yet"
             message="Collections will appear here as they are curated."
           />
@@ -177,7 +210,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: { fontSize: 20, fontWeight: '300', color: colors.ink },
-  collectionEmoji: { fontSize: 22 },
   list: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -195,8 +227,12 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.sm,
   },
-  emoji: {
-    fontSize: 32,
+  iconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   collectionTitle: {
     fontSize: 14,

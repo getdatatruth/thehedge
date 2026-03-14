@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { createClient } from '@/lib/supabase/server';
+import { createApiClient } from '@/lib/supabase/api-client';
+import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -34,16 +35,14 @@ const RATE_LIMITS: Record<string, number> = {
   educator: 999,
 };
 
+export async function OPTIONS() {
+  return apiOptions();
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { supabase, user, error } = await createApiClient(request);
+    if (!user) return apiError(error || 'Unauthorized', 401);
 
     // Get user profile and tier
     const { data: profile } = await supabase
@@ -61,21 +60,11 @@ export async function POST(request: NextRequest) {
     const tier = family?.subscription_tier || 'free';
     const weeklyLimit = RATE_LIMITS[tier] || 5;
 
-    // Check rate limit (count AI queries this week)
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-
-    // Simple rate limiting via a counter - in production you'd track this properly
-    // For now, we'll allow all requests and add proper tracking later
-
     const body = await request.json();
     const { prompt, context } = body;
 
     if (!prompt || typeof prompt !== 'string') {
-      return NextResponse.json(
-        { error: 'Missing prompt' },
-        { status: 400 }
-      );
+      return apiError('Missing prompt', 400);
     }
 
     const userMessage = context
@@ -103,17 +92,14 @@ export async function POST(request: NextRequest) {
       // If JSON parsing fails, return the text response
     }
 
-    return NextResponse.json({
+    return apiSuccess({
       suggestions,
       text: responseText,
       tier,
       weeklyLimit,
     });
-  } catch (error) {
-    console.error('AI suggestion error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate suggestions' },
-      { status: 500 }
-    );
+  } catch (err) {
+    console.error('AI suggestion error:', err);
+    return apiError('Failed to generate suggestions', 500);
   }
 }

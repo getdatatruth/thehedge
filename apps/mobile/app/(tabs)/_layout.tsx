@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Sun, Search, CalendarDays, Sparkles, Trophy, GraduationCap, Lock } from 'lucide-react-native';
+import { Sun, Search, CalendarDays, Leaf, Menu, Lock } from 'lucide-react-native';
 import { View, StyleSheet } from 'react-native';
 import { colors } from '@/theme/colors';
 import { useAuthStore } from '@/stores/auth-store';
@@ -47,6 +47,23 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'HedgeAI',
+          tabBarIcon: ({ focused, size }) => (
+            <View style={[styles.aiButton, focused && styles.aiButtonActive]}>
+              <Leaf size={size - 2} color={focused ? colors.parchment : colors.forest} />
+            </View>
+          ),
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: '700',
+            marginTop: 2,
+            color: colors.forest,
+          },
+        }}
+      />
+      <Tabs.Screen
         name="plan"
         options={{
           title: 'Plan',
@@ -63,32 +80,22 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="more"
         options={{
-          title: 'Ask AI',
+          title: 'More',
           tabBarIcon: ({ color, size }) => (
-            <Sparkles size={size} color={color} />
+            <Menu size={size} color={color} />
           ),
         }}
       />
+      {/* Hidden tabs - accessible via More screen but not shown in tab bar */}
       <Tabs.Screen
         name="progress"
-        options={{
-          title: 'Progress',
-          tabBarIcon: ({ color, size }) => (
-            <Trophy size={size} color={color} />
-          ),
-        }}
+        options={{ href: null }}
       />
       <Tabs.Screen
         name="educator"
-        options={{
-          title: 'Educator',
-          href: effectiveTier === 'educator' ? undefined : null,
-          tabBarIcon: ({ color, size }) => (
-            <GraduationCap size={size} color={color} />
-          ),
-        }}
+        options={{ href: null }}
       />
     </Tabs>
   );
@@ -107,5 +114,17 @@ const styles = StyleSheet.create({
     borderColor: colors.stone,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  aiButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${colors.forest}12`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: -4,
+  },
+  aiButtonActive: {
+    backgroundColor: colors.forest,
   },
 });

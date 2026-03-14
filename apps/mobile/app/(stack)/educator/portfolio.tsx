@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   childSelector: {
     paddingHorizontal: spacing.xl,
     gap: spacing.sm,
-    paddingBottom: spacing.lg,
+    paddingBottom: spacing.sm,
   },
   childChip: {
     paddingHorizontal: 16,
@@ -363,7 +363,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.linen,
     borderWidth: 1,
     borderColor: colors.stone,
-    marginRight: spacing.sm,
   },
   childChipActive: {
     backgroundColor: colors.forest,

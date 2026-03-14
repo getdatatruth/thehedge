@@ -22,6 +22,17 @@ import {
   Settings,
   Search,
   Heart,
+  Leaf,
+  TreePine,
+  Palette,
+  FlaskConical,
+  Calculator,
+  BookOpen,
+  Music,
+  UtensilsCrossed,
+  Footprints,
+  Globe,
+  Shapes,
 } from 'lucide-react-native';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery } from '@/hooks/use-api';
@@ -59,6 +70,33 @@ interface DashboardData {
   }>;
   familyName: string;
   featuredCollections?: CollectionItem[];
+}
+
+const COLLECTION_ICON_MAP: Record<string, { icon: any; color: string }> = {
+  nature: { icon: TreePine, color: colors.sage },
+  outdoor: { icon: TreePine, color: colors.sage },
+  science: { icon: FlaskConical, color: colors.moss },
+  art: { icon: Palette, color: colors.terracotta },
+  craft: { icon: Palette, color: colors.terracotta },
+  math: { icon: Calculator, color: colors.umber },
+  language: { icon: BookOpen, color: colors.forest },
+  reading: { icon: BookOpen, color: colors.forest },
+  music: { icon: Music, color: colors.clay },
+  cook: { icon: UtensilsCrossed, color: colors.terracotta },
+  bak: { icon: UtensilsCrossed, color: colors.terracotta },
+  physical: { icon: Footprints, color: colors.moss },
+  movement: { icon: Footprints, color: colors.moss },
+  irish: { icon: Globe, color: colors.forest },
+  sensory: { icon: Shapes, color: colors.sage },
+  play: { icon: Shapes, color: colors.sage },
+};
+
+function getCollectionIcon(title: string) {
+  const lower = title.toLowerCase();
+  for (const [keyword, config] of Object.entries(COLLECTION_ICON_MAP)) {
+    if (lower.includes(keyword)) return config;
+  }
+  return { icon: Leaf, color: colors.moss };
 }
 
 const WeatherIcon = ({ condition }: { condition: string }) => {
@@ -262,7 +300,14 @@ export default function TodayScreen() {
                 >
                   <Card variant="elevated" padding="lg">
                     <View style={styles.collectionContent}>
-                      {col.emoji && <Text style={styles.collectionEmoji}>{col.emoji}</Text>}
+                      {(() => {
+                        const { icon: Icon, color } = getCollectionIcon(col.title);
+                        return (
+                          <View style={[styles.collectionIconWrap, { backgroundColor: color + '12' }]}>
+                            <Icon size={20} color={color} />
+                          </View>
+                        );
+                      })()}
                       <Text style={styles.collectionTitle} numberOfLines={2}>
                         {col.title}
                       </Text>
@@ -485,8 +530,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  collectionEmoji: {
-    fontSize: 28,
+  collectionIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   collectionTitle: {
     fontSize: 13,

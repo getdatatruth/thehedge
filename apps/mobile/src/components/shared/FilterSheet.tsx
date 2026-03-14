@@ -68,7 +68,7 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
   };
 
   return (
-    <SimpleBottomSheet ref={bottomSheetRef} snapPoint="80%" scrollable>
+    <SimpleBottomSheet ref={bottomSheetRef} snapPoint="65%" scrollable>
       <View style={styles.content}>
         <View style={styles.headerRow}>
           <Text style={styles.title}>Filters</Text>

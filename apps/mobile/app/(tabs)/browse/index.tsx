@@ -99,7 +99,7 @@ export default function BrowseScreen() {
         filters.duration === null || a.duration_minutes <= filters.duration;
       const matchesLocation =
         filters.location === null ||
-        a.location?.toLowerCase() === filters.location;
+        a.location?.toLowerCase().includes(filters.location);
       const matchesEnergy =
         filters.energy === null ||
         a.energy_level?.toLowerCase() === filters.energy;
@@ -385,7 +385,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryStrip: {
-    width: 3,
+    width: 4,
+    minHeight: 40,
     height: '100%',
     marginRight: spacing.md,
     borderRadius: 2,

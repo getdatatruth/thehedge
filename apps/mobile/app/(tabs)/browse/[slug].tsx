@@ -16,6 +16,12 @@ import {
   Heart,
   Check,
   Sparkles,
+  Lightbulb,
+  BookOpen,
+  Zap,
+  Droplets,
+  MessageCircle,
+  Eye,
 } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
@@ -51,6 +57,11 @@ interface ActivityDetail {
   mess_level: string;
   screen_free: boolean;
   premium: boolean;
+  parent_guide: {
+    knowledge: { topic: string; content: string }[];
+    conversation_starters: string[];
+    watch_for: string[];
+  } | null;
 }
 
 export default function ActivityDetailScreen() {
@@ -226,6 +237,138 @@ export default function ActivityDetailScreen() {
             </Card>
           </View>
         )}
+
+        {/* Parent Guide - AI-generated teaching content */}
+        {activity.parent_guide ? (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Parent guide</Text>
+            <Text style={styles.sectionSubtitle}>
+              Everything you need to know to teach this activity confidently
+            </Text>
+
+            {/* Knowledge topics */}
+            {activity.parent_guide.knowledge.map((item, i) => (
+              <Card key={i} variant="elevated" padding="lg">
+                <View style={styles.knowledgeHeader}>
+                  <View style={styles.tipIcon}>
+                    <BookOpen size={14} color={colors.forest} />
+                  </View>
+                  <Text style={styles.knowledgeTopic}>{item.topic}</Text>
+                </View>
+                <Text style={styles.knowledgeContent}>{item.content}</Text>
+              </Card>
+            ))}
+
+            {/* Conversation starters */}
+            {activity.parent_guide.conversation_starters.length > 0 && (
+              <Card variant="elevated" padding="lg">
+                <View style={styles.knowledgeHeader}>
+                  <View style={[styles.tipIcon, { backgroundColor: `${colors.moss}12` }]}>
+                    <MessageCircle size={14} color={colors.moss} />
+                  </View>
+                  <Text style={styles.knowledgeTopic}>Questions to ask</Text>
+                </View>
+                {activity.parent_guide.conversation_starters.map((q, i) => (
+                  <View key={i} style={styles.starterRow}>
+                    <Text style={styles.starterBullet}>"</Text>
+                    <Text style={styles.starterText}>{q}</Text>
+                  </View>
+                ))}
+              </Card>
+            )}
+
+            {/* Watch for */}
+            {activity.parent_guide.watch_for.length > 0 && (
+              <Card variant="elevated" padding="lg">
+                <View style={styles.knowledgeHeader}>
+                  <View style={[styles.tipIcon, { backgroundColor: `${colors.sage}20` }]}>
+                    <Eye size={14} color={colors.sage} />
+                  </View>
+                  <Text style={styles.knowledgeTopic}>Signs of learning</Text>
+                </View>
+                {activity.parent_guide.watch_for.map((item, i) => (
+                  <View key={i} style={styles.watchRow}>
+                    <Sparkles size={12} color={colors.sage} />
+                    <Text style={styles.watchText}>{item}</Text>
+                  </View>
+                ))}
+              </Card>
+            )}
+          </View>
+        ) : (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Parent tips</Text>
+            <Card variant="elevated" padding="lg">
+              <View style={styles.tipRow}>
+                <View style={styles.tipIcon}>
+                  <Lightbulb size={14} color={colors.amber} />
+                </View>
+                <Text style={styles.tipText}>
+                  Let your child lead the pace. If they want to spend longer on one step,
+                  that's great - curiosity-driven learning sticks better than rushing through.
+                </Text>
+              </View>
+              <View style={styles.tipRow}>
+                <View style={styles.tipIcon}>
+                  <Lightbulb size={14} color={colors.amber} />
+                </View>
+                <Text style={styles.tipText}>
+                  Ask open-ended questions like "What do you notice?" or "Why do you think
+                  that happens?" to deepen their understanding.
+                </Text>
+              </View>
+              <View style={[styles.tipRow, { borderBottomWidth: 0 }]}>
+                <View style={styles.tipIcon}>
+                  <Lightbulb size={14} color={colors.amber} />
+                </View>
+                <Text style={styles.tipText}>
+                  Don't worry about getting it perfect. The goal is engagement and
+                  exploration, not a polished result.
+                </Text>
+              </View>
+            </Card>
+          </View>
+        )}
+
+        {/* Activity Info Badges */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Good to know</Text>
+          <View style={styles.infoBadgesRow}>
+            {activity.energy_level && (
+              <View style={styles.infoBadge}>
+                <View style={[styles.infoBadgeIcon, { backgroundColor: `${colors.terracotta}12` }]}>
+                  <Zap size={14} color={colors.terracotta} />
+                </View>
+                <View>
+                  <Text style={styles.infoBadgeLabel}>Energy</Text>
+                  <Text style={styles.infoBadgeValue}>{activity.energy_level}</Text>
+                </View>
+              </View>
+            )}
+            {activity.mess_level && (
+              <View style={styles.infoBadge}>
+                <View style={[styles.infoBadgeIcon, { backgroundColor: `${colors.moss}12` }]}>
+                  <Droplets size={14} color={colors.moss} />
+                </View>
+                <View>
+                  <Text style={styles.infoBadgeLabel}>Mess</Text>
+                  <Text style={styles.infoBadgeValue}>{activity.mess_level}</Text>
+                </View>
+              </View>
+            )}
+            {activity.screen_free && (
+              <View style={styles.infoBadge}>
+                <View style={[styles.infoBadgeIcon, { backgroundColor: `${colors.forest}12` }]}>
+                  <BookOpen size={14} color={colors.forest} />
+                </View>
+                <View>
+                  <Text style={styles.infoBadgeLabel}>Screen</Text>
+                  <Text style={styles.infoBadgeValue}>Screen-free</Text>
+                </View>
+              </View>
+            )}
+          </View>
+        </View>
 
         {/* Variations */}
         {(activity.instructions?.variations?.length ?? 0) > 0 && (
@@ -411,6 +554,121 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.clay,
     lineHeight: 20,
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: `${colors.clay}80`,
+    marginTop: -spacing.sm,
+    lineHeight: 18,
+  },
+  knowledgeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  knowledgeTopic: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.ink,
+    flex: 1,
+  },
+  knowledgeContent: {
+    fontSize: 14,
+    color: colors.clay,
+    lineHeight: 21,
+    paddingLeft: 36,
+  },
+  starterRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingLeft: 36,
+    paddingVertical: 4,
+    gap: 2,
+  },
+  starterBullet: {
+    fontSize: 18,
+    color: colors.moss,
+    fontWeight: '600',
+    lineHeight: 20,
+  },
+  starterText: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.clay,
+    lineHeight: 20,
+    fontStyle: 'italic',
+  },
+  watchRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingLeft: 36,
+    paddingVertical: 4,
+  },
+  watchText: {
+    flex: 1,
+    fontSize: 13,
+    color: colors.clay,
+    lineHeight: 18,
+  },
+  tipRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: `${colors.stone}30`,
+  },
+  tipIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: `${colors.amber}12`,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.clay,
+    lineHeight: 20,
+  },
+  infoBadgesRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  infoBadge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.linen,
+    borderWidth: 1,
+    borderColor: colors.stone,
+    borderRadius: radius.md,
+    padding: spacing.md,
+  },
+  infoBadgeIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoBadgeLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: `${colors.clay}80`,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  infoBadgeValue: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.ink,
+    textTransform: 'capitalize',
   },
   stickyBottom: {
     position: 'absolute',

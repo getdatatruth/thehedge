@@ -40,10 +40,6 @@ interface EducationPlan {
   curriculum_areas: string[];
 }
 
-interface PlansData {
-  plans: EducationPlan[];
-}
-
 interface CreatePlanBody {
   child_id: string;
   academic_year: string;
@@ -73,11 +69,11 @@ export default function PlansScreen() {
   const [daysPerWeek, setDaysPerWeek] = useState(5);
 
   const {
-    data: plansData,
+    data: plans,
     isLoading,
     refetch,
     isRefetching,
-  } = useApiQuery<PlansData>(['educator', 'plans'], '/educator/plans');
+  } = useApiQuery<EducationPlan[]>(['educator', 'plans'], '/educator/plans');
 
   const createPlan = useApiPost<EducationPlan, CreatePlanBody>(
     '/educator/plans',
@@ -113,15 +109,15 @@ export default function PlansScreen() {
     });
   };
 
-  const plans = plansData?.plans || [];
-  const grouped = plans.reduce<Record<string, EducationPlan[]>>((acc, plan) => {
+  const plansList = plans || [];
+  const grouped = plansList.reduce<Record<string, EducationPlan[]>>((acc, plan) => {
     const name = plan.child_name || 'Unknown';
     if (!acc[name]) acc[name] = [];
     acc[name].push(plan);
     return acc;
   }, {});
 
-  if (isLoading && !plansData) return <LoadingScreen />;
+  if (isLoading && !plans) return <LoadingScreen />;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -143,7 +139,7 @@ export default function PlansScreen() {
           />
         }
       >
-        {plans.length === 0 ? (
+        {plansList.length === 0 ? (
           <EmptyState
             icon={<FileText size={32} color={`${colors.clay}40`} />}
             title="No education plans"
