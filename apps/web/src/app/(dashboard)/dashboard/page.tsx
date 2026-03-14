@@ -38,7 +38,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('name, families(name, county, latitude, longitude, family_style)')
+    .select('name, families(name, county, latitude, longitude, family_style, subscription_tier, subscription_status, trial_ends_at)')
     .eq('id', user.id)
     .single();
 
@@ -50,7 +50,18 @@ export default async function DashboardPage() {
     latitude: number | null;
     longitude: number | null;
     family_style: string | null;
+    subscription_tier: string | null;
+    subscription_status: string | null;
+    trial_ends_at: string | null;
   } | null;
+
+  // Determine effective tier
+  let effectiveTier = family?.subscription_tier || 'free';
+  if (family?.subscription_status === 'trialing' && family?.trial_ends_at) {
+    if (new Date() > new Date(family.trial_ends_at)) effectiveTier = 'free';
+  } else if (family?.subscription_status === 'cancelled' || family?.subscription_status === 'past_due') {
+    effectiveTier = 'free';
+  }
 
   const firstName = profile?.name?.split(' ')[0] || 'there';
   const weather = await getWeather(family?.latitude, family?.longitude);
@@ -245,6 +256,7 @@ export default async function DashboardPage() {
       streak={streak}
       activitiesThisWeek={activitiesThisWeek}
       planActivities={planActivities}
+      isFreeUser={effectiveTier === 'free'}
     />
   );
 }

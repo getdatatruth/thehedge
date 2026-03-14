@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Send, Sparkles, Clock, User, ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
+import { Send, Sparkles, Clock, User, ArrowUpRight, Crown } from 'lucide-react';
 
 interface Suggestion {
   title: string;
@@ -33,7 +34,10 @@ interface ChatInterfaceProps {
     county: string | null;
     familyStyle: string | null;
   };
+  isFreeUser?: boolean;
 }
+
+const FREE_AI_LIMIT = 5;
 
 const EXAMPLE_PROMPTS = [
   "What should we do this afternoon?",
@@ -43,11 +47,13 @@ const EXAMPLE_PROMPTS = [
   "We're at the beach with the kids",
 ];
 
-export function ChatInterface({ context }: ChatInterfaceProps) {
+export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const suggestionsUsed = messages.filter((m) => m.role === 'assistant' && m.suggestions).length;
+  const isAtLimit = isFreeUser && suggestionsUsed >= FREE_AI_LIMIT;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -122,6 +128,26 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
             </span>
           )}
         </p>
+
+        {/* Free tier usage counter */}
+        {isFreeUser && (
+          <div className="mt-3 flex items-center gap-3">
+            <div className="flex-1 h-1.5 rounded-full bg-stone/30 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${suggestionsUsed >= FREE_AI_LIMIT ? 'bg-terracotta' : suggestionsUsed >= 3 ? 'bg-amber' : 'bg-moss'}`}
+                style={{ width: `${Math.min((suggestionsUsed / FREE_AI_LIMIT) * 100, 100)}%` }}
+              />
+            </div>
+            <span className="text-[11px] font-bold text-clay/50 whitespace-nowrap">
+              {suggestionsUsed}/{FREE_AI_LIMIT} suggestions
+            </span>
+            {suggestionsUsed >= 3 && (
+              <Link href="/settings/billing" className="text-[11px] font-bold text-amber hover:text-forest transition-colors whitespace-nowrap">
+                Upgrade
+              </Link>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Messages */}
@@ -250,30 +276,45 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
 
       {/* Input */}
       <div className="border-t border-stone pt-4">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-          className="flex gap-3"
-        >
-          <div className="relative flex-1">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about activities for your family..."
-              disabled={loading}
-              className="h-12 rounded-[4px] border-stone bg-linen pr-4 pl-4 text-sm shadow-sm focus:border-moss focus:shadow-md transition-all"
-            />
+        {isAtLimit ? (
+          <div className="flex items-center gap-4 rounded-[14px] bg-gradient-to-r from-amber/5 via-amber/8 to-amber/5 border border-amber/15 p-5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/10">
+              <Crown className="h-5 w-5 text-amber" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-ink">You&apos;ve used all {FREE_AI_LIMIT} free suggestions this week</p>
+              <p className="text-[12px] text-clay/60 font-serif mt-0.5">Upgrade to get unlimited AI-powered activity ideas.</p>
+            </div>
+            <Link href="/settings/billing?upgrade=family" className="btn-primary text-sm shrink-0">
+              Upgrade
+            </Link>
           </div>
-          <button
-            type="submit"
-            disabled={!input.trim() || loading}
-            className="btn-primary h-12 w-12 !p-0 justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className="flex gap-3"
           >
-            <Send className="h-4 w-4" />
-          </button>
-        </form>
+            <div className="relative flex-1">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about activities for your family..."
+                disabled={loading}
+                className="h-12 rounded-[4px] border-stone bg-linen pr-4 pl-4 text-sm shadow-sm focus:border-moss focus:shadow-md transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={!input.trim() || loading}
+              className="btn-primary h-12 w-12 !p-0 justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

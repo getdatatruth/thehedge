@@ -21,7 +21,7 @@ export default async function ChatPage() {
   // Get family context
   const { data: profile } = await supabase
     .from('users')
-    .select('family_id, families(county, latitude, longitude, family_style)')
+    .select('family_id, families(county, latitude, longitude, family_style, subscription_tier, subscription_status, trial_ends_at)')
     .eq('id', user.id)
     .single();
 
@@ -37,7 +37,19 @@ export default async function ChatPage() {
     latitude: number | null;
     longitude: number | null;
     family_style: string | null;
+    subscription_tier: string | null;
+    subscription_status: string | null;
+    trial_ends_at: string | null;
   } | null;
+
+  // Determine if free user
+  let effectiveTier = family?.subscription_tier || 'free';
+  if (family?.subscription_status === 'trialing' && family?.trial_ends_at) {
+    if (new Date() > new Date(family.trial_ends_at)) effectiveTier = 'free';
+  } else if (family?.subscription_status === 'cancelled' || family?.subscription_status === 'past_due') {
+    effectiveTier = 'free';
+  }
+  const isFreeUser = effectiveTier === 'free';
 
   // Get children
   const { data: children } = await supabase
@@ -76,5 +88,5 @@ export default async function ChatPage() {
     familyStyle: family?.family_style ?? null,
   };
 
-  return <ChatInterface context={context} />;
+  return <ChatInterface context={context} isFreeUser={isFreeUser} />;
 }

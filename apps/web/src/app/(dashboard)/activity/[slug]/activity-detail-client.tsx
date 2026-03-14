@@ -20,6 +20,8 @@ import {
   Sparkles,
   Lightbulb,
   ArrowRight,
+  Lock,
+  Crown,
 } from 'lucide-react';
 
 const MESS_LABELS: Record<string, string> = {
@@ -44,6 +46,7 @@ interface ActivityDetailClientProps {
   materials: { name: string; household_common: boolean }[];
   variations: MockActivity[];
   tryNext: MockActivity[];
+  isPremiumLocked?: boolean;
 }
 
 export function ActivityDetailClient({
@@ -53,6 +56,7 @@ export function ActivityDetailClient({
   materials,
   variations,
   tryNext,
+  isPremiumLocked = false,
 }: ActivityDetailClientProps) {
   const { loadFavourites } = useFavouritesStore();
   const [checkedMaterials, setCheckedMaterials] = useState<Set<number>>(new Set());
@@ -166,8 +170,47 @@ export function ActivityDetailClient({
         </div>
       </div>
 
+      {/* Premium lock overlay */}
+      {isPremiumLocked && (
+        <div className="card-elevated overflow-hidden">
+          <div className="relative p-8 text-center">
+            <div className="absolute inset-0 bg-gradient-to-b from-parchment/0 via-parchment/80 to-parchment z-0" />
+            <div className="relative z-10">
+              <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-full bg-amber/10 mb-4">
+                <Lock className="h-6 w-6 text-amber" />
+              </div>
+              <h3 className="font-display text-xl font-light text-ink mb-2">
+                This is a <em className="text-amber italic">premium</em> activity
+              </h3>
+              <p className="text-sm text-clay/60 font-serif max-w-sm mx-auto mb-5">
+                Upgrade your plan to access full instructions, materials lists, and step-by-step guides for all premium activities.
+              </p>
+              <Link href="/settings/billing?upgrade=family" className="btn-primary inline-flex items-center gap-2">
+                <Crown className="h-4 w-4" />
+                Upgrade to unlock
+              </Link>
+            </div>
+          </div>
+
+          {/* Blurred preview of what's inside */}
+          <div className="px-6 pb-6 blur-sm select-none pointer-events-none" aria-hidden="true">
+            <div className="space-y-2">
+              {instructions.steps.slice(0, 3).map((step, i) => (
+                <div key={i} className="flex gap-3 rounded-lg bg-linen/50 px-3 py-2.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-forest text-parchment text-[10px] font-bold">{i + 1}</span>
+                  <p className="text-sm text-clay/50">{step}</p>
+                </div>
+              ))}
+              {instructions.steps.length > 3 && (
+                <p className="text-xs text-clay/30 text-center">+ {instructions.steps.length - 3} more steps</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Materials checklist */}
-      {materials && materials.length > 0 && (
+      {!isPremiumLocked && materials && materials.length > 0 && (
         <div className="card-elevated p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display text-lg font-light text-ink">
@@ -218,7 +261,7 @@ export function ActivityDetailClient({
       )}
 
       {/* Step-by-step instructions */}
-      <div className="card-elevated p-6">
+      {!isPremiumLocked && <div className="card-elevated p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display text-lg font-light text-ink">
             How to <em className="text-moss italic">do it</em>
@@ -272,7 +315,7 @@ export function ActivityDetailClient({
             </p>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Learning outcomes */}
       {(activity.learning_outcomes as string[])?.length > 0 && (
@@ -364,7 +407,7 @@ export function ActivityDetailClient({
       )}
 
       {/* Sticky log button */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 lg:left-[calc(50%+130px)]">
+      {!isPremiumLocked && <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 lg:left-[calc(50%+130px)]">
         <LogActivityModal
           activityId={activity.id as string}
           activityTitle={activity.title as string}
@@ -375,7 +418,7 @@ export function ActivityDetailClient({
             We did this!
           </button>
         </LogActivityModal>
-      </div>
+      </div>}
     </div>
   );
 }

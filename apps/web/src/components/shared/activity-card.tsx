@@ -64,22 +64,41 @@ interface ActivityCardProps {
 export function ActivityCard({ activity, showPremiumLock }: ActivityCardProps) {
   const config = CATEGORY_CONFIG[activity.category] || CATEGORY_CONFIG.nature;
   const Icon = config.icon;
+  const isLocked = activity.premium && showPremiumLock;
 
   return (
-    <Link href={`/activity/${activity.slug}`}>
+    <Link href={isLocked ? '/settings/billing?upgrade=family' : `/activity/${activity.slug}`}>
       <div
-        className="category-strip card-interactive group h-full flex flex-col relative"
+        className={`category-strip card-interactive group h-full flex flex-col relative ${isLocked ? 'opacity-75' : ''}`}
         data-category={activity.category}
       >
-        {/* Favourite + New badge */}
+        {/* Locked overlay */}
+        {isLocked && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-[14px] bg-parchment/60 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="text-center px-4">
+              <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-full bg-forest/10 mb-2">
+                <Lock className="h-4 w-4 text-forest" />
+              </div>
+              <p className="text-[12px] font-bold text-forest">Upgrade to unlock</p>
+            </div>
+          </div>
+        )}
+
+        {/* Favourite + New badge + Pro badge */}
         <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          {isLocked && (
+            <span className="inline-flex items-center gap-1 tag bg-amber/15 text-amber">
+              <Lock className="h-2.5 w-2.5" />
+              Pro
+            </span>
+          )}
           {activity.is_new && (
             <div className="tag tag-terra flex items-center gap-1">
               <Sparkles className="h-2.5 w-2.5" />
               NEW
             </div>
           )}
-          <FavouriteButton activityId={activity.id} size="sm" />
+          {!isLocked && <FavouriteButton activityId={activity.id} size="sm" />}
         </div>
 
         {/* Category header */}
@@ -93,7 +112,7 @@ export function ActivityCard({ activity, showPremiumLock }: ActivityCardProps) {
                 {config.label}
               </span>
             </div>
-            <ArrowUpRight className="h-4 w-4 text-stone transition-all group-hover:text-terracotta group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            <ArrowUpRight className={`h-4 w-4 transition-all ${isLocked ? 'text-stone/50' : 'text-stone group-hover:text-terracotta group-hover:translate-x-0.5 group-hover:-translate-y-0.5'}`} />
           </div>
 
           <h3 className="font-display text-[17px] font-light leading-snug text-ink group-hover:text-moss transition-colors">
@@ -103,8 +122,10 @@ export function ActivityCard({ activity, showPremiumLock }: ActivityCardProps) {
 
         {/* Content */}
         <div className="px-5 pb-5 flex-1 flex flex-col">
-          <p className="text-[13px] text-clay line-clamp-2 font-serif leading-relaxed mb-4 flex-1">
-            {activity.description}
+          <p className={`text-[13px] text-clay line-clamp-2 font-serif leading-relaxed mb-4 flex-1 ${isLocked ? 'select-none' : ''}`}>
+            {isLocked
+              ? activity.description.slice(0, 60) + '...'
+              : activity.description}
           </p>
 
           {/* Meta row */}
@@ -119,12 +140,6 @@ export function ActivityCard({ activity, showPremiumLock }: ActivityCardProps) {
             <span className={`tag ${ENERGY_COLORS[activity.energy_level] || 'bg-stone/30 text-umber'}`}>
               {activity.energy_level}
             </span>
-            {activity.premium && showPremiumLock && (
-              <span className="inline-flex items-center gap-1 tag bg-amber/15 text-amber">
-                <Lock className="h-3 w-3" />
-                Pro
-              </span>
-            )}
           </div>
         </div>
       </div>

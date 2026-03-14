@@ -16,6 +16,7 @@ import {
   X,
   ArrowRight,
   ChevronDown,
+  Crown,
 } from 'lucide-react';
 
 const PAGE_SIZE = 12;
@@ -193,6 +194,7 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
   ];
 
   const newActivities = activities.filter((a) => a.is_new);
+  const freeActivityCount = activities.filter((a) => !a.premium).length;
 
   // Count activities per category
   const categoryCounts = useMemo(() => {
@@ -283,6 +285,27 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
           {activities.length} activities across {Object.keys(CATEGORY_CONFIG).length} categories.
         </p>
       </div>
+
+      {/* Free tier upgrade nudge */}
+      {isFreeUser && (
+        <Link
+          href="/settings/billing"
+          className="card-elevated flex items-center gap-4 p-4 border-l-4 border-l-amber/40 hover:border-l-amber transition-all group"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-amber/10">
+            <Crown className="h-5 w-5 text-amber" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-ink">
+              You&apos;re browsing {freeActivityCount} free activities
+            </p>
+            <p className="text-[12px] text-clay/60 font-serif mt-0.5">
+              Upgrade to unlock all {activities.length} activities, including premium content across every category.
+            </p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-stone shrink-0 transition-all group-hover:text-amber group-hover:translate-x-1" />
+        </Link>
+      )}
 
       {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-stone">
@@ -494,7 +517,7 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-                {visibleActivities.map((activity) => (
+                {visibleActivities.map((activity, index) => (
                   <ActivityCard
                     key={activity.id}
                     activity={activity}
@@ -502,6 +525,25 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
                   />
                 ))}
               </div>
+
+              {/* Inline upgrade prompt after first page for free users */}
+              {isFreeUser && visibleCount >= PAGE_SIZE && (
+                <Link
+                  href="/settings/billing"
+                  className="block rounded-[14px] bg-gradient-to-r from-forest/5 via-forest/8 to-forest/5 border border-forest/10 p-6 text-center hover:border-forest/20 transition-all group"
+                >
+                  <p className="font-display text-lg font-light text-ink">
+                    Loving what you see? <em className="text-moss italic">There&apos;s so much more.</em>
+                  </p>
+                  <p className="text-sm text-clay/60 font-serif mt-1.5 max-w-md mx-auto">
+                    Unlock {activities.length - freeActivityCount} premium activities, the weekly planner, unlimited AI suggestions, and favourites.
+                  </p>
+                  <span className="inline-flex items-center gap-2 btn-primary text-sm mt-4 group-hover:shadow-lg transition-all">
+                    <Crown className="h-4 w-4" />
+                    See plans
+                  </span>
+                </Link>
+              )}
 
               {/* Load more */}
               {hasMore && (

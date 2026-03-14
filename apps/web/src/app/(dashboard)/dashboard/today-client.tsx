@@ -18,6 +18,9 @@ import {
   CloudRain,
   Sun,
   Cloud,
+  Crown,
+  Heart,
+  CalendarDays,
 } from 'lucide-react';
 
 const FILTERS = [
@@ -60,7 +63,15 @@ interface TodayClientProps {
   streak: number;
   activitiesThisWeek: number;
   planActivities?: PlanActivity[];
+  isFreeUser?: boolean;
 }
+
+const UPGRADE_PROMPTS = [
+  { icon: CalendarDays, text: 'Unlock the weekly planner', description: 'Plan your week with drag-and-drop scheduling.' },
+  { icon: Heart, text: 'Save your favourites', description: 'Build a library of activities your family loves.' },
+  { icon: Sparkles, text: 'Unlimited AI suggestions', description: 'Ask HedgeAI as many times as you like.' },
+  { icon: Crown, text: 'Access all 700+ activities', description: 'Including premium content across every category.' },
+];
 
 export function TodayClient({
   activities,
@@ -76,6 +87,7 @@ export function TodayClient({
   streak,
   activitiesThisWeek,
   planActivities = [],
+  isFreeUser = false,
 }: TodayClientProps) {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
@@ -238,6 +250,30 @@ export function TodayClient({
           <p className="text-[11px] text-clay font-medium mt-1">this week</p>
         </div>
       </div>
+
+      {/* ─── Upgrade card (free users) ─── */}
+      {isFreeUser && (() => {
+        // Rotate through prompts based on day of week
+        const prompt = UPGRADE_PROMPTS[new Date().getDay() % UPGRADE_PROMPTS.length];
+        const PromptIcon = prompt.icon;
+        return (
+          <Link
+            href="/settings/billing"
+            className="card-elevated flex items-center gap-4 p-5 border-l-4 border-l-amber/40 hover:border-l-amber transition-all group"
+          >
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-amber/10">
+              <PromptIcon className="h-5 w-5 text-amber" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-ink">{prompt.text}</p>
+              <p className="text-[12px] text-clay/60 font-serif mt-0.5">{prompt.description}</p>
+            </div>
+            <span className="text-[11px] font-bold text-amber shrink-0 group-hover:underline">
+              See plans
+            </span>
+          </Link>
+        );
+      })()}
 
       {/* ─── Week Preview ─── */}
       <div>

@@ -62,6 +62,31 @@ export default async function ActivityDetailPage({ params }: PageProps) {
 
   if (!activity) notFound();
 
+  // Check if activity is premium and user is on free tier
+  let isPremiumLocked = false;
+  if (activity.premium) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('families(subscription_tier, subscription_status, trial_ends_at)')
+        .eq('id', user.id)
+        .single();
+      const fam = (
+        Array.isArray(profile?.families) ? profile.families[0] : profile?.families
+      ) as { subscription_tier: string; subscription_status: string; trial_ends_at: string | null } | null;
+      let effectiveTier = fam?.subscription_tier || 'free';
+      if (fam?.subscription_status === 'trialing' && fam?.trial_ends_at) {
+        if (new Date() > new Date(fam.trial_ends_at)) effectiveTier = 'free';
+      } else if (fam?.subscription_status === 'cancelled' || fam?.subscription_status === 'past_due') {
+        effectiveTier = 'free';
+      }
+      isPremiumLocked = effectiveTier === 'free';
+    }
+  }
+
   const instructions = isFromDb
     ? (activity.instructions as { steps: string[] })
     : (activity.instructions as { steps: string[] });
@@ -100,6 +125,7 @@ export default async function ActivityDetailPage({ params }: PageProps) {
       materials={materials}
       variations={variations}
       tryNext={tryNext}
+      isPremiumLocked={isPremiumLocked}
     />
   );
 }
