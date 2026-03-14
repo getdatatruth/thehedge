@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiPost, apiPut, apiDelete } from '@/lib/api';
 
-const storage = new MMKV({ id: 'offline-queue' });
+const STORAGE_KEY = 'offline-queue';
 
 interface QueueItem {
   id: string;
@@ -20,22 +20,12 @@ interface OfflineQueueState {
   clear: () => void;
 }
 
-function loadQueue(): QueueItem[] {
-  const raw = storage.getString('queue');
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
 function saveQueue(queue: QueueItem[]) {
-  storage.set('queue', JSON.stringify(queue));
+  AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(queue)).catch(() => {});
 }
 
 export const useOfflineQueue = create<OfflineQueueState>((set, get) => ({
-  queue: loadQueue(),
+  queue: [],
   isProcessing: false,
 
   enqueue: (item) => {
@@ -70,7 +60,6 @@ export const useOfflineQueue = create<OfflineQueueState>((set, get) => ({
             break;
         }
       } catch {
-        // Keep failed items for retry
         remaining.push(item);
       }
     }
@@ -84,3 +73,12 @@ export const useOfflineQueue = create<OfflineQueueState>((set, get) => ({
     set({ queue: [] });
   },
 }));
+
+// Load persisted queue on first access
+AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
+  if (raw) {
+    try {
+      useOfflineQueue.setState({ queue: JSON.parse(raw) });
+    } catch {}
+  }
+}).catch(() => {});
