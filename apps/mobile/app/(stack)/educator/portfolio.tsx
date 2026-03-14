@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -18,8 +18,8 @@ import {
   Image,
   Calendar,
 } from 'lucide-react-native';
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { useQueryClient } from '@tanstack/react-query';
+import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { useApiQuery, useApiPost } from '@/hooks/use-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@/components/ui/Card';
@@ -69,21 +69,18 @@ export default function PortfolioScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { children } = useAuthStore();
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<SimpleBottomSheetRef>(null);
 
   const [selectedChild, setSelectedChild] = useState<string | null>(
     children[0]?.id ?? null
   );
 
-  // Form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [entryDate, setEntryDate] = useState(
     new Date().toISOString().split('T')[0]
   );
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-
-  const snapPoints = useMemo(() => ['80%'], []);
 
   const {
     data: portfolioData,
@@ -140,18 +137,6 @@ export default function PortfolioScreen() {
     });
   };
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    []
-  );
-
   const entries = portfolioData?.entries || [];
 
   if (isLoading && !portfolioData) return <LoadingScreen />;
@@ -165,7 +150,6 @@ export default function PortfolioScreen() {
         <Text style={styles.headerTitle}>Portfolio</Text>
       </View>
 
-      {/* Child Selector Chips */}
       {children.length > 1 && (
         <ScrollView
           horizontal
@@ -211,7 +195,7 @@ export default function PortfolioScreen() {
             title="No portfolio entries"
             message="Add learning observations, work samples, and milestones to build a portfolio."
             actionLabel="Add entry"
-            onAction={() => bottomSheetRef.current?.snapToIndex(0)}
+            onAction={() => bottomSheetRef.current?.expand()}
           />
         ) : (
           entries.map((entry) => (
@@ -257,34 +241,20 @@ export default function PortfolioScreen() {
         )}
       </ScrollView>
 
-      {/* Add Entry FAB */}
       <View style={styles.fabContainer}>
         <TouchableOpacity
           style={styles.fab}
-          onPress={() => bottomSheetRef.current?.snapToIndex(0)}
+          onPress={() => bottomSheetRef.current?.expand()}
           activeOpacity={0.8}
         >
           <Plus size={22} color={colors.parchment} />
         </TouchableOpacity>
       </View>
 
-      {/* Add Entry Bottom Sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backdropComponent={renderBackdrop}
-        backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={styles.sheetIndicator}
-      >
-        <ScrollView
-          contentContainerStyle={styles.sheetContent}
-          showsVerticalScrollIndicator={false}
-        >
+      <SimpleBottomSheet ref={bottomSheetRef} snapPoint="80%" scrollable>
+        <View style={styles.sheetContent}>
           <Text style={styles.sheetTitle}>Add portfolio entry</Text>
 
-          {/* Title */}
           <Text style={styles.fieldLabel}>Title</Text>
           <TextInput
             style={styles.textInput}
@@ -294,7 +264,6 @@ export default function PortfolioScreen() {
             placeholderTextColor={`${colors.clay}60`}
           />
 
-          {/* Description */}
           <Text style={styles.fieldLabel}>Description</Text>
           <TextInput
             style={[styles.textInput, styles.textArea]}
@@ -307,7 +276,6 @@ export default function PortfolioScreen() {
             textAlignVertical="top"
           />
 
-          {/* Date */}
           <Text style={styles.fieldLabel}>Date</Text>
           <TextInput
             style={styles.textInput}
@@ -317,7 +285,6 @@ export default function PortfolioScreen() {
             placeholderTextColor={`${colors.clay}60`}
           />
 
-          {/* Curriculum Areas */}
           <Text style={styles.fieldLabel}>Curriculum areas</Text>
           <View style={styles.chipRow}>
             {CURRICULUM_AREAS.map((area) => (
@@ -341,7 +308,6 @@ export default function PortfolioScreen() {
             ))}
           </View>
 
-          {/* Photos placeholder */}
           <Text style={styles.fieldLabel}>Photos</Text>
           <View style={styles.photoPlaceholder}>
             <Image size={20} color={`${colors.clay}60`} />
@@ -359,8 +325,8 @@ export default function PortfolioScreen() {
           >
             Add entry
           </Button>
-        </ScrollView>
-      </BottomSheet>
+        </View>
+      </SimpleBottomSheet>
     </SafeAreaView>
   );
 }
@@ -473,12 +439,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.forest,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  sheetBackground: {
-    backgroundColor: colors.parchment,
-  },
-  sheetIndicator: {
-    backgroundColor: colors.stone,
   },
   sheetContent: {
     paddingHorizontal: spacing.xl,

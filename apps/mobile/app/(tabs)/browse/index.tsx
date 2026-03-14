@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Search, Clock, ChevronRight, SlidersHorizontal } from 'lucide-react-native';
-import BottomSheet from '@gorhom/bottom-sheet';
+import { SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -63,7 +63,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function BrowseScreen() {
   const router = useRouter();
-  const filterSheetRef = useRef<BottomSheet>(null);
+  const filterSheetRef = useRef<SimpleBottomSheetRef>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -138,7 +138,7 @@ export default function BrowseScreen() {
         </View>
         <TouchableOpacity
           style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
-          onPress={() => filterSheetRef.current?.snapToIndex(0)}
+          onPress={() => filterSheetRef.current?.expand()}
         >
           <SlidersHorizontal
             size={18}

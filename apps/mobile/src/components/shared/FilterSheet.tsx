@@ -1,6 +1,6 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { hapticLight } from '@/lib/haptics';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/theme/colors';
@@ -27,7 +27,7 @@ export const DEFAULT_FILTERS: Filters = {
 interface FilterSheetProps {
   filters: Filters;
   onChange: (filters: Filters) => void;
-  bottomSheetRef: React.RefObject<BottomSheet | null>;
+  bottomSheetRef: React.RefObject<SimpleBottomSheetRef | null>;
 }
 
 const DURATIONS = [
@@ -55,13 +55,6 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
     setLocal(filters);
   }, [filters]);
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.4} />
-    ),
-    []
-  );
-
   const apply = () => {
     onChange(local);
     bottomSheetRef.current?.close();
@@ -75,16 +68,8 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
   };
 
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={['80%']}
-      enablePanDownToClose
-      backdropComponent={renderBackdrop}
-      backgroundStyle={styles.sheetBg}
-      handleIndicatorStyle={styles.handle}
-    >
-      <BottomSheetScrollView contentContainerStyle={styles.content}>
+    <SimpleBottomSheet ref={bottomSheetRef} snapPoint="80%" scrollable>
+      <View style={styles.content}>
         <View style={styles.headerRow}>
           <Text style={styles.title}>Filters</Text>
           <TouchableOpacity onPress={reset}>
@@ -92,7 +77,6 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
           </TouchableOpacity>
         </View>
 
-        {/* Duration */}
         <View style={styles.section}>
           <Text style={styles.label}>Duration</Text>
           <View style={styles.chipRow}>
@@ -113,7 +97,6 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
           </View>
         </View>
 
-        {/* Location */}
         <View style={styles.section}>
           <Text style={styles.label}>Location</Text>
           <View style={styles.chipRow}>
@@ -134,7 +117,6 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
           </View>
         </View>
 
-        {/* Energy */}
         <View style={styles.section}>
           <Text style={styles.label}>Energy level</Text>
           <View style={styles.chipRow}>
@@ -155,7 +137,6 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
           </View>
         </View>
 
-        {/* Mess level */}
         <View style={styles.section}>
           <Text style={styles.label}>Mess level</Text>
           <View style={styles.chipRow}>
@@ -176,7 +157,6 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
           </View>
         </View>
 
-        {/* Age range */}
         <View style={styles.section}>
           <Text style={styles.label}>Age range</Text>
           <View style={styles.chipRow}>
@@ -208,21 +188,12 @@ export function FilterSheet({ filters, onChange, bottomSheetRef }: FilterSheetPr
         <Button variant="primary" size="lg" fullWidth onPress={apply}>
           Apply filters
         </Button>
-      </BottomSheetScrollView>
-    </BottomSheet>
+      </View>
+    </SimpleBottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  sheetBg: {
-    backgroundColor: colors.parchment,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  handle: {
-    backgroundColor: colors.stone,
-    width: 36,
-  },
   content: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.md,

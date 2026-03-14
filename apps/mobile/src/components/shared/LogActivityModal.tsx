@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiPost } from '@/hooks/use-api';
+import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { ChildSelector } from './ChildSelector';
 import { StarRating } from './StarRating';
 import { Button } from '@/components/ui/Button';
@@ -14,7 +14,7 @@ import { spacing, radius } from '@/theme/spacing';
 interface LogActivityModalProps {
   activityId: string;
   activityTitle: string;
-  bottomSheetRef: React.RefObject<BottomSheet | null>;
+  bottomSheetRef: React.RefObject<SimpleBottomSheetRef | null>;
   onLogged?: () => void;
 }
 
@@ -57,31 +57,12 @@ export function LogActivityModal({
     });
   };
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} opacity={0.4} />
-    ),
-    []
-  );
-
   return (
-    <BottomSheet
-      ref={bottomSheetRef}
-      index={-1}
-      snapPoints={['75%']}
-      enablePanDownToClose
-      backdropComponent={renderBackdrop}
-      backgroundStyle={styles.sheetBg}
-      handleIndicatorStyle={styles.handle}
-    >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.content}
-      >
+    <SimpleBottomSheet ref={bottomSheetRef} snapPoint="75%">
+      <View style={styles.content}>
         <Text style={styles.title}>Log activity</Text>
         <Text style={styles.activityName}>{activityTitle}</Text>
 
-        {/* Child selector */}
         {children.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.label}>Who did it?</Text>
@@ -93,7 +74,6 @@ export function LogActivityModal({
           </View>
         )}
 
-        {/* Duration */}
         <View style={styles.section}>
           <Text style={styles.label}>How long?</Text>
           <View style={styles.durationRow}>
@@ -113,13 +93,11 @@ export function LogActivityModal({
           </View>
         </View>
 
-        {/* Rating */}
         <View style={styles.section}>
           <Text style={styles.label}>How did it go?</Text>
           <StarRating rating={rating} onChange={setRating} />
         </View>
 
-        {/* Notes */}
         <View style={styles.section}>
           <Text style={styles.label}>Notes (optional)</Text>
           <TextInput
@@ -143,21 +121,12 @@ export function LogActivityModal({
         >
           {logMutation.isSuccess ? 'Logged!' : 'Log activity'}
         </Button>
-      </KeyboardAvoidingView>
-    </BottomSheet>
+      </View>
+    </SimpleBottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  sheetBg: {
-    backgroundColor: colors.parchment,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  handle: {
-    backgroundColor: colors.stone,
-    width: 36,
-  },
   content: {
     flex: 1,
     paddingHorizontal: spacing.xl,

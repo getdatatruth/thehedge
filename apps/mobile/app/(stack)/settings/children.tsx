@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,13 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
+import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { useAuthStore, Child } from '@/stores/auth-store';
 import { useApiPost, useApiPut, useApiDelete } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
@@ -40,8 +38,7 @@ export default function ChildrenScreen() {
   const queryClient = useQueryClient();
   const { children } = useAuthStore();
 
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  const snapPoints = useMemo(() => ['70%'], []);
+  const bottomSheetRef = useRef<SimpleBottomSheetRef>(null);
 
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [childName, setChildName] = useState('');
@@ -91,7 +88,7 @@ export default function ChildrenScreen() {
 
   const openAddSheet = () => {
     resetForm();
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.expand();
   };
 
   const openEditSheet = (child: Child) => {
@@ -100,7 +97,7 @@ export default function ChildrenScreen() {
     setChildDob(child.date_of_birth || '');
     setChildSchoolStatus(child.school_status || 'mainstream');
     setChildInterests(child.interests?.join(', ') || '');
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.expand();
   };
 
   const handleSave = () => {
@@ -141,18 +138,6 @@ export default function ChildrenScreen() {
       ]
     );
   };
-
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    []
-  );
 
   const schoolStatusBadge = (status: string) => {
     switch (status) {
@@ -234,19 +219,8 @@ export default function ChildrenScreen() {
         )}
       />
 
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backdropComponent={renderBackdrop}
-        backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={{ backgroundColor: colors.stone }}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.sheetContent}
-        >
+      <SimpleBottomSheet ref={bottomSheetRef} snapPoint="70%">
+        <View style={styles.sheetContent}>
           <Text style={styles.sheetTitle}>
             {editingChild ? 'Edit child' : 'Add child'}
           </Text>
@@ -307,8 +281,8 @@ export default function ChildrenScreen() {
           >
             {editingChild ? 'Save changes' : 'Add child'}
           </Button>
-        </KeyboardAvoidingView>
-      </BottomSheet>
+        </View>
+      </SimpleBottomSheet>
     </SafeAreaView>
   );
 }
@@ -362,9 +336,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.parchment,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  sheetBackground: {
-    backgroundColor: colors.parchment,
   },
   sheetContent: {
     paddingHorizontal: spacing.xl,

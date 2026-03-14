@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -15,11 +15,10 @@ import {
   ArrowLeft,
   Plus,
   FileText,
-  ChevronDown,
   Minus,
 } from 'lucide-react-native';
-import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import { useQueryClient } from '@tanstack/react-query';
+import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { useApiQuery, useApiPost } from '@/hooks/use-api';
 import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@/components/ui/Card';
@@ -65,15 +64,13 @@ export default function PlansScreen() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { children } = useAuthStore();
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<SimpleBottomSheetRef>(null);
 
   const [selectedChildId, setSelectedChildId] = useState(children[0]?.id ?? '');
   const [academicYear, setAcademicYear] = useState('2025-2026');
   const [approach, setApproach] = useState('blended');
   const [hoursPerDay, setHoursPerDay] = useState(3);
   const [daysPerWeek, setDaysPerWeek] = useState(5);
-
-  const snapPoints = useMemo(() => ['75%'], []);
 
   const {
     data: plansData,
@@ -116,19 +113,6 @@ export default function PlansScreen() {
     });
   };
 
-  const renderBackdrop = useCallback(
-    (props: any) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-      />
-    ),
-    []
-  );
-
-  // Group plans by child
   const plans = plansData?.plans || [];
   const grouped = plans.reduce<Record<string, EducationPlan[]>>((acc, plan) => {
     const name = plan.child_name || 'Unknown';
@@ -165,7 +149,7 @@ export default function PlansScreen() {
             title="No education plans"
             message="Create an education plan for each child to track their learning approach and hours."
             actionLabel="Add plan"
-            onAction={() => bottomSheetRef.current?.snapToIndex(0)}
+            onAction={() => bottomSheetRef.current?.expand()}
           />
         ) : (
           Object.entries(grouped).map(([childName, childPlans]) => (
@@ -175,10 +159,7 @@ export default function PlansScreen() {
                 <Card key={plan.id} variant="elevated" padding="lg">
                   <View style={styles.planHeader}>
                     <Text style={styles.planYear}>{plan.academic_year}</Text>
-                    <Badge
-                      variant="sage"
-                      size="sm"
-                    >
+                    <Badge variant="sage" size="sm">
                       {plan.approach.replace('_', '-')}
                     </Badge>
                   </View>
@@ -207,34 +188,20 @@ export default function PlansScreen() {
         )}
       </ScrollView>
 
-      {/* Add Plan Button */}
       <View style={styles.fabContainer}>
         <TouchableOpacity
           style={styles.fab}
-          onPress={() => bottomSheetRef.current?.snapToIndex(0)}
+          onPress={() => bottomSheetRef.current?.expand()}
           activeOpacity={0.8}
         >
           <Plus size={22} color={colors.parchment} />
         </TouchableOpacity>
       </View>
 
-      {/* Add Plan Bottom Sheet */}
-      <BottomSheet
-        ref={bottomSheetRef}
-        index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backdropComponent={renderBackdrop}
-        backgroundStyle={styles.sheetBackground}
-        handleIndicatorStyle={styles.sheetIndicator}
-      >
-        <ScrollView
-          contentContainerStyle={styles.sheetContent}
-          showsVerticalScrollIndicator={false}
-        >
+      <SimpleBottomSheet ref={bottomSheetRef} snapPoint="75%" scrollable>
+        <View style={styles.sheetContent}>
           <Text style={styles.sheetTitle}>Add education plan</Text>
 
-          {/* Child Selector */}
           <Text style={styles.fieldLabel}>Child</Text>
           <View style={styles.chipRow}>
             {children.map((child) => (
@@ -258,7 +225,6 @@ export default function PlansScreen() {
             ))}
           </View>
 
-          {/* Academic Year */}
           <Text style={styles.fieldLabel}>Academic year</Text>
           <TextInput
             style={styles.textInput}
@@ -268,7 +234,6 @@ export default function PlansScreen() {
             placeholderTextColor={`${colors.clay}60`}
           />
 
-          {/* Approach */}
           <Text style={styles.fieldLabel}>Approach</Text>
           <View style={styles.chipRow}>
             {APPROACHES.map((a) => (
@@ -292,7 +257,6 @@ export default function PlansScreen() {
             ))}
           </View>
 
-          {/* Hours Per Day Stepper */}
           <Text style={styles.fieldLabel}>Hours per day</Text>
           <View style={styles.stepperRow}>
             <TouchableOpacity
@@ -310,7 +274,6 @@ export default function PlansScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Days Per Week Stepper */}
           <Text style={styles.fieldLabel}>Days per week</Text>
           <View style={styles.stepperRow}>
             <TouchableOpacity
@@ -337,8 +300,8 @@ export default function PlansScreen() {
           >
             Create plan
           </Button>
-        </ScrollView>
-      </BottomSheet>
+        </View>
+      </SimpleBottomSheet>
     </SafeAreaView>
   );
 }
@@ -418,12 +381,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.forest,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  sheetBackground: {
-    backgroundColor: colors.parchment,
-  },
-  sheetIndicator: {
-    backgroundColor: colors.stone,
   },
   sheetContent: {
     paddingHorizontal: spacing.xl,

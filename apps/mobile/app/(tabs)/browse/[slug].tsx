@@ -17,11 +17,12 @@ import {
   Check,
   Sparkles,
 } from 'lucide-react-native';
-import BottomSheet from '@gorhom/bottom-sheet';
 import { useQueryClient } from '@tanstack/react-query';
+import { SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { useApiQuery, useApiPost, useApiDelete } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { LogActivityModal } from '@/components/shared/LogActivityModal';
 import { hapticLight, hapticSuccess } from '@/lib/haptics';
@@ -56,7 +57,7 @@ export default function ActivityDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const bottomSheetRef = useRef<BottomSheet>(null);
+  const bottomSheetRef = useRef<SimpleBottomSheetRef>(null);
   const [checkedMaterials, setCheckedMaterials] = useState<Set<number>>(
     new Set()
   );
@@ -108,7 +109,7 @@ export default function ActivityDetailScreen() {
   };
 
   const handleLog = () => {
-    bottomSheetRef.current?.snapToIndex(0);
+    bottomSheetRef.current?.expand();
   };
 
   if (isLoading || !activity) return <LoadingScreen />;
@@ -265,9 +266,6 @@ export default function ActivityDetailScreen() {
     </SafeAreaView>
   );
 }
-
-// Need Button import
-import { Button } from '@/components/ui/Button';
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.parchment },
