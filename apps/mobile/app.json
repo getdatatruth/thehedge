@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "The Hedge",
+    "slug": "the-hedge",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "thehedge",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F5F0E4"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ie.thehedge.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "The Hedge uses your location to provide weather-aware activity suggestions for your area."
+      }
+    },
+    "android": {
+      "package": "ie.thehedge.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#1C3520",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#1C3520"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
