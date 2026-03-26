@@ -9,8 +9,7 @@ import {
   TouchableOpacityProps,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { colors } from '@/theme/colors';
-import { radius } from '@/theme/spacing';
+import { lightTheme } from '@/theme/colors';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'terra' | 'light';
 
@@ -87,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    borderRadius: radius.sm,
+    borderRadius: 14,
   },
   fullWidth: {
     width: '100%',
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
 
 const sizes = {
   sm: {
-    container: { paddingHorizontal: 12, paddingVertical: 8 } as ViewStyle,
+    container: { paddingHorizontal: 14, paddingVertical: 8 } as ViewStyle,
     text: { fontSize: 13 } as TextStyle,
   },
   md: {
@@ -120,27 +119,27 @@ const variants: Record<
   { container: ViewStyle; text: TextStyle }
 > = {
   primary: {
-    container: { backgroundColor: colors.forest },
-    text: { color: colors.parchment },
+    container: { backgroundColor: lightTheme.primary },
+    text: { color: '#FFFFFF' },
   },
   secondary: {
     container: {
       backgroundColor: 'transparent',
-      borderWidth: 1,
-      borderColor: colors.stone,
+      borderWidth: 1.5,
+      borderColor: lightTheme.border,
     },
-    text: { color: colors.ink },
+    text: { color: lightTheme.text },
   },
   ghost: {
     container: { backgroundColor: 'transparent' },
-    text: { color: colors.clay },
+    text: { color: lightTheme.textSecondary },
   },
   terra: {
-    container: { backgroundColor: colors.terracotta },
-    text: { color: colors.white },
+    container: { backgroundColor: lightTheme.accent },
+    text: { color: '#FFFFFF' },
   },
   light: {
-    container: { backgroundColor: colors.parchment },
-    text: { color: colors.forest },
+    container: { backgroundColor: lightTheme.background },
+    text: { color: lightTheme.primary },
   },
 };

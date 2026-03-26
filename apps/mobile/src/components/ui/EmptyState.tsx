@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 import { Button } from './Button';
 
@@ -35,14 +36,13 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h3,
+    color: lightTheme.text,
     textAlign: 'center',
   },
   message: {
-    fontSize: 14,
-    color: colors.clay,
+    ...typography.body,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     maxWidth: 280,
     lineHeight: 20,

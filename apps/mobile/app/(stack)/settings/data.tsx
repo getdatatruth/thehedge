@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Download, Trash2 } from 'lucide-react-native';
+import { ChevronLeft, Download, Trash2 } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
+import { apiDelete } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { colors } from '@/theme/colors';
@@ -45,8 +46,13 @@ export default function DataPrivacyScreen() {
                 {
                   text: 'Yes, delete everything',
                   style: 'destructive',
-                  onPress: () => {
-                    supabase.auth.signOut();
+                  onPress: async () => {
+                    try {
+                      await apiDelete('/me');
+                      supabase.auth.signOut();
+                    } catch (e: any) {
+                      Alert.alert('Error', e.message || 'Failed to delete account. Please try again.');
+                    }
                   },
                 },
               ]
@@ -61,7 +67,7 @@ export default function DataPrivacyScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={colors.ink} />
         </TouchableOpacity>
         <Text style={styles.title}>Data & Privacy</Text>
       </View>
@@ -133,10 +139,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },

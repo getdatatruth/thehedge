@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, ViewStyle } from 'react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { radius } from '@/theme/spacing';
 
 interface SkeletonProps {
@@ -44,7 +44,7 @@ export function Skeleton({
           width: width as any,
           height,
           borderRadius,
-          backgroundColor: colors.stone,
+          backgroundColor: lightTheme.border,
           opacity,
         },
         style,
@@ -65,10 +65,8 @@ export function SkeletonCard({ style }: { style?: ViewStyle }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.lg,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
     padding: 16,
   },
 });

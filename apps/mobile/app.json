@@ -2,7 +2,7 @@
   "expo": {
     "name": "The Hedge",
     "slug": "the-hedge",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -10,17 +10,25 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F5F0E4"
+      "backgroundColor": "#0D1F12"
     },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "ie.thehedge.app",
+      "buildNumber": "1",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "The Hedge uses your location to provide weather-aware activity suggestions for your area."
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent",
+        "NSLocationWhenInUseUsageDescription": "The Hedge uses your location to provide weather-aware activity suggestions for your area.",
+        "NSCameraUsageDescription": "The Hedge uses the camera to let you capture photos of your child's activities for their learning portfolio.",
+        "NSPhotoLibraryUsageDescription": "The Hedge accesses your photo library to let you add photos to activity logs and your child's learning portfolio."
       }
     },
     "android": {
       "package": "ie.thehedge.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#1C3520",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -41,6 +49,13 @@
         {
           "photosPermission": "The Hedge needs access to your photos to add evidence to portfolios.",
           "cameraPermission": "The Hedge needs access to your camera to capture activity photos."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1C3520"
         }
       ]
     ],

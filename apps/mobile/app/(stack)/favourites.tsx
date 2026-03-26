@@ -9,13 +9,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Heart, Clock, ChevronRight } from 'lucide-react-native';
+import { ChevronLeft, Heart, Clock, ChevronRight } from 'lucide-react-native';
 import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing } from '@/theme/spacing';
 
 interface FavouriteItem {
   activity_id: string;
@@ -52,7 +53,7 @@ export default function FavouritesScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Favourites</Text>
       </View>
@@ -66,7 +67,7 @@ export default function FavouritesScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.accent}
           />
         }
         renderItem={({ item }) => (
@@ -79,11 +80,11 @@ export default function FavouritesScreen() {
                   <Badge variant="sage" size="sm">{item.activity?.category}</Badge>
                   <Text style={styles.activityTitle}>{item.activity?.title}</Text>
                   <View style={styles.meta}>
-                    <Clock size={12} color={colors.clay} />
+                    <Clock size={12} color={lightTheme.textSecondary} />
                     <Text style={styles.metaText}>{item.activity?.duration_minutes} min</Text>
                   </View>
                 </View>
-                <ChevronRight size={18} color={colors.stone} />
+                <ChevronRight size={18} color={lightTheme.textMuted} />
               </View>
             </Card>
           </TouchableOpacity>
@@ -91,7 +92,7 @@ export default function FavouritesScreen() {
         ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
         ListEmptyComponent={() => (
           <View style={styles.empty}>
-            <Heart size={32} color={`${colors.clay}40`} />
+            <Heart size={32} color={`${lightTheme.textMuted}40`} />
             <Text style={styles.emptyTitle}>No favourites yet</Text>
             <Text style={styles.emptyBody}>
               Tap the heart icon on any activity to save it here.
@@ -104,7 +105,7 @@ export default function FavouritesScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -115,14 +116,12 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { ...typography.h3, color: lightTheme.text },
   list: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -133,14 +132,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   info: { flex: 1, gap: 6 },
-  activityTitle: { fontSize: 15, fontWeight: '500', color: colors.ink },
+  activityTitle: { fontSize: 15, fontWeight: '500', color: lightTheme.text },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { fontSize: 11, color: colors.clay },
+  metaText: { fontSize: 11, color: lightTheme.textSecondary },
   empty: {
     alignItems: 'center',
     paddingTop: spacing['6xl'],
     gap: spacing.md,
   },
-  emptyTitle: { fontSize: 18, fontWeight: '300', color: colors.ink },
-  emptyBody: { fontSize: 14, color: colors.clay, textAlign: 'center', maxWidth: 260 },
+  emptyTitle: { ...typography.h3, fontWeight: '300', color: lightTheme.text },
+  emptyBody: { fontSize: 14, color: lightTheme.textSecondary, textAlign: 'center', maxWidth: 260 },
 });

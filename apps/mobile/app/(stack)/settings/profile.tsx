@@ -9,14 +9,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ChevronLeft } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiPut } from '@/hooks/use-api';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 const FAMILY_STYLES = ['active', 'creative', 'curious', 'bookish', 'balanced'];
@@ -55,7 +56,7 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Profile</Text>
       </View>
@@ -120,7 +121,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -131,14 +132,12 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { ...typography.h3, color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
   styleLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   chips: {
     flexDirection: 'row',
@@ -161,20 +160,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     borderRadius: radius.full,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    backgroundColor: lightTheme.surface,
   },
   chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
   },
   chipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: lightTheme.background,
   },
 });

@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Plus,
   FileText,
   Minus,
@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { TierGate } from '@/components/shared/TierGate';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
@@ -63,7 +64,10 @@ export default function PlansScreen() {
   const bottomSheetRef = useRef<SimpleBottomSheetRef>(null);
 
   const [selectedChildId, setSelectedChildId] = useState(children[0]?.id ?? '');
-  const [academicYear, setAcademicYear] = useState('2025-2026');
+  // Determine current academic year (Sept-Aug cycle)
+  const now = new Date();
+  const startYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  const [academicYear, setAcademicYear] = useState(`${startYear}-${startYear + 1}`);
   const [approach, setApproach] = useState('blended');
   const [hoursPerDay, setHoursPerDay] = useState(3);
   const [daysPerWeek, setDaysPerWeek] = useState(5);
@@ -123,11 +127,12 @@ export default function PlansScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={colors.ink} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Education Plans</Text>
       </View>
 
+      <TierGate requiredTier="educator" featureName="Educator Dashboard">
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -298,6 +303,7 @@ export default function PlansScreen() {
           </Button>
         </View>
       </SimpleBottomSheet>
+      </TierGate>
     </SafeAreaView>
   );
 }
@@ -314,10 +320,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -24,7 +24,8 @@ import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { TierGate } from '@/components/shared/TierGate';
-import { colors } from '@/theme/colors';
+import { lightTheme, colors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 interface DashboardData {
@@ -214,24 +215,20 @@ export default function EducatorScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
   },
   eyebrow: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: `${colors.clay}80`,
+    ...typography.eyebrow,
+    color: lightTheme.textMuted,
     marginBottom: 4,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h2,
+    color: lightTheme.text,
   },
   scroll: {
     paddingHorizontal: spacing.xl,
@@ -244,10 +241,8 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.lg,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
     padding: spacing.md,
     alignItems: 'center',
     gap: 4,
@@ -255,20 +250,16 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 22,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   statLabel: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: `${colors.clay}80`,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    ...typography.eyebrow,
+    color: lightTheme.textMuted,
   },
   section: { gap: spacing.md },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h3,
+    color: lightTheme.text,
   },
   breakdownRow: {
     gap: 6,
@@ -283,13 +274,13 @@ const styles = StyleSheet.create({
   breakdownCategory: {
     fontSize: 13,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
     textTransform: 'capitalize',
   },
   breakdownCount: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   breakdownBar: {
     height: 6,
@@ -309,10 +300,8 @@ const styles = StyleSheet.create({
   },
   quickLinkCard: {
     width: '47%',
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.lg,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
     padding: spacing.lg,
     gap: 6,
   },
@@ -327,11 +316,11 @@ const styles = StyleSheet.create({
   quickLinkLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   quickLinkDesc: {
     fontSize: 11,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   quickLinkArrow: {
     position: 'absolute',

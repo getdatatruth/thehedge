@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,55 +10,34 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
+  Bell,
+  Sparkles,
+  Plus,
+  Flame,
+  Activity,
+  Leaf,
   Sun,
   Cloud,
   CloudRain,
-  Flame,
-  Activity,
-  Trophy,
-  ChevronRight,
-  Sparkles,
-  Bell,
-  Settings,
-  Search,
-  Heart,
-  Leaf,
-  TreePine,
-  Palette,
-  FlaskConical,
-  Calculator,
-  BookOpen,
-  Music,
-  UtensilsCrossed,
-  Footprints,
-  Globe,
-  Shapes,
 } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery } from '@/hooks/use-api';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { TodaySkeleton } from '@/components/ui/ScreenSkeletons';
+import { WeekStrip } from '@/components/today/WeekStrip';
+import { ActivityCard } from '@/components/today/ActivityCard';
+import { AnimatedCard } from '@/components/ui/AnimatedCard';
+import { InsightCard } from '@/components/ui/InsightCard';
+import { lightTheme, categoryColors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing } from '@/theme/spacing';
 
-interface CollectionItem {
-  id: string;
-  title: string;
-  slug: string;
-  emoji: string | null;
-  activity_count: number;
-}
+// ---- Types ----
 
 interface DashboardData {
   greeting: string;
   firstName: string;
-  weather: {
-    temperature: number;
-    condition: string;
-    isRaining: boolean;
-  } | null;
+  weather: { temperature: number; condition: string; isRaining: boolean } | null;
   streak: number;
   activitiesThisWeek: number;
   todayActivities: Array<{
@@ -69,89 +48,185 @@ interface DashboardData {
     duration_minutes: number;
   }>;
   familyName: string;
-  featuredCollections?: CollectionItem[];
 }
 
-const COLLECTION_ICON_MAP: Record<string, { icon: any; color: string }> = {
-  nature: { icon: TreePine, color: colors.sage },
-  outdoor: { icon: TreePine, color: colors.sage },
-  science: { icon: FlaskConical, color: colors.moss },
-  art: { icon: Palette, color: colors.terracotta },
-  craft: { icon: Palette, color: colors.terracotta },
-  math: { icon: Calculator, color: colors.umber },
-  language: { icon: BookOpen, color: colors.forest },
-  reading: { icon: BookOpen, color: colors.forest },
-  music: { icon: Music, color: colors.clay },
-  cook: { icon: UtensilsCrossed, color: colors.terracotta },
-  bak: { icon: UtensilsCrossed, color: colors.terracotta },
-  physical: { icon: Footprints, color: colors.moss },
-  movement: { icon: Footprints, color: colors.moss },
-  irish: { icon: Globe, color: colors.forest },
-  sensory: { icon: Shapes, color: colors.sage },
-  play: { icon: Shapes, color: colors.sage },
-};
-
-function getCollectionIcon(title: string) {
-  const lower = title.toLowerCase();
-  for (const [keyword, config] of Object.entries(COLLECTION_ICON_MAP)) {
-    if (lower.includes(keyword)) return config;
-  }
-  return { icon: Leaf, color: colors.moss };
+interface PlanDayBlock {
+  time: string;
+  subject: string;
+  activity_id?: string;
+  title: string;
+  duration: number;
+  completed: boolean;
 }
 
-const WeatherIcon = ({ condition }: { condition: string }) => {
-  if (condition?.toLowerCase().includes('rain'))
-    return <CloudRain size={20} color={colors.clay} />;
-  if (condition?.toLowerCase().includes('cloud'))
-    return <Cloud size={20} color={colors.clay} />;
-  return <Sun size={20} color={colors.amber} />;
-};
+interface PlanDay {
+  id: string;
+  date: string;
+  child_id: string;
+  child_name: string;
+  blocks: PlanDayBlock[];
+}
+
+interface PlannerWeekData {
+  week_start: string;
+  week_end: string;
+  days: PlanDay[];
+}
+
+// ---- Helpers ----
+
+const DAY_NAMES_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAY_NAMES_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+function getMonday(d: Date): Date {
+  const date = new Date(d);
+  const day = date.getDay();
+  date.setDate(date.getDate() - day + (day === 0 ? -6 : 1));
+  date.setHours(0, 0, 0, 0);
+  return date;
+}
+
+function getWeekNumber(d: Date): number {
+  const start = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d.getTime() - start.getTime()) / 86400000 + 1) / 7);
+}
+
+function dateToDayIndex(dateStr: string): number {
+  const d = new Date(dateStr + 'T00:00:00');
+  return (d.getDay() + 6) % 7;
+}
+
+function getDateForDayIndex(monday: Date, dayIndex: number): Date {
+  const d = new Date(monday);
+  d.setDate(d.getDate() + dayIndex);
+  return d;
+}
+
+function WeatherIcon({ condition }: { condition: string }) {
+  if (condition?.toLowerCase().includes('rain')) return <CloudRain size={16} color={lightTheme.textMuted} />;
+  if (condition?.toLowerCase().includes('cloud')) return <Cloud size={16} color={lightTheme.textMuted} />;
+  return <Sun size={16} color="#F5A623" />;
+}
+
+// ---- Component ----
 
 export default function TodayScreen() {
   const router = useRouter();
   const { profile, children, family } = useAuthStore();
   const firstName = profile?.name?.split(' ')[0] || 'there';
 
+  const now = new Date();
+  const todayDow = (now.getDay() + 6) % 7;
+  const monday = getMonday(now);
+
+  const [selectedDay, setSelectedDay] = useState<number>(todayDow);
+  const [selectedChild, setSelectedChild] = useState<string | null>(null); // null = all
+
+  // Dashboard data
   const {
     data: dashboard,
-    isLoading,
-    refetch,
-    isRefetching,
-  } = useApiQuery<DashboardData>(['dashboard'], '/me/dashboard', {
-    staleTime: 1000 * 60 * 5,
-  });
+    isLoading: dashLoading,
+    refetch: refetchDash,
+    isRefetching: dashRefetching,
+  } = useApiQuery<DashboardData>(['dashboard'], '/me/dashboard', { staleTime: 300000 });
 
-  // Build greeting locally as fallback
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  // Planner week data
+  const plannerPath = selectedChild ? `/planner?child_id=${selectedChild}` : '/planner';
+  const {
+    data: plannerWeek,
+    isLoading: planLoading,
+    refetch: refetchPlan,
+    isRefetching: planRefetching,
+  } = useApiQuery<PlannerWeekData>(
+    ['planner-week', selectedChild || 'all'],
+    plannerPath,
+    { staleTime: 300000 }
+  );
 
-  if (isLoading && !dashboard) return <LoadingScreen />;
+  const isLoading = dashLoading || planLoading;
+  const isRefetching = dashRefetching || planRefetching;
+  const handleRefresh = () => { refetchDash(); refetchPlan(); };
+
+  // Build week dots from planner data
+  const activitiesByDay = useMemo(() => {
+    const byDay: Record<number, { category: string }[]> = {};
+    if (plannerWeek?.days?.length) {
+      for (const day of plannerWeek.days) {
+        const idx = dateToDayIndex(day.date);
+        if (!byDay[idx]) byDay[idx] = [];
+        for (const b of day.blocks) byDay[idx].push({ category: b.subject });
+      }
+    } else if (dashboard?.todayActivities) {
+      byDay[todayDow] = dashboard.todayActivities.map(a => ({ category: a.category }));
+    }
+    return byDay;
+  }, [plannerWeek, dashboard?.todayActivities, todayDow]);
+
+  // Get activities for selected day
+  const selectedDayActivities = useMemo(() => {
+    if (plannerWeek?.days?.length) {
+      const matching = plannerWeek.days.filter(d => dateToDayIndex(d.date) === selectedDay);
+      return matching.flatMap(day =>
+        day.blocks.map(b => ({
+          id: `${day.id}-${b.time}-${b.title}`,
+          title: b.title,
+          category: b.subject,
+          slug: b.activity_id,
+          duration_minutes: b.duration,
+          child_name: day.child_name,
+          completed: b.completed,
+        }))
+      );
+    }
+    if (selectedDay === todayDow && dashboard?.todayActivities) {
+      return dashboard.todayActivities.map(a => ({
+        ...a, child_name: '', completed: false, duration_minutes: a.duration_minutes,
+      }));
+    }
+    return [];
+  }, [plannerWeek, dashboard?.todayActivities, selectedDay, todayDow]);
+
+  const hasMultipleChildren = children.length > 1;
+  const isSelectedToday = selectedDay === todayDow;
+
+  // Day header
+  const selectedDate = getDateForDayIndex(monday, selectedDay);
+  const dayHeader = isSelectedToday
+    ? `Today, ${DAY_NAMES_SHORT[selectedDay]} ${selectedDate.getDate()} ${MONTH_SHORT[selectedDate.getMonth()]}`
+    : `${DAY_NAMES_FULL[selectedDay]}, ${selectedDate.getDate()} ${MONTH_SHORT[selectedDate.getMonth()]}`;
+
+  const hour = now.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+
+  if (isLoading && !dashboard) return <TodaySkeleton />;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Text style={styles.eyebrow}>
-            {family?.name || 'Your family'}
-          </Text>
-          <Text style={styles.greeting}>
-            {greeting}, {firstName}
-          </Text>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{(firstName || 'U').charAt(0).toUpperCase()}</Text>
+          </View>
+          <View>
+            <Text style={styles.greeting}>{greeting}, {firstName}</Text>
+            <Text style={styles.familyName}>{family?.name || 'Your family'}</Text>
+          </View>
         </View>
         <View style={styles.headerRight}>
+          {/* Compact weather */}
+          {dashboard?.weather && (
+            <View style={styles.weatherPill}>
+              <WeatherIcon condition={dashboard.weather.condition} />
+              <Text style={styles.weatherText}>{Math.round(dashboard.weather.temperature)}{'\u00B0'}</Text>
+            </View>
+          )}
           <TouchableOpacity
             onPress={() => router.push('/(stack)/notifications' as any)}
             style={styles.headerButton}
           >
-            <Bell size={20} color={colors.clay} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => router.push('/(stack)/settings' as any)}
-            style={styles.headerButton}
-          >
-            <Settings size={20} color={colors.clay} />
+            <Bell size={20} color={lightTheme.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -160,428 +235,194 @@ export default function TodayScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={refetch}
-            tintColor={colors.moss}
-          />
+          <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} tintColor={lightTheme.accent} />
         }
       >
-        {/* Weather + Brief Card */}
-        <Card variant="elevated" padding="xl">
-          <View style={styles.briefHeader}>
-            <Text style={styles.briefTitle}>Today's brief</Text>
-            {dashboard?.weather && (
-              <View style={styles.weatherPill}>
-                <WeatherIcon condition={dashboard.weather.condition} />
-                <Text style={styles.weatherText}>
-                  {Math.round(dashboard.weather.temperature)}C
-                </Text>
-              </View>
-            )}
-          </View>
-          <Text style={styles.briefBody}>
-            {dashboard?.weather?.isRaining
-              ? "It's a rainy day - perfect for indoor activities."
-              : children.length > 0
-              ? `We've got ${dashboard?.todayActivities?.length || 'some great'} ideas for ${children.map((c) => c.name).join(' & ')} today.`
-              : "Here are today's activity ideas for your family."}
-          </Text>
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/chat')}
-            style={styles.askAiButton}
-          >
-            <Sparkles size={16} color={colors.parchment} />
-            <Text style={styles.askAiText}>Ask AI for ideas</Text>
-          </TouchableOpacity>
-        </Card>
+        {/* Week Strip */}
+        <WeekStrip
+          activitiesByDay={activitiesByDay}
+          selectedDay={selectedDay}
+          onDayPress={(i) => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelectedDay(i); }}
+          weekLabel={`Week ${getWeekNumber(now)}`}
+          weekStart={monday}
+        />
 
-        {/* Stats Row */}
-        <View style={styles.statsRow}>
-          <View style={styles.statCard}>
-            <Flame size={18} color={colors.terracotta} />
-            <Text style={styles.statNumber}>
-              {dashboard?.streak || 0}
-            </Text>
-            <Text style={styles.statLabel}>Day streak</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Activity size={18} color={colors.moss} />
-            <Text style={styles.statNumber}>
-              {dashboard?.activitiesThisWeek || 0}
-            </Text>
-            <Text style={styles.statLabel}>This week</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Trophy size={18} color={colors.amber} />
-            <Text style={styles.statNumber}>
-              {children.length}
-            </Text>
-            <Text style={styles.statLabel}>
-              {children.length === 1 ? 'Child' : 'Children'}
-            </Text>
-          </View>
-        </View>
-
-        {/* Today's Activities */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's ideas</Text>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/browse')}>
-              <Text style={styles.seeAll}>Browse all</Text>
-            </TouchableOpacity>
-          </View>
-
-          {dashboard?.todayActivities?.map((activity) => (
+        {/* Child filter (if multiple children) */}
+        {hasMultipleChildren && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.childPills} style={{ flexGrow: 0 }}>
             <TouchableOpacity
-              key={activity.id}
-              onPress={() =>
-                router.push(`/(tabs)/browse/${activity.slug}` as any)
-              }
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelectedChild(null); }}
+              style={[styles.childPill, !selectedChild && styles.childPillActive]}
             >
-              <Card variant="interactive" padding="lg">
-                <View style={styles.activityRow}>
-                  <View style={styles.activityInfo}>
-                    <Badge variant="sage" size="sm">
-                      {activity.category}
-                    </Badge>
-                    <Text style={styles.activityTitle}>
-                      {activity.title}
-                    </Text>
-                    <Text style={styles.activityDuration}>
-                      {activity.duration_minutes} min
-                    </Text>
-                  </View>
-                  <ChevronRight size={18} color={colors.stone} />
-                </View>
-              </Card>
+              <Text style={[styles.childPillText, !selectedChild && styles.childPillTextActive]}>All</Text>
             </TouchableOpacity>
-          )) ?? (
-            <Card variant="elevated" padding="xl">
-              <View style={styles.emptyState}>
-                <Sparkles size={24} color={colors.moss} />
-                <Text style={styles.emptyTitle}>
-                  Your activities will appear here
-                </Text>
-                <Text style={styles.emptyBody}>
-                  Ask the AI for personalised ideas or browse the library.
-                </Text>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onPress={() => router.push('/(tabs)/browse')}
-                >
-                  Browse activities
-                </Button>
-              </View>
-            </Card>
+            {children.map(c => (
+              <TouchableOpacity
+                key={c.id}
+                onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setSelectedChild(c.id); }}
+                style={[styles.childPill, selectedChild === c.id && styles.childPillActive]}
+              >
+                <Text style={[styles.childPillText, selectedChild === c.id && styles.childPillTextActive]}>{c.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+
+        {/* AI Insight */}
+        <InsightCard
+          type="today"
+          context={{
+            children,
+            weather: dashboard?.weather,
+            streak: dashboard?.streak,
+            activitiesThisWeek: dashboard?.activitiesThisWeek,
+            todayActivities: selectedDayActivities,
+            categoryBreakdown: activitiesByDay,
+          }}
+          enabled={!!dashboard}
+        />
+
+        {/* Day header */}
+        <View style={styles.dayHeader}>
+          <Text style={styles.dayHeaderText}>{dayHeader}</Text>
+          {selectedDayActivities.length > 0 && (
+            <Text style={styles.dayCount}>{selectedDayActivities.length} activit{selectedDayActivities.length === 1 ? 'y' : 'ies'}</Text>
           )}
         </View>
 
-        {/* Featured Collections */}
-        {(dashboard?.featuredCollections?.length ?? 0) > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Collections</Text>
-              <TouchableOpacity onPress={() => router.push('/(stack)/collections' as any)}>
-                <Text style={styles.seeAll}>See all</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.collectionsRow}
+        {/* Activities for selected day */}
+        {selectedDayActivities.length > 0 ? (
+          <View style={styles.activityList}>
+            {selectedDayActivities.map((activity, index) => (
+              <AnimatedCard key={activity.id} delay={index * 50}>
+                <ActivityCard
+                  title={activity.title}
+                  category={activity.category}
+                  durationMinutes={activity.duration_minutes}
+                  childName={hasMultipleChildren && !selectedChild ? activity.child_name : undefined}
+                  completed={activity.completed}
+                  onPress={() => {
+                    const slug = (activity as any).slug;
+                    if (slug) router.push(`/(tabs)/browse/${slug}` as any);
+                  }}
+                />
+              </AnimatedCard>
+            ))}
+          </View>
+        ) : (
+          <View style={styles.emptyCard}>
+            <Sparkles size={24} color={lightTheme.accent} />
+            <Text style={styles.emptyTitle}>No activities for {DAY_NAMES_FULL[selectedDay]}</Text>
+            <Text style={styles.emptyBody}>Add activities or generate a plan from the Plan tab.</Text>
+            <TouchableOpacity
+              onPress={() => router.push('/(tabs)/browse')}
+              style={styles.addButton}
             >
-              {dashboard!.featuredCollections!.map((col) => (
-                <TouchableOpacity
-                  key={col.id}
-                  onPress={() => router.push('/(stack)/collections' as any)}
-                  style={styles.collectionCard}
-                >
-                  <Card variant="elevated" padding="lg">
-                    <View style={styles.collectionContent}>
-                      {(() => {
-                        const { icon: Icon, color } = getCollectionIcon(col.title);
-                        return (
-                          <View style={[styles.collectionIconWrap, { backgroundColor: color + '12' }]}>
-                            <Icon size={20} color={color} />
-                          </View>
-                        );
-                      })()}
-                      <Text style={styles.collectionTitle} numberOfLines={2}>
-                        {col.title}
-                      </Text>
-                      <Text style={styles.collectionCount}>
-                        {col.activity_count} activities
-                      </Text>
-                    </View>
-                  </Card>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+              <Plus size={14} color="#FFFFFF" />
+              <Text style={styles.addButtonText}>Browse activities</Text>
+            </TouchableOpacity>
           </View>
         )}
 
-        {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick actions</Text>
-          <View style={styles.quickActions}>
-            {[
-              {
-                label: 'Ask AI',
-                icon: Sparkles,
-                color: colors.forest,
-                route: '/(tabs)/chat',
-              },
-              {
-                label: 'Browse',
-                icon: Search,
-                color: colors.moss,
-                route: '/(tabs)/browse',
-              },
-              {
-                label: 'Favourites',
-                icon: Heart,
-                color: colors.terracotta,
-                route: '/(stack)/favourites',
-              },
-              {
-                label: 'Timeline',
-                icon: Activity,
-                color: colors.umber,
-                route: '/(stack)/timeline',
-              },
-            ].map((action) => (
-              <TouchableOpacity
-                key={action.label}
-                style={styles.quickAction}
-                onPress={() => router.push(action.route as any)}
-              >
-                <View
-                  style={[
-                    styles.quickActionIcon,
-                    { backgroundColor: `${action.color}12` },
-                  ]}
-                >
-                  <action.icon size={20} color={action.color} />
-                </View>
-                <Text style={styles.quickActionLabel}>{action.label}</Text>
-              </TouchableOpacity>
-            ))}
+        {/* Compact stats row - inline, not big cards */}
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Flame size={14} color="#E8735A" />
+            <Text style={styles.statValue}>{dashboard?.streak || 0}</Text>
+            <Text style={styles.statLabel}>streak</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Activity size={14} color={lightTheme.accent} />
+            <Text style={styles.statValue}>{dashboard?.activitiesThisWeek || 0}</Text>
+            <Text style={styles.statLabel}>this week</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Leaf size={14} color={lightTheme.accent} />
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>score</Text>
           </View>
         </View>
+
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-    zIndex: 1,
-  },
-  headerLeft: { flex: 1, marginRight: spacing.md },
-  headerRight: { flexDirection: 'row', gap: spacing.sm },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
   },
-  eyebrow: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: `${colors.clay}80`,
-    marginBottom: 4,
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  avatar: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: lightTheme.primary,
+    alignItems: 'center', justifyContent: 'center',
   },
-  greeting: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: colors.ink,
-    letterSpacing: -0.3,
+  avatarText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  greeting: { ...typography.uiBold, color: lightTheme.text },
+  familyName: { ...typography.uiSmall, color: lightTheme.textMuted },
+  weatherPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16, paddingHorizontal: 10, paddingVertical: 6,
   },
+  weatherText: { fontSize: 13, fontWeight: '600', color: lightTheme.textSecondary },
+  headerButton: {
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: lightTheme.surface,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  // Scroll
   scroll: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['4xl'],
-    gap: spacing.xl,
+    paddingBottom: spacing['6xl'],
+    gap: spacing.lg,
   },
-  briefHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.md,
+  // Child pills
+  childPills: { gap: 8 },
+  childPill: {
+    height: 32, paddingHorizontal: 16, borderRadius: 16,
+    backgroundColor: lightTheme.surface,
+    justifyContent: 'center', alignItems: 'center',
   },
-  briefTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.ink,
+  childPillActive: { backgroundColor: lightTheme.primary },
+  childPillText: { fontSize: 13, fontWeight: '600', color: lightTheme.textSecondary },
+  childPillTextActive: { color: '#FFFFFF' },
+  // Day header
+  dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  dayHeaderText: { ...typography.h3, color: lightTheme.text },
+  dayCount: { ...typography.uiSmall, color: lightTheme.textMuted },
+  // Activities
+  activityList: { gap: spacing.md },
+  emptyCard: {
+    backgroundColor: lightTheme.surface, borderRadius: 16,
+    padding: spacing['2xl'], alignItems: 'center', gap: spacing.sm,
   },
-  weatherPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: colors.parchment,
-    borderRadius: radius.full,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: colors.stone,
+  emptyTitle: { ...typography.uiBold, color: lightTheme.text },
+  emptyBody: { ...typography.bodySmall, color: lightTheme.textSecondary, textAlign: 'center' },
+  addButton: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: lightTheme.accent, borderRadius: 14,
+    paddingHorizontal: spacing.lg, paddingVertical: 10, marginTop: spacing.xs,
   },
-  weatherText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.clay,
-  },
-  briefBody: {
-    fontSize: 15,
-    color: colors.clay,
-    lineHeight: 22,
-    marginBottom: spacing.lg,
-  },
-  askAiButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.forest,
-    borderRadius: radius.sm,
-    paddingVertical: 12,
-  },
-  askAiText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.parchment,
-  },
+  addButtonText: { fontSize: 14, fontWeight: '600', color: '#FFFFFF' },
+  // Compact stats
   statsRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: lightTheme.surface, borderRadius: 16,
+    paddingVertical: spacing.lg, paddingHorizontal: spacing.xl,
   },
-  statCard: {
-    flex: 1,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    alignItems: 'center',
-    gap: 4,
-  },
-  statNumber: {
-    fontSize: 22,
-    fontWeight: '300',
-    color: colors.ink,
-  },
-  statLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: `${colors.clay}80`,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  section: { gap: spacing.md },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '300',
-    color: colors.ink,
-  },
-  seeAll: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.moss,
-  },
-  activityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  activityInfo: { flex: 1, gap: 6 },
-  activityTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.ink,
-  },
-  activityDuration: {
-    fontSize: 12,
-    color: `${colors.clay}80`,
-  },
-  collectionsRow: {
-    gap: spacing.md,
-  },
-  collectionCard: {
-    width: 140,
-  },
-  collectionContent: {
-    alignItems: 'center',
-    gap: 4,
-  },
-  collectionIconWrap: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  collectionTitle: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.ink,
-    textAlign: 'center',
-  },
-  collectionCount: {
-    fontSize: 11,
-    color: colors.clay,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  quickAction: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 8,
-  },
-  quickActionIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  quickActionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.clay,
-  },
-  emptyState: {
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.xl,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.ink,
-  },
-  emptyBody: {
-    fontSize: 13,
-    color: colors.clay,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
+  statItem: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  statValue: { fontSize: 16, fontWeight: '700', color: lightTheme.text },
+  statLabel: { fontSize: 11, color: lightTheme.textMuted },
+  statDivider: { width: 1, height: 20, backgroundColor: lightTheme.borderLight },
 });

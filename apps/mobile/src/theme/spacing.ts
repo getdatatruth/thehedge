@@ -16,5 +16,6 @@ export const radius = {
   md: 8,
   lg: 14,
   xl: 20,
+  '2xl': 24,   // new - for large cards
   full: 9999,
 } as const;

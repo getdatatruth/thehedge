@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { hapticLight } from '@/lib/haptics';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface Child {
@@ -67,20 +67,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: radius.full,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    backgroundColor: lightTheme.surface,
   },
   chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.accent,
   },
   chipText: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: '#FFFFFF',
   },
 });

@@ -10,11 +10,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Mail } from 'lucide-react-native';
+import { ChevronLeft, Mail } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { colors } from '@/theme/colors';
+import { darkTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 
 export default function ForgotPasswordScreen() {
@@ -49,8 +49,7 @@ export default function ForgotPasswordScreen() {
         style={styles.flex}
       >
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-          <ArrowLeft size={20} color={colors.clay} />
-          <Text style={styles.backText}>Back to sign in</Text>
+          <ChevronLeft size={24} color={darkTheme.text} />
         </TouchableOpacity>
 
         <ScrollView
@@ -60,19 +59,18 @@ export default function ForgotPasswordScreen() {
           {sent ? (
             <View style={styles.sentContainer}>
               <View style={styles.sentIcon}>
-                <Mail size={32} color={colors.moss} />
+                <Mail size={32} color={darkTheme.accent} />
               </View>
               <Text style={styles.title}>Check your email</Text>
               <Text style={styles.subtitle}>
                 We've sent a password reset link to {email}
               </Text>
-              <Button
-                variant="secondary"
+              <TouchableOpacity
                 onPress={() => router.back()}
-                style={{ marginTop: spacing['3xl'] }}
+                style={styles.ctaButton}
               >
-                Back to sign in
-              </Button>
+                <Text style={styles.ctaText}>Back to sign in</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View style={styles.form}>
@@ -94,17 +92,22 @@ export default function ForgotPasswordScreen() {
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                variant="dark"
               />
 
-              <Button
+              <TouchableOpacity
                 onPress={handleReset}
-                loading={loading}
-                disabled={!email.trim()}
-                fullWidth
-                size="lg"
+                activeOpacity={0.8}
+                disabled={!email.trim() || loading}
+                style={[
+                  styles.ctaButton,
+                  (!email.trim() || loading) && styles.ctaDisabled,
+                ]}
               >
-                Send reset link
-              </Button>
+                <Text style={styles.ctaText}>
+                  {loading ? 'Sending...' : 'Send reset link'}
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
         </ScrollView>
@@ -114,47 +117,60 @@ export default function ForgotPasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: darkTheme.background },
   flex: { flex: 1 },
   back: {
-    flexDirection: 'row',
+    width: 44,
+    height: 44,
     alignItems: 'center',
-    gap: 6,
-    padding: spacing.lg,
+    justifyContent: 'center',
+    marginLeft: spacing.sm,
   },
-  backText: { fontSize: 13, color: colors.clay },
   scroll: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: spacing['3xl'],
   },
   title: {
-    fontSize: 26,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.onboardingTitle,
+    color: darkTheme.text,
     marginBottom: spacing.sm,
   },
   subtitle: {
-    fontSize: 15,
-    color: colors.clay,
+    ...typography.body,
+    color: darkTheme.textSecondary,
     marginBottom: spacing['3xl'],
     lineHeight: 22,
   },
   form: { gap: spacing.lg },
   errorBox: {
-    backgroundColor: `${colors.terracotta}10`,
+    backgroundColor: `${darkTheme.error}15`,
     borderWidth: 1,
-    borderColor: `${colors.terracotta}20`,
-    borderRadius: 4,
+    borderColor: `${darkTheme.error}30`,
+    borderRadius: 12,
     padding: spacing.md,
   },
-  errorText: { fontSize: 13, color: colors.terracotta },
+  errorText: { fontSize: 13, color: darkTheme.error },
+  ctaButton: {
+    backgroundColor: darkTheme.accent,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  ctaDisabled: {
+    backgroundColor: darkTheme.surfaceElevated,
+  },
+  ctaText: {
+    ...typography.button,
+    color: '#FFFFFF',
+  },
   sentContainer: { alignItems: 'center' },
   sentIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: `${colors.moss}15`,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: darkTheme.accentLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.xl,

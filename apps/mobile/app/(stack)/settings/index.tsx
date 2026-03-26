@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ArrowLeft,
+  ChevronLeft,
   User,
   Users,
   Bell,
@@ -25,8 +25,9 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing } from '@/theme/spacing';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -108,7 +109,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Settings</Text>
       </View>
@@ -168,10 +169,10 @@ export default function SettingsScreen() {
                     i < section.items.length - 1 && styles.settingsRowBorder,
                   ]}
                 >
-                  <item.icon size={18} color={colors.clay} />
+                  <item.icon size={18} color={lightTheme.textSecondary} />
                   <Text style={styles.settingsLabel}>{item.label}</Text>
                   <Text style={styles.settingsDetail}>{item.detail}</Text>
-                  <ChevronRight size={16} color={colors.stone} />
+                  <ChevronRight size={16} color={lightTheme.textMuted} />
                 </TouchableOpacity>
               ))}
             </Card>
@@ -180,7 +181,7 @@ export default function SettingsScreen() {
 
         {/* Logout */}
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <LogOut size={18} color={colors.terracotta} />
+          <LogOut size={18} color={'#E8735A'} />
           <Text style={styles.logoutText}>Sign out</Text>
         </TouchableOpacity>
 
@@ -191,7 +192,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -202,14 +203,12 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { ...typography.h3, color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -224,27 +223,27 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.forest,
+    backgroundColor: lightTheme.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     fontSize: 20,
     fontWeight: '600',
-    color: colors.parchment,
+    color: lightTheme.background,
   },
   profileInfo: { flex: 1, gap: 4 },
-  profileName: { fontSize: 17, fontWeight: '600', color: colors.ink },
-  profileEmail: { fontSize: 13, color: colors.clay },
+  profileName: { fontSize: 17, fontWeight: '600', color: lightTheme.text },
+  profileEmail: { fontSize: 13, color: lightTheme.textSecondary },
   tierRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 4 },
-  trialText: { fontSize: 11, color: colors.amber, fontWeight: '600' },
+  trialText: { fontSize: 11, color: '#F5A623', fontWeight: '600' },
   section: { gap: spacing.sm },
   sectionTitle: {
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: `${colors.clay}80`,
+    color: lightTheme.textMuted,
     paddingLeft: 4,
   },
   settingsRow: {
@@ -256,10 +255,10 @@ const styles = StyleSheet.create({
   },
   settingsRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: `${colors.stone}40`,
+    borderBottomColor: lightTheme.borderLight,
   },
-  settingsLabel: { flex: 1, fontSize: 15, color: colors.ink },
-  settingsDetail: { fontSize: 13, color: colors.clay },
+  settingsLabel: { flex: 1, fontSize: 15, color: lightTheme.text },
+  settingsDetail: { fontSize: 13, color: lightTheme.textSecondary },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,10 +267,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     marginTop: spacing.xl,
   },
-  logoutText: { fontSize: 15, fontWeight: '600', color: colors.terracotta },
+  logoutText: { fontSize: 15, fontWeight: '600', color: '#E8735A' },
   version: {
     fontSize: 11,
-    color: `${colors.clay}40`,
+    color: lightTheme.textMuted,
     textAlign: 'center',
     marginTop: spacing.md,
   },

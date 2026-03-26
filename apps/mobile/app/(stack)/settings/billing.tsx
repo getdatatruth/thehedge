@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Crown,
   Check,
   Sparkles,
@@ -24,12 +24,13 @@ import {
   Smartphone,
 } from 'lucide-react-native';
 import { useAuthStore } from '@/stores/auth-store';
-import { apiPost } from '@/lib/api';
+import { apiRootPost } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing } from '@/theme/spacing';
 
 const PLANS = [
   {
@@ -76,7 +77,7 @@ export default function BillingScreen() {
 
   const handleUpgrade = async (plan: string) => {
     try {
-      const { data } = await apiPost<{ url: string }>('/../../stripe/checkout', {
+      const { data } = await apiRootPost<{ url: string }>('/stripe/checkout', {
         plan,
         interval: 'monthly',
       });
@@ -90,7 +91,7 @@ export default function BillingScreen() {
 
   const handleManageBilling = async () => {
     try {
-      const { data } = await apiPost<{ url: string }>('/../../stripe/portal', {});
+      const { data } = await apiRootPost<{ url: string }>('/stripe/portal', {});
       if (data.url) {
         await WebBrowser.openBrowserAsync(data.url);
       }
@@ -103,7 +104,7 @@ export default function BillingScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Billing</Text>
       </View>
@@ -115,7 +116,7 @@ export default function BillingScreen() {
         {/* Current plan */}
         <Card variant="elevated" padding="xl">
           <View style={styles.currentPlan}>
-            <Crown size={24} color={colors.amber} />
+            <Crown size={24} color={'#F5A623'} />
             <Text style={styles.currentPlanName}>
               {effectiveTier.charAt(0).toUpperCase() + effectiveTier.slice(1)}{' '}
               Plan
@@ -168,7 +169,7 @@ export default function BillingScreen() {
               <View style={styles.featureList}>
                 {plan.features.map((f) => (
                   <View key={f} style={styles.featureRow}>
-                    <Check size={14} color={colors.moss} />
+                    <Check size={14} color={lightTheme.accent} />
                     <Text style={styles.featureText}>{f}</Text>
                   </View>
                 ))}
@@ -195,7 +196,7 @@ export default function BillingScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -206,14 +207,12 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { ...typography.h3, color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -224,14 +223,14 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   currentPlanName: {
-    fontSize: 20,
+    ...typography.h3,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   planName: {
     fontSize: 18,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
     marginBottom: 4,
   },
   priceRow: {
@@ -240,20 +239,20 @@ const styles = StyleSheet.create({
     gap: 4,
     marginBottom: spacing.lg,
   },
-  price: { fontSize: 28, fontWeight: '300', color: colors.ink },
-  pricePeriod: { fontSize: 14, color: colors.clay },
+  price: { fontSize: 28, fontWeight: '300', color: lightTheme.text },
+  pricePeriod: { fontSize: 14, color: lightTheme.textSecondary },
   featureList: { gap: spacing.sm, marginBottom: spacing.lg },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  featureText: { fontSize: 14, color: colors.clay },
+  featureText: { fontSize: 14, color: lightTheme.textSecondary },
   currentBadge: {
-    backgroundColor: `${colors.stone}30`,
-    borderRadius: radius.sm,
+    backgroundColor: lightTheme.borderLight,
+    borderRadius: 14,
     paddingVertical: 10,
     alignItems: 'center',
   },
   currentBadgeText: {
     fontSize: 14,
     fontWeight: '500',
-    color: `${colors.clay}80`,
+    color: lightTheme.textMuted,
   },
 });

@@ -5,11 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Clock,
   MapPin,
   Users,
@@ -24,17 +25,18 @@ import {
   Eye,
   GraduationCap,
   Layers,
+  Play,
 } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
+import { InsightCard } from '@/components/ui/InsightCard';
+import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery, useApiPost, useApiDelete } from '@/hooks/use-api';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { ActivityDetailSkeleton } from '@/components/ui/ScreenSkeletons';
 import { LogActivityModal } from '@/components/shared/LogActivityModal';
 import { hapticLight, hapticSuccess } from '@/lib/haptics';
-import { colors } from '@/theme/colors';
+import { lightTheme, categoryColors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 interface MaterialItem {
@@ -73,14 +75,19 @@ interface ActivityDetail {
   } | null;
 }
 
+function getCategoryColor(category: string): string {
+  const key = category?.toLowerCase() as keyof typeof categoryColors;
+  return categoryColors[key] || categoryColors.default;
+}
+
 export default function ActivityDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { children } = useAuthStore();
   const bottomSheetRef = useRef<SimpleBottomSheetRef>(null);
-  const [checkedMaterials, setCheckedMaterials] = useState<Set<number>>(
-    new Set()
-  );
+  const heartScale = useRef(new Animated.Value(1)).current;
+  const [checkedMaterials, setCheckedMaterials] = useState<Set<number>>(new Set());
   const [logged, setLogged] = useState(false);
 
   const { data: activity, isLoading } = useApiQuery<ActivityDetail>(
@@ -88,7 +95,6 @@ export default function ActivityDetailScreen() {
     `/activities/${slug}`
   );
 
-  // Favourites
   const { data: favIds } = useApiQuery<{ activity_ids: string[] }>(
     ['favourites-ids'],
     '/favourites'
@@ -113,6 +119,10 @@ export default function ActivityDetailScreen() {
 
   const handleFavourite = () => {
     if (!activity) return;
+    Animated.sequence([
+      Animated.timing(heartScale, { toValue: 1.3, duration: 150, useNativeDriver: true }),
+      Animated.timing(heartScale, { toValue: 1, duration: 150, useNativeDriver: true }),
+    ]).start();
     if (isFavourited) {
       removeFav.mutate({ activity_id: activity.id });
     } else {
@@ -132,21 +142,25 @@ export default function ActivityDetailScreen() {
     bottomSheetRef.current?.expand();
   };
 
-  if (isLoading || !activity) return <LoadingScreen />;
+  if (isLoading || !activity) return <ActivityDetailSkeleton />;
+
+  const catColor = getCategoryColor(activity.category);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+        <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
+          <ChevronLeft size={24} color={lightTheme.text} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.heartBtn} onPress={handleFavourite}>
-          <Heart
-            size={20}
-            color={isFavourited ? colors.terracotta : colors.clay}
-            fill={isFavourited ? colors.terracotta : 'transparent'}
-          />
+        <TouchableOpacity style={styles.headerBtn} onPress={handleFavourite}>
+          <Animated.View style={{ transform: [{ scale: heartScale }] }}>
+            <Heart
+              size={20}
+              color={isFavourited ? '#E8735A' : lightTheme.textMuted}
+              fill={isFavourited ? '#E8735A' : 'transparent'}
+            />
+          </Animated.View>
         </TouchableOpacity>
       </View>
 
@@ -154,26 +168,29 @@ export default function ActivityDetailScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title Section */}
+        {/* Category badge + Title */}
         <View style={styles.titleSection}>
-          <Badge variant="sage">{activity.category}</Badge>
+          <View style={[styles.categoryBadge, { backgroundColor: `${catColor}15` }]}>
+            <Text style={[styles.categoryText, { color: catColor }]}>
+              {activity.category}
+            </Text>
+          </View>
           <Text style={styles.title}>{activity.title}</Text>
           <Text style={styles.description}>{activity.description}</Text>
 
+          {/* Meta tags row */}
           <View style={styles.metaRow}>
-            <View style={styles.metaItem}>
-              <Clock size={14} color={colors.clay} />
-              <Text style={styles.metaText}>
-                {activity.duration_minutes} min
-              </Text>
+            <View style={styles.metaTag}>
+              <Clock size={14} color={lightTheme.textMuted} />
+              <Text style={styles.metaText}>{activity.duration_minutes} min</Text>
             </View>
-            <View style={styles.metaItem}>
-              <MapPin size={14} color={colors.clay} />
+            <View style={styles.metaTag}>
+              <MapPin size={14} color={lightTheme.textMuted} />
               <Text style={styles.metaText}>{activity.location}</Text>
             </View>
             {(activity.age_min || activity.age_max) && (
-              <View style={styles.metaItem}>
-                <Users size={14} color={colors.clay} />
+              <View style={styles.metaTag}>
+                <Users size={14} color={lightTheme.textMuted} />
                 <Text style={styles.metaText}>
                   {activity.age_min || '?'}-{activity.age_max || '?'} yrs
                 </Text>
@@ -182,11 +199,49 @@ export default function ActivityDetailScreen() {
           </View>
         </View>
 
+        {/* Info badges */}
+        <View style={styles.infoBadgesRow}>
+          {activity.energy_level && (
+            <View style={styles.infoBadge}>
+              <Zap size={16} color="#E8735A" />
+              <Text style={styles.infoBadgeLabel}>{activity.energy_level}</Text>
+            </View>
+          )}
+          {activity.mess_level && (
+            <View style={styles.infoBadge}>
+              <Droplets size={16} color="#5B8DEF" />
+              <Text style={styles.infoBadgeLabel}>{activity.mess_level}</Text>
+            </View>
+          )}
+          {activity.screen_free && (
+            <View style={styles.infoBadge}>
+              <BookOpen size={16} color={lightTheme.accent} />
+              <Text style={styles.infoBadgeLabel}>Screen-free</Text>
+            </View>
+          )}
+        </View>
+
+        {/* AI Insight */}
+        <View style={{ marginBottom: spacing.xl }}>
+          <InsightCard
+            type="activity"
+            context={{
+              children,
+              activityTitle: activity.title,
+              activityCategory: activity.category,
+              learningOutcomes: activity.learning_outcomes,
+              aistearThemes: activity.curriculum_tags?.aistear_themes,
+              nccaAreas: activity.curriculum_tags?.ncca_areas,
+            }}
+            enabled={!!activity}
+          />
+        </View>
+
         {/* Materials */}
         {activity.materials?.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>What you'll need</Text>
-            <Card variant="elevated" padding="lg">
+            <View style={styles.card}>
               {activity.materials.map((material, i) => (
                 <TouchableOpacity
                   key={i}
@@ -200,7 +255,7 @@ export default function ActivityDetailScreen() {
                     ]}
                   >
                     {checkedMaterials.has(i) && (
-                      <Check size={12} color={colors.parchment} />
+                      <Check size={12} color="#FFFFFF" />
                     )}
                   </View>
                   <Text
@@ -213,7 +268,7 @@ export default function ActivityDetailScreen() {
                   </Text>
                 </TouchableOpacity>
               ))}
-            </Card>
+            </View>
           </View>
         )}
 
@@ -221,14 +276,16 @@ export default function ActivityDetailScreen() {
         {(activity.instructions?.steps?.length ?? 0) > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>How to do it</Text>
-            {activity.instructions!.steps.map((step, i) => (
-              <View key={i} style={styles.stepRow}>
-                <View style={styles.stepNumber}>
-                  <Text style={styles.stepNumberText}>{i + 1}</Text>
+            <View style={styles.card}>
+              {activity.instructions!.steps.map((step, i) => (
+                <View key={i} style={styles.stepRow}>
+                  <View style={styles.stepNumber}>
+                    <Text style={styles.stepNumberText}>{i + 1}</Text>
+                  </View>
+                  <Text style={styles.stepText}>{step}</Text>
                 </View>
-                <Text style={styles.stepText}>{step}</Text>
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
         )}
 
@@ -236,14 +293,14 @@ export default function ActivityDetailScreen() {
         {activity.learning_outcomes?.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>What they'll learn</Text>
-            <Card variant="elevated" padding="lg">
+            <View style={styles.card}>
               {activity.learning_outcomes.map((outcome, i) => (
                 <View key={i} style={styles.outcomeRow}>
-                  <Sparkles size={14} color={colors.moss} />
+                  <Sparkles size={14} color={lightTheme.accent} />
                   <Text style={styles.outcomeText}>{outcome}</Text>
                 </View>
               ))}
-            </Card>
+            </View>
           </View>
         )}
 
@@ -251,194 +308,106 @@ export default function ActivityDetailScreen() {
         {activity.curriculum_tags && (activity.curriculum_tags.aistear_themes?.length > 0 || activity.curriculum_tags.ncca_areas?.length > 0) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Curriculum links</Text>
-            <Text style={styles.sectionSubtitle}>
-              How this activity maps to the Irish curriculum
-            </Text>
-
-            {activity.curriculum_tags.aistear_themes?.length > 0 && (
-              <View style={styles.curriculumGroup}>
-                <View style={styles.curriculumLabelRow}>
-                  <View style={[styles.curriculumIcon, { backgroundColor: `${colors.sage}20` }]}>
-                    <Layers size={12} color={colors.sage} />
+            <View style={styles.card}>
+              {activity.curriculum_tags.aistear_themes?.length > 0 && (
+                <View style={styles.curriculumGroup}>
+                  <View style={styles.curriculumLabelRow}>
+                    <Layers size={14} color={lightTheme.accent} />
+                    <Text style={styles.curriculumLabel}>Aistear</Text>
                   </View>
-                  <Text style={styles.curriculumLabel}>Aistear</Text>
-                </View>
-                <View style={styles.tagRow}>
-                  {activity.curriculum_tags.aistear_themes.map((theme, i) => (
-                    <View key={i} style={[styles.tag, styles.tagAistear]}>
-                      <Text style={styles.tagTextAistear}>{theme}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            {activity.curriculum_tags.ncca_areas?.length > 0 && (
-              <View style={styles.curriculumGroup}>
-                <View style={styles.curriculumLabelRow}>
-                  <View style={[styles.curriculumIcon, { backgroundColor: `${colors.forest}12` }]}>
-                    <GraduationCap size={12} color={colors.forest} />
+                  <View style={styles.tagRow}>
+                    {activity.curriculum_tags.aistear_themes.map((theme, i) => (
+                      <View key={i} style={[styles.tag, { backgroundColor: `${lightTheme.accent}15` }]}>
+                        <Text style={[styles.tagText, { color: lightTheme.accent }]}>{theme}</Text>
+                      </View>
+                    ))}
                   </View>
-                  <Text style={styles.curriculumLabel}>Primary Curriculum</Text>
                 </View>
-                <View style={styles.tagRow}>
-                  {activity.curriculum_tags.ncca_areas.map((area, i) => (
-                    <View key={i} style={[styles.tag, styles.tagNcca]}>
-                      <Text style={styles.tagTextNcca}>{area}</Text>
-                    </View>
-                  ))}
+              )}
+              {activity.curriculum_tags.ncca_areas?.length > 0 && (
+                <View style={styles.curriculumGroup}>
+                  <View style={styles.curriculumLabelRow}>
+                    <GraduationCap size={14} color={lightTheme.primary} />
+                    <Text style={styles.curriculumLabel}>Primary Curriculum</Text>
+                  </View>
+                  <View style={styles.tagRow}>
+                    {activity.curriculum_tags.ncca_areas.map((area, i) => (
+                      <View key={i} style={[styles.tag, { backgroundColor: `${lightTheme.primary}10` }]}>
+                        <Text style={[styles.tagText, { color: lightTheme.primary }]}>{area}</Text>
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            )}
-
-            {activity.curriculum_tags.outcome_codes?.length > 0 && (
-              <Text style={styles.outcomeCodeText}>
-                {activity.curriculum_tags.outcome_codes.length} curriculum outcomes covered
-              </Text>
-            )}
+              )}
+            </View>
           </View>
         )}
 
-        {/* Parent Guide - AI-generated teaching content */}
+        {/* Parent Guide */}
         {activity.parent_guide ? (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Parent guide</Text>
-            <Text style={styles.sectionSubtitle}>
-              Everything you need to know to teach this activity confidently
-            </Text>
-
-            {/* Knowledge topics */}
             {activity.parent_guide.knowledge.map((item, i) => (
-              <Card key={i} variant="elevated" padding="lg">
-                <View style={styles.knowledgeHeader}>
-                  <View style={styles.tipIcon}>
-                    <BookOpen size={14} color={colors.forest} />
-                  </View>
-                  <Text style={styles.knowledgeTopic}>{item.topic}</Text>
+              <View key={i} style={styles.card}>
+                <View style={styles.guideHeader}>
+                  <BookOpen size={16} color={lightTheme.accent} />
+                  <Text style={styles.guideTopic}>{item.topic}</Text>
                 </View>
-                <Text style={styles.knowledgeContent}>{item.content}</Text>
-              </Card>
+                <Text style={styles.guideContent}>{item.content}</Text>
+              </View>
             ))}
-
-            {/* Conversation starters */}
             {activity.parent_guide.conversation_starters.length > 0 && (
-              <Card variant="elevated" padding="lg">
-                <View style={styles.knowledgeHeader}>
-                  <View style={[styles.tipIcon, { backgroundColor: `${colors.moss}12` }]}>
-                    <MessageCircle size={14} color={colors.moss} />
-                  </View>
-                  <Text style={styles.knowledgeTopic}>Questions to ask</Text>
+              <View style={styles.card}>
+                <View style={styles.guideHeader}>
+                  <MessageCircle size={16} color="#9B7BD4" />
+                  <Text style={styles.guideTopic}>Questions to ask</Text>
                 </View>
                 {activity.parent_guide.conversation_starters.map((q, i) => (
-                  <View key={i} style={styles.starterRow}>
-                    <Text style={styles.starterBullet}>"</Text>
-                    <Text style={styles.starterText}>{q}</Text>
-                  </View>
+                  <Text key={i} style={styles.starterText}>"{q}"</Text>
                 ))}
-              </Card>
+              </View>
             )}
-
-            {/* Watch for */}
             {activity.parent_guide.watch_for.length > 0 && (
-              <Card variant="elevated" padding="lg">
-                <View style={styles.knowledgeHeader}>
-                  <View style={[styles.tipIcon, { backgroundColor: `${colors.sage}20` }]}>
-                    <Eye size={14} color={colors.sage} />
-                  </View>
-                  <Text style={styles.knowledgeTopic}>Signs of learning</Text>
+              <View style={styles.card}>
+                <View style={styles.guideHeader}>
+                  <Eye size={16} color={lightTheme.accent} />
+                  <Text style={styles.guideTopic}>Signs of learning</Text>
                 </View>
                 {activity.parent_guide.watch_for.map((item, i) => (
                   <View key={i} style={styles.watchRow}>
-                    <Sparkles size={12} color={colors.sage} />
+                    <Sparkles size={12} color={lightTheme.accent} />
                     <Text style={styles.watchText}>{item}</Text>
                   </View>
                 ))}
-              </Card>
+              </View>
             )}
           </View>
         ) : (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Parent tips</Text>
-            <Card variant="elevated" padding="lg">
-              <View style={styles.tipRow}>
-                <View style={styles.tipIcon}>
-                  <Lightbulb size={14} color={colors.amber} />
+            <View style={styles.card}>
+              {[
+                'Let your child lead the pace. Curiosity-driven learning sticks better.',
+                'Ask open-ended questions like "What do you notice?" to deepen understanding.',
+                "Don't worry about perfection. The goal is engagement and exploration.",
+              ].map((tip, i) => (
+                <View key={i} style={styles.tipRow}>
+                  <Lightbulb size={14} color="#F5A623" />
+                  <Text style={styles.tipText}>{tip}</Text>
                 </View>
-                <Text style={styles.tipText}>
-                  Let your child lead the pace. If they want to spend longer on one step,
-                  that's great - curiosity-driven learning sticks better than rushing through.
-                </Text>
-              </View>
-              <View style={styles.tipRow}>
-                <View style={styles.tipIcon}>
-                  <Lightbulb size={14} color={colors.amber} />
-                </View>
-                <Text style={styles.tipText}>
-                  Ask open-ended questions like "What do you notice?" or "Why do you think
-                  that happens?" to deepen their understanding.
-                </Text>
-              </View>
-              <View style={[styles.tipRow, { borderBottomWidth: 0 }]}>
-                <View style={styles.tipIcon}>
-                  <Lightbulb size={14} color={colors.amber} />
-                </View>
-                <Text style={styles.tipText}>
-                  Don't worry about getting it perfect. The goal is engagement and
-                  exploration, not a polished result.
-                </Text>
-              </View>
-            </Card>
+              ))}
+            </View>
           </View>
         )}
-
-        {/* Activity Info Badges */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Good to know</Text>
-          <View style={styles.infoBadgesRow}>
-            {activity.energy_level && (
-              <View style={styles.infoBadge}>
-                <View style={[styles.infoBadgeIcon, { backgroundColor: `${colors.terracotta}12` }]}>
-                  <Zap size={14} color={colors.terracotta} />
-                </View>
-                <View>
-                  <Text style={styles.infoBadgeLabel}>Energy</Text>
-                  <Text style={styles.infoBadgeValue}>{activity.energy_level}</Text>
-                </View>
-              </View>
-            )}
-            {activity.mess_level && (
-              <View style={styles.infoBadge}>
-                <View style={[styles.infoBadgeIcon, { backgroundColor: `${colors.moss}12` }]}>
-                  <Droplets size={14} color={colors.moss} />
-                </View>
-                <View>
-                  <Text style={styles.infoBadgeLabel}>Mess</Text>
-                  <Text style={styles.infoBadgeValue}>{activity.mess_level}</Text>
-                </View>
-              </View>
-            )}
-            {activity.screen_free && (
-              <View style={styles.infoBadge}>
-                <View style={[styles.infoBadgeIcon, { backgroundColor: `${colors.forest}12` }]}>
-                  <BookOpen size={14} color={colors.forest} />
-                </View>
-                <View>
-                  <Text style={styles.infoBadgeLabel}>Screen</Text>
-                  <Text style={styles.infoBadgeValue}>Screen-free</Text>
-                </View>
-              </View>
-            )}
-          </View>
-        </View>
 
         {/* Variations */}
         {(activity.instructions?.variations?.length ?? 0) > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Try it differently</Text>
             {activity.instructions!.variations!.map((variation, i) => (
-              <Card key={i} variant="elevated" padding="md">
+              <View key={i} style={styles.card}>
                 <Text style={styles.variationText}>{variation}</Text>
-              </Card>
+              </View>
             ))}
           </View>
         )}
@@ -447,17 +416,22 @@ export default function ActivityDetailScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* Sticky Log Button */}
+      {/* Floating Log Button - Runna "Record workout" pattern */}
       <View style={styles.stickyBottom}>
-        <Button
-          variant="primary"
-          size="lg"
-          fullWidth
+        <TouchableOpacity
           onPress={handleLog}
-          icon={<Check size={18} color={colors.parchment} />}
+          activeOpacity={0.8}
+          style={[styles.logButton, logged && styles.logButtonDone]}
         >
-          {logged ? 'Logged!' : 'Log this activity'}
-        </Button>
+          {logged ? (
+            <Check size={20} color="#FFFFFF" />
+          ) : (
+            <Play size={18} color="#FFFFFF" fill="#FFFFFF" />
+          )}
+          <Text style={styles.logText}>
+            {logged ? 'Logged!' : 'Log this activity'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Log Activity Bottom Sheet */}
@@ -472,31 +446,19 @@ export default function ActivityDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
   },
-  backBtn: {
+  headerBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heartBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -504,86 +466,124 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['3xl'],
   },
+  // Title
   titleSection: {
     gap: spacing.md,
-    marginBottom: spacing['2xl'],
+    marginBottom: spacing.xl,
+  },
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  categoryText: {
+    fontSize: 13,
+    fontWeight: '600',
+    textTransform: 'capitalize',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '300',
-    color: colors.ink,
-    letterSpacing: -0.3,
-    lineHeight: 34,
+    ...typography.h2,
+    color: lightTheme.text,
+    lineHeight: 30,
   },
   description: {
-    fontSize: 16,
-    color: colors.clay,
+    ...typography.body,
+    color: lightTheme.textSecondary,
     lineHeight: 24,
   },
   metaRow: {
     flexDirection: 'row',
-    gap: spacing.xl,
-    marginTop: spacing.sm,
+    gap: spacing.lg,
+    marginTop: spacing.xs,
   },
-  metaItem: {
+  metaTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   metaText: {
-    fontSize: 13,
-    color: colors.clay,
+    ...typography.uiSmall,
+    color: lightTheme.textMuted,
     textTransform: 'capitalize',
   },
+  // Info badges
+  infoBadgesRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  infoBadge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: lightTheme.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+  },
+  infoBadgeLabel: {
+    ...typography.uiSmall,
+    color: lightTheme.text,
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+  // Sections
   section: {
     gap: spacing.md,
-    marginBottom: spacing['2xl'],
+    marginBottom: spacing.xl,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h3,
+    color: lightTheme.text,
   },
+  card: {
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
+    padding: spacing.lg,
+  },
+  // Materials
   materialRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: `${colors.stone}40`,
+    borderBottomColor: lightTheme.borderLight,
   },
   checkbox: {
     width: 22,
     height: 22,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    borderColor: colors.stone,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: lightTheme.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: colors.moss,
-    borderColor: colors.moss,
+    backgroundColor: lightTheme.accent,
+    borderColor: lightTheme.accent,
   },
   materialText: {
-    fontSize: 14,
-    color: colors.ink,
+    ...typography.ui,
+    color: lightTheme.text,
     flex: 1,
   },
   materialChecked: {
     textDecorationLine: 'line-through',
-    color: colors.clay,
+    color: lightTheme.textMuted,
   },
+  // Steps
   stepRow: {
     flexDirection: 'row',
     gap: spacing.md,
-    marginBottom: spacing.md,
+    paddingVertical: spacing.sm,
   },
   stepNumber: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: `${colors.forest}10`,
+    backgroundColor: `${lightTheme.accent}15`,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
@@ -591,14 +591,15 @@ const styles = StyleSheet.create({
   stepNumberText: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.forest,
+    color: lightTheme.accent,
   },
   stepText: {
     flex: 1,
-    fontSize: 15,
-    color: colors.ink,
+    ...typography.body,
+    color: lightTheme.text,
     lineHeight: 22,
   },
+  // Outcomes
   outcomeRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -607,197 +608,129 @@ const styles = StyleSheet.create({
   },
   outcomeText: {
     flex: 1,
-    fontSize: 14,
-    color: colors.clay,
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
     lineHeight: 20,
   },
-  variationText: {
-    fontSize: 14,
-    color: colors.clay,
-    lineHeight: 20,
-  },
-  sectionSubtitle: {
-    fontSize: 13,
-    color: `${colors.clay}80`,
-    marginTop: -spacing.sm,
-    lineHeight: 18,
-  },
-  knowledgeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  knowledgeTopic: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.ink,
-    flex: 1,
-  },
-  knowledgeContent: {
-    fontSize: 14,
-    color: colors.clay,
-    lineHeight: 21,
-    paddingLeft: 36,
-  },
-  starterRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingLeft: 36,
-    paddingVertical: 4,
-    gap: 2,
-  },
-  starterBullet: {
-    fontSize: 18,
-    color: colors.moss,
-    fontWeight: '600',
-    lineHeight: 20,
-  },
-  starterText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.clay,
-    lineHeight: 20,
-    fontStyle: 'italic',
-  },
-  watchRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    paddingLeft: 36,
-    paddingVertical: 4,
-  },
-  watchText: {
-    flex: 1,
-    fontSize: 13,
-    color: colors.clay,
-    lineHeight: 18,
-  },
-  tipRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: `${colors.stone}30`,
-  },
-  tipIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: `${colors.amber}12`,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 1,
-  },
-  tipText: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.clay,
-    lineHeight: 20,
-  },
-  infoBadgesRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
-  },
-  infoBadge: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.md,
-    padding: spacing.md,
-  },
-  infoBadgeIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  infoBadgeLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: `${colors.clay}80`,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  infoBadgeValue: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.ink,
-    textTransform: 'capitalize',
-  },
+  // Curriculum
   curriculumGroup: {
     gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   curriculumLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  curriculumIcon: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   curriculumLabel: {
+    ...typography.uiBold,
+    color: lightTheme.text,
     fontSize: 13,
-    fontWeight: '600',
-    color: colors.ink,
   },
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    paddingLeft: 28,
+    paddingLeft: 22,
   },
   tag: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
   },
-  tagAistear: {
-    backgroundColor: `${colors.sage}18`,
-    borderWidth: 1,
-    borderColor: `${colors.sage}30`,
-  },
-  tagTextAistear: {
+  tagText: {
     fontSize: 12,
     fontWeight: '500',
-    color: colors.moss,
   },
-  tagNcca: {
-    backgroundColor: `${colors.forest}10`,
-    borderWidth: 1,
-    borderColor: `${colors.forest}20`,
+  // Parent guide
+  guideHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  tagTextNcca: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.forest,
+  guideTopic: {
+    ...typography.uiBold,
+    color: lightTheme.text,
+    flex: 1,
   },
-  outcomeCodeText: {
-    fontSize: 12,
-    color: `${colors.clay}90`,
-    paddingLeft: 28,
-    marginTop: 2,
+  guideContent: {
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
+    lineHeight: 21,
+    paddingLeft: 30,
   },
+  starterText: {
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
+    fontStyle: 'italic',
+    lineHeight: 20,
+    paddingLeft: 30,
+    paddingVertical: 3,
+  },
+  watchRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingLeft: 30,
+    paddingVertical: 3,
+  },
+  watchText: {
+    flex: 1,
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
+    lineHeight: 18,
+  },
+  // Tips
+  tipRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: lightTheme.borderLight,
+  },
+  tipText: {
+    flex: 1,
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
+    lineHeight: 20,
+  },
+  variationText: {
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
+    lineHeight: 20,
+  },
+  // Floating log button (Runna "Record workout" pattern)
   stickyBottom: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.lg,
     paddingBottom: spacing['3xl'],
-    backgroundColor: colors.parchment,
-    borderTopWidth: 1,
-    borderTopColor: colors.stone,
+    backgroundColor: lightTheme.background,
+  },
+  logButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: '#1A2E1E',
+    borderRadius: 16,
+    paddingVertical: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  logButtonDone: {
+    backgroundColor: lightTheme.accent,
+  },
+  logText: {
+    ...typography.button,
+    color: '#FFFFFF',
   },
 });

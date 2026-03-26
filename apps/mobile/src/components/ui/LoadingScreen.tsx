@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 
 export function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color={colors.moss} />
+      <ActivityIndicator size="large" color={lightTheme.accent} />
     </View>
   );
 }
@@ -15,6 +15,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.parchment,
+    backgroundColor: lightTheme.background,
   },
 });

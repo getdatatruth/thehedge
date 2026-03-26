@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Plus,
   FolderOpen,
   Image,
@@ -27,6 +27,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { TierGate } from '@/components/shared/TierGate';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
@@ -145,11 +146,12 @@ export default function PortfolioScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={colors.ink} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Portfolio</Text>
       </View>
 
+      <TierGate requiredTier="educator" featureName="Educator Dashboard">
       {children.length > 1 && (
         <ScrollView
           horizontal
@@ -327,6 +329,7 @@ export default function PortfolioScreen() {
           </Button>
         </View>
       </SimpleBottomSheet>
+      </TierGate>
     </SafeAreaView>
   );
 }
@@ -343,10 +346,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
