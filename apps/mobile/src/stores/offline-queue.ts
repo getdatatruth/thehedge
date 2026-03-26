@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiPost, apiPut, apiDelete } from '@/lib/api';
 
 const STORAGE_KEY = 'offline-queue';
 
@@ -46,19 +45,15 @@ export const useOfflineQueue = create<OfflineQueueState>((set, get) => ({
     set({ isProcessing: true });
     const remaining: QueueItem[] = [];
 
+    // Lazy import to avoid circular dependency with api.ts
+    const { api } = require('@/lib/api');
+
     for (const item of queue) {
       try {
-        switch (item.method) {
-          case 'POST':
-            await apiPost(item.path, item.body);
-            break;
-          case 'PUT':
-            await apiPut(item.path, item.body);
-            break;
-          case 'DELETE':
-            await apiDelete(item.path, item.body);
-            break;
-        }
+        await api(item.path, {
+          method: item.method,
+          ...(item.body ? { body: JSON.stringify(item.body) } : {}),
+        });
       } catch {
         remaining.push(item);
       }
