@@ -7,14 +7,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Leaf } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { colors } from '@/theme/colors';
+import { darkTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 
 export default function SignupScreen() {
@@ -50,6 +51,8 @@ export default function SignupScreen() {
     setLoading(false);
   };
 
+  const canSubmit = name.trim().length > 0 && email.trim().length > 0 && password.trim().length > 0;
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
@@ -60,16 +63,15 @@ export default function SignupScreen() {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Header */}
           <View style={styles.header}>
-            <View style={styles.logoIcon}>
-              <Leaf size={28} color={colors.parchment} />
+            <View style={styles.logoCircle}>
+              <Leaf size={28} color={darkTheme.accent} strokeWidth={1.5} />
             </View>
-            <Text style={styles.title}>Join The Hedge</Text>
-            <Text style={styles.subtitle}>
-              Create your family profile in 2 minutes
-            </Text>
+            <Text style={styles.title}>Sign up to The Hedge</Text>
           </View>
 
+          {/* Form */}
           <View style={styles.form}>
             {error && (
               <View style={styles.errorBox}>
@@ -78,12 +80,13 @@ export default function SignupScreen() {
             )}
 
             <Input
-              label="Your name"
-              placeholder="First and last name"
+              label="First name"
+              placeholder="Your name"
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
               textContentType="name"
+              variant="dark"
             />
 
             <Input
@@ -95,6 +98,7 @@ export default function SignupScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               textContentType="emailAddress"
+              variant="dark"
             />
 
             <Input
@@ -104,30 +108,57 @@ export default function SignupScreen() {
               onChangeText={setPassword}
               secureTextEntry
               textContentType="newPassword"
+              variant="dark"
             />
 
-            <Button
-              onPress={handleSignup}
-              loading={loading}
-              disabled={!name.trim() || !email.trim() || !password.trim()}
-              fullWidth
-              size="lg"
-            >
-              Create account
-            </Button>
-          </View>
+            <Text style={styles.terms}>
+              By signing up, you agree to our Terms and Conditions. View our Privacy Policy.
+            </Text>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account?</Text>
-            <TouchableOpacity onPress={() => router.back()}>
-              <Text style={styles.footerLink}>Sign in</Text>
+            <TouchableOpacity
+              onPress={handleSignup}
+              activeOpacity={0.8}
+              disabled={!canSubmit || loading}
+              style={[
+                styles.ctaButton,
+                (!canSubmit || loading) && styles.ctaDisabled,
+              ]}
+            >
+              <Text style={styles.ctaText}>
+                {loading ? 'Creating account...' : 'Create account'}
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.terms}>
-            By creating an account, you agree to our Terms of Service and
-            Privacy Policy.
-          </Text>
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Social sign-in */}
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={() => Alert.alert('Coming Soon', 'Apple sign-in will be available shortly.')}
+          >
+            <Text style={styles.socialText}>Sign up with Apple</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.socialButton, { marginTop: spacing.md }]}
+            onPress={() => Alert.alert('Coming Soon', 'Google sign-in will be available shortly.')}
+          >
+            <Text style={styles.socialText}>Sign up with Google</Text>
+          </TouchableOpacity>
+
+          {/* Sign in link */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.replace('/(auth)/login')}>
+              <Text style={styles.footerLink}>Sign in</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -135,7 +166,7 @@ export default function SignupScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: darkTheme.background },
   flex: { flex: 1 },
   scroll: {
     flexGrow: 1,
@@ -143,37 +174,76 @@ const styles = StyleSheet.create({
     padding: spacing['3xl'],
   },
   header: {
-    alignItems: 'center',
-    marginBottom: spacing['4xl'],
+    alignItems: 'flex-start',
+    marginBottom: spacing['3xl'],
   },
-  logoIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
-    backgroundColor: colors.forest,
+  logoCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: darkTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '300',
-    color: colors.ink,
-  },
-  subtitle: {
-    fontSize: 15,
-    color: colors.clay,
-    marginTop: spacing.sm,
+    ...typography.onboardingTitle,
+    color: darkTheme.text,
   },
   form: { gap: spacing.lg },
   errorBox: {
-    backgroundColor: `${colors.terracotta}10`,
+    backgroundColor: `${darkTheme.error}15`,
     borderWidth: 1,
-    borderColor: `${colors.terracotta}20`,
-    borderRadius: 4,
+    borderColor: `${darkTheme.error}30`,
+    borderRadius: 12,
     padding: spacing.md,
   },
-  errorText: { fontSize: 13, color: colors.terracotta },
+  errorText: { fontSize: 13, color: darkTheme.error },
+  terms: {
+    ...typography.uiSmall,
+    color: darkTheme.textMuted,
+    lineHeight: 18,
+  },
+  ctaButton: {
+    backgroundColor: darkTheme.accent,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  ctaDisabled: {
+    backgroundColor: darkTheme.surfaceElevated,
+  },
+  ctaText: {
+    ...typography.button,
+    color: '#FFFFFF',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing['2xl'],
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: darkTheme.border,
+  },
+  dividerText: {
+    ...typography.uiSmall,
+    color: darkTheme.textMuted,
+    marginHorizontal: spacing.lg,
+  },
+  socialButton: {
+    borderWidth: 1.5,
+    borderColor: darkTheme.border,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+    backgroundColor: darkTheme.surface,
+  },
+  socialText: {
+    ...typography.button,
+    color: darkTheme.text,
+  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -181,13 +251,6 @@ const styles = StyleSheet.create({
     gap: 6,
     marginTop: spacing['3xl'],
   },
-  footerText: { fontSize: 14, color: colors.clay },
-  footerLink: { fontSize: 14, color: colors.forest, fontWeight: '700' },
-  terms: {
-    fontSize: 11,
-    color: `${colors.clay}80`,
-    textAlign: 'center',
-    marginTop: spacing.xl,
-    lineHeight: 16,
-  },
+  footerText: { ...typography.body, color: darkTheme.textSecondary },
+  footerLink: { ...typography.uiBold, color: darkTheme.accent },
 });

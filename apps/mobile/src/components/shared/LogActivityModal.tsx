@@ -24,7 +24,7 @@ import { ChildSelector } from './ChildSelector';
 import { StarRating } from './StarRating';
 import { Button } from '@/components/ui/Button';
 import { hapticLight, hapticSuccess } from '@/lib/haptics';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface LogActivityModalProps {
@@ -176,7 +176,7 @@ export function LogActivityModal({
           <TextInput
             style={styles.notesInput}
             placeholder="What happened, what they enjoyed..."
-            placeholderTextColor={`${colors.clay}60`}
+            placeholderTextColor={`${lightTheme.textMuted}`}
             value={notes}
             onChangeText={setNotes}
             multiline
@@ -194,7 +194,7 @@ export function LogActivityModal({
           <TextInput
             style={[styles.notesInput, styles.diaryInput]}
             placeholder="Today we explored cloud types together. They were fascinated by..."
-            placeholderTextColor={`${colors.clay}40`}
+            placeholderTextColor={lightTheme.textMuted}
             value={diaryEntry}
             onChangeText={setDiaryEntry}
             multiline
@@ -220,7 +220,7 @@ export function LogActivityModal({
                       style={styles.photoRemove}
                       onPress={() => removePhoto(i)}
                     >
-                      <X size={12} color={colors.parchment} />
+                      <X size={12} color="#FFFFFF" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -229,11 +229,11 @@ export function LogActivityModal({
             {photos.length < 5 && (
               <View style={styles.photoActions}>
                 <TouchableOpacity style={styles.photoBtn} onPress={takePhoto}>
-                  <Camera size={18} color={colors.forest} />
+                  <Camera size={18} color={lightTheme.accent} />
                   <Text style={styles.photoBtnText}>Take photo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.photoBtn} onPress={pickFromLibrary}>
-                  <ImagePlus size={18} color={colors.forest} />
+                  <ImagePlus size={18} color={lightTheme.accent} />
                   <Text style={styles.photoBtnText}>Choose from library</Text>
                 </TouchableOpacity>
               </View>
@@ -249,7 +249,7 @@ export function LogActivityModal({
           activeOpacity={0.7}
         >
           <View style={[styles.portfolioIcon, saveToPortfolio && styles.portfolioIconActive]}>
-            <BookOpen size={16} color={saveToPortfolio ? colors.parchment : colors.forest} />
+            <BookOpen size={16} color={saveToPortfolio ? '#FFFFFF' : lightTheme.accent} />
           </View>
           <View style={styles.portfolioInfo}>
             <Text style={[styles.portfolioLabel, saveToPortfolio && styles.portfolioLabelActive]}>
@@ -287,12 +287,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   activityName: {
     fontSize: 15,
     fontWeight: '500',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     marginTop: -spacing.sm,
   },
   section: {
@@ -301,12 +301,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
     letterSpacing: 0.3,
   },
   hint: {
     fontSize: 12,
-    color: `${colors.clay}80`,
+    color: lightTheme.textMuted,
     lineHeight: 16,
     marginTop: -2,
   },
@@ -317,32 +317,27 @@ const styles = StyleSheet.create({
   durationChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
-    borderRadius: radius.sm,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 16,
+    backgroundColor: lightTheme.surface,
   },
   durationChipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.accent,
   },
   durationText: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   durationTextActive: {
-    color: colors.parchment,
+    color: '#FFFFFF',
   },
   notesInput: {
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.sm,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: 14,
-    color: colors.ink,
+    color: lightTheme.text,
     minHeight: 80,
   },
   diaryInput: {
@@ -357,7 +352,7 @@ const styles = StyleSheet.create({
   photoThumb: {
     width: 72,
     height: 72,
-    borderRadius: radius.sm,
+    borderRadius: 12,
     overflow: 'hidden',
   },
   photoImage: {
@@ -371,7 +366,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: `${colors.ink}80`,
+    backgroundColor: `${lightTheme.text}80`,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -386,20 +381,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     paddingVertical: 12,
-    backgroundColor: `${colors.forest}08`,
-    borderWidth: 1,
-    borderColor: `${colors.forest}30`,
-    borderRadius: radius.sm,
+    backgroundColor: lightTheme.accentLight,
+    borderRadius: 16,
     borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: `${lightTheme.accent}40`,
   },
   photoBtnText: {
     fontSize: 13,
     fontWeight: '500',
-    color: colors.forest,
+    color: lightTheme.accent,
   },
   photoLimit: {
     fontSize: 11,
-    color: `${colors.clay}60`,
+    color: lightTheme.textMuted,
     textAlign: 'right',
   },
   portfolioToggle: {
@@ -407,25 +402,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
     padding: spacing.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.md,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
   },
   portfolioToggleActive: {
-    backgroundColor: `${colors.forest}08`,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.accentLight,
   },
   portfolioIcon: {
     width: 36,
     height: 36,
-    borderRadius: 8,
-    backgroundColor: `${colors.forest}12`,
+    borderRadius: 12,
+    backgroundColor: lightTheme.accentLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   portfolioIconActive: {
-    backgroundColor: colors.forest,
+    backgroundColor: lightTheme.accent,
   },
   portfolioInfo: {
     flex: 1,
@@ -434,14 +426,14 @@ const styles = StyleSheet.create({
   portfolioLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   portfolioLabelActive: {
-    color: colors.forest,
+    color: lightTheme.accent,
   },
   portfolioHint: {
     fontSize: 11,
-    color: `${colors.clay}80`,
+    color: lightTheme.textMuted,
     lineHeight: 14,
   },
   portfolioCheck: {
@@ -449,10 +441,10 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
   },
   portfolioCheckActive: {
-    borderColor: colors.forest,
-    backgroundColor: colors.forest,
+    borderColor: lightTheme.accent,
+    backgroundColor: lightTheme.accent,
   },
 });

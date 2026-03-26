@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createApiClient } from '@/lib/supabase/api-client';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { supabase, user } = await createApiClient(request);
 
     if (!user) {
       return NextResponse.json(
-        { error: 'You must be signed in to complete onboarding.' },
+        { success: false, error: { message: 'You must be signed in to complete onboarding.', code: 'UNAUTHORIZED' } },
         { status: 401 }
       );
     }
@@ -32,15 +29,15 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!familyName?.trim()) {
-      return NextResponse.json({ error: 'Family name is required.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: { message: 'Family name is required.', code: 'VALIDATION_ERROR' } }, { status: 400 });
     }
     if (!children || children.length === 0) {
-      return NextResponse.json({ error: 'At least one child is required.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: { message: 'At least one child is required.', code: 'VALIDATION_ERROR' } }, { status: 400 });
     }
     for (const child of children) {
       if (!child.name?.trim() || !child.dateOfBirth) {
         return NextResponse.json(
-          { error: 'Each child must have a name and date of birth.' },
+          { success: false, error: { message: 'Each child must have a name and date of birth.', code: 'VALIDATION_ERROR' } },
           { status: 400 }
         );
       }
@@ -197,15 +194,18 @@ export async function POST(request: NextRequest) {
       // Non-critical, don't fail the whole request
     }
 
-    return NextResponse.json({ success: true, familyId });
+    return NextResponse.json({ success: true, data: { familyId } });
   } catch (error) {
     console.error('POST /api/onboarding error:', error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
+        success: false,
+        error: {
+          message: error instanceof Error
             ? error.message
             : 'Something went wrong. Please try again.',
+          code: 'SERVER_ERROR',
+        },
       },
       { status: 500 }
     );

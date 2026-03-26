@@ -9,30 +9,31 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ChevronRight, Clock, Leaf, Palette, FlaskConical, Calculator, BookOpen, Music, UtensilsCrossed, TreePine, Footprints, Globe, Shapes, FolderOpen } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Clock, Leaf, Palette, FlaskConical, Calculator, BookOpen, Music, UtensilsCrossed, TreePine, Footprints, Globe, Shapes, FolderOpen } from 'lucide-react-native';
 import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { colors, lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing } from '@/theme/spacing';
 
 const COLLECTION_ICON_MAP: Record<string, { icon: any; color: string }> = {
   nature: { icon: TreePine, color: colors.sage },
   outdoor: { icon: TreePine, color: colors.sage },
   science: { icon: FlaskConical, color: colors.moss },
-  art: { icon: Palette, color: colors.terracotta },
-  craft: { icon: Palette, color: colors.terracotta },
-  math: { icon: Calculator, color: colors.umber },
-  language: { icon: BookOpen, color: colors.forest },
-  reading: { icon: BookOpen, color: colors.forest },
-  music: { icon: Music, color: colors.clay },
-  cook: { icon: UtensilsCrossed, color: colors.terracotta },
-  bak: { icon: UtensilsCrossed, color: colors.terracotta },
+  art: { icon: Palette, color: '#E8735A' },
+  craft: { icon: Palette, color: '#E8735A' },
+  math: { icon: Calculator, color: lightTheme.textSecondary },
+  language: { icon: BookOpen, color: lightTheme.primary },
+  reading: { icon: BookOpen, color: lightTheme.primary },
+  music: { icon: Music, color: lightTheme.textSecondary },
+  cook: { icon: UtensilsCrossed, color: '#E8735A' },
+  bak: { icon: UtensilsCrossed, color: '#E8735A' },
   physical: { icon: Footprints, color: colors.moss },
   movement: { icon: Footprints, color: colors.moss },
-  irish: { icon: Globe, color: colors.forest },
+  irish: { icon: Globe, color: lightTheme.primary },
   sensory: { icon: Shapes, color: colors.sage },
   play: { icon: Shapes, color: colors.sage },
 };
@@ -83,7 +84,7 @@ export default function CollectionsScreen() {
             onPress={() => setSelectedCollection(null)}
             style={styles.backBtn}
           >
-            <ArrowLeft size={20} color={colors.ink} />
+            <ChevronLeft size={20} color={lightTheme.text} />
           </TouchableOpacity>
           <View style={styles.headerInfo}>
             {(() => {
@@ -109,11 +110,11 @@ export default function CollectionsScreen() {
                     <Badge variant="sage" size="sm">{item.category}</Badge>
                     <Text style={styles.activityTitle}>{item.title}</Text>
                     <View style={styles.meta}>
-                      <Clock size={12} color={colors.clay} />
+                      <Clock size={12} color={lightTheme.textSecondary} />
                       <Text style={styles.metaText}>{item.duration_minutes} min</Text>
                     </View>
                   </View>
-                  <ChevronRight size={18} color={colors.stone} />
+                  <ChevronRight size={18} color={lightTheme.textMuted} />
                 </View>
               </Card>
             </TouchableOpacity>
@@ -128,7 +129,7 @@ export default function CollectionsScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Collections</Text>
       </View>
@@ -144,7 +145,7 @@ export default function CollectionsScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.accent}
           />
         }
         renderItem={({ item }) => (
@@ -175,7 +176,7 @@ export default function CollectionsScreen() {
         )}
         ListEmptyComponent={() => (
           <EmptyState
-            icon={<FolderOpen size={32} color={`${colors.clay}40`} />}
+            icon={<FolderOpen size={32} color={`${lightTheme.textMuted}40`} />}
             title="No collections yet"
             message="Collections will appear here as they are curated."
           />
@@ -186,7 +187,7 @@ export default function CollectionsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -202,14 +203,12 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { ...typography.h3, color: lightTheme.text },
   list: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -237,12 +236,12 @@ const styles = StyleSheet.create({
   collectionTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
     textAlign: 'center',
   },
   collectionCount: {
     fontSize: 11,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   activityRow: {
     flexDirection: 'row',
@@ -250,7 +249,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   activityInfo: { flex: 1, gap: 6 },
-  activityTitle: { fontSize: 15, fontWeight: '500', color: colors.ink },
+  activityTitle: { fontSize: 15, fontWeight: '500', color: lightTheme.text },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  metaText: { fontSize: 11, color: colors.clay },
+  metaText: { fontSize: 11, color: lightTheme.textSecondary },
 });

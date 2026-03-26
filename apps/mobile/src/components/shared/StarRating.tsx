@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Star } from 'lucide-react-native';
 import { hapticLight } from '@/lib/haptics';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 
 interface StarRatingProps {
   rating: number;
@@ -24,8 +24,8 @@ export function StarRating({ rating, onChange, size = 28 }: StarRatingProps) {
         >
           <Star
             size={size}
-            color={star <= rating ? colors.amber : colors.stone}
-            fill={star <= rating ? colors.amber : 'transparent'}
+            color={star <= rating ? lightTheme.warning : lightTheme.border}
+            fill={star <= rating ? lightTheme.warning : 'transparent'}
           />
         </TouchableOpacity>
       ))}

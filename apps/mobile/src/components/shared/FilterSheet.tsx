@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { hapticLight } from '@/lib/haptics';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { lightTheme } from '@/theme/colors';
+import { spacing } from '@/theme/spacing';
+import { typography } from '@/theme/typography';
 
 export interface Filters {
   duration: number | null;
@@ -206,23 +207,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h3,
+    color: lightTheme.text,
   },
   resetText: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.terracotta,
+    color: lightTheme.accent,
   },
   section: {
     gap: spacing.sm,
   },
   label: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.ink,
-    letterSpacing: 0.3,
+    ...typography.uiBold,
+    color: lightTheme.text,
   },
   chipRow: {
     flexDirection: 'row',
@@ -230,24 +228,20 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: radius.sm,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 50,
+    backgroundColor: lightTheme.surface,
   },
   chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
   },
   chipText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: colors.clay,
+    ...typography.ui,
+    color: lightTheme.textSecondary,
     textTransform: 'capitalize',
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: '#FFFFFF',
   },
 });

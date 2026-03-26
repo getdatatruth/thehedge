@@ -1,7 +1,50 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
+import { Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { apiGet } from '@/lib/api';
+import { apiGet, apiPost } from '@/lib/api';
 import { useAuthStore, type UserProfile, type Family, type Child } from '@/stores/auth-store';
+
+// Configure how notifications are handled when the app is in the foreground
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
+
+async function registerPushToken() {
+  // Push notifications only work on physical devices, skip gracefully on simulator
+  if (Platform.OS === 'web') return;
+
+  const { status: existing } = await Notifications.getPermissionsAsync();
+  let finalStatus = existing;
+  if (existing !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+  if (finalStatus !== 'granted') return;
+
+  const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+  const tokenData = await Notifications.getExpoPushTokenAsync({
+    projectId: projectId || undefined,
+  });
+
+  // Send token to backend for storage
+  try {
+    await apiPost('/me/push-token', {
+      token: tokenData.data,
+      platform: Platform.OS,
+    });
+  } catch {
+    // Silently fail - push registration is not critical
+  }
+}
 
 // Set to true to bypass Supabase auth and use mock data for UI testing
 const DEV_BYPASS_AUTH = false;
@@ -61,9 +104,11 @@ interface MeResponse {
   }>;
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children: childrenProp }: { children: React.ReactNode }) {
   const { setSession, setProfile, setFamily, setChildren, setLoading, setInitialized, reset } =
     useAuthStore();
+  const router = useRouter();
+  const notificationResponseListener = useRef<Notifications.EventSubscription | null>(null);
 
   const loadUserData = useCallback(async () => {
     try {
@@ -105,10 +150,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) {
-        loadUserData().finally(() => {
-          setLoading(false);
-          setInitialized(true);
-        });
+        loadUserData()
+          .then(() => {
+            registerPushToken();
+          })
+          .finally(() => {
+            setLoading(false);
+            setInitialized(true);
+          });
       } else {
         setLoading(false);
         setInitialized(true);
@@ -124,6 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (event === 'SIGNED_IN' && session) {
         setLoading(true);
         await loadUserData();
+        registerPushToken();
         setLoading(false);
       } else if (event === 'SIGNED_OUT') {
         reset();
@@ -131,8 +181,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [setSession, setLoading, setInitialized, loadUserData, reset]);
+    // Listen for notification taps to handle deep linking
+    notificationResponseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const data = response.notification.request.content.data as {
+          type?: string;
+          activityId?: string;
+          screen?: string;
+        };
 
-  return <>{children}</>;
+        if (!data?.type) return;
+
+        switch (data.type) {
+          case 'morning_plan':
+          case 'weekly_plan':
+          case 'tomorrow_preview':
+            router.push('/(tabs)/plan');
+            break;
+          case 'activity_reminder':
+            if (data.activityId) {
+              router.push(`/(stack)/activity/${data.activityId}` as any);
+            } else {
+              router.push('/(tabs)');
+            }
+            break;
+          case 'streak_risk':
+          case 'day_review':
+          case 'week_review':
+          case 'month_review':
+          case 'achievement':
+            router.push('/(tabs)/progress');
+            break;
+          default:
+            router.push('/(tabs)');
+            break;
+        }
+      });
+
+    return () => {
+      subscription.unsubscribe();
+      if (notificationResponseListener.current) {
+        notificationResponseListener.current.remove();
+      }
+    };
+  }, [setSession, setLoading, setInitialized, loadUserData, reset, router]);
+
+  return <>{childrenProp}</>;
 }

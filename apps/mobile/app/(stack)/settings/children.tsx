@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react-native';
+import { ChevronLeft, Plus, Pencil, Trash2 } from 'lucide-react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Haptics from 'expo-haptics';
 import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
@@ -19,7 +19,8 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 const SCHOOL_STATUSES = ['mainstream', 'homeschool', 'considering'];
@@ -154,7 +155,7 @@ export default function ChildrenScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Children</Text>
       </View>
@@ -194,13 +195,13 @@ export default function ChildrenScreen() {
                   onPress={() => openEditSheet(item)}
                   style={styles.actionBtn}
                 >
-                  <Pencil size={16} color={colors.clay} />
+                  <Pencil size={16} color={lightTheme.textSecondary} />
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleDelete(item)}
                   style={styles.actionBtn}
                 >
-                  <Trash2 size={16} color={colors.terracotta} />
+                  <Trash2 size={16} color={'#E8735A'} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -210,7 +211,7 @@ export default function ChildrenScreen() {
           <Button
             variant="secondary"
             fullWidth
-            icon={<Plus size={16} color={colors.ink} />}
+            icon={<Plus size={16} color={lightTheme.text} />}
             onPress={openAddSheet}
             style={{ marginTop: spacing.lg }}
           >
@@ -288,7 +289,7 @@ export default function ChildrenScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -299,14 +300,12 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { ...typography.h3, color: lightTheme.text },
   list: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -317,14 +316,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   childInfo: { flex: 1, gap: 6 },
-  childName: { fontSize: 16, fontWeight: '500', color: colors.ink },
+  childName: { fontSize: 16, fontWeight: '500', color: lightTheme.text },
   childMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
   },
-  childAge: { fontSize: 13, color: colors.clay },
-  childInterests: { fontSize: 12, color: `${colors.clay}80` },
+  childAge: { fontSize: 13, color: lightTheme.textSecondary },
+  childInterests: { fontSize: 12, color: lightTheme.textMuted },
   childActions: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -332,8 +331,8 @@ const styles = StyleSheet.create({
   actionBtn: {
     width: 36,
     height: 36,
-    borderRadius: radius.md,
-    backgroundColor: colors.parchment,
+    borderRadius: 16,
+    backgroundColor: lightTheme.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -343,16 +342,16 @@ const styles = StyleSheet.create({
     gap: spacing.xl,
   },
   sheetTitle: {
-    fontSize: 20,
+    ...typography.h3,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
     marginBottom: spacing.sm,
   },
   statusSection: { gap: spacing.sm },
   statusLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   chips: {
     flexDirection: 'row',
@@ -363,20 +362,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     borderRadius: radius.full,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    backgroundColor: lightTheme.surface,
   },
   chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
   },
   chipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: lightTheme.background,
   },
 });

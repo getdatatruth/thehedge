@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ArrowLeft,
+  ChevronLeft,
   Check,
   Square,
   CheckSquare,
@@ -24,6 +24,7 @@ import { useApiQuery, useApiPut } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { TierGate } from '@/components/shared/TierGate';
 import { colors } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
@@ -110,11 +111,12 @@ export default function ScheduleScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={colors.ink} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Schedule</Text>
       </View>
 
+      <TierGate requiredTier="educator" featureName="Educator Dashboard">
       {/* Day Tabs */}
       <ScrollView
         horizontal
@@ -235,6 +237,7 @@ export default function ScheduleScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      </TierGate>
     </SafeAreaView>
   );
 }
@@ -251,10 +254,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 40,
     height: 40,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -6,8 +6,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useAuthStore } from '@/stores/auth-store';
-import { colors } from '@/theme/colors';
+import { darkTheme } from '@/theme/colors';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,6 +16,8 @@ function RootNavigator() {
   const router = useRouter();
   const segments = useSegments();
   const { session, profile, isLoading, isInitialized } = useAuthStore();
+
+  const inAuthGroup = segments[0] === '(auth)';
 
   const onReady = useCallback(async () => {
     if (isInitialized) {
@@ -29,12 +32,10 @@ function RootNavigator() {
   useEffect(() => {
     if (!isInitialized || isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
-
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (session && inAuthGroup) {
-      if (profile && !profile.onboarding_completed) {
+      if (!profile || !profile.onboarding_completed) {
         router.replace('/(auth)/onboarding');
       } else {
         router.replace('/(tabs)');
@@ -45,7 +46,8 @@ function RootNavigator() {
   if (!isInitialized) return null;
 
   return (
-    <>
+    <ErrorBoundary>
+      <StatusBar style={inAuthGroup ? 'light' : 'dark'} />
       <OfflineBanner />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
@@ -57,16 +59,15 @@ function RootNavigator() {
           }}
         />
       </Stack>
-    </>
+    </ErrorBoundary>
   );
 }
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.parchment }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: darkTheme.background }}>
       <QueryProvider>
         <AuthProvider>
-          <StatusBar style="dark" />
           <RootNavigator />
         </AuthProvider>
       </QueryProvider>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, ViewProps } from 'react-native';
-import { colors } from '@/theme/colors';
-import { radius, spacing } from '@/theme/spacing';
+import { lightTheme } from '@/theme/colors';
+import { spacing } from '@/theme/spacing';
 
 interface CardProps extends ViewProps {
   variant?: 'elevated' | 'interactive' | 'flat';
@@ -33,23 +33,19 @@ export function Card({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: radius.lg,
+    borderRadius: 16,
     overflow: 'hidden',
   },
 });
 
 const variantStyles: Record<string, ViewStyle> = {
   elevated: {
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    backgroundColor: lightTheme.surface,
   },
   interactive: {
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    backgroundColor: lightTheme.surface,
   },
   flat: {
-    backgroundColor: colors.parchment,
+    backgroundColor: lightTheme.background,
   },
 };

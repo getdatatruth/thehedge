@@ -11,7 +11,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   sheet: {
-    backgroundColor: colors.parchment,
+    backgroundColor: lightTheme.surface,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.stone,
+    backgroundColor: lightTheme.border,
   },
   scrollContent: {
     paddingBottom: 40,

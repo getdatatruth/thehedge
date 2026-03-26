@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
+import * as Haptics from 'expo-haptics';
 import {
   View,
   Text,
@@ -7,18 +8,20 @@ import {
   TouchableOpacity,
   TextInput,
   RefreshControl,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Search, Clock, ChevronRight, SlidersHorizontal } from 'lucide-react-native';
+import { Search, Clock, ChevronRight, SlidersHorizontal, X } from 'lucide-react-native';
 import { SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { useApiQuery } from '@/hooks/use-api';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { BrowseSkeleton } from '@/components/ui/ScreenSkeletons';
 import { FilterSheet, Filters, DEFAULT_FILTERS } from '@/components/shared/FilterSheet';
-import { colors } from '@/theme/colors';
-import { spacing, radius } from '@/theme/spacing';
+import { AnimatedCard } from '@/components/ui/AnimatedCard';
+import { lightTheme, categoryColors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing } from '@/theme/spacing';
 
 interface Activity {
   id: string;
@@ -32,117 +35,142 @@ interface Activity {
   age_max?: number;
   energy_level?: string;
   mess_level?: string;
-  age_range: string;
-  is_premium: boolean;
 }
 
+// Labels for display, values match database category enum exactly
 const CATEGORIES = [
-  'All',
-  'Nature',
-  'Science',
-  'Arts',
-  'Maths',
-  'Language',
-  'Irish',
-  'Physical',
-  'Music',
-  'Cooking',
+  { label: 'All', value: 'all' },
+  { label: 'Nature', value: 'nature' },
+  { label: 'Science', value: 'science' },
+  { label: 'Art', value: 'art' },
+  { label: 'Maths', value: 'maths' },
+  { label: 'Literacy', value: 'literacy' },
+  { label: 'Movement', value: 'movement' },
+  { label: 'Kitchen', value: 'kitchen' },
+  { label: 'Life Skills', value: 'life_skills' },
+  { label: 'Calm', value: 'calm' },
+  { label: 'Social', value: 'social' },
 ];
 
-const CATEGORY_COLORS: Record<string, string> = {
-  nature: colors.sage,
-  science: colors.moss,
-  arts: colors.terracotta,
-  maths: colors.amber,
-  language: colors.umber,
-  irish: colors.forest,
-  physical: colors.terracotta,
-  music: colors.clay,
-  cooking: colors.amber,
-};
+function getCategoryColor(category: string): string {
+  const key = category?.toLowerCase() as keyof typeof categoryColors;
+  return categoryColors[key] || categoryColors.default;
+}
 
 export default function BrowseScreen() {
   const router = useRouter();
   const filterSheetRef = useRef<SimpleBottomSheetRef>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchSubmitted, setSearchSubmitted] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+
+  // Build server-side query params - the API handles all filtering
+  const queryParams = useMemo(() => {
+    const params: string[] = ['per_page=50'];
+    if (selectedCategory !== 'all') {
+      params.push(`category=${selectedCategory}`);
+    }
+    if (searchSubmitted) {
+      params.push(`q=${encodeURIComponent(searchSubmitted)}`);
+    }
+    if (filters.duration !== null) {
+      params.push(`duration_max=${filters.duration}`);
+    }
+    if (filters.location && filters.location !== 'anywhere' && filters.location !== 'both') {
+      params.push(`location=${filters.location}`);
+    }
+    if (filters.energy) {
+      params.push(`energy=${filters.energy}`);
+    }
+    if (filters.mess) {
+      params.push(`mess=${filters.mess}`);
+    }
+    if (filters.ageMin !== null) {
+      params.push(`age_min=${filters.ageMin}`);
+    }
+    if (filters.ageMax !== null) {
+      params.push(`age_max=${filters.ageMax}`);
+    }
+    return params.join('&');
+  }, [selectedCategory, searchSubmitted, filters]);
 
   const {
     data: activities,
     isLoading,
     refetch,
     isRefetching,
-  } = useApiQuery<Activity[]>(['activities'], '/activities?limit=100');
+  } = useApiQuery<Activity[]>(
+    ['activities', queryParams],
+    `/activities?${queryParams}`
+  );
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.duration !== null) count++;
-    if (filters.location !== null) count++;
+    if (filters.location !== null && filters.location !== 'anywhere') count++;
     if (filters.energy !== null) count++;
     if (filters.mess !== null) count++;
     if (filters.ageMin !== null) count++;
     return count;
   }, [filters]);
 
-  const filtered = useMemo(() => {
-    if (!activities) return [];
-    return activities.filter((a) => {
-      const matchesCategory =
-        selectedCategory === 'All' ||
-        a.category.toLowerCase() === selectedCategory.toLowerCase();
-      const matchesSearch =
-        !searchQuery ||
-        a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesDuration =
-        filters.duration === null || a.duration_minutes <= filters.duration;
-      const matchesLocation =
-        filters.location === null ||
-        a.location?.toLowerCase().includes(filters.location);
-      const matchesEnergy =
-        filters.energy === null ||
-        a.energy_level?.toLowerCase() === filters.energy;
-      const matchesMess =
-        filters.mess === null ||
-        a.mess_level?.toLowerCase() === filters.mess;
-      const matchesAge =
-        (filters.ageMin === null && filters.ageMax === null) ||
-        ((a.age_min == null || a.age_min <= (filters.ageMax ?? 99)) &&
-         (a.age_max == null || a.age_max >= (filters.ageMin ?? 0)));
-      return matchesCategory && matchesSearch && matchesDuration && matchesLocation && matchesEnergy && matchesMess && matchesAge;
-    });
-  }, [activities, selectedCategory, searchQuery, filters]);
+  const handleCategoryChange = useCallback((cat: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedCategory(cat);
+  }, []);
 
-  if (isLoading && !activities) return <LoadingScreen />;
+  const handleFilterChange = useCallback((newFilters: Filters) => {
+    setFilters(newFilters);
+  }, []);
+
+  const handleSearch = useCallback(() => {
+    setSearchSubmitted(searchQuery);
+  }, [searchQuery]);
+
+  const clearSearch = useCallback(() => {
+    setSearchQuery('');
+    setSearchSubmitted('');
+  }, []);
+
+  if (isLoading && !activities) return <BrowseSkeleton />;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.eyebrow}>Explore</Text>
-        <Text style={styles.title}>Browse activities</Text>
+        <Text style={styles.title}>Browse</Text>
       </View>
 
       {/* Search + Filter */}
       <View style={styles.searchRow}>
         <View style={styles.searchContainer}>
-          <Search size={18} color={colors.clay} />
+          <Search size={18} color={lightTheme.textMuted} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search activities..."
-            placeholderTextColor={`${colors.clay}80`}
+            placeholderTextColor={lightTheme.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onSubmitEditing={handleSearch}
+            returnKeyType="search"
           />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={clearSearch} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <X size={16} color={lightTheme.textMuted} />
+            </TouchableOpacity>
+          )}
         </View>
         <TouchableOpacity
           style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
-          onPress={() => filterSheetRef.current?.expand()}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            filterSheetRef.current?.expand();
+          }}
         >
           <SlidersHorizontal
             size={18}
-            color={activeFilterCount > 0 ? colors.parchment : colors.clay}
+            color={activeFilterCount > 0 ? '#FFFFFF' : lightTheme.textSecondary}
           />
           {activeFilterCount > 0 && (
             <View style={styles.filterBadge}>
@@ -153,42 +181,64 @@ export default function BrowseScreen() {
       </View>
 
       {/* Category Chips */}
-      <FlatList
+      <ScrollView
         horizontal
-        data={CATEGORIES}
-        keyExtractor={(item) => item}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.chips}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => setSelectedCategory(item)}
-            style={[
-              styles.chip,
-              selectedCategory === item && styles.chipActive,
-            ]}
-          >
-            <Text
-              style={[
-                styles.chipText,
-                selectedCategory === item && styles.chipTextActive,
-              ]}
+        style={styles.chipsContainer}
+        bounces={false}
+        alwaysBounceHorizontal={false}
+      >
+        {CATEGORIES.map((cat) => {
+          const isActive = selectedCategory === cat.value;
+          const chipBg = isActive
+            ? cat.value === 'all'
+              ? lightTheme.primary
+              : getCategoryColor(cat.value)
+            : lightTheme.surface;
+
+          return (
+            <TouchableOpacity
+              key={cat.value}
+              onPress={() => handleCategoryChange(cat.value)}
+              style={[styles.chip, { backgroundColor: chipBg }]}
+              activeOpacity={0.7}
             >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
+              <Text
+                style={[
+                  styles.chipText,
+                  isActive && styles.chipTextActive,
+                ]}
+              >
+                {cat.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
       {/* Results count */}
       <View style={styles.resultsBar}>
         <Text style={styles.resultsText}>
-          {filtered.length} activit{filtered.length === 1 ? 'y' : 'ies'}
+          {activities?.length || 0} activit{(activities?.length || 0) === 1 ? 'y' : 'ies'}
+          {selectedCategory !== 'all' ? ` in ${CATEGORIES.find(c => c.value === selectedCategory)?.label || selectedCategory}` : ''}
         </Text>
+        {(activeFilterCount > 0 || searchSubmitted || selectedCategory !== 'all') && (
+          <TouchableOpacity
+            onPress={() => {
+              setFilters(DEFAULT_FILTERS);
+              clearSearch();
+              setSelectedCategory('all');
+            }}
+          >
+            <Text style={styles.clearAll}>Clear all</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Activity List */}
       <FlatList
-        data={filtered}
+        data={activities || []}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
@@ -196,71 +246,72 @@ export default function BrowseScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.accent}
           />
         }
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => router.push(`/(tabs)/browse/${item.slug}` as any)}
-            activeOpacity={0.8}
-          >
-            <Card variant="interactive" padding="lg">
-              <View style={styles.activityCard}>
-                <View style={styles.categoryStrip}>
-                  <View
-                    style={[
-                      styles.categoryDot,
-                      {
-                        backgroundColor:
-                          CATEGORY_COLORS[item.category.toLowerCase()] ||
-                          colors.moss,
-                      },
-                    ]}
-                  />
-                </View>
-                <View style={styles.activityContent}>
-                  <View style={styles.activityMeta}>
-                    <Badge variant="sage" size="sm">
-                      {item.category}
-                    </Badge>
-                    <View style={styles.durationPill}>
-                      <Clock size={10} color={colors.clay} />
-                      <Text style={styles.durationText}>
-                        {item.duration_minutes} min
-                      </Text>
+        renderItem={({ item, index }) => {
+          const catColor = getCategoryColor(item.category);
+          return (
+            <AnimatedCard delay={index * 50}>
+              <TouchableOpacity
+                onPress={() => router.push(`/(tabs)/browse/${item.slug}` as any)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.activityCard}>
+                  <View style={[styles.categoryStrip, { backgroundColor: catColor }]} />
+                  <View style={styles.activityContent}>
+                    <View style={styles.activityTopRow}>
+                      <View style={[styles.categoryBadge, { backgroundColor: `${catColor}15` }]}>
+                        <Text style={[styles.categoryBadgeText, { color: catColor }]}>
+                          {item.category}
+                        </Text>
+                      </View>
+                      <View style={styles.durationPill}>
+                        <Clock size={11} color={lightTheme.textMuted} />
+                        <Text style={styles.durationText}>
+                          {item.duration_minutes} min
+                        </Text>
+                      </View>
                     </View>
+                    <Text style={styles.activityTitle} numberOfLines={1}>
+                      {item.title}
+                    </Text>
+                    <Text style={styles.activityDesc} numberOfLines={2}>
+                      {item.description}
+                    </Text>
                   </View>
-                  <Text style={styles.activityTitle} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.activityDesc} numberOfLines={2}>
-                    {item.description}
-                  </Text>
+                  <ChevronRight size={18} color={lightTheme.border} style={styles.chevron} />
                 </View>
-                <ChevronRight
-                  size={18}
-                  color={colors.stone}
-                  style={styles.chevron}
-                />
-              </View>
-            </Card>
-          </TouchableOpacity>
-        )}
+              </TouchableOpacity>
+            </AnimatedCard>
+          );
+        }}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={() => (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>No activities found</Text>
             <Text style={styles.emptyBody}>
-              Try a different search or category.
+              Try a different search, category, or adjust your filters.
             </Text>
+            {(activeFilterCount > 0 || searchSubmitted || selectedCategory !== 'all') && (
+              <TouchableOpacity
+                onPress={() => {
+                  setFilters(DEFAULT_FILTERS);
+                  clearSearch();
+                  setSelectedCategory('all');
+                }}
+                style={styles.clearButton}
+              >
+                <Text style={styles.clearButtonText}>Clear filters</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
       />
 
-      {/* Filter Bottom Sheet */}
       <FilterSheet
         filters={filters}
-        onChange={setFilters}
+        onChange={handleFilterChange}
         bottomSheetRef={filterSheetRef}
       />
     </SafeAreaView>
@@ -268,24 +319,18 @@ export default function BrowseScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: {
+    flex: 1,
+    backgroundColor: lightTheme.background,
+  },
   header: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
   },
-  eyebrow: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: `${colors.clay}80`,
-    marginBottom: 4,
-  },
   title: {
-    fontSize: 26,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h2,
+    color: lightTheme.text,
   },
   searchRow: {
     flexDirection: 'row',
@@ -299,147 +344,170 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.sm,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 14,
     paddingHorizontal: spacing.lg,
-    height: 44,
+    height: 48,
   },
   searchInput: {
     flex: 1,
-    fontSize: 15,
-    color: colors.ink,
+    ...typography.body,
+    color: lightTheme.text,
+    paddingVertical: 0,
   },
   filterBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.sm,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: lightTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
   filterBtnActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.accent,
   },
   filterBadge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
+    top: -2,
+    right: -2,
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: colors.terracotta,
+    backgroundColor: '#E8735A',
     alignItems: 'center',
     justifyContent: 'center',
   },
   filterBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: colors.white,
+    color: '#FFFFFF',
+  },
+  chipsContainer: {
+    flexGrow: 0,
+    height: 40,
+    marginBottom: spacing.md,
   },
   chips: {
     paddingHorizontal: spacing.xl,
-    gap: spacing.sm,
-    paddingBottom: spacing.md,
+    gap: 8,
+    alignItems: 'center',
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: radius.sm,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-  },
-  chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    height: 34,
+    paddingHorizontal: 16,
+    borderRadius: 17,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   chipText: {
     fontSize: 13,
-    fontWeight: '500',
-    color: colors.clay,
+    fontWeight: '600',
+    color: lightTheme.textSecondary,
+    lineHeight: 16,
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: '#FFFFFF',
   },
   resultsBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.sm,
+    paddingVertical: spacing.sm,
   },
   resultsText: {
-    fontSize: 12,
-    color: `${colors.clay}60`,
+    ...typography.uiSmall,
+    color: lightTheme.textMuted,
+    fontWeight: '600',
+  },
+  clearAll: {
+    ...typography.uiSmall,
+    color: lightTheme.accent,
     fontWeight: '600',
   },
   list: {
     paddingHorizontal: spacing.xl,
-    paddingBottom: spacing['4xl'],
+    paddingBottom: spacing['6xl'],
   },
   separator: { height: spacing.md },
   activityCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   categoryStrip: {
     width: 4,
-    minHeight: 40,
-    height: '100%',
-    marginRight: spacing.md,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  categoryDot: {
-    flex: 1,
-    borderRadius: 2,
+    alignSelf: 'stretch',
   },
   activityContent: {
     flex: 1,
-    gap: 6,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    gap: 4,
   },
-  activityMeta: {
+  activityTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    justifyContent: 'space-between',
+  },
+  categoryBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  categoryBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'capitalize',
   },
   durationPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
   },
   durationText: {
-    fontSize: 11,
-    color: colors.clay,
+    fontSize: 12,
+    color: lightTheme.textMuted,
   },
   activityTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.ink,
-    lineHeight: 20,
+    ...typography.uiBold,
+    color: lightTheme.text,
+    marginTop: 2,
   },
   activityDesc: {
-    fontSize: 13,
-    color: `${colors.clay}90`,
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
     lineHeight: 18,
   },
   chevron: {
-    marginLeft: spacing.sm,
+    marginRight: spacing.md,
   },
   empty: {
     alignItems: 'center',
     paddingVertical: spacing['5xl'],
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.ink,
+    ...typography.h3,
+    color: lightTheme.text,
   },
   emptyBody: {
-    fontSize: 13,
-    color: colors.clay,
+    ...typography.body,
+    color: lightTheme.textSecondary,
+    textAlign: 'center',
+    maxWidth: 280,
+  },
+  clearButton: {
+    backgroundColor: lightTheme.accent,
+    borderRadius: 14,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    marginTop: spacing.sm,
+  },
+  clearButtonText: {
+    ...typography.buttonSmall,
+    color: '#FFFFFF',
   },
 });

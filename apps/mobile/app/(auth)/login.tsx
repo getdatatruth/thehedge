@@ -12,15 +12,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Leaf } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { colors } from '@/theme/colors';
+import { darkTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [email, setEmail] = useState(__DEV__ ? 'adam@thehedge.ie' : '');
-  const [password, setPassword] = useState(__DEV__ ? 'River24!?' : '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +45,8 @@ export default function LoginScreen() {
     setLoading(false);
   };
 
+  const canSubmit = email.trim().length > 0 && password.trim().length > 0;
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
@@ -57,8 +59,8 @@ export default function LoginScreen() {
         >
           {/* Logo */}
           <View style={styles.logoContainer}>
-            <View style={styles.logoIcon}>
-              <Leaf size={32} color={colors.parchment} />
+            <View style={styles.logoCircle}>
+              <Leaf size={36} color={darkTheme.accent} strokeWidth={1.5} />
             </View>
             <Text style={styles.logoText}>The Hedge</Text>
             <Text style={styles.tagline}>
@@ -83,6 +85,7 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoCorrect={false}
               textContentType="emailAddress"
+              variant="dark"
             />
 
             <Input
@@ -92,17 +95,22 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
               textContentType="password"
+              variant="dark"
             />
 
-            <Button
+            <TouchableOpacity
               onPress={handleLogin}
-              loading={loading}
-              disabled={!email.trim() || !password.trim()}
-              fullWidth
-              size="lg"
+              activeOpacity={0.8}
+              disabled={!canSubmit || loading}
+              style={[
+                styles.signInButton,
+                (!canSubmit || loading) && styles.signInDisabled,
+              ]}
             >
-              Sign in
-            </Button>
+              <Text style={styles.signInText}>
+                {loading ? 'Signing in...' : 'Sign in'}
+              </Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => router.push('/(auth)/forgot-password')}
@@ -112,13 +120,20 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Sign up link */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
-            <TouchableOpacity onPress={() => router.push('/(auth)/signup')}>
-              <Text style={styles.footerLink}>Sign up free</Text>
-            </TouchableOpacity>
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
           </View>
+
+          {/* Sign up link */}
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/signup')}
+            style={styles.signUpButton}
+          >
+            <Text style={styles.signUpText}>Create an account</Text>
+          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -128,11 +143,9 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.parchment,
+    backgroundColor: darkTheme.background,
   },
-  flex: {
-    flex: 1,
-  },
+  flex: { flex: 1 },
   scroll: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -142,63 +155,89 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing['5xl'],
   },
-  logoIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    backgroundColor: colors.forest,
+  logoCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: darkTheme.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
+    borderWidth: 1.5,
+    borderColor: darkTheme.accent,
   },
   logoText: {
-    fontSize: 28,
-    fontWeight: '300',
-    color: colors.ink,
+    fontFamily: 'CormorantGaramond-Light',
+    fontSize: 32,
+    color: darkTheme.text,
     letterSpacing: -0.5,
   },
   tagline: {
-    fontSize: 15,
-    color: colors.clay,
+    ...typography.body,
+    color: darkTheme.textSecondary,
     marginTop: spacing.sm,
   },
   form: {
     gap: spacing.lg,
   },
   errorBox: {
-    backgroundColor: `${colors.terracotta}10`,
+    backgroundColor: `${darkTheme.error}15`,
     borderWidth: 1,
-    borderColor: `${colors.terracotta}20`,
-    borderRadius: 4,
+    borderColor: `${darkTheme.error}30`,
+    borderRadius: 12,
     padding: spacing.md,
   },
   errorText: {
     fontSize: 13,
-    color: colors.terracotta,
+    color: darkTheme.error,
+  },
+  signInButton: {
+    backgroundColor: darkTheme.accent,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  signInDisabled: {
+    backgroundColor: darkTheme.surfaceElevated,
+  },
+  signInText: {
+    ...typography.button,
+    color: '#FFFFFF',
   },
   linkButton: {
     alignSelf: 'center',
     padding: spacing.sm,
   },
   linkText: {
-    fontSize: 13,
-    color: colors.moss,
+    ...typography.uiSmall,
+    color: darkTheme.accent,
     fontWeight: '600',
   },
-  footer: {
+  divider: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
-    marginTop: spacing['4xl'],
+    marginVertical: spacing['2xl'],
   },
-  footerText: {
-    fontSize: 14,
-    color: colors.clay,
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: darkTheme.border,
   },
-  footerLink: {
-    fontSize: 14,
-    color: colors.forest,
-    fontWeight: '700',
+  dividerText: {
+    ...typography.uiSmall,
+    color: darkTheme.textMuted,
+    marginHorizontal: spacing.lg,
+  },
+  signUpButton: {
+    borderWidth: 1.5,
+    borderColor: darkTheme.border,
+    borderRadius: 14,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  signUpText: {
+    ...typography.button,
+    color: darkTheme.text,
   },
 });

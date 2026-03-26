@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { AlertCircle } from 'lucide-react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { Button } from './Button';
 
@@ -16,7 +16,7 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <View style={styles.container}>
-      <AlertCircle size={32} color={`${colors.terracotta}80`} />
+      <AlertCircle size={32} color={`${lightTheme.error}80`} />
       <Text style={styles.message}>{message}</Text>
       {onRetry && (
         <Button variant="secondary" size="sm" onPress={onRetry}>
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 14,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     maxWidth: 280,
     lineHeight: 20,

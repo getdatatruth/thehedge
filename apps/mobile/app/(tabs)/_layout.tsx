@@ -1,31 +1,49 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Sun, Search, CalendarDays, Leaf, Menu, Lock } from 'lucide-react-native';
-import { View, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
-import { useAuthStore } from '@/stores/auth-store';
+import {
+  Sun,
+  Search,
+  CalendarDays,
+  BarChart3,
+  User,
+} from 'lucide-react-native';
+import { Platform, TouchableOpacity } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { lightTheme } from '@/theme/colors';
 
 export default function TabLayout() {
-  const effectiveTier = useAuthStore((s) => s.effectiveTier());
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.forest,
-        tabBarInactiveTintColor: `${colors.clay}80`,
+        tabBarActiveTintColor: lightTheme.primary,
+        tabBarHideOnKeyboard: true,
+        tabBarInactiveTintColor: lightTheme.textMuted,
         tabBarStyle: {
-          backgroundColor: colors.parchment,
-          borderTopColor: colors.stone,
-          borderTopWidth: 1,
-          paddingTop: 4,
-          height: 85,
+          backgroundColor: lightTheme.surface,
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.04,
+          shadowRadius: 8,
+          paddingTop: 6,
+          height: Platform.OS === 'ios' ? 88 : 70,
         },
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
           marginTop: 2,
         },
+        tabBarButton: (props: any) => (
+          <TouchableOpacity
+            {...props}
+            onPress={(e: any) => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              props.onPress?.(e);
+            }}
+          />
+        ),
       }}
     >
       <Tabs.Screen
@@ -47,84 +65,35 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
-        options={{
-          title: 'HedgeAI',
-          tabBarIcon: ({ focused, size }) => (
-            <View style={[styles.aiButton, focused && styles.aiButtonActive]}>
-              <Leaf size={size - 2} color={focused ? colors.parchment : colors.forest} />
-            </View>
-          ),
-          tabBarLabelStyle: {
-            fontSize: 10,
-            fontWeight: '700',
-            marginTop: 2,
-            color: colors.forest,
-          },
-        }}
-      />
-      <Tabs.Screen
         name="plan"
         options={{
           title: 'Plan',
           tabBarIcon: ({ color, size }) => (
-            <View>
-              <CalendarDays size={size} color={effectiveTier === 'free' ? `${colors.clay}40` : color} />
-              {effectiveTier === 'free' && (
-                <View style={styles.lockBadge}>
-                  <Lock size={8} color={colors.clay} />
-                </View>
-              )}
-            </View>
+            <CalendarDays size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="progress"
+        options={{
+          title: 'Progress',
+          tabBarIcon: ({ color, size }) => (
+            <BarChart3 size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="more"
         options={{
-          title: 'More',
+          title: 'Profile',
           tabBarIcon: ({ color, size }) => (
-            <Menu size={size} color={color} />
+            <User size={size} color={color} />
           ),
         }}
       />
-      {/* Hidden tabs - accessible via More screen but not shown in tab bar */}
-      <Tabs.Screen
-        name="progress"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="educator"
-        options={{ href: null }}
-      />
+      {/* Hidden tabs */}
+      <Tabs.Screen name="chat" options={{ href: null }} />
+      <Tabs.Screen name="educator" options={{ href: null }} />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  lockBadge: {
-    position: 'absolute',
-    top: -2,
-    right: -6,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  aiButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: `${colors.forest}12`,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: -4,
-  },
-  aiButtonActive: {
-    backgroundColor: colors.forest,
-  },
-});

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,15 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Send, Sparkles, Clock, User } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { apiPost } from '@/lib/api';
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
+import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 interface Suggestion {
@@ -47,6 +47,27 @@ export default function ChatScreen() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+
+  const dot1 = useRef(new Animated.Value(0.3)).current;
+  const dot2 = useRef(new Animated.Value(0.3)).current;
+  const dot3 = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    if (!loading) return;
+    const animate = (dot: Animated.Value, delay: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(dot, { toValue: 1, duration: 400, useNativeDriver: true }),
+          Animated.timing(dot, { toValue: 0.3, duration: 400, useNativeDriver: true }),
+        ])
+      );
+    const a1 = animate(dot1, 0);
+    const a2 = animate(dot2, 200);
+    const a3 = animate(dot3, 400);
+    a1.start(); a2.start(); a3.start();
+    return () => { a1.stop(); a2.stop(); a3.stop(); };
+  }, [loading]);
 
   const suggestionsUsed = messages.filter(
     (m) => m.role === 'assistant' && m.suggestions
@@ -131,7 +152,7 @@ export default function ChatScreen() {
           {messages.length === 0 && (
             <View style={styles.emptyState}>
               <View style={styles.emptyIcon}>
-                <Sparkles size={32} color={colors.parchment} />
+                <Sparkles size={32} color={lightTheme.surface} />
               </View>
               <Text style={styles.emptyTitle}>
                 What would you like to do today?
@@ -165,7 +186,7 @@ export default function ChatScreen() {
             >
               {msg.role === 'assistant' && (
                 <View style={styles.aiAvatar}>
-                  <Sparkles size={14} color={colors.parchment} />
+                  <Sparkles size={14} color={lightTheme.surface} />
                 </View>
               )}
               <View
@@ -181,13 +202,13 @@ export default function ChatScreen() {
                 ) : msg.suggestions ? (
                   <View style={styles.suggestions}>
                     {msg.suggestions.map((s, j) => (
-                      <Card key={j} variant="interactive" padding="lg">
+                      <View key={j} style={styles.suggestionCard}>
                         <View style={styles.suggestionHeader}>
                           <Text style={styles.suggestionTitle}>
                             {s.title}
                           </Text>
                           <View style={styles.durationPill}>
-                            <Clock size={10} color={colors.clay} />
+                            <Clock size={10} color={lightTheme.textSecondary} />
                             <Text style={styles.durationText}>
                               {s.duration}
                             </Text>
@@ -203,7 +224,7 @@ export default function ChatScreen() {
                             </Text>
                           </View>
                         )}
-                      </Card>
+                      </View>
                     ))}
                   </View>
                 ) : (
@@ -212,7 +233,7 @@ export default function ChatScreen() {
               </View>
               {msg.role === 'user' && (
                 <View style={styles.userAvatar}>
-                  <User size={14} color={`${colors.clay}80`} />
+                  <User size={14} color={lightTheme.textMuted} />
                 </View>
               )}
             </View>
@@ -221,12 +242,12 @@ export default function ChatScreen() {
           {loading && (
             <View style={styles.loadingRow}>
               <View style={styles.aiAvatar}>
-                <Sparkles size={14} color={colors.parchment} />
+                <Sparkles size={14} color={lightTheme.surface} />
               </View>
               <View style={styles.loadingDots}>
-                <View style={styles.dot} />
-                <View style={[styles.dot, { opacity: 0.6 }]} />
-                <View style={[styles.dot, { opacity: 0.3 }]} />
+                <Animated.View style={[styles.dot, { opacity: dot1 }]} />
+                <Animated.View style={[styles.dot, { opacity: dot2 }]} />
+                <Animated.View style={[styles.dot, { opacity: dot3 }]} />
               </View>
             </View>
           )}
@@ -248,7 +269,7 @@ export default function ChatScreen() {
               <TextInput
                 style={styles.textInput}
                 placeholder="Ask about activities..."
-                placeholderTextColor={`${colors.clay}60`}
+                placeholderTextColor={lightTheme.textMuted}
                 value={input}
                 onChangeText={setInput}
                 editable={!loading}
@@ -263,7 +284,7 @@ export default function ChatScreen() {
                   (!input.trim() || loading) && styles.sendButtonDisabled,
                 ]}
               >
-                <Send size={18} color={colors.parchment} />
+                <Send size={18} color={lightTheme.surface} />
               </TouchableOpacity>
             </View>
           )}
@@ -287,7 +308,7 @@ function getSeason(): string {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   flex: { flex: 1 },
   header: {
     paddingHorizontal: spacing.xl,
@@ -295,21 +316,17 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
   },
   eyebrow: {
-    fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    color: `${colors.clay}80`,
+    ...typography.eyebrow,
+    color: lightTheme.textMuted,
     marginBottom: 4,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h2,
+    color: lightTheme.text,
   },
   context: {
-    fontSize: 13,
-    color: colors.moss,
+    ...typography.bodySmall,
+    color: lightTheme.accent,
     marginTop: 4,
   },
   messages: {
@@ -326,22 +343,20 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 18,
-    backgroundColor: colors.forest,
+    backgroundColor: lightTheme.accent,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: '300',
-    color: colors.ink,
+    ...typography.h3,
+    color: lightTheme.text,
   },
   emptyBody: {
-    fontSize: 14,
-    color: colors.clay,
+    ...typography.body,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     maxWidth: 280,
-    lineHeight: 20,
   },
   prompts: {
     flexDirection: 'row',
@@ -352,16 +367,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   promptChip: {
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.sm,
-    paddingHorizontal: 14,
+    backgroundColor: lightTheme.surface,
+    borderRadius: radius.full,
+    paddingHorizontal: 16,
     paddingVertical: 10,
   },
   promptText: {
-    fontSize: 13,
-    color: colors.clay,
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
   },
   messageRow: {
     flexDirection: 'row',
@@ -378,18 +391,16 @@ const styles = StyleSheet.create({
   aiAvatar: {
     width: 32,
     height: 32,
-    borderRadius: radius.lg,
-    backgroundColor: colors.forest,
+    borderRadius: radius.full,
+    backgroundColor: lightTheme.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   userAvatar: {
     width: 32,
     height: 32,
-    borderRadius: radius.lg,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
+    borderRadius: radius.full,
+    backgroundColor: lightTheme.borderLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -398,32 +409,34 @@ const styles = StyleSheet.create({
     maxWidth: '85%',
   },
   userBubble: {
-    backgroundColor: colors.forest,
-    borderRadius: radius.lg,
+    backgroundColor: lightTheme.primary,
+    borderRadius: 16,
     borderTopRightRadius: 4,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
   assistantBubble: {},
   userText: {
-    fontSize: 14,
-    color: colors.parchment,
-    lineHeight: 20,
+    ...typography.body,
+    color: lightTheme.surface,
   },
   assistantText: {
-    fontSize: 14,
-    color: colors.umber,
-    lineHeight: 20,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.lg,
+    ...typography.body,
+    color: lightTheme.text,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     overflow: 'hidden',
   },
   suggestions: {
     gap: spacing.md,
+  },
+  suggestionCard: {
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   suggestionHeader: {
     flexDirection: 'row',
@@ -432,43 +445,37 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   suggestionTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.ink,
+    ...typography.uiBold,
+    color: lightTheme.text,
     flex: 1,
   },
   durationPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.parchment,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: 3,
+    backgroundColor: lightTheme.background,
+    borderRadius: radius.full,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
   durationText: {
     fontSize: 10,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   suggestionDesc: {
-    fontSize: 13,
-    color: `${colors.clay}B0`,
-    lineHeight: 18,
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
   },
   whyToday: {
     marginTop: spacing.sm,
-    backgroundColor: `${colors.forest}08`,
-    borderWidth: 1,
-    borderColor: `${colors.forest}12`,
-    borderRadius: radius.sm,
+    backgroundColor: lightTheme.accentLight,
+    borderRadius: radius.md,
     padding: spacing.md,
   },
   whyTodayText: {
-    fontSize: 12,
-    color: colors.forest,
+    ...typography.uiSmall,
+    color: lightTheme.accent,
   },
   loadingRow: {
     flexDirection: 'row',
@@ -478,10 +485,8 @@ const styles = StyleSheet.create({
   loadingDots: {
     flexDirection: 'row',
     gap: 4,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.lg,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
   },
@@ -489,14 +494,12 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: `${colors.moss}60`,
+    backgroundColor: lightTheme.accent,
   },
   inputContainer: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.stone,
     gap: 6,
   },
   inputRow: {
@@ -506,19 +509,17 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     height: 48,
-    backgroundColor: colors.linen,
-    borderWidth: 1,
-    borderColor: colors.stone,
-    borderRadius: radius.sm,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 14,
     paddingHorizontal: spacing.lg,
     fontSize: 15,
-    color: colors.ink,
+    color: lightTheme.text,
   },
   sendButton: {
     width: 48,
     height: 48,
-    borderRadius: radius.sm,
-    backgroundColor: colors.forest,
+    borderRadius: 14,
+    backgroundColor: lightTheme.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -526,26 +527,23 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   limitBanner: {
-    backgroundColor: `${colors.amber}08`,
-    borderWidth: 1,
-    borderColor: `${colors.amber}20`,
+    backgroundColor: `${lightTheme.warning}10`,
     borderRadius: radius.lg,
     padding: spacing.lg,
     alignItems: 'center',
     gap: 4,
   },
   limitTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.ink,
+    ...typography.uiBold,
+    color: lightTheme.text,
   },
   limitBody: {
-    fontSize: 12,
-    color: colors.clay,
+    ...typography.uiSmall,
+    color: lightTheme.textSecondary,
   },
   usageText: {
     fontSize: 11,
-    color: `${colors.clay}60`,
+    color: lightTheme.textMuted,
     textAlign: 'center',
   },
 });
