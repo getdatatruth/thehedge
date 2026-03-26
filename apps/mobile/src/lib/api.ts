@@ -1,5 +1,4 @@
 import { supabase } from './supabase';
-import { useOfflineQueue } from '@/stores/offline-queue';
 
 const API_BASE = __DEV__
   ? 'http://192.168.68.104:3000/api/v1'
@@ -110,6 +109,8 @@ async function withOfflineQueue<T>(
     return await apiCall!();
   } catch (error) {
     if (isNetworkError(error) && isQueueablePath(path)) {
+      // Lazy import to avoid circular dependency (offline-queue imports from api.ts)
+      const { useOfflineQueue } = require('@/stores/offline-queue');
       useOfflineQueue.getState().enqueue({ method, path, body });
       // Return a synthetic success response so the caller can proceed optimistically
       return {
