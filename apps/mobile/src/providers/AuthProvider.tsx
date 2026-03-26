@@ -19,30 +19,30 @@ Notifications.setNotificationHandler({
 });
 
 async function registerPushToken() {
-  // Push notifications only work on physical devices, skip gracefully on simulator
+  // Push notifications only work on physical devices with proper entitlements
   if (Platform.OS === 'web') return;
 
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  let finalStatus = existing;
-  if (existing !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  if (finalStatus !== 'granted') return;
-
-  const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-  const tokenData = await Notifications.getExpoPushTokenAsync({
-    projectId: projectId || undefined,
-  });
-
-  // Send token to backend for storage
   try {
+    const { status: existing } = await Notifications.getPermissionsAsync();
+    let finalStatus = existing;
+    if (existing !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') return;
+
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    const tokenData = await Notifications.getExpoPushTokenAsync({
+      projectId: projectId || undefined,
+    });
+
     await apiPost('/me/push-token', {
       token: tokenData.data,
       platform: Platform.OS,
     });
   } catch {
-    // Silently fail - push registration is not critical
+    // Silently fail - push registration requires proper APS entitlements
+    // which are only available in EAS builds, not local dev builds
   }
 }
 
