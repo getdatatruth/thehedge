@@ -1,49 +1,33 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { WifiOff, RefreshCw } from 'lucide-react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { WifiOff } from 'lucide-react-native';
 import { lightTheme } from '@/theme/colors';
-import { useNetwork } from '@/hooks/use-network';
-import { useOfflineQueue } from '@/stores/offline-queue';
 
+// Simplified - no offline queue import to avoid circular dependency chain
 export function OfflineBanner() {
-  const { isConnected } = useNetwork();
-  const { queue, isProcessing } = useOfflineQueue();
+  // Inline network check to avoid importing use-network (which imports offline-queue)
+  const [isConnected, setIsConnected] = React.useState(true);
 
-  // Show syncing banner when back online and processing queued actions
-  if (isConnected && isProcessing) {
-    return (
-      <View style={[styles.container, styles.syncingContainer]}>
-        <ActivityIndicator size="small" color="#FFFFFF" />
-        <Text style={styles.text}>
-          Syncing {queue.length} {queue.length === 1 ? 'action' : 'actions'}...
-        </Text>
-      </View>
-    );
-  }
-
-  // Show pending count when online with unprocessed items (waiting for next flush)
-  if (isConnected && queue.length > 0) {
-    return (
-      <View style={[styles.container, styles.pendingContainer]}>
-        <RefreshCw size={14} color="#FFFFFF" />
-        <Text style={styles.text}>
-          {queue.length} pending {queue.length === 1 ? 'action' : 'actions'} to sync
-        </Text>
-      </View>
-    );
-  }
+  React.useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      try {
+        const Network = require('expo-network');
+        const state = await Network.getNetworkStateAsync();
+        if (mounted) setIsConnected(state.isConnected ?? true);
+      } catch {}
+    };
+    check();
+    const interval = setInterval(check, 15000);
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
 
   if (isConnected) return null;
 
-  const queueLabel =
-    queue.length > 0
-      ? ` - ${queue.length} ${queue.length === 1 ? 'action' : 'actions'} queued`
-      : '';
-
   return (
     <View style={styles.container}>
-      <WifiOff size={14} color={'#FFFFFF'} />
-      <Text style={styles.text}>You're offline - showing cached data{queueLabel}</Text>
+      <WifiOff size={14} color="#FFFFFF" />
+      <Text style={styles.text}>You're offline - showing cached data</Text>
     </View>
   );
 }
@@ -57,12 +41,6 @@ const styles = StyleSheet.create({
     backgroundColor: lightTheme.textSecondary,
     paddingVertical: 8,
     paddingHorizontal: 16,
-  },
-  syncingContainer: {
-    backgroundColor: '#3D6142', // moss - positive syncing state
-  },
-  pendingContainer: {
-    backgroundColor: '#C4623A', // terracotta - attention needed
   },
   text: {
     fontSize: 12,
