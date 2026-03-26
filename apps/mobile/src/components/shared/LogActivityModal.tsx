@@ -79,35 +79,45 @@ export function LogActivityModal({
   };
 
   const pickFromLibrary = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Please allow access to your photo library.');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsMultipleSelection: true,
-      selectionLimit: 5 - photos.length,
-      quality: 0.8,
-    });
-    if (!result.canceled) {
-      hapticLight();
-      setPhotos((prev) => [...prev, ...result.assets.map((a) => a.uri)].slice(0, 5));
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Please allow photo library access in Settings.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        selectionLimit: 5 - photos.length,
+        quality: 0.7,
+      });
+      if (!result.canceled && result.assets?.length > 0) {
+        hapticLight();
+        setPhotos((prev) => [...prev, ...result.assets.map((a) => a.uri)].slice(0, 5));
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Could not access photo library. Please check permissions in Settings.');
     }
   };
 
   const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission needed', 'Please allow camera access.');
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      quality: 0.8,
-    });
-    if (!result.canceled) {
-      hapticLight();
-      setPhotos((prev) => [...prev, result.assets[0].uri].slice(0, 5));
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission needed', 'Please allow camera access in Settings.');
+        return;
+      }
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.7,
+        allowsEditing: true,
+      });
+      if (!result.canceled && result.assets?.length > 0) {
+        hapticLight();
+        setPhotos((prev) => [...prev, result.assets[0].uri].slice(0, 5));
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Could not open camera. Please check permissions in Settings.');
     }
   };
 
