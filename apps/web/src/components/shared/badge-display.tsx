@@ -40,7 +40,7 @@ export function BadgeDisplay({ badges, showAll = true, compact = false }: BadgeD
                 <span className="text-2xl flex-shrink-0">{badge.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-ink">{badge.name}</p>
-                  <p className="text-xs text-clay/50 truncate font-serif">{badge.description}</p>
+                  <p className="text-xs text-clay/50 truncate">{badge.description}</p>
                 </div>
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-moss/15 flex-shrink-0">
                   <Star className="h-3.5 w-3.5 text-moss fill-moss" />
@@ -70,7 +70,7 @@ export function BadgeDisplay({ badges, showAll = true, compact = false }: BadgeD
                     <span className="text-2xl grayscale-[30%] flex-shrink-0">{badge.icon}</span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-ink">{badge.name}</p>
-                      <p className="text-xs text-clay/50 truncate font-serif">{badge.description}</p>
+                      <p className="text-xs text-clay/50 truncate">{badge.description}</p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center gap-2">
@@ -122,7 +122,7 @@ export function BadgeDisplay({ badges, showAll = true, compact = false }: BadgeD
           onClick={() => setSelectedBadge(null)}
         >
           <div
-            className="bg-parchment rounded-[14px] p-6 max-w-sm w-full mx-4 shadow-xl"
+            className="bg-parchment rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-4">
@@ -141,7 +141,7 @@ export function BadgeDisplay({ badges, showAll = true, compact = false }: BadgeD
               </button>
             </div>
 
-            <p className="text-sm font-serif text-clay mb-4">{selectedBadge.description}</p>
+            <p className="text-sm text-clay mb-4">{selectedBadge.description}</p>
 
             {selectedBadge.unlocked ? (
               <div className="flex items-center gap-2 bg-moss/10 rounded-lg p-3">
@@ -164,7 +164,7 @@ export function BadgeDisplay({ badges, showAll = true, compact = false }: BadgeD
                     style={{ width: `${Math.min((selectedBadge.progress / selectedBadge.threshold) * 100, 100)}%` }}
                   />
                 </div>
-                <p className="text-xs text-clay/40 mt-2 font-serif">
+                <p className="text-xs text-clay/40 mt-2">
                   {selectedBadge.threshold - selectedBadge.progress} more to go!
                 </p>
               </div>
@@ -223,7 +223,7 @@ export function AchievementTimeline({ badges }: AchievementTimelineProps) {
 
   if (earned.length === 0) {
     return (
-      <p className="text-sm text-clay/50 font-serif py-4">
+      <p className="text-sm text-clay/50 py-4">
         Start logging activities to earn your first badge!
       </p>
     );
@@ -248,7 +248,7 @@ export function AchievementTimeline({ badges }: AchievementTimelineProps) {
               </div>
               <div className={`flex-1 pb-4 ${index < earned.length - 1 ? '' : ''}`}>
                 <p className="text-sm font-medium text-ink">{badge.name}</p>
-                <p className="text-xs text-clay/50 font-serif">{badge.description}</p>
+                <p className="text-xs text-clay/50">{badge.description}</p>
                 <p className="text-[10px] text-clay/40 mt-1">{date}</p>
               </div>
             </div>

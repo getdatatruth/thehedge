@@ -80,13 +80,13 @@ export function StepPractical() {
         <h2 className="font-display text-xl font-semibold text-ink">
           Nearly there! A few practical bits.
         </h2>
-        <p className="text-sm text-clay mt-1 font-serif">
+        <p className="text-sm text-clay mt-1">
           So we suggest activities that actually work for you.
         </p>
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center gap-3 rounded-[14px] border border-stone p-4">
+        <div className="flex items-center gap-3 rounded-2xl border border-stone p-4">
           <Checkbox
             id="outdoor"
             checked={hasOutdoorSpace}
@@ -99,7 +99,7 @@ export function StepPractical() {
           </Label>
         </div>
 
-        <div className="flex items-center gap-3 rounded-[14px] border border-stone p-4">
+        <div className="flex items-center gap-3 rounded-2xl border border-stone p-4">
           <Checkbox
             id="car"
             checked={carActivities}

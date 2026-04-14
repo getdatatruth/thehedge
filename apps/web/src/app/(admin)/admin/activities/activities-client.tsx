@@ -159,7 +159,7 @@ export function AdminActivitiesClient({ initialActivities }: { initialActivities
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Activities
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             {initialActivities.length} total · Manage your activity library.
           </p>
         </div>

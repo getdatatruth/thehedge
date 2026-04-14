@@ -39,7 +39,7 @@ export function OnboardingWizard() {
           <TreePine className="h-6 w-6 text-forest" />
           <h1 className="font-display text-3xl font-bold text-ink">The Hedge</h1>
         </div>
-        <p className="mt-1 text-sm text-clay font-serif">
+        <p className="mt-1 text-sm text-clay">
           Where curious families learn
         </p>
       </div>
@@ -54,7 +54,7 @@ export function OnboardingWizard() {
         <Progress value={(step / TOTAL_FORM_STEPS) * 100} className="h-2" />
       </div>
 
-      <div className="rounded-[14px] border border-stone bg-linen p-6">
+      <div className="rounded-2xl border border-stone bg-linen p-6">
         {step === 1 && <StepFamilyBasics />}
         {step === 2 && <StepChildren />}
         {step === 3 && <StepFamilyStyle />}

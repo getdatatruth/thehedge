@@ -95,8 +95,8 @@ export function ChildProgressClient({
           Back to progress
         </Link>
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-[14px] bg-sage/15">
-            <span className="text-2xl font-bold font-display text-forest">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sage/15">
+            <span className="text-2xl font-bold text-forest">
               {child.name[0]}
             </span>
           </div>
@@ -104,7 +104,7 @@ export function ChildProgressClient({
             <h1 className="font-display text-3xl font-light text-ink tracking-tight">
               {child.name}
             </h1>
-            <p className="text-clay font-serif mt-1">
+            <p className="text-clay mt-1">
               Age {child.age}{child.interests.length > 0 ? ` · ${child.interests.join(', ')}` : ''}
             </p>
             <div className="mt-1.5">
@@ -117,47 +117,47 @@ export function ChildProgressClient({
       {/* Stats */}
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-5">
         <div className="card-elevated p-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-moss/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-moss/10">
             <Target className="h-5 w-5 text-moss" />
           </div>
           <div>
-            <p className="text-2xl font-display font-light text-ink">{totalActivities}</p>
+            <p className="text-2xl font-light text-ink">{totalActivities}</p>
             <p className="text-xs text-clay/50">Activities</p>
           </div>
         </div>
         <div className="card-elevated p-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-terracotta/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-terracotta/10">
             <Flame className="h-5 w-5 text-terracotta" />
           </div>
           <div>
-            <p className="text-2xl font-display font-light text-ink">{currentStreak}</p>
+            <p className="text-2xl font-light text-ink">{currentStreak}</p>
             <p className="text-xs text-clay/50">Streak</p>
           </div>
         </div>
         <div className="card-elevated p-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-amber/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-amber/10">
             <Zap className="h-5 w-5 text-amber" />
           </div>
           <div>
-            <p className="text-2xl font-display font-light text-ink">{longestStreak}</p>
+            <p className="text-2xl font-light text-ink">{longestStreak}</p>
             <p className="text-xs text-clay/50">Best streak</p>
           </div>
         </div>
         <div className="card-elevated p-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-sage/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sage/10">
             <Trophy className="h-5 w-5 text-sage" />
           </div>
           <div>
-            <p className="text-2xl font-display font-light text-ink">{earnedCount}</p>
+            <p className="text-2xl font-light text-ink">{earnedCount}</p>
             <p className="text-xs text-clay/50">Badges</p>
           </div>
         </div>
         <div className="card-elevated p-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-sky/10">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky/10">
             <Clock className="h-5 w-5 text-sky" />
           </div>
           <div>
-            <p className="text-2xl font-display font-light text-ink">{totalMinutes}</p>
+            <p className="text-2xl font-light text-ink">{totalMinutes}</p>
             <p className="text-xs text-clay/50">Minutes</p>
           </div>
         </div>
@@ -193,7 +193,7 @@ export function ChildProgressClient({
               Activities by category
             </p>
             {Object.keys(categoryCounts).length === 0 ? (
-              <p className="text-sm text-clay/50 font-serif py-4">
+              <p className="text-sm text-clay/50 py-4">
                 No activities logged for {child.name} yet.
               </p>
             ) : (
@@ -246,7 +246,7 @@ export function ChildProgressClient({
           <div className="card-elevated p-6 sm:p-8 space-y-4">
             <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Recent activities</p>
             {activityLogs.length === 0 ? (
-              <p className="text-sm text-clay/50 font-serif py-4">
+              <p className="text-sm text-clay/50 py-4">
                 No activities logged for {child.name} yet.
               </p>
             ) : (
@@ -258,7 +258,7 @@ export function ChildProgressClient({
                     <Link
                       key={log.id}
                       href={log.activity.slug ? `/activity/${log.activity.slug}` : '#'}
-                      className="flex items-center gap-3 rounded-[14px] p-3 hover:bg-parchment/50 transition-colors"
+                      className="flex items-center gap-3 rounded-2xl p-3 hover:bg-parchment/50 transition-colors"
                     >
                       {Icon && (
                         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${config.bg}`}>
@@ -267,7 +267,7 @@ export function ChildProgressClient({
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-ink">{log.activity.title}</p>
-                        <p className="text-xs text-clay/50 font-serif">
+                        <p className="text-xs text-clay/50">
                           {new Date(log.date).toLocaleDateString('en-IE', { day: 'numeric', month: 'short' })}
                           {log.duration_minutes ? ` · ${log.duration_minutes}m` : ''}
                         </p>
@@ -299,7 +299,7 @@ export function ChildProgressClient({
             </div>
             {portfolioEntries.length === 0 ? (
               <div className="card-elevated p-6 text-center">
-                <p className="text-sm text-clay/50 font-serif">
+                <p className="text-sm text-clay/50">
                   No portfolio entries for {child.name} yet.
                 </p>
               </div>
@@ -311,13 +311,13 @@ export function ChildProgressClient({
                   return (
                     <div key={entry.id} className="card-elevated p-4">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-terracotta/8">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-terracotta/8">
                           <TypeIcon className="h-5 w-5 text-terracotta" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-ink">{entry.title}</p>
                           {entry.description && (
-                            <p className="text-xs text-clay/50 line-clamp-2 mt-0.5 font-serif">{entry.description}</p>
+                            <p className="text-xs text-clay/50 line-clamp-2 mt-0.5">{entry.description}</p>
                           )}
                           <div className="flex items-center gap-2 mt-2 flex-wrap">
                             <span className="text-[10px] text-clay/40">
@@ -367,16 +367,16 @@ export function ChildProgressClient({
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50 mb-1">Current streak</p>
                 <div className="flex items-center gap-2">
                   <Flame className="h-5 w-5 text-terracotta" />
-                  <p className="text-3xl font-display font-light text-ink">{currentStreak}</p>
-                  <span className="text-sm text-clay/50 font-serif">days</span>
+                  <p className="text-3xl font-light text-ink">{currentStreak}</p>
+                  <span className="text-sm text-clay/50">days</span>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50 mb-1">Longest streak</p>
                 <div className="flex items-center gap-2 justify-end">
                   <Zap className="h-5 w-5 text-amber" />
-                  <p className="text-3xl font-display font-light text-ink">{longestStreak}</p>
-                  <span className="text-sm text-clay/50 font-serif">days</span>
+                  <p className="text-3xl font-light text-ink">{longestStreak}</p>
+                  <span className="text-sm text-clay/50">days</span>
                 </div>
               </div>
             </div>
@@ -387,7 +387,7 @@ export function ChildProgressClient({
             <div className="card-elevated p-6 sm:p-8">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50 mb-2">Average rating</p>
               <div className="flex items-center gap-3">
-                <p className="text-3xl font-display font-light text-ink">{avgRating}</p>
+                <p className="text-3xl font-light text-ink">{avgRating}</p>
                 <div className="flex items-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
@@ -411,7 +411,7 @@ function CalendarHeatmap({ data }: { data: CalendarDay[] }) {
   if (data.length === 0) {
     return (
       <div className="card-elevated p-6 text-center">
-        <p className="text-sm text-clay/50 font-serif">No activity data to display.</p>
+        <p className="text-sm text-clay/50">No activity data to display.</p>
       </div>
     );
   }

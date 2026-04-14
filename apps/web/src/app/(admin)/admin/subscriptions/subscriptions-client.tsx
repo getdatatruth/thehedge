@@ -171,7 +171,7 @@ export function SubscriptionsClient() {
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Subscriptions
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             Revenue, tiers, and discount management.
           </p>
         </div>
@@ -252,7 +252,7 @@ export function SubscriptionsClient() {
                 const colors: Record<string, string> = { free: 'text-clay/50', family: 'text-moss', educator: 'text-gold' };
                 const Icon = icons[tier] || User;
                 return (
-                  <div key={tier} className="flex items-center gap-4 rounded-[14px] bg-parchment/50 p-4">
+                  <div key={tier} className="flex items-center gap-4 rounded-2xl bg-parchment/50 p-4">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-linen ${colors[tier]}`}>
                       <Icon className="h-5 w-5" />
                     </div>
@@ -283,7 +283,7 @@ export function SubscriptionsClient() {
                   cancelled: 'bg-clay/10 text-clay/50',
                 };
                 return (
-                  <div key={status} className="rounded-[14px] bg-parchment/50 p-4 text-center">
+                  <div key={status} className="rounded-2xl bg-parchment/50 p-4 text-center">
                     <p className="text-xl font-bold font-display text-forest">{count}</p>
                     <span className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold uppercase mt-1 ${statusColors[status] || 'bg-linen text-clay/50'}`}>
                       {status.replace('_', ' ')}

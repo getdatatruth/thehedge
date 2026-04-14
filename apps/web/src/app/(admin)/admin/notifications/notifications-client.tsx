@@ -177,7 +177,7 @@ export function NotificationsClient() {
         <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
           Notifications
         </h1>
-        <p className="text-clay/70 mt-1 font-serif">
+        <p className="text-clay/70 mt-1">
           Send notifications and manage templates.
         </p>
       </div>

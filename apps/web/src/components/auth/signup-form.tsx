@@ -62,14 +62,14 @@ export function SignupForm() {
 
   if (confirmationSent) {
     return (
-      <div className="bg-linen border border-stone rounded-[14px] p-8 text-center space-y-4 animate-scale-in">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[14px] bg-gradient-to-br from-forest to-moss">
+      <div className="bg-linen border border-stone rounded-2xl p-8 text-center space-y-4 animate-scale-in">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss">
           <Mail className="h-7 w-7 text-parchment" />
         </div>
         <h2 className="font-display text-2xl font-bold text-ink">
           Check your email
         </h2>
-        <p className="text-clay font-serif">
+        <p className="text-clay">
           We&apos;ve sent a confirmation link to <strong className="text-umber">{email}</strong>.
           Click the link to activate your account, then you&apos;ll set up
           your family.
@@ -85,12 +85,12 @@ export function SignupForm() {
   }
 
   return (
-    <div className="bg-linen border border-stone rounded-[14px] p-8 animate-scale-in">
+    <div className="bg-linen border border-stone rounded-2xl p-8 animate-scale-in">
       <div className="text-center mb-6">
         <h2 className="font-display text-2xl font-bold text-ink">
           Join The Hedge
         </h2>
-        <p className="text-clay font-serif mt-1">
+        <p className="text-clay mt-1">
           Where curious families learn. Create your account to get started.
         </p>
         {planName && (

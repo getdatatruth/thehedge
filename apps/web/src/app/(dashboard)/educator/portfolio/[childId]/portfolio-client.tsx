@@ -377,14 +377,14 @@ export function PortfolioClient({
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-moss/15">
-              <span className="text-xl font-light font-display text-ink">{child.name[0]}</span>
+              <span className="text-xl font-light text-ink">{child.name[0]}</span>
             </div>
             <div>
               <p className="eyebrow mb-1">Portfolio</p>
               <h1 className="font-display text-3xl font-light text-ink tracking-tight">
                 {child.name}&apos;s <em className="text-moss italic">Portfolio</em>
               </h1>
-              <p className="text-clay font-serif mt-1">
+              <p className="text-clay mt-1">
                 {entries.length} {entries.length === 1 ? 'entry' : 'entries'} - Evidence of learning
               </p>
             </div>
@@ -418,7 +418,7 @@ export function PortfolioClient({
             <Link
               key={c.id}
               href={`/educator/portfolio/${c.id}`}
-              className={`rounded-[14px] px-4 py-2 text-sm font-medium transition-all shrink-0 ${
+              className={`rounded-2xl px-4 py-2 text-sm font-medium transition-all shrink-0 ${
                 c.id === child.id
                   ? 'bg-forest text-parchment shadow-sm'
                   : 'bg-linen text-clay/50 hover:bg-parchment'
@@ -453,7 +453,7 @@ export function PortfolioClient({
                 type="text"
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
-                className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                 placeholder="What did they learn or create?"
               />
             </div>
@@ -463,7 +463,7 @@ export function PortfolioClient({
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 rows={3}
-                className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none resize-none"
+                className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none resize-none"
                 placeholder="Describe what happened, what they learned..."
               />
             </div>
@@ -474,7 +474,7 @@ export function PortfolioClient({
                   type="date"
                   value={formDate}
                   onChange={(e) => setFormDate(e.target.value)}
-                  className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                  className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                 />
               </div>
               <div>
@@ -482,7 +482,7 @@ export function PortfolioClient({
                 <select
                   value={formLogId}
                   onChange={(e) => setFormLogId(e.target.value)}
-                  className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                  className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                 >
                   <option value="">None</option>
                   {activityLogs.map((log) => (
@@ -565,7 +565,7 @@ export function PortfolioClient({
                 <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60 mb-2 block">
                   Curriculum Outcomes
                 </label>
-                <div className="max-h-48 overflow-y-auto space-y-2 rounded-[14px] border border-forest/10 bg-parchment/30 p-3">
+                <div className="max-h-48 overflow-y-auto space-y-2 rounded-2xl border border-forest/10 bg-parchment/30 p-3">
                   {formAreas.map((area) => {
                     const areaOutcomes = outcomesByArea[area] || [];
                     if (areaOutcomes.length === 0) return null;
@@ -725,7 +725,7 @@ export function PortfolioClient({
                               {activityTitle && (
                                 <>
                                   <span className="text-clay/20">·</span>
-                                  <span className="text-[11px] text-clay/40 font-serif">
+                                  <span className="text-[11px] text-clay/40">
                                     from: {activityTitle}
                                   </span>
                                 </>
@@ -747,7 +747,7 @@ export function PortfolioClient({
                         {isExpanded && (
                           <div className="mt-4 pt-4 border-t border-stone/15 space-y-3">
                             {entry.description && (
-                              <p className="text-xs text-clay/60 font-serif leading-relaxed">
+                              <p className="text-xs text-clay/60 leading-relaxed">
                                 {entry.description}
                               </p>
                             )}
@@ -777,7 +777,7 @@ export function PortfolioClient({
                                   {entry.outcome_ids.map((oid) => {
                                     const outcome = outcomes.find((o) => o.id === oid);
                                     return outcome ? (
-                                      <p key={oid} className="text-[11px] text-clay/50 font-serif">
+                                      <p key={oid} className="text-[11px] text-clay/50">
                                         <span className="font-mono text-[9px] text-clay/30 mr-1">{outcome.outcome_code}</span>
                                         {outcome.outcome_text}
                                       </p>
@@ -864,7 +864,7 @@ export function PortfolioClient({
             <p className="font-medium text-clay/40">
               {filterArea ? `No entries for ${filterArea}` : 'No portfolio entries yet'}
             </p>
-            <p className="text-sm text-clay/30 mt-1 font-serif">
+            <p className="text-sm text-clay/30 mt-1">
               {filterArea
                 ? 'Try clearing the filter or add entries for this curriculum area.'
                 : 'Add evidence of learning from completed activities.'}

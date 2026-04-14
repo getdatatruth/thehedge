@@ -170,7 +170,7 @@ export function BillingClient({
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
           <em className="text-moss italic">Billing</em>
         </h1>
-        <p className="text-clay mt-2 font-serif text-lg">
+        <p className="text-clay mt-2 text-lg">
           Manage your subscription and billing details.
         </p>
       </div>
@@ -208,7 +208,7 @@ export function BillingClient({
               <p className="text-sm font-medium text-forest">
                 {trialDaysLeft} day{trialDaysLeft !== 1 ? 's' : ''} left in your trial
               </p>
-              <p className="text-sm text-clay/60 mt-1 font-serif">
+              <p className="text-sm text-clay/60 mt-1">
                 Subscribe now to keep all your {currentTier === 'educator' ? 'Educator' : 'Family'} features when your trial ends.
               </p>
             </div>
@@ -233,7 +233,7 @@ export function BillingClient({
       {/* Current plan summary */}
       <div className="card-elevated p-6 sm:p-8">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-amber/10">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber/10">
             <Crown className="h-6 w-6 text-amber" />
           </div>
           <div className="flex-1">
@@ -245,7 +245,7 @@ export function BillingClient({
                 {statusInfo.text}
               </span>
             </div>
-            <p className="text-sm text-clay/60 mt-1.5 font-serif">
+            <p className="text-sm text-clay/60 mt-1.5">
               {PLANS.find((p) => p.id === currentTier)?.description}
             </p>
           </div>
@@ -334,7 +334,7 @@ export function BillingClient({
                       Save &euro;{plan.id === 'family' ? '23.89' : '44.89'} per year
                     </p>
                   )}
-                  <p className="text-sm text-clay/60 mt-2 font-serif">
+                  <p className="text-sm text-clay/60 mt-2">
                     {plan.description}
                   </p>
                 </div>
@@ -412,7 +412,7 @@ export function BillingClient({
               className="py-3 border-b border-stone last:border-0"
             >
               <p className="text-sm font-medium text-ink">{item.q}</p>
-              <p className="text-sm text-clay/60 mt-1 font-serif">{item.a}</p>
+              <p className="text-sm text-clay/60 mt-1">{item.a}</p>
             </div>
           ))}
         </div>

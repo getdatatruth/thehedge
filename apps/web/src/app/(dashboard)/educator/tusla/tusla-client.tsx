@@ -565,7 +565,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
               Registration {'&'} <em className="text-moss italic">Compliance</em>
             </h1>
-            <p className="text-clay mt-2 font-serif text-lg">
+            <p className="text-clay mt-2 text-lg">
               {selectedChild
                 ? `Managing Tusla registration and compliance for ${selectedChild.name}.`
                 : 'Add children and create an education plan to begin.'}
@@ -624,7 +624,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
           {alerts.map((alert, i) => (
             <div
               key={i}
-              className={`flex items-center gap-3 rounded-[14px] px-5 py-3.5 ${
+              className={`flex items-center gap-3 rounded-2xl px-5 py-3.5 ${
                 alert.type === 'danger'
                   ? 'bg-terracotta/8 border border-terracotta/15'
                   : 'bg-amber/8 border border-amber/15'
@@ -633,7 +633,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               <AlertTriangle className={`h-5 w-5 shrink-0 ${
                 alert.type === 'danger' ? 'text-terracotta' : 'text-amber'
               }`} />
-              <p className={`text-sm font-serif ${
+              <p className={`text-sm ${
                 alert.type === 'danger' ? 'text-terracotta' : 'text-amber'
               }`}>
                 {alert.message}
@@ -718,7 +718,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <FileText className="h-4 w-4 text-moss" />
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Documents</p>
               </div>
-              <p className="text-2xl font-light font-display text-ink">
+              <p className="text-2xl font-light text-ink">
                 {completedRequiredDocs}<span className="text-sm font-normal text-clay/40"> / {requiredDocs}</span>
               </p>
               <div className="mt-3 h-1.5 rounded-full bg-stone/20">
@@ -734,7 +734,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <Calendar className="h-4 w-4 text-sky" />
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Attendance</p>
               </div>
-              <p className="text-2xl font-light font-display text-ink">
+              <p className="text-2xl font-light text-ink">
                 {attendancePercentage}%
               </p>
               <div className="mt-3 h-1.5 rounded-full bg-stone/20">
@@ -752,7 +752,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <Clock className="h-4 w-4 text-amber" />
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Hours Logged</p>
               </div>
-              <p className="text-2xl font-light font-display text-ink">
+              <p className="text-2xl font-light text-ink">
                 {hoursLogged}<span className="text-sm font-normal text-clay/40"> / {requiredHours}h</span>
               </p>
               <div className="mt-3 h-1.5 rounded-full bg-stone/20">
@@ -768,7 +768,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <CheckCircle className="h-4 w-4 text-sage" />
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Assessment Prep</p>
               </div>
-              <p className="text-2xl font-light font-display text-ink">
+              <p className="text-2xl font-light text-ink">
                 {completedAssessmentItems}<span className="text-sm font-normal text-clay/40"> / {totalAssessmentItems}</span>
               </p>
               <div className="mt-3 h-1.5 rounded-full bg-stone/20">
@@ -791,7 +791,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               {nextDeadline ? (
                 <div>
                   <p className="text-sm font-medium text-ink">{nextDeadline.title}</p>
-                  <p className="text-xs text-clay/60 font-serif mt-1">{nextDeadline.description}</p>
+                  <p className="text-xs text-clay/60 mt-1">{nextDeadline.description}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <CalendarDays className="h-3.5 w-3.5 text-clay/40" />
                     <span className="text-xs font-medium text-umber">
@@ -807,7 +807,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-clay/40 font-serif">No upcoming deadlines. Add dates in the Deadlines tab.</p>
+                <p className="text-sm text-clay/40">No upcoming deadlines. Add dates in the Deadlines tab.</p>
               )}
             </div>
 
@@ -817,7 +817,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <TrendingUp className="h-4 w-4 text-amber" />
                 <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Curriculum Coverage</h3>
               </div>
-              <p className="text-2xl font-light font-display text-ink mb-2">
+              <p className="text-2xl font-light text-ink mb-2">
                 {activeAreas} <span className="text-sm font-normal text-clay/40">/ {totalAreas} areas active</span>
               </p>
               {allAreasCovered.size > 0 ? (
@@ -827,7 +827,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-clay/40 font-serif">No curriculum areas logged yet.</p>
+                <p className="text-xs text-clay/40">No curriculum areas logged yet.</p>
               )}
             </div>
           </div>
@@ -878,13 +878,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               ] as const).map((report) => {
                 const reportUrl = `/api/educator/reports?type=${report.reportType}&childId=${selectedChildId}`;
                 return (
-                  <div key={report.title} className="flex items-center gap-3 rounded-[14px] p-3.5 hover:bg-parchment/50 transition-colors">
+                  <div key={report.title} className="flex items-center gap-3 rounded-2xl p-3.5 hover:bg-parchment/50 transition-colors">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-moss/8">
                       <FileText className="h-5 w-5 text-moss" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-umber">{report.title}</p>
-                      <p className="text-xs text-clay/50 font-serif">{report.description}</p>
+                      <p className="text-xs text-clay/50">{report.description}</p>
                     </div>
                     <a
                       href={reportUrl}
@@ -915,7 +915,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h2 className="font-display text-xl font-light text-ink mb-2">
               Registration <em className="text-moss italic">Status</em>
             </h2>
-            <p className="text-sm text-clay font-serif mb-6">
+            <p className="text-sm text-clay mb-6">
               Track your Tusla registration progress. Update your status as you move through the process.
             </p>
 
@@ -960,14 +960,14 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </div>
 
             {/* Status-specific guidance */}
-            <div className="rounded-[14px] bg-parchment p-5 border border-stone/50">
+            <div className="rounded-2xl bg-parchment p-5 border border-stone/50">
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-moss shrink-0 mt-0.5" />
                 <div>
                   {registrationStatus === 'not_started' && (
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Getting Started</h3>
-                      <p className="text-sm text-clay font-serif">
+                      <p className="text-sm text-clay">
                         Under Section 14 of the Education (Welfare) Act 2000, parents who wish to educate their children at home
                         must notify Tusla. Begin by completing the Notification of Intent form and gathering the required documents.
                         Tusla will then arrange a preliminary assessment of your educational provision.
@@ -985,7 +985,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   {registrationStatus === 'in_progress' && (
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Application In Progress</h3>
-                      <p className="text-sm text-clay font-serif">
+                      <p className="text-sm text-clay">
                         You have begun the registration process. Ensure all required documents are prepared and your notification
                         form is complete. When ready, submit your notification to Tusla Education and Welfare Service (TESS)
                         at your regional office.
@@ -1003,7 +1003,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   {registrationStatus === 'submitted' && (
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Application Submitted</h3>
-                      <p className="text-sm text-clay font-serif">
+                      <p className="text-sm text-clay">
                         Your notification has been submitted to Tusla. They will review your application and arrange a preliminary
                         assessment visit. This typically takes 4-8 weeks. In the meantime, continue documenting your educational
                         provision and keep attendance records.
@@ -1018,7 +1018,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   {registrationStatus === 'approved' && (
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Registration Approved</h3>
-                      <p className="text-sm text-clay font-serif">
+                      <p className="text-sm text-clay">
                         Congratulations! Your home education provision has been approved by Tusla. You are now on the register
                         maintained under Section 14. Annual assessments will be conducted to review your educational provision.
                         Keep documenting learning, maintaining attendance records, and building portfolios.
@@ -1043,14 +1043,14 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h2 className="font-display text-lg font-light text-ink mb-3">
               Registration <em className="text-moss italic">Notes</em>
             </h2>
-            <p className="text-xs text-clay/60 mb-4 font-serif">
+            <p className="text-xs text-clay/60 mb-4">
               Keep track of any correspondence, assessor names, reference numbers, or other important notes.
             </p>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={5}
-              className="w-full rounded-[10px] border border-stone bg-parchment px-4 py-3 text-sm text-umber font-serif placeholder:text-clay/30 focus:outline-none focus:ring-2 focus:ring-moss/20 resize-y"
+              className="w-full rounded-[10px] border border-stone bg-parchment px-4 py-3 text-sm text-umber placeholder:text-clay/30 focus:outline-none focus:ring-2 focus:ring-moss/20 resize-y"
               placeholder="e.g., TESS reference number, assessor contact details, dates of correspondence..."
             />
           </div>
@@ -1068,12 +1068,12 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               <h2 className="font-display text-xl font-light text-ink">
                 Document <em className="text-moss italic">Checklist</em>
               </h2>
-              <p className="text-sm text-clay font-serif mt-1">
+              <p className="text-sm text-clay mt-1">
                 Track all required and recommended documents for your Tusla registration.
               </p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-light font-display text-ink">{completedDocs}/{documents.length}</p>
+              <p className="text-2xl font-light text-ink">{completedDocs}/{documents.length}</p>
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Complete</p>
             </div>
           </div>
@@ -1139,7 +1139,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                               <span className="tag tag-terra text-[8px]">Required</span>
                             )}
                           </div>
-                          <p className="text-xs text-clay/60 font-serif mt-1">{doc.description}</p>
+                          <p className="text-xs text-clay/60 mt-1">{doc.description}</p>
                           {doc.completed && doc.completedDate && (
                             <p className="text-[10px] text-moss/60 mt-1">
                               Completed on {new Date(doc.completedDate).toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -1165,7 +1165,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h2 className="font-display text-xl font-light text-ink mb-2">
               Notification of Intent to <em className="text-moss italic">Educate at Home</em>
             </h2>
-            <p className="text-sm text-clay font-serif mb-2">
+            <p className="text-sm text-clay mb-2">
               Complete this form to prepare your Section 14 notification to Tusla. You can save your progress
               and return later. When complete, print or download to submit to your regional Tusla office.
             </p>
@@ -1325,7 +1325,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </div>
 
             <div className="mt-6 pt-6 border-t border-stone/30 flex items-center justify-between">
-              <p className="text-xs text-clay/40 font-serif">
+              <p className="text-xs text-clay/40">
                 Save your progress and return anytime. When ready, print this form for submission.
               </p>
               <div className="flex gap-3">
@@ -1350,13 +1350,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <h2 className="font-display text-xl font-light text-ink mb-2">
                   Annual Assessment <em className="text-moss italic">Preparation</em>
                 </h2>
-                <p className="text-sm text-clay font-serif">
+                <p className="text-sm text-clay">
                   Use this checklist to prepare for your annual Tusla assessment. The assessor will review your
                   educational provision, meet your child, and examine portfolio evidence.
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-light font-display text-ink">
+                <p className="text-2xl font-light text-ink">
                   {completedAssessmentItems}/{totalAssessmentItems}
                 </p>
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Complete</p>
@@ -1407,7 +1407,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
 
                   {expandedSections[category] && (
                     <>
-                      <p className="text-xs text-clay/50 font-serif mb-3 ml-6">{categoryDescriptions[category]}</p>
+                      <p className="text-xs text-clay/50 mb-3 ml-6">{categoryDescriptions[category]}</p>
                       <div className="space-y-1 ml-6">
                         {categoryItems.map((item) => (
                           <button
@@ -1452,7 +1452,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <h2 className="font-display text-xl font-light text-ink mb-2">
                   Important <em className="text-moss italic">Dates {'&'} Deadlines</em>
                 </h2>
-                <p className="text-sm text-clay font-serif">
+                <p className="text-sm text-clay">
                   Track registration deadlines, assessment dates, and review periods.
                 </p>
               </div>
@@ -1479,7 +1479,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 return (
                   <div
                     key={deadline.id}
-                    className={`rounded-[14px] border p-5 transition-all ${
+                    className={`rounded-2xl border p-5 transition-all ${
                       deadline.completed
                         ? 'bg-sage/5 border-sage/20'
                         : isPast && !deadline.completed
@@ -1519,7 +1519,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                           type="text"
                           value={deadline.description}
                           onChange={(e) => updateDeadline(deadline.id, 'description', e.target.value)}
-                          className="text-xs text-clay/60 font-serif bg-transparent border-none p-0 w-full focus:outline-none focus:ring-0"
+                          className="text-xs text-clay/60 bg-transparent border-none p-0 w-full focus:outline-none focus:ring-0"
                           placeholder="Description"
                         />
 
@@ -1557,7 +1557,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               {deadlines.length === 0 && (
                 <div className="text-center py-12">
                   <CalendarDays className="h-10 w-10 text-clay/20 mx-auto mb-3" />
-                  <p className="text-sm text-clay/40 font-serif">No deadlines set yet.</p>
+                  <p className="text-sm text-clay/40">No deadlines set yet.</p>
                   <button onClick={addDeadline} className="btn-secondary text-xs py-2 px-3 mt-3">
                     Add Your First Deadline
                   </button>
@@ -1571,7 +1571,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h2 className="font-display text-lg font-light text-ink mb-4">
               Typical <em className="text-moss italic">Academic Year</em> Key Dates
             </h2>
-            <p className="text-xs text-clay/50 font-serif mb-4">
+            <p className="text-xs text-clay/50 mb-4">
               These are general guideline dates. Your actual Tusla assessment schedule may vary.
             </p>
             <div className="space-y-3">
@@ -1591,7 +1591,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     </div>
                     <div>
                       <p className="text-xs font-bold text-ink">{item.month}</p>
-                      <p className="text-xs text-clay/60 font-serif mt-0.5">{item.event}</p>
+                      <p className="text-xs text-clay/60 mt-0.5">{item.event}</p>
                     </div>
                   </div>
                 );
@@ -1610,7 +1610,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h2 className="font-display text-xl font-light text-ink mb-2">
               Tusla <em className="text-moss italic">Resources</em>
             </h2>
-            <p className="text-sm text-clay font-serif mb-6">
+            <p className="text-sm text-clay mb-6">
               Essential links, guides, and resources for home-educating families in Ireland.
             </p>
 
@@ -1621,7 +1621,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-4 rounded-[14px] p-4 hover:bg-parchment/50 transition-colors group border border-transparent hover:border-stone/30"
+                  className="flex items-start gap-4 rounded-2xl p-4 hover:bg-parchment/50 transition-colors group border border-transparent hover:border-stone/30"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-moss/8 group-hover:bg-moss/12 transition-colors">
                     <ExternalLink className="h-5 w-5 text-moss" />
@@ -1630,7 +1630,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <p className="text-sm font-medium text-ink group-hover:text-moss transition-colors">
                       {resource.title}
                     </p>
-                    <p className="text-xs text-clay/60 font-serif mt-1">{resource.description}</p>
+                    <p className="text-xs text-clay/60 mt-1">{resource.description}</p>
                     <p className="text-[10px] text-clay/30 mt-1 truncate">{resource.url}</p>
                   </div>
                   <ChevronRight className="h-4 w-4 text-clay/30 group-hover:text-moss transition-colors shrink-0 mt-1" />
@@ -1644,7 +1644,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <h2 className="font-display text-lg font-light text-ink mb-4">
               Irish Primary <em className="text-moss italic">Curriculum Areas</em>
             </h2>
-            <p className="text-xs text-clay/50 font-serif mb-4">
+            <p className="text-xs text-clay/50 mb-4">
               Tusla assessors will look for evidence of education across these curriculum areas as defined by the NCCA.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -1680,10 +1680,10 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   description: 'Wellbeing, relationships, safety, citizenship, and personal development.',
                 },
               ].map((item) => (
-                <div key={item.area} className="rounded-[14px] bg-parchment p-4 border border-stone/30">
+                <div key={item.area} className="rounded-2xl bg-parchment p-4 border border-stone/30">
                   <h4 className="text-sm font-bold text-ink">{item.area}</h4>
                   <p className="text-[10px] font-bold text-moss/70 uppercase tracking-wider mt-0.5">{item.subjects}</p>
-                  <p className="text-xs text-clay/60 font-serif mt-2">{item.description}</p>
+                  <p className="text-xs text-clay/60 mt-2">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -1723,7 +1723,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               ].map((faq, idx) => (
                 <div key={idx} className="rounded-[10px] p-4 bg-parchment/50 border border-stone/20">
                   <p className="text-sm font-bold text-ink">{faq.q}</p>
-                  <p className="text-sm text-clay font-serif mt-2">{faq.a}</p>
+                  <p className="text-sm text-clay mt-2">{faq.a}</p>
                 </div>
               ))}
             </div>
@@ -1754,7 +1754,7 @@ function FormField({
   rows?: number;
 }) {
   const inputClasses =
-    'w-full rounded-[8px] border border-stone bg-parchment px-3 py-2.5 text-sm text-umber font-serif placeholder:text-clay/30 focus:outline-none focus:ring-2 focus:ring-moss/20 focus:border-moss/30';
+    'w-full rounded-[8px] border border-stone bg-parchment px-3 py-2.5 text-sm text-umber placeholder:text-clay/30 focus:outline-none focus:ring-2 focus:ring-moss/20 focus:border-moss/30';
 
   return (
     <div>

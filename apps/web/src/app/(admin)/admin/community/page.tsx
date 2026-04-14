@@ -1,7 +1,7 @@
-import { CommunityClient } from './community-client';
+import { CommunityAdminClient } from './community-client';
 
 export const dynamic = 'force-dynamic';
 
 export default function AdminCommunityPage() {
-  return <CommunityClient />;
+  return <CommunityAdminClient />;
 }

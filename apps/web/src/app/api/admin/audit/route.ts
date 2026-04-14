@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       offset: parseInt(searchParams.get('offset') || '0'),
     };
 
-    const result = getAuditEvents(filters);
+    const result = await getAuditEvents(filters);
     return NextResponse.json(result);
   } catch (error) {
     console.error('GET /api/admin/audit error:', error);

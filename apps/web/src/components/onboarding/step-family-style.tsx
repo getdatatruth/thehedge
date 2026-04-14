@@ -53,7 +53,7 @@ export function StepFamilyStyle() {
         <h2 className="font-display text-xl font-semibold text-ink">
           What&apos;s your family style?
         </h2>
-        <p className="text-sm text-clay mt-1 font-serif">
+        <p className="text-sm text-clay mt-1">
           This helps us suggest the right activities. You can change this later.
         </p>
       </div>
@@ -63,14 +63,14 @@ export function StepFamilyStyle() {
           <button
             key={value}
             onClick={() => updateField('familyStyle', value)}
-            className={`flex items-start gap-4 rounded-[14px] border p-4 text-left transition-all ${
+            className={`flex items-start gap-4 rounded-2xl border p-4 text-left transition-all ${
               familyStyle === value
                 ? 'border-moss bg-forest/5 ring-1 ring-moss'
                 : 'border-stone hover:border-moss/50 hover:bg-linen'
             }`}
           >
             <div
-              className={`rounded-[14px] p-2 ${
+              className={`rounded-2xl p-2 ${
                 familyStyle === value
                   ? 'bg-forest/10 text-forest'
                   : 'bg-linen text-clay'
@@ -80,7 +80,7 @@ export function StepFamilyStyle() {
             </div>
             <div>
               <p className="font-medium text-umber">{label}</p>
-              <p className="text-sm text-clay font-serif">{description}</p>
+              <p className="text-sm text-clay">{description}</p>
             </div>
           </button>
         ))}

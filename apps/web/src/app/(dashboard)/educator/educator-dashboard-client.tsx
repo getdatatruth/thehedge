@@ -189,7 +189,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
           Educator <em className="text-moss italic">Dashboard</em>
         </h1>
-        <p className="text-clay mt-2 font-serif text-lg">
+        <p className="text-clay mt-2 text-lg">
           {children.length > 0
             ? `Managing home education for ${children.map((c) => c.name).join(', ')}.`
             : 'Add children in settings to get started.'}
@@ -216,7 +216,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
 
       {/* Tusla compliance alert */}
       {attendancePercentage > 0 && attendancePercentage < 90 && (
-        <div className="flex items-center gap-3 rounded-[14px] bg-amber/8 border border-amber/15 px-5 py-3.5">
+        <div className="flex items-center gap-3 rounded-2xl bg-amber/8 border border-amber/15 px-5 py-3.5">
           <AlertTriangle className="h-5 w-5 text-amber shrink-0" />
           <div>
             <p className="text-sm font-semibold text-amber">Attendance tracking</p>
@@ -237,7 +237,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             <Clock className="h-5 w-5 text-moss" />
           </div>
           <div>
-            <p className="text-2xl font-light font-display text-ink">{hoursThisWeek}</p>
+            <p className="text-2xl font-light text-ink">{hoursThisWeek}</p>
             <p className="text-xs text-clay/50">Hours / {targetHoursWeek}h target</p>
           </div>
         </div>
@@ -246,7 +246,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             <CalendarDays className="h-5 w-5 text-sky" />
           </div>
           <div>
-            <p className="text-2xl font-light font-display text-ink">{attendanceDays}</p>
+            <p className="text-2xl font-light text-ink">{attendanceDays}</p>
             <p className="text-xs text-clay/50">Days / {totalSchoolDays} this week</p>
           </div>
         </div>
@@ -255,7 +255,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             <TrendingUp className="h-5 w-5 text-amber" />
           </div>
           <div>
-            <p className="text-2xl font-light font-display text-ink">
+            <p className="text-2xl font-light text-ink">
               {coveredAreas}/{totalAreas}
             </p>
             <p className="text-xs text-clay/50">Curriculum areas</p>
@@ -266,7 +266,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             <Sparkles className="h-5 w-5 text-terracotta" />
           </div>
           <div>
-            <p className="text-2xl font-light font-display text-ink">
+            <p className="text-2xl font-light text-ink">
               {todayCompleted}/{todayBlocks.length}
             </p>
             <p className="text-xs text-clay/50">Today&apos;s activities</p>
@@ -360,7 +360,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
                       style={{ width: isCovered ? '100%' : '0%', opacity: 0.7 }}
                     />
                   </div>
-                  <p className="text-[10px] text-clay/40 font-serif capitalize">
+                  <p className="text-[10px] text-clay/40 capitalize">
                     Priority: {areaConfig?.priority || 'medium'}
                     {areaConfig?.notes ? ` - ${areaConfig.notes}` : ''}
                   </p>
@@ -381,7 +381,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             Irish Early Years Curriculum
           </span>
         </div>
-        <p className="text-xs text-clay/50 font-serif mb-6">
+        <p className="text-xs text-clay/50 mb-6">
           Aistear is the curriculum framework for children from birth to six years in Ireland.
           Siolta is the National Quality Framework for Early Childhood Education.
         </p>
@@ -389,14 +389,14 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
           {AISTEAR_THEMES.map((theme) => {
             const ThemeIcon = theme.icon;
             return (
-              <div key={theme.name} className="rounded-[14px] bg-parchment/50 p-5">
+              <div key={theme.name} className="rounded-2xl bg-parchment/50 p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${theme.color.split(' ')[0]}`}>
                     <ThemeIcon className={`h-5 w-5 ${theme.color.split(' ')[1]}`} />
                   </div>
                   <div>
                     <h3 className="text-sm font-semibold text-ink">{theme.name}</h3>
-                    <p className="text-[10px] text-clay/50 font-serif">{theme.description}</p>
+                    <p className="text-[10px] text-clay/50">{theme.description}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -432,7 +432,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
                 .map((c) => c.name);
 
               return (
-                <div key={log.id} className="flex items-center gap-3 rounded-[14px] p-3.5 hover:bg-parchment/50 transition-colors">
+                <div key={log.id} className="flex items-center gap-3 rounded-2xl p-3.5 hover:bg-parchment/50 transition-colors">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-moss/10">
                     <GraduationCap className="h-5 w-5 text-moss" />
                   </div>
@@ -478,19 +478,19 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Child</p>
               <p className="text-sm font-medium text-umber">{firstChild.name}</p>
             </div>
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Approach</p>
               <p className="text-sm font-medium text-umber capitalize">{firstPlan.approach.replace('_', '-')}</p>
             </div>
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Hours/day</p>
               <p className="text-sm font-medium text-umber">{firstPlan.hours_per_day}h</p>
             </div>
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Days/week</p>
               <p className="text-sm font-medium text-umber">{firstPlan.days_per_week} days</p>
             </div>
@@ -511,9 +511,9 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
               const portfolioCount = portfolioCountByChild[child.id] || 0;
 
               return (
-                <div key={child.id} className="flex items-center gap-3 rounded-[14px] bg-parchment/30 p-3.5">
+                <div key={child.id} className="flex items-center gap-3 rounded-2xl bg-parchment/30 p-3.5">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-moss/10">
-                    <span className="text-sm font-display font-light text-ink">{child.name[0]}</span>
+                    <span className="text-sm font-light text-ink">{child.name[0]}</span>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-umber">{child.name}</p>
@@ -550,15 +550,15 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
             </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Registration</p>
               <p className="text-sm font-medium text-umber capitalize">{tuslaStatus.replace('_', ' ')}</p>
             </div>
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Attendance</p>
               <p className="text-sm font-medium text-umber">{attendancePercentage}%</p>
             </div>
-            <div className="rounded-[14px] bg-parchment/50 p-4">
+            <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Hours This Week</p>
               <p className="text-sm font-medium text-umber">{hoursThisWeek}h</p>
             </div>
@@ -572,7 +572,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
           <div className="text-center">
             <BookOpen className="mx-auto mb-3 h-8 w-8 text-clay/20" />
             <p className="font-medium text-clay/40">No children added yet</p>
-            <p className="text-sm text-clay/30 mt-1 font-serif">
+            <p className="text-sm text-clay/30 mt-1">
               Add children in settings to start using educator tools.
             </p>
             <Link href="/settings" className="btn-primary mt-4 inline-flex items-center gap-2 text-sm">

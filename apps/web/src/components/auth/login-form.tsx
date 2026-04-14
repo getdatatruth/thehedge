@@ -62,14 +62,14 @@ export function LoginForm() {
 
   if (magicLinkSent) {
     return (
-      <div className="bg-linen border border-stone rounded-[14px] p-8 text-center space-y-4 animate-scale-in">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[14px] bg-gradient-to-br from-forest to-moss">
+      <div className="bg-linen border border-stone rounded-2xl p-8 text-center space-y-4 animate-scale-in">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss">
           <Mail className="h-7 w-7 text-parchment" />
         </div>
         <h2 className="font-display text-2xl font-bold text-ink">
           Check your email
         </h2>
-        <p className="text-clay font-serif">
+        <p className="text-clay">
           We&apos;ve sent a magic link to <strong className="text-umber">{email}</strong>. Click the
           link to sign in.
         </p>
@@ -84,18 +84,18 @@ export function LoginForm() {
   }
 
   return (
-    <div className="bg-linen border border-stone rounded-[14px] p-8 animate-scale-in">
+    <div className="bg-linen border border-stone rounded-2xl p-8 animate-scale-in">
       <div className="text-center mb-6">
         <h2 className="font-display text-2xl font-bold text-ink">
           Welcome back
         </h2>
-        <p className="text-clay font-serif mt-1">
+        <p className="text-clay mt-1">
           Sign in to your family account
         </p>
       </div>
 
       <Tabs defaultValue="password" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-parchment rounded-[14px] p-1 h-10">
+        <TabsList className="grid w-full grid-cols-2 bg-parchment rounded-2xl p-1 h-10">
           <TabsTrigger value="password" className="rounded text-xs font-semibold">Password</TabsTrigger>
           <TabsTrigger value="magic-link" className="rounded text-xs font-semibold">Magic Link</TabsTrigger>
         </TabsList>
@@ -153,7 +153,7 @@ export function LoginForm() {
                 className="h-11 rounded-md border-stone bg-parchment/30"
               />
             </div>
-            <p className="text-xs text-clay/70 font-serif">
+            <p className="text-xs text-clay/70">
               We&apos;ll send you a link to sign in - no password needed.
             </p>
             {error && (

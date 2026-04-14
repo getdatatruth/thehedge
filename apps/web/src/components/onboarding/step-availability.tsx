@@ -36,7 +36,7 @@ export function StepAvailability() {
         <h2 className="font-display text-xl font-semibold text-ink">
           When do you need ideas?
         </h2>
-        <p className="text-sm text-clay mt-1 font-serif">
+        <p className="text-sm text-clay mt-1">
           We&apos;ll suggest activities at the right times.
         </p>
       </div>
@@ -46,7 +46,7 @@ export function StepAvailability() {
           <button
             key={value}
             onClick={() => toggleTime(value)}
-            className={`flex w-full items-center gap-3 rounded-[14px] border p-4 text-left transition-all ${
+            className={`flex w-full items-center gap-3 rounded-2xl border p-4 text-left transition-all ${
               ideaTimes.includes(value)
                 ? 'border-moss bg-forest/5'
                 : 'border-stone hover:border-moss/50'
@@ -55,13 +55,13 @@ export function StepAvailability() {
             <Checkbox checked={ideaTimes.includes(value)} />
             <div>
               <p className="font-medium text-umber">{label}</p>
-              <p className="text-sm text-clay font-serif">{description}</p>
+              <p className="text-sm text-clay">{description}</p>
             </div>
           </button>
         ))}
       </div>
 
-      <div className="space-y-4 rounded-[14px] border border-stone p-4">
+      <div className="space-y-4 rounded-2xl border border-stone p-4">
         <div className="flex items-center gap-3">
           <Checkbox
             id="weekend"

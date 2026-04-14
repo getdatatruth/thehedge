@@ -134,7 +134,7 @@ export function FavouritesClient() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-6 w-6 text-moss animate-spin mx-auto mb-3" />
-          <p className="text-sm text-clay/50 font-serif">Loading your favourites...</p>
+          <p className="text-sm text-clay/50">Loading your favourites...</p>
         </div>
       </div>
     );
@@ -153,7 +153,7 @@ export function FavouritesClient() {
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
               Favourites
             </h1>
-            <p className="text-clay mt-1 font-serif text-base">
+            <p className="text-clay mt-1 text-base">
               {favourites.length} saved {favourites.length === 1 ? 'activity' : 'activities'}
               {selectedCategory && (
                 <span>
@@ -286,7 +286,7 @@ export function FavouritesClient() {
       {/* Content */}
       {favourites.length === 0 ? (
         /* Empty state - no favourites at all */
-        <div className="flex min-h-[400px] items-center justify-center rounded-[14px] border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
           <div className="text-center px-6 max-w-sm">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-terracotta/8 mx-auto mb-5">
               <Heart className="h-8 w-8 text-terracotta/40" />
@@ -294,7 +294,7 @@ export function FavouritesClient() {
             <p className="font-display text-2xl font-light text-ink mb-2">
               Save activities you love
             </p>
-            <p className="text-[14px] text-clay font-serif leading-relaxed mb-6">
+            <p className="text-[14px] text-clay leading-relaxed mb-6">
               Tap the heart on any activity to save it here. Build your own collection of
               go-to ideas for every mood, weather, and energy level.
             </p>
@@ -309,11 +309,11 @@ export function FavouritesClient() {
         </div>
       ) : filtered.length === 0 ? (
         /* No results from search/filter */
-        <div className="flex min-h-[240px] items-center justify-center rounded-[14px] border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
           <div className="text-center px-4">
             <Search className="mx-auto mb-3 h-8 w-8 text-stone" />
             <p className="font-medium text-umber">No matches found</p>
-            <p className="text-[13px] text-clay mt-1 font-serif italic max-w-xs">
+            <p className="text-[13px] text-clay mt-1 italic max-w-xs">
               Try adjusting your search or category filter.
             </p>
           </div>
@@ -345,7 +345,7 @@ export function FavouritesClient() {
                   <p className="text-[14px] font-medium text-ink group-hover:text-moss transition-colors truncate">
                     {activity.title}
                   </p>
-                  <p className="text-[12px] text-clay font-serif truncate">{activity.description}</p>
+                  <p className="text-[12px] text-clay truncate">{activity.description}</p>
                 </div>
                 <div className="hidden sm:flex items-center gap-2 shrink-0">
                   <span className="tag bg-stone/30 text-umber">{activity.duration_minutes}m</span>

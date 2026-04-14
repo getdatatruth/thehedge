@@ -17,6 +17,9 @@ import {
   CreditCard,
   GraduationCap,
   ScrollText,
+  TrendingUp,
+  MapPin,
+  FileText,
 } from 'lucide-react';
 
 const adminNav = [
@@ -29,6 +32,9 @@ const adminNav = [
   { label: 'Subscriptions', href: '/admin/subscriptions', icon: CreditCard },
   { label: 'Educator', href: '/admin/educator', icon: GraduationCap },
   { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+  { label: 'Funnel', href: '/admin/funnel', icon: TrendingUp },
+  { label: 'Geography', href: '/admin/geography', icon: MapPin },
+  { label: 'Content', href: '/admin/content', icon: FileText },
   { label: 'Content Calendar', href: '/admin/calendar', icon: Calendar },
   { label: 'Settings', href: '/admin/settings', icon: Settings },
   { label: 'Audit Log', href: '/admin/audit', icon: ScrollText },

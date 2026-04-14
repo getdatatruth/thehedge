@@ -433,7 +433,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
               Education <em className="text-moss italic">Plans</em>
             </h1>
-            <p className="text-clay mt-2 font-serif text-lg">
+            <p className="text-clay mt-2 text-lg">
               Per-child education plans with learning goals and curriculum tracking.
             </p>
           </div>
@@ -470,7 +470,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                 <select
                   value={formChildId}
                   onChange={(e) => setFormChildId(e.target.value)}
-                  className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                  className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                 >
                   {children.map((child) => (
                     <option key={child.id} value={child.id}>{child.name}</option>
@@ -484,7 +484,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                 type="text"
                 value={formYear}
                 onChange={(e) => setFormYear(e.target.value)}
-                className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                 placeholder="2025/2026"
               />
             </div>
@@ -495,14 +495,14 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                   <button
                     key={a.value}
                     onClick={() => setFormApproach(a.value)}
-                    className={`rounded-[14px] p-3 text-left transition-all border ${
+                    className={`rounded-2xl p-3 text-left transition-all border ${
                       formApproach === a.value
                         ? 'bg-moss/10 border-moss/20'
                         : 'bg-parchment/30 border-stone/30 hover:bg-parchment/50'
                     }`}
                   >
                     <span className="text-sm font-medium text-umber block">{a.label}</span>
-                    <span className="text-[10px] text-clay/50 font-serif">{a.description}</span>
+                    <span className="text-[10px] text-clay/50">{a.description}</span>
                   </button>
                 ))}
               </div>
@@ -516,7 +516,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                 step={0.5}
                 value={formHours}
                 onChange={(e) => setFormHours(parseFloat(e.target.value))}
-                className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
               />
             </div>
             <div>
@@ -527,7 +527,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                 max={7}
                 value={formDays}
                 onChange={(e) => setFormDays(parseInt(e.target.value, 10))}
-                className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
               />
             </div>
           </div>
@@ -554,7 +554,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
           <div className="text-center">
             <BookOpen className="mx-auto mb-3 h-8 w-8 text-clay/20" />
             <p className="font-medium text-clay/40">No education plans yet</p>
-            <p className="text-sm text-clay/30 mt-1 font-serif">
+            <p className="text-sm text-clay/30 mt-1">
               Create a plan for each child to start tracking home education.
             </p>
           </div>
@@ -611,21 +611,21 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
 
               {/* Quick stats */}
               <div className="grid gap-3 sm:grid-cols-4 mt-4">
-                <div className="rounded-[14px] bg-parchment/50 p-3">
+                <div className="rounded-2xl bg-parchment/50 p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="h-3.5 w-3.5 text-clay/40" />
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40">Schedule</p>
                   </div>
                   <p className="text-sm font-medium text-umber">{plan.hours_per_day}h/day · {plan.days_per_week} days</p>
                 </div>
-                <div className="rounded-[14px] bg-parchment/50 p-3">
+                <div className="rounded-2xl bg-parchment/50 p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <TrendingUp className="h-3.5 w-3.5 text-clay/40" />
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40">Coverage</p>
                   </div>
                   <p className="text-sm font-medium text-umber">{stats.coveredAreas}/{stats.totalAreas} areas active</p>
                 </div>
-                <div className="rounded-[14px] bg-parchment/50 p-3">
+                <div className="rounded-2xl bg-parchment/50 p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Target className="h-3.5 w-3.5 text-clay/40" />
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40">Goals</p>
@@ -634,7 +634,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                     {stats.achievedGoals}/{stats.totalGoals} achieved
                   </p>
                 </div>
-                <div className="rounded-[14px] bg-parchment/50 p-3">
+                <div className="rounded-2xl bg-parchment/50 p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <CalendarDays className="h-3.5 w-3.5 text-clay/40" />
                     <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40">Hours logged</p>
@@ -667,7 +667,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                       });
 
                       return (
-                        <div key={theme.name} className={`rounded-[14px] p-4 border ${theme.borderColor} ${theme.color.split(' ')[0]}`}>
+                        <div key={theme.name} className={`rounded-2xl p-4 border ${theme.borderColor} ${theme.color.split(' ')[0]}`}>
                           <div className="flex items-center gap-3">
                             <ThemeIcon className={`h-5 w-5 ${theme.color.split(' ')[1]}`} />
                             <div className="flex-1">
@@ -710,7 +710,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
 
                   {/* Add curriculum area form */}
                   {editingAreas === plan.id && (
-                    <div className="rounded-[14px] bg-parchment/50 p-4 mb-4 space-y-3">
+                    <div className="rounded-2xl bg-parchment/50 p-4 mb-4 space-y-3">
                       <div className="grid gap-3 sm:grid-cols-3">
                         <div>
                           <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60 mb-1 block">Subject name</label>
@@ -719,7 +719,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                             value={editAreaName}
                             onChange={(e) => setEditAreaName(e.target.value)}
                             placeholder="e.g., Music"
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           />
                         </div>
                         <div>
@@ -727,7 +727,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                           <select
                             value={editAreaPriority}
                             onChange={(e) => setEditAreaPriority(e.target.value)}
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           >
                             <option value="high">High</option>
                             <option value="medium">Medium</option>
@@ -741,7 +741,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                             value={editAreaNotes}
                             onChange={(e) => setEditAreaNotes(e.target.value)}
                             placeholder="Optional notes"
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           />
                         </div>
                       </div>
@@ -760,7 +760,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
 
                   {/* Add goal form */}
                   {showGoalForm === plan.id && (
-                    <div className="rounded-[14px] bg-moss/5 border border-moss/15 p-4 mb-4 space-y-3">
+                    <div className="rounded-2xl bg-moss/5 border border-moss/15 p-4 mb-4 space-y-3">
                       <h4 className="text-sm font-semibold text-ink">New Learning Goal</h4>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <div className="sm:col-span-2">
@@ -770,7 +770,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                             value={goalText}
                             onChange={(e) => setGoalText(e.target.value)}
                             placeholder="e.g., Can read short sentences independently"
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           />
                         </div>
                         <div>
@@ -778,7 +778,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                           <select
                             value={goalArea}
                             onChange={(e) => setGoalArea(e.target.value)}
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           >
                             {areaNames.map((a) => (
                               <option key={a} value={a}>{a}</option>
@@ -790,7 +790,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                           <select
                             value={goalTerm}
                             onChange={(e) => setGoalTerm(e.target.value)}
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           >
                             {TERMS.map((t) => (
                               <option key={t} value={t}>{t}</option>
@@ -802,7 +802,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                           <select
                             value={goalTheme}
                             onChange={(e) => setGoalTheme(e.target.value)}
-                            className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
+                            className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-3 py-2 text-sm text-umber focus:border-moss focus:outline-none"
                           >
                             {AISTEAR_THEMES.map((t) => (
                               <option key={t.name} value={t.name}>{t.name}</option>
@@ -836,7 +836,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                             : 'bg-clay/30';
 
                       return (
-                        <div key={areaName} className="rounded-[14px] bg-parchment/30 p-4">
+                        <div key={areaName} className="rounded-2xl bg-parchment/30 p-4">
                           <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-2">
                               <div className={`h-3 w-3 rounded-full ${priorityColor}`} />
@@ -852,7 +852,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                             </button>
                           </div>
                           {areaConfig?.notes && (
-                            <p className="text-[11px] text-clay/50 font-serif mb-3">{areaConfig.notes}</p>
+                            <p className="text-[11px] text-clay/50 mb-3">{areaConfig.notes}</p>
                           )}
 
                           {/* Goals for this area */}
@@ -910,7 +910,7 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                               })}
                             </div>
                           ) : (
-                            <p className="text-[10px] text-clay/30 font-serif italic">
+                            <p className="text-[10px] text-clay/30 italic">
                               No learning goals set for this area yet.
                             </p>
                           )}
@@ -921,14 +921,14 @@ export function PlansClient({ plans: initialPlans, children, activityLogs }: Pro
                 </div>
 
                 {/* Generate report section */}
-                <div className="rounded-[14px] bg-parchment/30 p-5">
+                <div className="rounded-2xl bg-parchment/30 p-5">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky/10">
                       <FileText className="h-5 w-5 text-sky" />
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-umber">Plan Report</p>
-                      <p className="text-[10px] text-clay/50 font-serif">
+                      <p className="text-[10px] text-clay/50">
                         Generate a PDF summary of this education plan, including goals and progress.
                       </p>
                     </div>

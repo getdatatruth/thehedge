@@ -115,7 +115,7 @@ export function SettingsClient() {
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             System Settings
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             Feature flags, admin management, and system configuration.
           </p>
         </div>
@@ -127,7 +127,7 @@ export function SettingsClient() {
 
       {/* Maintenance mode alert */}
       {settings.maintenanceMode && (
-        <div className="flex items-center gap-3 rounded-[14px] bg-rust/5 border border-rust/20 p-4">
+        <div className="flex items-center gap-3 rounded-2xl bg-rust/5 border border-rust/20 p-4">
           <AlertTriangle className="h-5 w-5 text-rust shrink-0" />
           <div>
             <p className="text-sm font-semibold text-rust">Maintenance mode is ON</p>
@@ -362,7 +362,7 @@ export function SettingsClient() {
           </div>
 
           {settings.maintenanceMode && (
-            <div className="rounded-[14px] bg-rust/5 border border-rust/20 p-6 text-center">
+            <div className="rounded-2xl bg-rust/5 border border-rust/20 p-6 text-center">
               <Wrench className="h-8 w-8 text-rust mx-auto mb-3" />
               <h3 className="font-display text-lg font-bold text-rust mb-2">Preview</h3>
               <p className="text-sm text-rust/70">{settings.maintenanceMessage}</p>

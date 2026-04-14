@@ -3,6 +3,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { InsightCard } from '@/components/shared/insight-card';
+import { PrintPlanModal } from '@/components/shared/print-plan-modal';
 import {
   Calendar,
   ChevronLeft,
@@ -107,16 +109,16 @@ const TIME_SLOTS = [
 ] as const;
 
 const CATEGORY_COLORS: Record<string, string> = {
-  nature: 'bg-moss/15 text-moss border-moss/20',
-  science: 'bg-[#5B9BD5]/15 text-[#5B9BD5] border-[#5B9BD5]/20',
-  kitchen: 'bg-amber/15 text-amber border-amber/20',
-  art: 'bg-[#8B3A62]/15 text-[#8B3A62] border-[#8B3A62]/20',
-  movement: 'bg-terracotta/15 text-terracotta border-terracotta/20',
-  literacy: 'bg-forest/15 text-forest border-forest/20',
-  maths: 'bg-amber/15 text-amber border-amber/20',
-  life_skills: 'bg-umber/15 text-umber border-umber/20',
-  calm: 'bg-sage/15 text-sage border-sage/20',
-  social: 'bg-fern/15 text-fern border-fern/20',
+  nature: 'bg-cat-nature/15 text-cat-nature border-cat-nature/20',
+  science: 'bg-cat-science/15 text-cat-science border-cat-science/20',
+  kitchen: 'bg-cat-kitchen/15 text-cat-kitchen border-cat-kitchen/20',
+  art: 'bg-cat-art/15 text-cat-art border-cat-art/20',
+  movement: 'bg-cat-movement/15 text-cat-movement border-cat-movement/20',
+  literacy: 'bg-cat-literacy/15 text-cat-literacy border-cat-literacy/20',
+  maths: 'bg-cat-maths/15 text-cat-maths border-cat-maths/20',
+  life_skills: 'bg-cat-life-skills/15 text-cat-life-skills border-cat-life-skills/20',
+  calm: 'bg-cat-calm/15 text-cat-calm border-cat-calm/20',
+  social: 'bg-cat-social/15 text-cat-social border-cat-social/20',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -250,7 +252,7 @@ export function PlannerClient({
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
 
@@ -550,10 +552,6 @@ export function PlannerClient({
       .slice(0, 3);
   }, [swapState, activities, plansByDate]);
 
-  // Print handler
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
 
   // ─── Render: No children ──────────────────────────
 
@@ -572,7 +570,7 @@ export function PlannerClient({
             <p className="font-display text-xl text-ink font-light mb-2">
               No children added yet
             </p>
-            <p className="text-[13px] text-clay font-serif italic">
+            <p className="text-[13px] text-clay italic">
               Add your children in Settings to start planning their learning
               week.
             </p>
@@ -594,7 +592,7 @@ export function PlannerClient({
             {familyName}&apos;s{' '}
             <em className="text-moss italic">learning week</em>
           </h1>
-          <p className="text-clay mt-2 font-serif text-base">
+          <p className="text-clay mt-2 text-base">
             {formatDate(weekDates[0])} &ndash; {formatDate(weekDates[6])}
             {childrenProp.length === 1 && (
               <span> &middot; {selectedChildName}</span>
@@ -626,14 +624,23 @@ export function PlannerClient({
           </div>
 
           {/* Print button */}
-          <button
-            onClick={handlePrint}
-            className="btn-ghost print:hidden"
-            title="Print weekly plan"
-          >
-            <Printer className="h-4 w-4" />
-            <span className="hidden sm:inline">Print</span>
-          </button>
+          <PrintPlanModal
+            familyName={familyName}
+            weekStart={weekStart}
+            weekEnd={(() => { const d = new Date(weekStart + 'T00:00:00'); d.setDate(d.getDate() + 6); return d.toISOString().split('T')[0]; })()}
+            children={childrenProp}
+            dailyPlans={childPlans}
+            activityCategories={Object.fromEntries(activities.map(a => [a.id, a.category]))}
+            trigger={
+              <button
+                className="btn-ghost print:hidden"
+                title="Print weekly plan"
+              >
+                <Printer className="h-4 w-4" />
+                <span className="hidden sm:inline">Print</span>
+              </button>
+            }
+          />
 
           {/* View toggle */}
           <div className="flex items-center border border-stone rounded overflow-hidden print:hidden">
@@ -772,7 +779,7 @@ export function PlannerClient({
                 </p>
               </div>
             </div>
-            <span className="text-2xl font-light font-display text-ink">
+            <span className="text-2xl font-light text-ink">
               {stats.total > 0
                 ? Math.round((stats.completed / stats.total) * 100)
                 : 0}
@@ -806,6 +813,17 @@ export function PlannerClient({
         </div>
       )}
 
+      {/* AI Insight */}
+      <InsightCard
+        type="plan_week"
+        context={{
+          children: childrenProp.map(c => ({ name: c.name, age: Math.floor((Date.now() - new Date(c.date_of_birth).getTime()) / 31557600000) })),
+          planActivities: childPlans.flatMap(p => p.blocks.map(b => ({ title: b.subject, category: activityById[b.activity_id || '']?.category || 'other', day: p.date }))),
+          categoryBreakdown: childPlans.flatMap(p => p.blocks).reduce((acc, b) => { const cat = activityById[b.activity_id || '']?.category || 'other'; acc[cat] = (acc[cat] || 0) + 1; return acc; }, {} as Record<string, number>),
+        }}
+        enabled={childPlans.length > 0}
+      />
+
       {/* Empty state */}
       {!hasPlans && (
         <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
@@ -814,7 +832,7 @@ export function PlannerClient({
             <p className="font-display text-2xl text-ink font-light mb-2">
               Generate your first plan!
             </p>
-            <p className="text-[13px] text-clay font-serif italic mb-6 max-w-xs mx-auto">
+            <p className="text-[13px] text-clay italic mb-6 max-w-xs mx-auto">
               We&apos;ll create a personalised learning week based on your
               children&apos;s ages, interests, and your family style.
             </p>
@@ -1125,7 +1143,7 @@ export function PlannerClient({
                   {/* Empty day - no plan at all */}
                   {!plan && (
                     <div className="flex flex-col items-center justify-center h-[120px] text-center gap-2">
-                      <p className="text-[11px] text-clay/30 italic font-serif">
+                      <p className="text-[11px] text-clay/30 italic">
                         {isWeekend ? 'Weekend' : 'No activities'}
                       </p>
                       {!past && (
@@ -1334,7 +1352,7 @@ export function PlannerClient({
                   {/* No activities */}
                   {(!plan || plan.blocks.length === 0) && (
                     <div className="px-5 py-6 text-center">
-                      <p className="text-[12px] text-clay/40 italic font-serif">
+                      <p className="text-[12px] text-clay/40 italic">
                         No activities planned
                       </p>
                       {!past && (
@@ -1384,7 +1402,7 @@ export function PlannerClient({
                     <p className="text-[13px] font-medium text-ink mb-1">
                       {activity.title}
                     </p>
-                    <p className="text-[11px] text-clay font-serif line-clamp-2 mb-2">
+                    <p className="text-[11px] text-clay line-clamp-2 mb-2">
                       {activity.description}
                     </p>
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -1447,7 +1465,7 @@ export function PlannerClient({
               <p className="text-sm font-semibold text-ink mb-1">
                 Why these activities?
               </p>
-              <p className="text-sm text-clay font-serif leading-relaxed">
+              <p className="text-sm text-clay leading-relaxed">
                 This week&apos;s plan is personalised for{' '}
                 {childrenProp.map((c) => c.name).join(' & ')}, based on their
                 ages, interests, and your family&apos;s preferences. We&apos;ve
@@ -1468,7 +1486,7 @@ export function PlannerClient({
                 <h3 className="font-display text-lg font-light text-ink">
                   Add activity
                 </h3>
-                <p className="text-[12px] text-clay font-serif">
+                <p className="text-[12px] text-clay">
                   {formatDateLong(showAddModal.date)} &middot;{' '}
                   {TIME_SLOTS.find((s) => s.key === showAddModal.slot)?.label}
                 </p>
@@ -1501,7 +1519,7 @@ export function PlannerClient({
             <div className="overflow-y-auto flex-1 space-y-2">
               {searchQuery.trim() ? (
                 searchResults.length === 0 ? (
-                  <p className="text-[12px] text-clay/50 italic text-center py-8 font-serif">
+                  <p className="text-[12px] text-clay/50 italic text-center py-8">
                     No activities found for &ldquo;{searchQuery}&rdquo;
                   </p>
                 ) : (
@@ -1523,7 +1541,7 @@ export function PlannerClient({
                         <p className="text-[13px] font-medium text-ink">
                           {activity.title}
                         </p>
-                        <p className="text-[11px] text-clay mt-0.5 line-clamp-2 font-serif">
+                        <p className="text-[11px] text-clay mt-0.5 line-clamp-2">
                           {activity.description}
                         </p>
                         <div className="flex items-center gap-1.5 mt-1">
@@ -1567,7 +1585,7 @@ export function PlannerClient({
                         <p className="text-[13px] font-medium text-ink">
                           {activity.title}
                         </p>
-                        <p className="text-[11px] text-clay mt-0.5 line-clamp-2 font-serif">
+                        <p className="text-[11px] text-clay mt-0.5 line-clamp-2">
                           {activity.description}
                         </p>
                         <div className="flex items-center gap-1.5 mt-1">
@@ -1609,14 +1627,14 @@ export function PlannerClient({
                 <X className="h-4 w-4 text-clay" />
               </button>
             </div>
-            <p className="text-[12px] text-clay font-serif mb-4">
+            <p className="text-[12px] text-clay mb-4">
               Choose an alternative{' '}
               {CATEGORY_LABELS[swapState.category] || swapState.category}{' '}
               activity:
             </p>
 
             {swapAlternatives.length === 0 ? (
-              <p className="text-[12px] text-clay/50 italic text-center py-4 font-serif">
+              <p className="text-[12px] text-clay/50 italic text-center py-4">
                 No alternatives available in this category.
               </p>
             ) : (
@@ -1639,7 +1657,7 @@ export function PlannerClient({
                       <p className="text-[13px] font-medium text-ink">
                         {alt.title}
                       </p>
-                      <p className="text-[11px] text-clay mt-0.5 line-clamp-2 font-serif">
+                      <p className="text-[11px] text-clay mt-0.5 line-clamp-2">
                         {alt.description}
                       </p>
                       <span className="text-[10px] text-clay/50 mt-1 inline-block">

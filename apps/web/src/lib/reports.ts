@@ -640,15 +640,15 @@ function htmlShell(title: string, childName: string, dateRange: string, generate
 
     :root {
       --forest: #1C3520;
-      --parchment: #F5F0E4;
-      --linen: #EDE6D3;
-      --stone: #D5C9B0;
-      --sage: #8FAF7E;
-      --moss: #3D6142;
-      --terracotta: #C4623A;
-      --ink: #1A1612;
-      --umber: #6B4F35;
-      --clay: #9E7B5A;
+      --parchment: #F2F5F0;
+      --linen: #FFFFFF;
+      --stone: #D8DDD5;
+      --sage: #8A9B8E;
+      --moss: #4CAF7C;
+      --terracotta: #4CAF7C;
+      --ink: #1A2E1E;
+      --umber: #1A2E1E;
+      --clay: #5A6B5E;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }

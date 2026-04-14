@@ -434,7 +434,7 @@ export function ScheduleClient({
             <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
               Weekly <em className="text-moss italic">Schedule</em>
             </h1>
-            <p className="text-clay mt-2 font-serif text-lg">
+            <p className="text-clay mt-2 text-lg">
               {child ? `Daily schedule for ${child.name}.` : 'No children found.'}
             </p>
           </div>
@@ -457,7 +457,7 @@ export function ScheduleClient({
             <button
               key={c.id}
               onClick={() => setSelectedChild(c.id)}
-              className={`rounded-[14px] px-4 py-2 text-sm font-medium transition-all ${
+              className={`rounded-2xl px-4 py-2 text-sm font-medium transition-all ${
                 selectedChild === c.id
                   ? 'bg-forest text-parchment shadow-sm'
                   : 'bg-linen text-clay/50 hover:bg-parchment'
@@ -534,7 +534,7 @@ export function ScheduleClient({
             <button
               onClick={toggleAttendance}
               disabled={togglingAttendance}
-              className={`rounded-[14px] px-4 py-2 text-sm font-medium transition-all ${
+              className={`rounded-2xl px-4 py-2 text-sm font-medium transition-all ${
                 dayPlan.attendance_logged
                   ? 'bg-moss/10 text-moss'
                   : 'bg-linen text-clay/50 hover:bg-parchment'
@@ -549,7 +549,7 @@ export function ScheduleClient({
         <button
           onClick={toggleHoliday}
           disabled={saving}
-          className={`rounded-[14px] px-4 py-3 text-sm font-medium transition-all flex items-center gap-2 shrink-0 ${
+          className={`rounded-2xl px-4 py-3 text-sm font-medium transition-all flex items-center gap-2 shrink-0 ${
             isHoliday
               ? 'bg-amber/10 text-amber border border-amber/20'
               : 'bg-linen text-clay/50 hover:bg-parchment border border-stone'
@@ -562,7 +562,7 @@ export function ScheduleClient({
 
       {/* Holiday notice */}
       {isHoliday && (
-        <div className="flex items-center gap-3 rounded-[14px] bg-amber/8 border border-amber/15 px-5 py-4">
+        <div className="flex items-center gap-3 rounded-2xl bg-amber/8 border border-amber/15 px-5 py-4">
           <CalendarOff className="h-5 w-5 text-amber shrink-0" />
           <div>
             <p className="text-sm font-semibold text-amber">Holiday / Break</p>
@@ -602,7 +602,7 @@ export function ScheduleClient({
             return (
               <div
                 key={index}
-                className={`rounded-[14px] border p-4 transition-all ${
+                className={`rounded-2xl border p-4 transition-all ${
                   block.completed ? 'opacity-60' : ''
                 } ${colorClass.split(' ').filter((c: string) => c.startsWith('border-')).join(' ')} bg-linen`}
               >
@@ -639,7 +639,7 @@ export function ScheduleClient({
                       </Link>
                     )}
                     {block.notes && (
-                      <p className="text-[11px] text-clay/40 font-serif mt-1">{block.notes}</p>
+                      <p className="text-[11px] text-clay/40 mt-1">{block.notes}</p>
                     )}
                   </div>
                   <button
@@ -662,7 +662,7 @@ export function ScheduleClient({
           {!showAddBlock ? (
             <button
               onClick={() => setShowAddBlock(true)}
-              className="w-full rounded-[14px] border-2 border-dashed border-forest/10 p-4 text-sm font-medium text-clay/40 hover:text-moss hover:border-moss/20 transition-all flex items-center justify-center gap-2"
+              className="w-full rounded-2xl border-2 border-dashed border-forest/10 p-4 text-sm font-medium text-clay/40 hover:text-moss hover:border-moss/20 transition-all flex items-center justify-center gap-2"
             >
               <Plus className="h-4 w-4" />
               Add a time block
@@ -687,7 +687,7 @@ export function ScheduleClient({
                   <select
                     value={newBlockTime}
                     onChange={(e) => setNewBlockTime(e.target.value)}
-                    className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                    className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                   >
                     {DEFAULT_TIMES.map((t) => (
                       <option key={t} value={t}>{t}</option>
@@ -699,7 +699,7 @@ export function ScheduleClient({
                   <select
                     value={newBlockSubject}
                     onChange={(e) => setNewBlockSubject(e.target.value)}
-                    className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                    className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                   >
                     {allSubjects.map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -712,7 +712,7 @@ export function ScheduleClient({
                     type="text"
                     value={newBlockTitle}
                     onChange={(e) => setNewBlockTitle(e.target.value)}
-                    className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                    className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                     placeholder={newBlockSubject === 'Break' ? 'Break' : 'e.g., Nature walk journaling'}
                   />
                 </div>
@@ -725,7 +725,7 @@ export function ScheduleClient({
                     step={5}
                     value={newBlockDuration}
                     onChange={(e) => setNewBlockDuration(parseInt(e.target.value, 10))}
-                    className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                    className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                   />
                 </div>
               </div>
@@ -735,7 +735,7 @@ export function ScheduleClient({
                   type="text"
                   value={newBlockNotes}
                   onChange={(e) => setNewBlockNotes(e.target.value)}
-                  className="w-full rounded-[14px] border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
+                  className="w-full rounded-2xl border border-forest/10 bg-parchment/50 px-4 py-2.5 text-sm text-umber focus:border-moss focus:outline-none"
                   placeholder="Any notes about this block..."
                 />
               </div>
@@ -767,7 +767,7 @@ export function ScheduleClient({
           <div className="text-center">
             <Clock className="mx-auto mb-3 h-8 w-8 text-clay/20" />
             <p className="font-medium text-clay/40">No schedule for {formatDateFull(selectedDate)}</p>
-            <p className="text-sm text-clay/30 mt-1 font-serif">
+            <p className="text-sm text-clay/30 mt-1">
               Add time blocks above or mark as a holiday.
             </p>
           </div>
@@ -793,7 +793,7 @@ export function ScheduleClient({
               <button
                 key={date}
                 onClick={() => setSelectedDay(i)}
-                className={`rounded-[14px] p-3 text-left transition-all ${
+                className={`rounded-2xl p-3 text-left transition-all ${
                   selectedDay === i
                     ? 'bg-moss/10 border border-moss/20'
                     : dateIsHoliday

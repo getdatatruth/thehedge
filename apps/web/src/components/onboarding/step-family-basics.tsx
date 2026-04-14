@@ -33,7 +33,7 @@ export function StepFamilyBasics() {
         <h2 className="font-display text-xl font-semibold text-ink">
           Tell us about your family
         </h2>
-        <p className="text-sm text-clay mt-1 font-serif">
+        <p className="text-sm text-clay mt-1">
           Just the basics to get you started.
         </p>
       </div>

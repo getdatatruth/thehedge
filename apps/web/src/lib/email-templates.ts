@@ -1,13 +1,13 @@
 // Shared styles for all email templates
 const COLORS = {
-  forest: '#2D5016',
-  moss: '#4A7C2E',
-  parchment: '#F5F0E8',
-  linen: '#EDE8DE',
-  ink: '#1A1A1A',
-  clay: '#6B6B6B',
-  terracotta: '#C0532C',
-  stone: '#D4CFC5',
+  forest: '#1C3520',
+  moss: '#4CAF7C',
+  parchment: '#F2F5F0',
+  linen: '#FFFFFF',
+  ink: '#1A2E1E',
+  clay: '#5A6B5E',
+  terracotta: '#4CAF7C',
+  stone: '#D8DDD5',
 };
 
 function baseLayout(content: string, preheader?: string): string {

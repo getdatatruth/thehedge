@@ -70,7 +70,7 @@ export default function PricingPage() {
       <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-forest">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-forest">
               <TreePine className="h-4 w-4 text-sage" />
             </div>
             <span className="font-display text-lg font-bold text-forest">The Hedge</span>
@@ -102,7 +102,7 @@ export default function PricingPage() {
           {TIERS.map((tier) => (
             <div
               key={tier.name}
-              className={`relative rounded-[14px] bg-parchment p-6 ${
+              className={`relative rounded-2xl bg-parchment p-6 ${
                 tier.popular
                   ? 'ring-2 ring-moss shadow-xl shadow-forest/10'
                   : 'border border-stone'

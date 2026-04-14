@@ -15,7 +15,7 @@ import {
   DialogClose,
   DialogHeader,
 } from '@/components/ui/dialog';
-import { Star, CheckCircle, Users, Clock, Calendar } from 'lucide-react';
+import { Star, CheckCircle, Users, Clock, Calendar, BookOpen, Camera, X } from 'lucide-react';
 
 interface Child {
   id: string;
@@ -53,6 +53,10 @@ export function LogActivityModal({
     defaultDuration ? String(defaultDuration) : ''
   );
   const [notes, setNotes] = useState('');
+  const [diaryEntry, setDiaryEntry] = useState('');
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [saveToPortfolio, setSaveToPortfolio] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -86,6 +90,10 @@ export function LogActivityModal({
       setDate(new Date().toISOString().split('T')[0]);
       setDuration(defaultDuration ? String(defaultDuration) : '');
       setNotes('');
+      setDiaryEntry('');
+      setPhotos([]);
+      setPhotoUrls([]);
+      setSaveToPortfolio(false);
       setRating(null);
       setError(null);
       setSuccess(false);
@@ -152,14 +160,14 @@ export function LogActivityModal({
       <DialogContent className="sm:max-w-md bg-linen border-stone">
         {success ? (
           <div className="text-center space-y-5 py-6 animate-scale-in">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[14px] bg-gradient-to-br from-forest to-moss shadow-lg">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-lg">
               <CheckCircle className="h-8 w-8 text-parchment" />
             </div>
             <DialogHeader>
               <DialogTitle className="font-display text-center text-2xl font-light text-ink">
                 Logged!
               </DialogTitle>
-              <DialogDescription className="text-center text-clay/60 font-serif">
+              <DialogDescription className="text-center text-clay/60">
                 &quot;{title}&quot; has been added to your family timeline.
               </DialogDescription>
             </DialogHeader>
@@ -173,7 +181,7 @@ export function LogActivityModal({
               <DialogTitle className="font-display text-xl font-light text-ink">
                 We did <em className="text-moss italic">this</em>!
               </DialogTitle>
-              <DialogDescription className="text-clay/60 font-serif">
+              <DialogDescription className="text-clay/60">
                 Log &quot;{title}&quot; to your family timeline.
               </DialogDescription>
             </DialogHeader>
@@ -190,12 +198,12 @@ export function LogActivityModal({
                     {[1, 2].map((i) => (
                       <div
                         key={i}
-                        className="h-10 w-24 rounded-[4px] bg-stone/30 animate-pulse"
+                        className="h-10 w-24 rounded-2xl bg-stone/30 animate-pulse"
                       />
                     ))}
                   </div>
                 ) : familyChildren.length === 0 ? (
-                  <p className="text-xs text-clay/40 italic font-serif">
+                  <p className="text-xs text-clay/40 italic">
                     No children in your family profile yet.
                   </p>
                 ) : (
@@ -209,7 +217,7 @@ export function LogActivityModal({
                           tabIndex={0}
                           onClick={() => toggleChild(child.id)}
                           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleChild(child.id); } }}
-                          className={`flex items-center gap-2 rounded-[4px] border px-3 py-2 text-sm transition-all cursor-pointer ${
+                          className={`flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm transition-all cursor-pointer ${
                             isSelected
                               ? 'border-moss bg-moss/8 text-forest font-medium'
                               : 'border-stone bg-parchment/30 text-clay hover:border-moss/40'
@@ -253,7 +261,7 @@ export function LogActivityModal({
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="rounded-[4px] border-stone bg-parchment/30 shadow-sm text-sm"
+                    className="rounded-2xl border-stone bg-parchment/30 shadow-sm text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -272,7 +280,7 @@ export function LogActivityModal({
                     placeholder={defaultDuration ? String(defaultDuration) : 'e.g. 30'}
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
-                    className="rounded-[4px] border-stone bg-parchment/30 shadow-sm text-sm"
+                    className="rounded-2xl border-stone bg-parchment/30 shadow-sm text-sm"
                   />
                 </div>
               </div>
@@ -304,7 +312,7 @@ export function LogActivityModal({
                     </button>
                   ))}
                   {rating && (
-                    <span className="ml-2 text-xs text-clay/50 self-center font-serif italic">
+                    <span className="ml-2 text-xs text-clay/50 self-center italic">
                       {rating === 1
                         ? 'Not great'
                         : rating === 2
@@ -333,13 +341,104 @@ export function LogActivityModal({
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={3}
-                  className="rounded-[4px] border-stone bg-parchment/30 shadow-sm resize-none text-sm"
+                  className="rounded-2xl border-stone bg-parchment/30 shadow-sm resize-none text-sm"
                 />
+              </div>
+
+              {/* Diary entry (for portfolio) */}
+              <div className="space-y-2">
+                <Label
+                  htmlFor="log-diary"
+                  className="text-umber text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1.5"
+                >
+                  <BookOpen className="h-3 w-3 text-clay/40" />
+                  Diary entry (optional)
+                </Label>
+                <Textarea
+                  id="log-diary"
+                  placeholder="What did they learn? Any breakthrough moments? This can be added to their portfolio."
+                  value={diaryEntry}
+                  onChange={(e) => setDiaryEntry(e.target.value)}
+                  rows={3}
+                  className="rounded-2xl border-stone bg-parchment/30 shadow-sm resize-none text-sm"
+                />
+              </div>
+
+              {/* Photo upload */}
+              <div className="space-y-2">
+                <Label className="text-umber text-[9px] font-bold uppercase tracking-[0.2em] flex items-center gap-1.5">
+                  <Camera className="h-3 w-3 text-clay/40" />
+                  Photos (optional)
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {photoUrls.map((url, i) => (
+                    <div key={i} className="relative h-16 w-16 rounded-xl overflow-hidden bg-stone/20">
+                      <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newPhotos = [...photos];
+                          const newUrls = [...photoUrls];
+                          URL.revokeObjectURL(newUrls[i]);
+                          newPhotos.splice(i, 1);
+                          newUrls.splice(i, 1);
+                          setPhotos(newPhotos);
+                          setPhotoUrls(newUrls);
+                        }}
+                        className="absolute top-0.5 right-0.5 h-5 w-5 rounded-full bg-black/50 flex items-center justify-center"
+                      >
+                        <X className="h-3 w-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                  {photos.length < 5 && (
+                    <label className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed border-stone/40 hover:border-cat-nature/40 transition-colors">
+                      <Camera className="h-5 w-5 text-stone" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && photos.length < 5) {
+                            setPhotos([...photos, file]);
+                            setPhotoUrls([...photoUrls, URL.createObjectURL(file)]);
+                          }
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  )}
+                </div>
+                {photos.length > 0 && (
+                  <p className="text-[10px] text-clay">{photos.length}/5 photos</p>
+                )}
+              </div>
+
+              {/* Save to portfolio toggle */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-umber">Save to portfolio</p>
+                  <p className="text-[11px] text-clay">Include diary entry and photos in learning portfolio</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSaveToPortfolio(!saveToPortfolio)}
+                  className={`relative h-6 w-11 rounded-full transition-colors ${
+                    saveToPortfolio ? 'bg-cat-nature' : 'bg-stone/40'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                      saveToPortfolio ? 'translate-x-5' : 'translate-x-0.5'
+                    }`}
+                  />
+                </button>
               </div>
 
               {/* Error */}
               {error && (
-                <p className="text-sm text-terracotta bg-terracotta/5 rounded-[4px] px-3 py-2">
+                <p className="text-sm text-terracotta bg-terracotta/5 rounded-2xl px-3 py-2">
                   {error}
                 </p>
               )}

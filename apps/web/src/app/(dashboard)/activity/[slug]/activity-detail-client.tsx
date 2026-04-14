@@ -6,6 +6,7 @@ import { CATEGORY_CONFIG } from '@/components/shared/activity-card';
 import { ActivityCard } from '@/components/shared/activity-card';
 import { LogActivityModal } from '@/components/shared/log-activity-modal';
 import { FavouriteButton } from '@/components/shared/favourite-button';
+import { InsightCard } from '@/components/shared/insight-card';
 import { useFavouritesStore } from '@/stores/favourites';
 import type { MockActivity } from '@/lib/mock-data';
 import {
@@ -120,7 +121,7 @@ export function ActivityDetailClient({
         <div className="relative">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-[14px] ${config.bg}`}>
+              <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${config.bg}`}>
                 <Icon className={`h-5 w-5 ${config.color}`} />
               </div>
               <span className="eyebrow">
@@ -130,7 +131,7 @@ export function ActivityDetailClient({
             {/* Action buttons */}
             <div className="flex items-center gap-1.5">
               <FavouriteButton activityId={activity.id as string} size="md" />
-              <button className="flex h-9 w-9 items-center justify-center rounded-[14px] bg-linen text-clay/30 hover:text-moss hover:bg-moss/5 transition-all">
+              <button className="flex h-9 w-9 items-center justify-center rounded-2xl bg-linen text-clay/30 hover:text-moss hover:bg-moss/5 transition-all">
                 <Share2 className="h-4 w-4" />
               </button>
             </div>
@@ -139,7 +140,7 @@ export function ActivityDetailClient({
           <h1 className="font-display text-3xl sm:text-4xl font-light text-ink mb-3 tracking-tight">
             {activity.title as string}
           </h1>
-          <p className="text-clay font-serif text-lg leading-relaxed">
+          <p className="text-clay text-lg leading-relaxed">
             {activity.description as string}
           </p>
 
@@ -182,7 +183,7 @@ export function ActivityDetailClient({
               <h3 className="font-display text-xl font-light text-ink mb-2">
                 This is a <em className="text-amber italic">premium</em> activity
               </h3>
-              <p className="text-sm text-clay/60 font-serif max-w-sm mx-auto mb-5">
+              <p className="text-sm text-clay/60 max-w-sm mx-auto mb-5">
                 Upgrade your plan to access full instructions, materials lists, and step-by-step guides for all premium activities.
               </p>
               <Link href="/settings/billing?upgrade=family" className="btn-primary inline-flex items-center gap-2">
@@ -209,6 +210,20 @@ export function ActivityDetailClient({
         </div>
       )}
 
+      {/* AI Insight */}
+      {!isPremiumLocked && (
+        <InsightCard
+          type="activity"
+          context={{
+            activityTitle: activity.title as string,
+            activityCategory: category,
+            learningOutcomes: (activity.learning_outcomes as string[]) || [],
+            aistearThemes: (activity.aistear_themes as string[]) || [],
+            nccaAreas: (activity.ncca_areas as string[]) || [],
+          }}
+        />
+      )}
+
       {/* Materials checklist */}
       {!isPremiumLocked && materials && materials.length > 0 && (
         <div className="card-elevated p-6">
@@ -224,7 +239,7 @@ export function ActivityDetailClient({
             {materials.map((item, i) => (
               <label
                 key={i}
-                className={`flex items-center gap-3 cursor-pointer group rounded-[14px] px-3 py-2.5 -mx-3 transition-all ${
+                className={`flex items-center gap-3 cursor-pointer group rounded-2xl px-3 py-2.5 -mx-3 transition-all ${
                   checkedMaterials.has(i) ? 'bg-forest/3' : 'hover:bg-linen'
                 }`}
                 onClick={() => toggleMaterial(i)}
@@ -276,7 +291,7 @@ export function ActivityDetailClient({
           {instructions.steps.map((step, i) => (
             <li
               key={i}
-              className={`flex gap-4 cursor-pointer group rounded-[14px] px-3 py-3 -mx-3 transition-all ${
+              className={`flex gap-4 cursor-pointer group rounded-2xl px-3 py-3 -mx-3 transition-all ${
                 completedSteps.has(i) ? 'bg-forest/3' : 'hover:bg-linen'
               }`}
               onClick={() => toggleStep(i)}
@@ -308,7 +323,7 @@ export function ActivityDetailClient({
         </ol>
 
         {allStepsCompleted && (
-          <div className="mt-5 flex items-center gap-3 rounded-[14px] bg-moss/8 border border-moss/15 px-4 py-3 animate-scale-in">
+          <div className="mt-5 flex items-center gap-3 rounded-2xl bg-moss/8 border border-moss/15 px-4 py-3 animate-scale-in">
             <Sparkles className="h-5 w-5 text-moss" />
             <p className="text-sm font-medium text-moss">
               All steps complete - tap &quot;We did this!&quot; below to log it.
@@ -339,20 +354,81 @@ export function ActivityDetailClient({
         </div>
       )}
 
-      {/* Tip card */}
-      <div className="rounded-[14px] bg-gradient-to-r from-amber/5 via-amber/8 to-amber/5 border border-amber/15 p-5">
+      {/* Curriculum Links */}
+      {((activity.aistear_themes as string[])?.length > 0 || (activity.ncca_areas as string[])?.length > 0) && (
+        <div className="card-elevated p-6">
+          <p className="eyebrow mb-4">Curriculum Links</p>
+          {(activity.aistear_themes as string[])?.length > 0 && (
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-clay mb-2">Aistear Themes</p>
+              <div className="flex flex-wrap gap-2">
+                {(activity.aistear_themes as string[]).map((theme: string) => (
+                  <span key={theme} className="inline-flex items-center rounded-xl bg-cat-nature/10 px-3 py-1 text-xs font-medium text-cat-nature">
+                    {theme}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {(activity.ncca_areas as string[])?.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-clay mb-2">Primary Curriculum</p>
+              <div className="flex flex-wrap gap-2">
+                {(activity.ncca_areas as string[]).map((area: string) => (
+                  <span key={area} className="inline-flex items-center rounded-xl bg-cat-science/10 px-3 py-1 text-xs font-medium text-cat-science">
+                    {area}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Parent Guide */}
+      <div className="card-elevated p-6 space-y-5">
+        <p className="eyebrow">Parent Guide</p>
+
+        {/* Tip */}
         <div className="flex gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[14px] bg-amber/10">
-            <Lightbulb className="h-4 w-4 text-amber" />
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cat-movement/10">
+            <Lightbulb className="h-4 w-4 text-cat-movement" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-umber mb-1">Parent tip</p>
-            <p className="text-[13px] text-clay/60 font-serif leading-relaxed">
-              Let your child lead the pace. If they want to spend longer on one step, that&apos;s
-              great - curiosity-driven learning sticks better than rushing through.
+            <p className="text-sm font-semibold text-umber mb-1">Tip</p>
+            <p className="text-[13px] text-clay leading-relaxed">
+              {(activity.parent_tip as string) || "Let your child lead the pace. If they want to spend longer on one step, that's great - curiosity-driven learning sticks better than rushing through."}
             </p>
           </div>
         </div>
+
+        {/* Conversation starters */}
+        {Array.isArray(activity.conversation_starters) && (activity.conversation_starters as string[]).length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-umber mb-2">Conversation starters</p>
+            <ul className="space-y-1.5">
+              {(activity.conversation_starters as string[]).map((q, i) => (
+                <li key={i} className="text-[13px] text-clay leading-relaxed pl-4 relative before:content-[''] before:absolute before:left-0 before:top-2 before:h-1.5 before:w-1.5 before:rounded-full before:bg-cat-nature/40">
+                  {q}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Signs of learning */}
+        {Array.isArray(activity.signs_of_learning) && (activity.signs_of_learning as string[]).length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-umber mb-2">Signs of learning</p>
+            <ul className="space-y-1.5">
+              {(activity.signs_of_learning as string[]).map((s, i) => (
+                <li key={i} className="text-[13px] text-clay leading-relaxed pl-4 relative before:content-[''] before:absolute before:left-0 before:top-2 before:h-1.5 before:w-1.5 before:rounded-full before:bg-cat-maths/40">
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Variations */}
@@ -368,7 +444,7 @@ export function ActivityDetailClient({
                 href={`/activity/${v.slug}`}
                 className="card-interactive p-4 flex items-center gap-3"
               >
-                <div className={`flex h-9 w-9 items-center justify-center rounded-[14px] ${CATEGORY_CONFIG[v.category]?.bg || 'bg-moss/10'}`}>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-2xl ${CATEGORY_CONFIG[v.category]?.bg || 'bg-moss/10'}`}>
                   {(() => { const VIcon = CATEGORY_CONFIG[v.category]?.icon; return VIcon ? <VIcon className={`h-4 w-4 ${CATEGORY_CONFIG[v.category]?.color}`} /> : null; })()}
                 </div>
                 <div className="flex-1 min-w-0">

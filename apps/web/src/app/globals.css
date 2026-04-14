@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Cabinet Grotesk", system-ui, sans-serif;
+  --font-sans: system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
   --font-serif: var(--font-serif);
@@ -48,41 +48,53 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* ─── Brand Colors (from design brief) ─── */
+  /* ─── Brand Colors (v2 modern sage palette) ─── */
 
   /* Green Scale */
   --color-forest: #1C3520;
-  --color-moss: #3D6142;
-  --color-fern: #5E8B52;
-  --color-sage: #8FAF7E;
+  --color-moss: #4CAF7C;
+  --color-fern: #2E7D32;
+  --color-sage: #8A9B8E;
   --color-mist: #BDD4B0;
 
-  /* Neutral / Warm Scale */
-  --color-parchment: #F5F0E4;
-  --color-linen: #EDE6D3;
-  --color-stone: #D5C9B0;
-  --color-umber: #6B4F35;
-  --color-clay: #9E7B5A;
-  --color-ink: #1A1612;
+  /* Neutral Scale */
+  --color-parchment: #F2F5F0;
+  --color-linen: #FFFFFF;
+  --color-stone: #D8DDD5;
+  --color-umber: #1A2E1E;
+  --color-clay: #5A6B5E;
+  --color-ink: #1A2E1E;
 
   /* Accents */
-  --color-terracotta: #C4623A;
-  --color-amber: #C9922E;
+  --color-terracotta: #4CAF7C;
+  --color-amber: #F5A623;
 
-  /* Legacy aliases (for gradual migration) */
+  /* Legacy aliases */
   --color-green-deep: #1C3520;
-  --color-green-mid: #3D6142;
-  --color-green-light: #5E8B52;
-  --color-cream: #F5F0E4;
-  --color-cream-dark: #EDE6D3;
-  --color-bark: #6B4F35;
-  --color-bark-light: #9E7B5A;
-  --color-gold: #C9922E;
-  --color-gold-light: #C9922E;
-  --color-moss-old: #8FAF7E;
-  --color-sky: #87CEEB;
-  --color-berry: #8B3A62;
-  --color-rust: #C4623A;
+  --color-green-mid: #4CAF7C;
+  --color-green-light: #2E7D32;
+  --color-cream: #F2F5F0;
+  --color-cream-dark: #FFFFFF;
+  --color-bark: #1A2E1E;
+  --color-bark-light: #5A6B5E;
+  --color-gold: #F5A623;
+  --color-gold-light: #F5A623;
+  --color-moss-old: #8A9B8E;
+  --color-sky: #5BBDD4;
+  --color-berry: #E85BAD;
+  --color-rust: #4CAF7C;
+
+  /* Category Colors */
+  --color-cat-nature: #4CAF7C;
+  --color-cat-science: #5B8DEF;
+  --color-cat-art: #E8735A;
+  --color-cat-maths: #9B7BD4;
+  --color-cat-literacy: #5BBDD4;
+  --color-cat-movement: #F5A623;
+  --color-cat-kitchen: #D4845B;
+  --color-cat-life-skills: #2E7D32;
+  --color-cat-calm: #8A9B8E;
+  --color-cat-social: #E85BAD;
 
   /* Animation */
   --animate-fade-up: fade-up 0.55s ease both;
@@ -131,38 +143,38 @@
 }
 
 :root {
-  --background: #F5F0E4;
-  --foreground: #6B4F35;
-  --card: #EDE6D3;
-  --card-foreground: #6B4F35;
-  --popover: #F5F0E4;
-  --popover-foreground: #6B4F35;
+  --background: #F2F5F0;
+  --foreground: #1A2E1E;
+  --card: #FFFFFF;
+  --card-foreground: #1A2E1E;
+  --popover: #F2F5F0;
+  --popover-foreground: #1A2E1E;
   --primary: #1C3520;
-  --primary-foreground: #F5F0E4;
-  --secondary: #EDE6D3;
-  --secondary-foreground: #6B4F35;
-  --muted: #EDE6D3;
-  --muted-foreground: #9E7B5A;
-  --accent: #EDE6D3;
-  --accent-foreground: #6B4F35;
-  --destructive: #C4623A;
-  --border: #D5C9B0;
-  --input: #D5C9B0;
-  --ring: #3D6142;
-  --chart-1: #3D6142;
-  --chart-2: #C9922E;
-  --chart-3: #8B3A62;
-  --chart-4: #87CEEB;
-  --chart-5: #8FAF7E;
-  --radius: 0.75rem;
+  --primary-foreground: #F2F5F0;
+  --secondary: #FFFFFF;
+  --secondary-foreground: #1A2E1E;
+  --muted: #E8EDE6;
+  --muted-foreground: #8A9B8E;
+  --accent: #E8EDE6;
+  --accent-foreground: #1A2E1E;
+  --destructive: #DC3545;
+  --border: #D8DDD5;
+  --input: #D8DDD5;
+  --ring: #4CAF7C;
+  --chart-1: #4CAF7C;
+  --chart-2: #5B8DEF;
+  --chart-3: #E8735A;
+  --chart-4: #9B7BD4;
+  --chart-5: #F5A623;
+  --radius: 1rem;
   --sidebar: #1C3520;
-  --sidebar-foreground: #F5F0E4;
-  --sidebar-primary: #5E8B52;
-  --sidebar-primary-foreground: #F5F0E4;
+  --sidebar-foreground: #F2F5F0;
+  --sidebar-primary: #4CAF7C;
+  --sidebar-primary-foreground: #F2F5F0;
   --sidebar-accent: #2A4A2E;
-  --sidebar-accent-foreground: #F5F0E4;
+  --sidebar-accent-foreground: #F2F5F0;
   --sidebar-border: #2A4A2E;
-  --sidebar-ring: #5E8B52;
+  --sidebar-ring: #4CAF7C;
 }
 
 @layer base {
@@ -171,17 +183,33 @@
   }
   body {
     @apply bg-parchment text-umber;
-    font-family: "Cabinet Grotesk", system-ui, sans-serif;
+    font-family: system-ui, -apple-system, sans-serif;
     font-feature-settings: "kern" 1, "liga" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  h1, h2, h3, h4 {
-    font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+  h1 {
     color: var(--color-ink);
     letter-spacing: -0.02em;
     font-weight: 300;
     line-height: 1.05;
+  }
+  h2 {
+    color: var(--color-ink);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  h3 {
+    color: var(--color-ink);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  h4 {
+    color: var(--color-ink);
+    font-weight: 600;
+    line-height: 1.3;
   }
 }
 
@@ -190,7 +218,7 @@
     font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
   }
   .font-body {
-    font-family: "Cabinet Grotesk", system-ui, sans-serif;
+    font-family: system-ui, -apple-system, sans-serif;
   }
   .font-serif {
     font-family: var(--font-serif), "Instrument Serif", Georgia, serif;
@@ -207,12 +235,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--color-terracotta);
+  color: var(--color-moss);
 }
 .eyebrow::before {
   content: "";
@@ -229,7 +257,7 @@
    Glass morphism
    ────────────────────────────────────────────── */
 .glass {
-  background: rgba(245, 240, 228, 0.96);
+  background: rgba(242, 245, 240, 0.96);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--color-stone);
@@ -239,30 +267,31 @@
   background: rgba(28, 53, 32, 0.92);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(245, 240, 228, 0.08);
+  border: 1px solid rgba(242, 245, 240, 0.08);
 }
 
 /* ──────────────────────────────────────────────
-   Card system (design brief: linen bg, stone borders)
+   Card system (v2: white bg, no borders, subtle shadow)
    ────────────────────────────────────────────── */
 .card-elevated {
   background: var(--color-linen);
-  border: 1px solid var(--color-stone);
-  border-radius: 14px;
-  transition: border-color 0.15s ease;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.15s ease;
 }
 
 .card-interactive {
   background: var(--color-linen);
-  border: 1px solid var(--color-stone);
-  border-radius: 14px;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   transition: all 0.15s ease;
   cursor: pointer;
 }
 
 .card-interactive:hover {
-  border-color: rgba(61, 97, 66, 0.25);
-  box-shadow: 0 2px 8px rgba(28, 53, 32, 0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .card-interactive:active {
@@ -278,7 +307,7 @@
 }
 
 /* ──────────────────────────────────────────────
-   Button system (design brief: 4px radius)
+   Button system (v2: 14px radius)
    ────────────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
@@ -286,13 +315,13 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 12px 24px;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
   color: var(--color-parchment);
   background: var(--color-forest);
-  border-radius: 4px;
+  border-radius: 14px;
   border: none;
   transition: all 0.2s;
   cursor: pointer;
@@ -313,13 +342,13 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 12px 24px;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
   color: var(--color-forest);
   background: transparent;
-  border-radius: 4px;
+  border-radius: 14px;
   border: 1.5px solid rgba(28, 53, 32, 0.25);
   transition: all 0.2s;
   cursor: pointer;
@@ -334,14 +363,14 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
   color: var(--color-umber);
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(107, 79, 53, 0.3);
+  border-bottom: 1px solid rgba(26, 46, 30, 0.3);
   padding: 4px 0;
   transition: all 0.2s;
   cursor: pointer;
@@ -358,13 +387,13 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 12px 24px;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
   color: var(--color-forest);
   background: var(--color-parchment);
-  border-radius: 4px;
+  border-radius: 14px;
   border: none;
   transition: all 0.2s;
   cursor: pointer;
@@ -381,13 +410,13 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 12px 24px;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.03em;
   color: white;
   background: var(--color-terracotta);
-  border-radius: 4px;
+  border-radius: 14px;
   border: none;
   transition: all 0.2s;
   cursor: pointer;
@@ -395,7 +424,7 @@
 
 .btn-terra:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(196, 98, 58, 0.3);
+  box-shadow: 0 4px 12px rgba(76, 175, 124, 0.3);
 }
 
 /* ──────────────────────────────────────────────
@@ -431,14 +460,14 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(94, 139, 82, 0.3) 30%,
-    rgba(94, 139, 82, 0.1) 70%,
+    rgba(76, 175, 124, 0.3) 30%,
+    rgba(76, 175, 124, 0.1) 70%,
     transparent
   );
 }
 
 /* ──────────────────────────────────────────────
-   Category strip for cards
+   Category strip for cards (v2 colors)
    ────────────────────────────────────────────── */
 .category-strip {
   position: relative;
@@ -452,22 +481,22 @@
   right: 0;
   height: 3px;
 }
-.category-strip[data-category="nature"]::before { background: linear-gradient(90deg, #3D6142, #5E8B52); }
-.category-strip[data-category="kitchen"]::before { background: linear-gradient(90deg, #C9922E, #D4A84A); }
-.category-strip[data-category="science"]::before { background: linear-gradient(90deg, #5B9BD5, #87CEEB); }
-.category-strip[data-category="art"]::before { background: linear-gradient(90deg, #8B3A62, #C06090); }
-.category-strip[data-category="movement"]::before { background: linear-gradient(90deg, #C4623A, #D4834F); }
-.category-strip[data-category="literacy"]::before { background: linear-gradient(90deg, #1C3520, #3D6142); }
-.category-strip[data-category="maths"]::before { background: linear-gradient(90deg, #C9922E, #D4A84A); }
-.category-strip[data-category="life_skills"]::before { background: linear-gradient(90deg, #6B4F35, #8B6F4E); }
-.category-strip[data-category="calm"]::before { background: linear-gradient(90deg, #8B3A62, #B8749A); }
-.category-strip[data-category="social"]::before { background: linear-gradient(90deg, #3D6142, #8FAF7E); }
+.category-strip[data-category="nature"]::before { background: linear-gradient(90deg, #4CAF7C, #6BC898); }
+.category-strip[data-category="kitchen"]::before { background: linear-gradient(90deg, #D4845B, #DFA07E); }
+.category-strip[data-category="science"]::before { background: linear-gradient(90deg, #5B8DEF, #7BA8F5); }
+.category-strip[data-category="art"]::before { background: linear-gradient(90deg, #E8735A, #EE9580); }
+.category-strip[data-category="movement"]::before { background: linear-gradient(90deg, #F5A623, #F7BC5C); }
+.category-strip[data-category="literacy"]::before { background: linear-gradient(90deg, #5BBDD4, #7CCEE0); }
+.category-strip[data-category="maths"]::before { background: linear-gradient(90deg, #9B7BD4, #B39AE0); }
+.category-strip[data-category="life_skills"]::before { background: linear-gradient(90deg, #2E7D32, #4CAF50); }
+.category-strip[data-category="calm"]::before { background: linear-gradient(90deg, #8A9B8E, #A5B3A9); }
+.category-strip[data-category="social"]::before { background: linear-gradient(90deg, #E85BAD, #EE82C2); }
 
 /* ──────────────────────────────────────────────
    Input focus
    ────────────────────────────────────────────── */
 input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
-  box-shadow: 0 0 0 3px rgba(61, 97, 66, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(76, 175, 124, 0.12) !important;
 }
 
 /* ──────────────────────────────────────────────
@@ -517,22 +546,22 @@ input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
   display: inline-flex;
   align-items: center;
   padding: 2px 6px;
-  font-family: "Cabinet Grotesk", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.04em;
   border-radius: 3px;
 }
 .tag-sage {
-  background: rgba(143, 175, 126, 0.2);
+  background: rgba(138, 155, 142, 0.2);
   color: var(--color-sage);
 }
 .tag-terra {
-  background: rgba(196, 98, 58, 0.2);
-  color: #E8A88A;
+  background: rgba(76, 175, 124, 0.2);
+  color: var(--color-terracotta);
 }
 .tag-amber {
-  background: rgba(201, 146, 46, 0.2);
+  background: rgba(245, 166, 35, 0.2);
   color: var(--color-amber);
 }
 
@@ -541,13 +570,14 @@ input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
    ────────────────────────────────────────────── */
 .stat {
   background: var(--color-linen);
-  border: 1px solid var(--color-stone);
+  border: none;
   border-radius: 16px;
   padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
 }
 .stat-dark {
-  background: rgba(245, 240, 228, 0.06);
-  border: 1px solid rgba(245, 240, 228, 0.1);
+  background: rgba(242, 245, 240, 0.06);
+  border: 1px solid rgba(242, 245, 240, 0.1);
   border-radius: 16px;
   padding: 20px;
 }
@@ -590,18 +620,48 @@ input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
    ────────────────────────────────────────────── */
 .mesh-gradient {
   background:
-    radial-gradient(at 20% 20%, rgba(94, 139, 82, 0.1) 0%, transparent 50%),
-    radial-gradient(at 80% 20%, rgba(201, 146, 46, 0.06) 0%, transparent 50%),
-    radial-gradient(at 50% 80%, rgba(61, 97, 66, 0.08) 0%, transparent 50%),
+    radial-gradient(at 20% 20%, rgba(76, 175, 124, 0.08) 0%, transparent 50%),
+    radial-gradient(at 80% 20%, rgba(91, 141, 239, 0.05) 0%, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(46, 125, 50, 0.06) 0%, transparent 50%),
     var(--color-parchment);
 }
 
 .mesh-gradient-hero {
   background:
-    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(94, 139, 82, 0.12) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 80% at 80% 30%, rgba(201, 146, 46, 0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 70% 50% at 60% 80%, rgba(143, 175, 126, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(76, 175, 124, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 80% 30%, rgba(91, 141, 239, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 60% 80%, rgba(138, 155, 142, 0.08) 0%, transparent 70%),
     var(--color-parchment);
+}
+
+/* ──────────────────────────────────────────────
+   Auth dark mode
+   ────────────────────────────────────────────── */
+.dark-auth {
+  --color-parchment: #0D1F12;
+  --color-linen: #162A1B;
+  --color-stone: #1E3A24;
+  --color-umber: #F2F5F0;
+  --color-clay: #8A9B8E;
+  --color-ink: #F2F5F0;
+  --color-terracotta: #4CAF7C;
+  --background: #0D1F12;
+  --foreground: #F2F5F0;
+  --card: #162A1B;
+  --card-foreground: #F2F5F0;
+  --popover: #162A1B;
+  --popover-foreground: #F2F5F0;
+  --primary: #4CAF7C;
+  --primary-foreground: #0D1F12;
+  --secondary: #1E3A24;
+  --secondary-foreground: #F2F5F0;
+  --muted: #1E3A24;
+  --muted-foreground: #8A9B8E;
+  --accent: #1E3A24;
+  --accent-foreground: #F2F5F0;
+  --border: #1E3A24;
+  --input: #1E3A24;
+  --ring: #4CAF7C;
 }
 
 /* ──────────────────────────────────────────────

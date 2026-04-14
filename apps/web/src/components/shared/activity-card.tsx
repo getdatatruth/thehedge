@@ -23,22 +23,22 @@ const CATEGORY_CONFIG: Record<
   string,
   { icon: React.ElementType; color: string; bg: string; gradient: string; label: string }
 > = {
-  nature: { icon: TreePine, color: 'text-moss', bg: 'bg-sage/15', gradient: 'from-sage/20 to-sage/5', label: 'Nature' },
-  kitchen: { icon: UtensilsCrossed, color: 'text-amber', bg: 'bg-amber/10', gradient: 'from-amber/20 to-amber/5', label: 'Kitchen' },
-  science: { icon: FlaskConical, color: 'text-sky', bg: 'bg-sky/12', gradient: 'from-sky/20 to-sky/5', label: 'Science' },
-  art: { icon: Palette, color: 'text-berry', bg: 'bg-berry/10', gradient: 'from-berry/15 to-berry/5', label: 'Art' },
-  movement: { icon: Dumbbell, color: 'text-terracotta', bg: 'bg-terracotta/10', gradient: 'from-terracotta/15 to-terracotta/5', label: 'Movement' },
-  literacy: { icon: BookOpen, color: 'text-forest', bg: 'bg-forest/8', gradient: 'from-forest/15 to-forest/5', label: 'Literacy' },
-  maths: { icon: Calculator, color: 'text-amber', bg: 'bg-amber/10', gradient: 'from-amber/15 to-amber/5', label: 'Maths' },
-  life_skills: { icon: Wrench, color: 'text-umber', bg: 'bg-umber/8', gradient: 'from-umber/10 to-umber/5', label: 'Life Skills' },
-  calm: { icon: Heart, color: 'text-berry', bg: 'bg-berry/10', gradient: 'from-berry/15 to-berry/5', label: 'Calm' },
-  social: { icon: HandHeart, color: 'text-moss', bg: 'bg-sage/12', gradient: 'from-sage/15 to-sage/5', label: 'Social' },
+  nature: { icon: TreePine, color: 'text-cat-nature', bg: 'bg-cat-nature/15', gradient: 'from-cat-nature/20 to-cat-nature/5', label: 'Nature' },
+  kitchen: { icon: UtensilsCrossed, color: 'text-cat-kitchen', bg: 'bg-cat-kitchen/10', gradient: 'from-cat-kitchen/20 to-cat-kitchen/5', label: 'Kitchen' },
+  science: { icon: FlaskConical, color: 'text-cat-science', bg: 'bg-cat-science/12', gradient: 'from-cat-science/20 to-cat-science/5', label: 'Science' },
+  art: { icon: Palette, color: 'text-cat-art', bg: 'bg-cat-art/10', gradient: 'from-cat-art/15 to-cat-art/5', label: 'Art' },
+  movement: { icon: Dumbbell, color: 'text-cat-movement', bg: 'bg-cat-movement/10', gradient: 'from-cat-movement/15 to-cat-movement/5', label: 'Movement' },
+  literacy: { icon: BookOpen, color: 'text-cat-literacy', bg: 'bg-cat-literacy/10', gradient: 'from-cat-literacy/15 to-cat-literacy/5', label: 'Literacy' },
+  maths: { icon: Calculator, color: 'text-cat-maths', bg: 'bg-cat-maths/10', gradient: 'from-cat-maths/15 to-cat-maths/5', label: 'Maths' },
+  life_skills: { icon: Wrench, color: 'text-cat-life-skills', bg: 'bg-cat-life-skills/10', gradient: 'from-cat-life-skills/15 to-cat-life-skills/5', label: 'Life Skills' },
+  calm: { icon: Heart, color: 'text-cat-calm', bg: 'bg-cat-calm/10', gradient: 'from-cat-calm/15 to-cat-calm/5', label: 'Calm' },
+  social: { icon: HandHeart, color: 'text-cat-social', bg: 'bg-cat-social/12', gradient: 'from-cat-social/15 to-cat-social/5', label: 'Social' },
 };
 
 const ENERGY_COLORS: Record<string, string> = {
-  calm: 'bg-sky/10 text-sky',
-  moderate: 'bg-amber/10 text-amber',
-  active: 'bg-terracotta/10 text-terracotta',
+  calm: 'bg-cat-literacy/10 text-cat-literacy',
+  moderate: 'bg-cat-movement/10 text-cat-movement',
+  active: 'bg-cat-art/10 text-cat-art',
 };
 
 interface ActivityCardProps {
@@ -74,7 +74,7 @@ export function ActivityCard({ activity, showPremiumLock }: ActivityCardProps) {
       >
         {/* Locked overlay */}
         {isLocked && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-[14px] bg-parchment/60 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-parchment/60 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity">
             <div className="text-center px-4">
               <div className="flex h-10 w-10 mx-auto items-center justify-center rounded-full bg-forest/10 mb-2">
                 <Lock className="h-4 w-4 text-forest" />
@@ -122,7 +122,7 @@ export function ActivityCard({ activity, showPremiumLock }: ActivityCardProps) {
 
         {/* Content */}
         <div className="px-5 pb-5 flex-1 flex flex-col">
-          <p className={`text-[13px] text-clay line-clamp-2 font-serif leading-relaxed mb-4 flex-1 ${isLocked ? 'select-none' : ''}`}>
+          <p className={`text-[13px] text-clay line-clamp-2 leading-relaxed mb-4 flex-1 ${isLocked ? 'select-none' : ''}`}>
             {isLocked
               ? activity.description.slice(0, 60) + '...'
               : activity.description}

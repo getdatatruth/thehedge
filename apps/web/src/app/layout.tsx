@@ -36,10 +36,6 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body
         className={`${cormorant.variable} ${instrumentSerif.variable} antialiased`}

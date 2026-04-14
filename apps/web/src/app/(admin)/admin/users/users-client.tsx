@@ -220,7 +220,7 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Users
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             {families.length} families registered.
           </p>
         </div>

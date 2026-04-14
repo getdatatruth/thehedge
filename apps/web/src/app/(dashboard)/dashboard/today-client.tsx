@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ActivityCard, CATEGORY_CONFIG } from '@/components/shared/activity-card';
 import { FilterChips } from '@/components/shared/filter-chips';
+import { InsightCard } from '@/components/shared/insight-card';
 import {
   MOCK_ACTIVITIES,
   MOCK_COLLECTIONS,
@@ -90,6 +91,7 @@ export function TodayClient({
   isFreeUser = false,
 }: TodayClientProps) {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [selectedChild, setSelectedChild] = useState<string | null>(null);
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayAbbrevs = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -216,7 +218,7 @@ export function TodayClient({
             })
           ) : (
             <div className="text-center py-4">
-              <p className="text-sage/60 text-sm font-serif italic">No plan for today yet.</p>
+              <p className="text-sage/60 text-sm italic">No plan for today yet.</p>
               <Link href="/planner" className="btn-light text-[12px] mt-3 py-2 px-4">
                 Generate a plan <ArrowRight className="h-3 w-3" />
               </Link>
@@ -234,6 +236,47 @@ export function TodayClient({
           </Link>
         </div>
       </div>
+
+      <InsightCard
+        type="today"
+        context={{
+          children: childNames.map(name => ({ name })),
+          weather: { temperature, isRaining, description: weatherDescription },
+          streak,
+          activitiesThisWeek,
+          todayActivities: todayPlanActivities.map(a => ({ title: a.title, category: a.category })),
+          categoryBreakdown: todayPlanActivities.reduce((acc, a) => { acc[a.category] = (acc[a.category] || 0) + 1; return acc; }, {} as Record<string, number>),
+        }}
+      />
+
+      {/* ─── Child Selector ─── */}
+      {childNames.length > 1 && (
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={() => setSelectedChild(null)}
+            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-all ${
+              !selectedChild
+                ? 'bg-forest text-parchment shadow-sm'
+                : 'bg-linen text-clay hover:bg-stone/30'
+            }`}
+          >
+            All
+          </button>
+          {childNames.map((name) => (
+            <button
+              key={name}
+              onClick={() => setSelectedChild(name)}
+              className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-all ${
+                selectedChild === name
+                  ? 'bg-forest text-parchment shadow-sm'
+                  : 'bg-linen text-clay hover:bg-stone/30'
+              }`}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ─── Stats Row ─── */}
       <div className="grid grid-cols-3 gap-3">
@@ -261,12 +304,12 @@ export function TodayClient({
             href="/settings/billing"
             className="card-elevated flex items-center gap-4 p-5 border-l-4 border-l-amber/40 hover:border-l-amber transition-all group"
           >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-amber/10">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber/10">
               <PromptIcon className="h-5 w-5 text-amber" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-ink">{prompt.text}</p>
-              <p className="text-[12px] text-clay/60 font-serif mt-0.5">{prompt.description}</p>
+              <p className="text-[12px] text-clay/60 mt-0.5">{prompt.description}</p>
             </div>
             <span className="text-[11px] font-bold text-amber shrink-0 group-hover:underline">
               See plans
@@ -405,7 +448,7 @@ export function TodayClient({
               <span className="text-3xl transition-transform group-hover:scale-110">{collection.emoji}</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-medium text-ink">{collection.title}</p>
-                <p className="text-[12px] text-clay font-serif">{collection.activity_ids.length} activities</p>
+                <p className="text-[12px] text-clay">{collection.activity_ids.length} activities</p>
               </div>
               <ChevronRight className="h-4 w-4 text-stone transition-all group-hover:text-terracotta group-hover:translate-x-1" />
             </Link>
@@ -416,7 +459,7 @@ export function TodayClient({
       {/* ─── Explore Section ─── */}
       <div>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-display text-2xl font-light text-ink">
+          <h2 className="text-2xl font-bold text-ink">
             Today&apos;s <em className="text-moss italic">ideas</em>
           </h2>
           <span className="text-[11px] font-bold text-clay/50 uppercase tracking-wider">
@@ -431,7 +474,7 @@ export function TodayClient({
             <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
               <div className="text-center">
                 <p className="font-medium text-umber">No activities match your filters</p>
-                <p className="text-[13px] text-clay mt-1 font-serif italic">Try removing some filters to see more ideas.</p>
+                <p className="text-[13px] text-clay mt-1 italic">Try removing some filters to see more ideas.</p>
               </div>
             </div>
           ) : (

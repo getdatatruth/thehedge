@@ -54,18 +54,20 @@ export default async function CommunityPage() {
     (m: { group_id: string }) => m.group_id
   );
 
+  // Build a set of moderator family_ids per group (admin or moderator role)
+  const { data: allModerators } = await supabase
+    .from('community_memberships')
+    .select('family_id, group_id, role')
+    .in('group_id', memberGroupIds.length > 0 ? memberGroupIds : ['__none__'])
+    .in('role', ['admin', 'moderator']);
+
+  const moderatorSet = new Set(
+    (allModerators || []).map((m: { family_id: string; group_id: string }) => `${m.group_id}:${m.family_id}`)
+  );
+
   // Fetch recent posts from groups the family belongs to
-  let posts: Array<{
-    id: string;
-    family_id: string;
-    group_id: string;
-    title: string;
-    body: string;
-    type: string;
-    created_at: string;
-    community_groups: { name: string } | { name: string }[] | null;
-    families: { name: string } | { name: string }[] | null;
-  }> = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let posts: any[] = [];
 
   if (memberGroupIds.length > 0) {
     const { data: postsData } = await supabase
@@ -93,6 +95,10 @@ export default async function CommunityPage() {
       title: post.title,
       body: post.body,
       type: post.type,
+      like_count: post.like_count ?? 0,
+      comment_count: post.comment_count ?? 0,
+      is_pinned: post.is_pinned ?? false,
+      is_moderator: moderatorSet.has(`${post.group_id}:${post.family_id}`),
       created_at: post.created_at,
       group_name: groupData?.name || 'Unknown group',
       family_name: familyData?.name || 'A family',

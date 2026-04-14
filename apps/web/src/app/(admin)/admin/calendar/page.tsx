@@ -176,7 +176,7 @@ export default function AdminCalendarPage() {
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Content Calendar
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             Plan seasonal content drops, collections, and editorial events.
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function AdminCalendarPage() {
           <Sparkles className="h-5 w-5 text-moss mt-0.5 shrink-0" />
           <div>
             <p className="text-sm font-semibold text-forest mb-1">Living content engine</p>
-            <p className="text-sm text-clay/60 font-serif leading-relaxed">
+            <p className="text-sm text-clay/60 leading-relaxed">
               Schedule content drops to keep the platform fresh. Each event can launch new activities,
               collections, or featured bundles. Users see &quot;New this week&quot; badges and seasonal
               collections automatically.
@@ -302,7 +302,7 @@ export default function AdminCalendarPage() {
         {Object.entries(grouped).map(([month, monthEvents]) => (
           <div key={month}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-[14px] bg-forest/5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-forest/5">
                 <Calendar className="h-4 w-4 text-moss" />
               </div>
               <h2 className="font-display text-base font-bold text-forest">
@@ -353,7 +353,7 @@ export default function AdminCalendarPage() {
                       </div>
                     </div>
                     {event.description && (
-                      <p className="text-xs text-clay/40 mt-1.5 ml-[76px] font-serif">{event.description}</p>
+                      <p className="text-xs text-clay/40 mt-1.5 ml-[76px]">{event.description}</p>
                     )}
                   </div>
                 );

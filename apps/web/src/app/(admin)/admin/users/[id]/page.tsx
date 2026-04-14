@@ -131,7 +131,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           {members.length > 0 ? (
             <div className="space-y-3">
               {members.map((member: { id: string; name: string; email: string; role: string; created_at: string }) => (
-                <div key={member.id} className="flex items-center gap-3 rounded-[14px] bg-parchment/50 p-3">
+                <div key={member.id} className="flex items-center gap-3 rounded-2xl bg-parchment/50 p-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-forest/10 text-sm font-bold text-forest">
                     {member.name?.charAt(0)?.toUpperCase() || '?'}
                   </div>
@@ -162,7 +162,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           {children.length > 0 ? (
             <div className="space-y-3">
               {children.map((child: { id: string; name: string; date_of_birth: string; school_status: string; interests: string[] }) => (
-                <div key={child.id} className="rounded-[14px] bg-parchment/50 p-3">
+                <div key={child.id} className="rounded-2xl bg-parchment/50 p-3">
                   <div className="flex items-center justify-between mb-2">
                     <p className="text-sm font-semibold text-forest">{child.name}</p>
                     <span className="text-xs text-clay/40">{getAge(child.date_of_birth)} years old</span>
@@ -198,7 +198,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         {recentLogs.length > 0 ? (
           <div className="space-y-2">
             {recentLogs.map((log: { id: string; date: string; activity_title: string; duration_minutes: number | null; rating: number | null; notes: string | null }) => (
-              <div key={log.id} className="flex items-center gap-3 rounded-[14px] bg-parchment/50 p-3">
+              <div key={log.id} className="flex items-center gap-3 rounded-2xl bg-parchment/50 p-3">
                 <span className="text-xs font-semibold text-clay/40 w-20 shrink-0">
                   {new Date(log.date).toLocaleDateString('en-IE', { month: 'short', day: 'numeric' })}
                 </span>

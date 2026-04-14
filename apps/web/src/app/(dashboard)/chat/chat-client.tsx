@@ -119,7 +119,7 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
           Ask <em className="text-moss italic">The Hedge</em>
         </h1>
-        <p className="text-clay mt-2 font-serif text-lg leading-relaxed">
+        <p className="text-clay mt-2 text-lg leading-relaxed">
           Your family activity companion, powered by HedgeAI.
           {context.children.length > 0 && (
             <span className="text-moss">
@@ -158,13 +158,13 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full space-y-10 animate-fade-up">
             <div className="text-center">
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-[14px] bg-gradient-to-br from-forest to-moss shadow-lg shadow-forest/20">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-lg shadow-forest/20">
                 <Sparkles className="h-8 w-8 text-parchment" />
               </div>
-              <h2 className="font-display text-2xl font-light text-ink">
+              <h2 className="text-2xl font-bold text-ink">
                 What would you like to do <em className="text-moss italic">today</em>?
               </h2>
-              <p className="text-sm text-clay/60 mt-3 font-serif max-w-sm mx-auto leading-relaxed">
+              <p className="text-sm text-clay/60 mt-3 max-w-sm mx-auto leading-relaxed">
                 Ask me anything about activities for your family. I&apos;ll personalise ideas based on your children, the weather, and your family style.
               </p>
             </div>
@@ -190,14 +190,14 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
             }`}
           >
             {msg.role === 'assistant' && (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-forest to-moss shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-sm">
                 <Sparkles className="h-4 w-4 text-parchment" />
               </div>
             )}
             <div
               className={`max-w-[85%] space-y-3 ${
                 msg.role === 'user'
-                  ? 'rounded-[14px] rounded-tr-sm bg-gradient-to-br from-forest to-moss text-parchment px-5 py-3 shadow-sm'
+                  ? 'rounded-2xl rounded-tr-sm bg-gradient-to-br from-forest to-moss text-parchment px-5 py-3 shadow-sm'
                   : ''
               }`}
             >
@@ -208,7 +208,7 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
                   {msg.suggestions.map((suggestion, j) => (
                     <div key={j} className="card-interactive p-5 space-y-3">
                       <div className="flex items-start justify-between">
-                        <h3 className="font-display font-light text-ink text-[15px]">
+                        <h3 className="font-semibold text-ink text-[15px]">
                           {suggestion.title}
                         </h3>
                         <span className="inline-flex items-center gap-1 shrink-0 ml-3 rounded-[3px] bg-linen border border-stone px-2.5 py-1 text-[11px] font-medium text-clay">
@@ -216,7 +216,7 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
                           {suggestion.duration}
                         </span>
                       </div>
-                      <p className="text-[13px] text-clay/70 font-serif leading-relaxed">
+                      <p className="text-[13px] text-clay/70 leading-relaxed">
                         {suggestion.description}
                       </p>
                       {suggestion.why_today && (
@@ -248,7 +248,7 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
               )}
             </div>
             {msg.role === 'user' && (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-linen border border-stone">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-linen border border-stone">
                 <User className="h-4 w-4 text-clay/50" />
               </div>
             )}
@@ -257,7 +257,7 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
 
         {loading && (
           <div className="flex gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-forest to-moss shadow-sm">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-sm">
               <Sparkles className="h-4 w-4 text-parchment animate-pulse" />
             </div>
             <div className="card-elevated px-5 py-3">
@@ -277,13 +277,13 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
       {/* Input */}
       <div className="border-t border-stone pt-4">
         {isAtLimit ? (
-          <div className="flex items-center gap-4 rounded-[14px] bg-gradient-to-r from-amber/5 via-amber/8 to-amber/5 border border-amber/15 p-5">
+          <div className="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-amber/5 via-amber/8 to-amber/5 border border-amber/15 p-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/10">
               <Crown className="h-5 w-5 text-amber" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-medium text-ink">You&apos;ve used all {FREE_AI_LIMIT} free suggestions this week</p>
-              <p className="text-[12px] text-clay/60 font-serif mt-0.5">Upgrade to get unlimited AI-powered activity ideas.</p>
+              <p className="text-[12px] text-clay/60 mt-0.5">Upgrade to get unlimited AI-powered activity ideas.</p>
             </div>
             <Link href="/settings/billing?upgrade=family" className="btn-primary text-sm shrink-0">
               Upgrade

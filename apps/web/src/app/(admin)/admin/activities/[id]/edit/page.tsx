@@ -206,7 +206,7 @@ export default function EditActivityPage({ params }: { params: Promise<{ id: str
             <Eye className="h-4 w-4 text-moss" />
             <h2 className="font-display text-lg font-light text-ink">Activity Preview</h2>
           </div>
-          <div className="rounded-[14px] border border-stone bg-parchment p-5 space-y-4">
+          <div className="rounded-2xl border border-stone bg-parchment p-5 space-y-4">
             <div className="flex items-center gap-3">
               <span className={`inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 text-[11px] font-medium ${config.bg} ${config.color}`}>
                 {config.label}
@@ -223,7 +223,7 @@ export default function EditActivityPage({ params }: { params: Promise<{ id: str
               </span>
             </div>
             <h3 className="font-display text-2xl font-light text-ink">{title || 'Untitled'}</h3>
-            <p className="text-sm text-clay font-serif">{description || 'No description'}</p>
+            <p className="text-sm text-clay">{description || 'No description'}</p>
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="tag bg-stone/30 text-umber">{durationMinutes}m</span>
               <span className="tag bg-stone/30 text-umber">{ageMin}–{ageMax}y</span>
@@ -234,7 +234,7 @@ export default function EditActivityPage({ params }: { params: Promise<{ id: str
             {instructions.filter(s => s.trim()).length > 0 && (
               <div>
                 <p className="text-xs font-bold text-umber mb-2">Instructions:</p>
-                <ol className="list-decimal list-inside space-y-1 text-sm text-clay font-serif">
+                <ol className="list-decimal list-inside space-y-1 text-sm text-clay">
                   {instructions.filter(s => s.trim()).map((step, i) => (
                     <li key={i}>{step}</li>
                   ))}

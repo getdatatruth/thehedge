@@ -43,7 +43,7 @@ export function StepChildren() {
         <h2 className="font-display text-xl font-semibold text-ink">
           Your children
         </h2>
-        <p className="text-sm text-clay mt-1 font-serif">
+        <p className="text-sm text-clay mt-1">
           So we can personalise ideas to their ages and interests.
         </p>
       </div>
@@ -51,7 +51,7 @@ export function StepChildren() {
       {children.map((child, index) => (
         <div
           key={index}
-          className="space-y-4 rounded-[14px] border border-stone bg-linen p-4"
+          className="space-y-4 rounded-2xl border border-stone bg-linen p-4"
         >
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-forest">

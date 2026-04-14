@@ -281,7 +281,7 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
           Find your next <em className="text-moss italic">adventure</em>
         </h1>
-        <p className="text-clay mt-2 font-serif text-base">
+        <p className="text-clay mt-2 text-base">
           {activities.length} activities across {Object.keys(CATEGORY_CONFIG).length} categories.
         </p>
       </div>
@@ -292,14 +292,14 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
           href="/settings/billing"
           className="card-elevated flex items-center gap-4 p-4 border-l-4 border-l-amber/40 hover:border-l-amber transition-all group"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-amber/10">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber/10">
             <Crown className="h-5 w-5 text-amber" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-ink">
               You&apos;re browsing {freeActivityCount} free activities
             </p>
-            <p className="text-[12px] text-clay/60 font-serif mt-0.5">
+            <p className="text-[12px] text-clay/60 mt-0.5">
               Upgrade to unlock all {activities.length} activities, including premium content across every category.
             </p>
           </div>
@@ -349,7 +349,7 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
                 <span className="text-3xl mt-0.5 transition-transform group-hover:scale-110">{collection.emoji}</span>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-[14px] font-medium text-ink">{collection.title}</h3>
-                  <p className="text-[12px] text-clay mt-1 line-clamp-2 font-serif">{collection.description}</p>
+                  <p className="text-[12px] text-clay mt-1 line-clamp-2">{collection.description}</p>
                   <p className="text-[11px] text-terracotta font-bold mt-2 uppercase tracking-wider">
                     {collectionActivityCount} {collectionActivityCount === 1 ? 'activity' : 'activities'}
                   </p>
@@ -501,7 +501,7 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
               <div className="text-center px-4">
                 <Search className="mx-auto mb-3 h-8 w-8 text-stone" />
                 <p className="font-medium text-umber">No activities found</p>
-                <p className="text-[13px] text-clay mt-1 font-serif italic max-w-xs">
+                <p className="text-[13px] text-clay mt-1 italic max-w-xs">
                   Try adjusting your search or filters. We&apos;re always adding new activities.
                 </p>
                 {(activeFilters.length > 0 || category !== 'all') && (
@@ -530,12 +530,12 @@ export function BrowseClient({ activities, collections, isFreeUser }: BrowseClie
               {isFreeUser && visibleCount >= PAGE_SIZE && (
                 <Link
                   href="/settings/billing"
-                  className="block rounded-[14px] bg-gradient-to-r from-forest/5 via-forest/8 to-forest/5 border border-forest/10 p-6 text-center hover:border-forest/20 transition-all group"
+                  className="block rounded-2xl bg-gradient-to-r from-forest/5 via-forest/8 to-forest/5 border border-forest/10 p-6 text-center hover:border-forest/20 transition-all group"
                 >
                   <p className="font-display text-lg font-light text-ink">
                     Loving what you see? <em className="text-moss italic">There&apos;s so much more.</em>
                   </p>
-                  <p className="text-sm text-clay/60 font-serif mt-1.5 max-w-md mx-auto">
+                  <p className="text-sm text-clay/60 mt-1.5 max-w-md mx-auto">
                     Unlock {activities.length - freeActivityCount} premium activities, the weekly planner, unlimited AI suggestions, and favourites.
                   </p>
                   <span className="inline-flex items-center gap-2 btn-primary text-sm mt-4 group-hover:shadow-lg transition-all">

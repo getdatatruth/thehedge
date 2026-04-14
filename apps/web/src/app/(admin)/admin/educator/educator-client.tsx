@@ -115,7 +115,7 @@ export function EducatorClient({ initialData }: { initialData: EducatorData }) {
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Educator / Tusla Oversight
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             {initialData.totalPlans} education plans across all families.
           </p>
         </div>
@@ -152,7 +152,7 @@ export function EducatorClient({ initialData }: { initialData: EducatorData }) {
 
       {/* Alert for overdue */}
       {overdueCount > 0 && (
-        <div className="flex items-center gap-3 rounded-[14px] bg-rust/5 border border-rust/20 p-4">
+        <div className="flex items-center gap-3 rounded-2xl bg-rust/5 border border-rust/20 p-4">
           <AlertTriangle className="h-5 w-5 text-rust shrink-0" />
           <div>
             <p className="text-sm font-semibold text-rust">

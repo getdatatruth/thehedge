@@ -216,7 +216,7 @@ export default function AdminCollectionsPage() {
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Collections
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             Curated activity bundles. {collections.length} collections.
           </p>
         </div>

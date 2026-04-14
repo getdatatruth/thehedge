@@ -87,7 +87,7 @@ export default async function TimelinePage() {
           <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
             Family <em className="text-moss italic">Timeline</em>
           </h1>
-          <p className="text-clay mt-2 font-serif text-lg leading-relaxed">
+          <p className="text-clay mt-2 text-lg leading-relaxed">
             Your family&apos;s activities and memories.
           </p>
         </div>
@@ -95,9 +95,9 @@ export default async function TimelinePage() {
       </div>
 
       {dates.length === 0 ? (
-        <div className="flex min-h-[350px] items-center justify-center rounded-[14px] border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[350px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-[14px] bg-linen">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-linen">
               <Clock className="h-7 w-7 text-clay/30" />
             </div>
             <p className="text-lg font-semibold text-clay/40">
@@ -138,7 +138,7 @@ export default async function TimelinePage() {
 
                     <div className="flex items-start justify-between">
                       <div className="space-y-1.5">
-                        <h3 className="font-display font-light text-ink">
+                        <h3 className="font-semibold text-ink">
                           {log.activities?.slug ? (
                             <Link
                               href={`/activity/${log.activities.slug}`}
@@ -151,7 +151,7 @@ export default async function TimelinePage() {
                           )}
                         </h3>
                         {log.notes && (
-                          <p className="text-sm text-clay font-serif leading-relaxed">
+                          <p className="text-sm text-clay leading-relaxed">
                             {log.notes}
                           </p>
                         )}
@@ -205,7 +205,7 @@ export default async function TimelinePage() {
                         {log.photos.map((url: string, i: number) => (
                           <div
                             key={i}
-                            className="relative h-20 w-20 overflow-hidden rounded-[14px] bg-linen shadow-sm"
+                            className="relative h-20 w-20 overflow-hidden rounded-2xl bg-linen shadow-sm"
                           >
                             <img
                               src={url}

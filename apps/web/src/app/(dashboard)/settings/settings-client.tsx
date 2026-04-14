@@ -605,7 +605,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
           <em className="text-moss italic">Settings</em>
         </h1>
-        <p className="text-clay mt-2 font-serif text-lg">
+        <p className="text-clay mt-2 text-lg">
           Manage your family profile and preferences.
         </p>
       </div>
@@ -715,7 +715,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
 
               {children.length === 0 && !showAddChild && (
                 <div className="card-elevated p-8 text-center">
-                  <p className="text-clay/50 font-serif">No children added yet.</p>
+                  <p className="text-clay/50">No children added yet.</p>
                   <button
                     onClick={() => setShowAddChild(true)}
                     className="btn-secondary mt-4 inline-flex items-center gap-2 text-sm"
@@ -737,14 +737,14 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                 ) : (
                   <div key={child.id} className="card-elevated p-5">
                     <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-sage/15">
-                        <span className="text-lg font-bold font-display text-forest">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sage/15">
+                        <span className="text-lg font-bold text-forest">
                           {child.name[0]}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-display font-medium text-ink">{child.name}</h3>
+                          <h3 className="font-semibold text-ink">{child.name}</h3>
                           {child.dateOfBirth && (
                             <span className="tag tag-sage text-[11px]">
                               Age {calculateAge(child.dateOfBirth)}
@@ -752,7 +752,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                           )}
                         </div>
                         {child.interests.length > 0 && (
-                          <p className="text-xs text-clay/60 mt-1 font-serif">
+                          <p className="text-xs text-clay/60 mt-1">
                             Interests: {child.interests.join(', ')}
                           </p>
                         )}
@@ -823,7 +823,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   <div key={item.label} className="flex items-center justify-between py-3 border-b border-stone last:border-0">
                     <div>
                       <p className="text-sm font-medium text-ink">{item.label}</p>
-                      <p className="text-xs text-clay/50 mt-0.5 font-serif">{item.description}</p>
+                      <p className="text-xs text-clay/50 mt-0.5">{item.description}</p>
                     </div>
                     <Toggle checked={item.checked} onChange={item.onChange} />
                   </div>
@@ -844,7 +844,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
             <div className="space-y-6">
               <div className="card-elevated p-6 sm:p-8">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-amber/10">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber/10">
                     <Crown className="h-6 w-6 text-amber" />
                   </div>
                   <div className="flex-1">
@@ -866,7 +866,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                           : family.subscriptionStatus}
                       </span>
                     </div>
-                    <p className="text-sm text-clay/60 mt-1.5 font-serif">
+                    <p className="text-sm text-clay/60 mt-1.5">
                       {TIER_DESCRIPTIONS[family.subscriptionTier] || TIER_DESCRIPTIONS.free}
                     </p>
                   </div>
@@ -875,8 +875,8 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
 
               {family.subscriptionTier === 'free' && (
                 <div className="card-elevated p-6 sm:p-8 border-l-4 border-l-moss/30">
-                  <h3 className="font-display font-medium text-ink mb-2">Upgrade to Family Plan</h3>
-                  <p className="text-sm text-clay/60 font-serif mb-4">
+                  <h3 className="font-semibold text-ink mb-2">Upgrade to Family Plan</h3>
+                  <p className="text-sm text-clay/60 mb-4">
                     Get unlimited AI suggestions, weekly plans, and full access to all activities.
                   </p>
                   <a href="/settings/billing" className="btn-primary text-sm inline-block">
@@ -923,14 +923,14 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   <div className="flex items-center justify-between py-3 border-b border-stone">
                     <div>
                       <p className="text-sm font-medium text-ink">Email</p>
-                      <p className="text-xs text-clay/50 font-serif">{user.email}</p>
+                      <p className="text-xs text-clay/50">{user.email}</p>
                     </div>
                   </div>
                   <div className="py-3 border-b border-stone">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-ink">Password</p>
-                        <p className="text-xs text-clay/50 font-serif">Change your account password</p>
+                        <p className="text-xs text-clay/50">Change your account password</p>
                       </div>
                       {!showPasswordForm && (
                         <button
@@ -948,7 +948,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   <div className="flex items-center justify-between py-3">
                     <div>
                       <p className="text-sm font-medium text-ink">Two-factor authentication</p>
-                      <p className="text-xs text-clay/50 font-serif">Not enabled</p>
+                      <p className="text-xs text-clay/50">Not enabled</p>
                     </div>
                     <button className="text-xs font-medium text-moss hover:text-forest transition-colors">
                       Enable
@@ -958,8 +958,8 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
               </div>
 
               <div className="card-elevated p-6 sm:p-8 border-l-4 border-l-terracotta/20">
-                <h3 className="font-display font-medium text-terracotta mb-2">Danger zone</h3>
-                <p className="text-sm text-clay/60 mb-4 font-serif">
+                <h3 className="font-semibold text-terracotta mb-2">Danger zone</h3>
+                <p className="text-sm text-clay/60 mb-4">
                   To delete your account and all data, go to the Your Data tab.
                 </p>
                 <button
@@ -989,12 +989,12 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
               {/* Export Data */}
               <div className="card-elevated p-6 sm:p-8 space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-sage/15">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sage/15">
                     <Download className="h-5 w-5 text-forest" />
                   </div>
                   <div className="flex-1">
                     <h2 className="font-display text-xl font-light text-ink">Export your data</h2>
-                    <p className="text-sm text-clay/60 mt-1.5 font-serif">
+                    <p className="text-sm text-clay/60 mt-1.5">
                       Download a copy of all your data, including your profile, family details,
                       children, activity logs, education plans, and portfolio entries.
                     </p>
@@ -1038,7 +1038,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   ].map((item) => (
                     <div key={item.label} className="py-3 border-b border-stone last:border-0">
                       <p className="text-sm font-medium text-ink">{item.label}</p>
-                      <p className="text-xs text-clay/50 mt-0.5 font-serif">{item.detail}</p>
+                      <p className="text-xs text-clay/50 mt-0.5">{item.detail}</p>
                     </div>
                   ))}
                 </div>
@@ -1047,12 +1047,12 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
               {/* Delete Account */}
               <div className="card-elevated p-6 sm:p-8 border-l-4 border-l-terracotta/20 space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-terracotta/10">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-terracotta/10">
                     <AlertTriangle className="h-5 w-5 text-terracotta" />
                   </div>
                   <div className="flex-1">
                     <h2 className="font-display text-xl font-light text-terracotta">Delete my account</h2>
-                    <p className="text-sm text-clay/60 mt-1.5 font-serif">
+                    <p className="text-sm text-clay/60 mt-1.5">
                       This will permanently delete your account and all associated data, including
                       your family profile, children, activity logs, education plans, and portfolio entries.
                       This action cannot be undone.

@@ -22,7 +22,7 @@ export default async function AdminAnalyticsPage() {
         <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
           Analytics
         </h1>
-        <p className="text-clay/70 mt-1 font-serif">
+        <p className="text-clay/70 mt-1">
           Platform engagement and growth metrics.
         </p>
       </div>
@@ -148,7 +148,7 @@ export default async function AdminAnalyticsPage() {
         {analytics.activeFamilies.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {analytics.activeFamilies.slice(0, 10).map((family, i) => (
-              <div key={family.id} className="rounded-[14px] bg-parchment/50 p-4 text-center">
+              <div key={family.id} className="rounded-2xl bg-parchment/50 p-4 text-center">
                 <span className="text-[10px] font-bold text-clay/30">#{i + 1}</span>
                 <p className="text-sm font-bold font-display text-forest mt-1 truncate">{family.name}</p>
                 <p className="text-xs text-clay/50 capitalize">{family.tier}</p>

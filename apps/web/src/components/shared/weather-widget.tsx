@@ -25,7 +25,7 @@ export function WeatherWidget({ weather, county }: WeatherWidgetProps) {
             <span className="font-display text-3xl font-light text-ink tracking-tight">
               {weather.temperature}°
             </span>
-            <span className="text-[13px] text-clay font-serif">
+            <span className="text-[13px] text-clay">
               {weather.weatherLabel}
             </span>
           </div>

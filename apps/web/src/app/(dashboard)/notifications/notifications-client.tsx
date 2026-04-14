@@ -124,7 +124,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
           <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
             Notifications
           </h1>
-          <p className="text-clay mt-2 font-serif text-lg">
+          <p className="text-clay mt-2 text-lg">
             {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
           </p>
         </div>

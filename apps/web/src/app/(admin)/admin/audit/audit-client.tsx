@@ -133,7 +133,7 @@ export function AuditClient() {
           <h1 className="font-display text-3xl font-bold text-forest tracking-tight">
             Audit Log
           </h1>
-          <p className="text-clay/70 mt-1 font-serif">
+          <p className="text-clay/70 mt-1">
             {total} events recorded.
           </p>
         </div>

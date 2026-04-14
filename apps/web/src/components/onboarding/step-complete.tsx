@@ -46,7 +46,7 @@ export function StepComplete() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-[14px] border border-stone bg-linen p-8 text-center">
+    <div className="relative overflow-hidden rounded-2xl border border-stone bg-linen p-8 text-center">
       {/* Confetti */}
       {showConfetti && (
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -76,14 +76,14 @@ export function StepComplete() {
             </h2>
             <Sparkles className="h-5 w-5 text-gold" />
           </div>
-          <p className="text-clay font-serif">
+          <p className="text-clay">
             Welcome to The Hedge, {familyName || 'family'}!
           </p>
         </div>
 
-        <div className="space-y-3 rounded-[14px] bg-parchment/50 p-5 text-left">
+        <div className="space-y-3 rounded-2xl bg-parchment/50 p-5 text-left">
           <p className="text-sm font-medium text-forest">Here&apos;s what happens next:</p>
-          <ul className="space-y-2 text-sm text-clay font-serif">
+          <ul className="space-y-2 text-sm text-clay">
             <li className="flex items-start gap-2">
               <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-forest/10 text-[10px] font-bold text-forest">1</span>
               We&apos;ll suggest activities matched to your children&apos;s ages and interests
