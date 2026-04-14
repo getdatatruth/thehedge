@@ -207,20 +207,37 @@ export default function TodayScreen() {
     return [];
   }, [plannerWeek, dashboard?.todayActivities, selectedDay, todayDow]);
 
-  // Hero activity - the next uncompleted activity for today, or a recommendation
+  // Weather-aware hero activity - prioritise indoor when raining, outdoor when dry
   const heroActivity = useMemo(() => {
+    const isRaining = dashboard?.weather?.isRaining || false;
+
     const todayActivities = selectedDayActivities.filter(a => !a.completed);
     if (todayActivities.length > 0) {
-      const idx = heroShuffle % todayActivities.length;
-      return todayActivities[idx];
+      // If we have plan activities, prioritise weather-appropriate ones
+      const weatherFiltered = isRaining
+        ? todayActivities.filter(a => {
+            const loc = (a as any).location;
+            return !loc || loc === 'indoor' || loc === 'both' || loc === 'anywhere';
+          })
+        : todayActivities;
+      const pool = weatherFiltered.length > 0 ? weatherFiltered : todayActivities;
+      const idx = heroShuffle % pool.length;
+      return pool[idx];
     }
-    // Fall back to dashboard today activities
+    // Fall back to dashboard today activities with weather filtering
     if (dashboard?.todayActivities?.length) {
-      const idx = heroShuffle % dashboard.todayActivities.length;
-      return { ...dashboard.todayActivities[idx], completed: false, child_name: '', time: '' };
+      const weatherFiltered = isRaining
+        ? dashboard.todayActivities.filter(a => {
+            const loc = (a as any).location;
+            return !loc || loc === 'indoor' || loc === 'both' || loc === 'anywhere';
+          })
+        : dashboard.todayActivities;
+      const pool = weatherFiltered.length > 0 ? weatherFiltered : dashboard.todayActivities;
+      const idx = heroShuffle % pool.length;
+      return { ...pool[idx], completed: false, child_name: '', time: '' };
     }
     return null;
-  }, [selectedDayActivities, dashboard?.todayActivities, heroShuffle]);
+  }, [selectedDayActivities, dashboard?.todayActivities, dashboard?.weather, heroShuffle]);
 
   const hasMultipleChildren = children.length > 1;
   const isSelectedToday = selectedDay === todayDow;
@@ -294,7 +311,7 @@ export default function TodayScreen() {
                 <View style={styles.heroLabelRow}>
                   <Sparkles size={14} color={lightTheme.accent} />
                   <Text style={styles.heroLabel}>
-                    {isFirstTime ? 'Start here' : hasPlan ? 'Up next' : 'Try this today'}
+                    {isFirstTime ? 'Start here' : hasPlan ? 'Up next' : dashboard?.weather?.isRaining ? 'Perfect for a rainy day' : 'Try this today'}
                   </Text>
                 </View>
                 <TouchableOpacity

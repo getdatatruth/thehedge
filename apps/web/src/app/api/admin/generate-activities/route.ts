@@ -16,16 +16,22 @@ export async function POST(request: NextRequest) {
   try {
     // Allow admin to specify count (default 5, max 10)
     let count = 5;
+    let options: Record<string, unknown> = {};
     try {
       const body = await request.json();
       if (body.count && typeof body.count === 'number') {
         count = Math.min(Math.max(1, body.count), 10);
       }
+      if (body.focusCategory) options.focusCategory = body.focusCategory;
+      if (body.focusAgeRange) options.focusAgeRange = body.focusAgeRange;
+      if (body.focusEnergy) options.focusEnergy = body.focusEnergy;
+      if (body.focusSeason) options.focusSeason = body.focusSeason;
+      options.includeParentGuide = true;
     } catch {
-      // No body or invalid JSON - use default count
+      // No body or invalid JSON - use defaults
     }
 
-    const result = await generateActivities(count);
+    const result = await generateActivities(count, options as any);
 
     console.log(
       `[ADMIN] generate-activities by ${auth.user.email}: ${result.generated} created`

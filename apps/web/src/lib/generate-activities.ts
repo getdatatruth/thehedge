@@ -94,9 +94,31 @@ async function getExistingSlugs(): Promise<Set<string>> {
   return new Set((data || []).map((a: { slug: string }) => a.slug));
 }
 
-function buildPrompt(existingTitles: string[], count: number): string {
+interface GenerationOptions {
+  focusCategory?: string;
+  focusAgeRange?: { min: number; max: number };
+  focusEnergy?: string;
+  focusSeason?: string;
+  includeParentGuide?: boolean;
+}
+
+function buildPrompt(existingTitles: string[], count: number, options: GenerationOptions = {}): string {
   const season = getCurrentSeason();
   const month = getMonthName();
+
+  const focusInstructions: string[] = [];
+  if (options.focusCategory) {
+    focusInstructions.push(`ALL ${count} activities must be in the "${options.focusCategory}" category.`);
+  }
+  if (options.focusAgeRange) {
+    focusInstructions.push(`ALL activities must be suitable for ages ${options.focusAgeRange.min}-${options.focusAgeRange.max}.`);
+  }
+  if (options.focusEnergy) {
+    focusInstructions.push(`ALL activities must have energyLevel "${options.focusEnergy}".`);
+  }
+  if (options.focusSeason) {
+    focusInstructions.push(`ALL activities must be specifically designed for ${options.focusSeason}.`);
+  }
 
   return `You are a content creator for The Hedge, an Irish family learning platform inspired by Ireland's hedge schools. Generate exactly ${count} new, unique activities for families.
 
@@ -107,10 +129,12 @@ IMPORTANT CONTEXT:
 - All activities must be screen-free
 - Only use household materials - nothing families would need to buy
 - Activities should be rooted in Irish culture, nature, and geography where appropriate
-- Cover a mix of categories and age ranges
+- Include activities for babies (0-1), toddlers (1-3), preschool (3-5), and primary age (5-12)
+- We need MORE active/high-energy activities and MORE messy/sensory activities
+${focusInstructions.length > 0 ? '\nSPECIFIC REQUIREMENTS:\n' + focusInstructions.join('\n') : '- Cover a mix of categories, age ranges, and energy levels'}
 
 DO NOT duplicate any of these existing activity titles:
-${existingTitles.map((t) => `- ${t}`).join('\n')}
+${existingTitles.slice(0, 200).map((t) => `- ${t}`).join('\n')}
 
 Generate exactly ${count} activities as a JSON array. Each activity must match this exact schema:
 
@@ -119,7 +143,7 @@ Generate exactly ${count} activities as a JSON array. Each activity must match t
   "description": "2-3 sentence engaging description in Irish English",
   "instructions": { "steps": ["Step 1 detailed instruction", "Step 2...", "...at least 5 steps"] },
   "category": "one of: ${CATEGORIES.join(', ')}",
-  "ageMin": 3,
+  "ageMin": 0,
   "ageMax": 10,
   "durationMinutes": 30,
   "location": "one of: ${LOCATIONS.join(', ')}",
@@ -130,7 +154,14 @@ Generate exactly ${count} activities as a JSON array. Each activity must match t
   "curriculumTags": { "aistear_theme": ["Well-being", "Identity and Belonging", "Communicating", "Exploring and Thinking"] },
   "energyLevel": "one of: ${ENERGY_LEVELS.join(', ')}",
   "messLevel": "one of: ${MESS_LEVELS.join(', ')}",
-  "screenFree": true
+  "screenFree": true,
+  "parentGuide": {
+    "knowledge": [{ "topic": "What to know", "content": "Brief explanation for parents" }],
+    "conversationStarters": ["Question to ask your child during the activity", "Another question"],
+    "watchFor": ["Sign of learning to observe", "Another sign"]
+  },
+  "aistearThemes": ["Well-being", "Communicating"],
+  "nccaAreas": ["SESE", "Language"]
 }
 
 Rules for the values:
@@ -138,13 +169,16 @@ Rules for the values:
 - location MUST be exactly one of: ${LOCATIONS.join(', ')}
 - energyLevel MUST be exactly one of: ${ENERGY_LEVELS.join(', ')}
 - messLevel MUST be exactly one of: ${MESS_LEVELS.join(', ')}
-- ageMin must be between 0 and 14
+- ageMin must be between 0 and 14 (use 0 for baby activities, 1 for toddler)
 - ageMax must be between ageMin and 14
-- durationMinutes should be between 10 and 120
+- durationMinutes should be between 5 and 120 (shorter for babies/toddlers)
 - instructions.steps must have at least 5 steps
-- materials should all have household_common: true (we only suggest household items)
-- curriculumTags should map Aistear themes to relevant sub-themes
+- materials should all have household_common: true
+- parentGuide MUST have at least 2 conversationStarters and 2 watchFor items
+- aistearThemes must be from: Well-being, Identity and Belonging, Communicating, Exploring and Thinking
+- nccaAreas must be from: Language, Mathematics, SESE, Arts, Physical Education, SPHE
 - Emphasise the current season (${season}) but include a mix
+- Never use em dashes - use regular dashes instead
 
 Respond with ONLY the JSON array, no other text.`;
 }
@@ -198,7 +232,7 @@ function validateActivity(activity: GeneratedActivity): string[] {
   return errors;
 }
 
-export async function generateActivities(count: number = 5): Promise<GenerationResult> {
+export async function generateActivities(count: number = 5, options: GenerationOptions = {}): Promise<GenerationResult> {
   const result: GenerationResult = {
     success: false,
     generated: 0,
@@ -213,7 +247,7 @@ export async function generateActivities(count: number = 5): Promise<GenerationR
       getExistingSlugs(),
     ]);
 
-    const prompt = buildPrompt(existingTitles, count);
+    const prompt = buildPrompt(existingTitles, count, options);
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -290,6 +324,11 @@ export async function generateActivities(count: number = 5): Promise<GenerationR
           energy_level: activity.energyLevel,
           mess_level: activity.messLevel,
           screen_free: activity.screenFree !== false,
+          parent_guide: (activity as any).parentGuide || null,
+          conversation_starters: (activity as any).parentGuide?.conversationStarters || null,
+          signs_of_learning: (activity as any).parentGuide?.watchFor || null,
+          aistear_themes: (activity as any).aistearThemes || null,
+          ncca_areas: (activity as any).nccaAreas || null,
           premium: false,
           created_by: 'ai-pipeline',
           published: false,
