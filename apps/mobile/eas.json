@@ -30,8 +30,8 @@
     "production": {
       "ios": {
         "appleId": "adam@thehedge.ie",
-        "ascAppId": "",
-        "appleTeamId": ""
+        "ascAppId": "6762201127",
+        "appleTeamId": "D8644QDC4R"
       },
       "android": {
         "serviceAccountKeyPath": "",

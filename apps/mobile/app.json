@@ -16,6 +16,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "ie.thehedge.app",
       "buildNumber": "1",
+      "appleTeamId": "D8644QDC4R",
       "config": {
         "usesNonExemptEncryption": false
       },
