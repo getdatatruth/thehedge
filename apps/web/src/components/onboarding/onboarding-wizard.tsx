@@ -4,6 +4,8 @@ import { useOnboardingStore } from '@/stores/onboarding-store';
 import { Progress } from '@/components/ui/progress';
 import { StepFamilyBasics } from './step-family-basics';
 import { StepChildren } from './step-children';
+import { StepLearningPath } from './step-learning-path';
+import { StepInterests } from './step-interests';
 import { StepFamilyStyle } from './step-family-style';
 import { StepAvailability } from './step-availability';
 import { StepPractical } from './step-practical';
@@ -13,18 +15,20 @@ import { TreePine } from 'lucide-react';
 const STEP_LABELS = [
   'Family basics',
   'Your children',
+  'Learning path',
+  'Interests',
   'Family style',
   'Availability',
   'Practical details',
 ];
 
-const TOTAL_FORM_STEPS = 5;
+const TOTAL_FORM_STEPS = 7;
 
 export function OnboardingWizard() {
   const step = useOnboardingStore((s) => s.step);
 
   // Step 6 is the completion screen
-  if (step === 6) {
+  if (step === 8) {
     return (
       <div className="mx-auto max-w-lg animate-fade-up">
         <StepComplete />
@@ -57,9 +61,11 @@ export function OnboardingWizard() {
       <div className="rounded-2xl border border-stone bg-linen p-6">
         {step === 1 && <StepFamilyBasics />}
         {step === 2 && <StepChildren />}
-        {step === 3 && <StepFamilyStyle />}
-        {step === 4 && <StepAvailability />}
-        {step === 5 && <StepPractical />}
+        {step === 3 && <StepLearningPath />}
+        {step === 4 && <StepInterests />}
+        {step === 5 && <StepFamilyStyle />}
+        {step === 6 && <StepAvailability />}
+        {step === 7 && <StepPractical />}
       </div>
     </div>
   );

@@ -19,7 +19,11 @@ export interface OnboardingState {
   county: string;
   // Step 2: Children
   children: ChildData[];
-  // Step 3: Family style
+  // Step 3: Learning path
+  learningPath: string;
+  // Step 4: Interests (applied to all children)
+  familyInterests: string[];
+  // Step 5: Family style
   familyStyle: FamilyStyle;
   // Step 4: Availability
   ideaTimes: string[];
@@ -60,6 +64,8 @@ const initialState: OnboardingState = {
       learningStyle: null,
     },
   ],
+  learningPath: '',
+  familyInterests: [],
   familyStyle: 'balanced',
   ideaTimes: [],
   weekendPlanning: true,
@@ -75,7 +81,7 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
       ...initialState,
 
       setStep: (step) => set({ step }),
-      nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 6) })),
+      nextStep: () => set((state) => ({ step: Math.min(state.step + 1, 8) })),
       prevStep: () => set((state) => ({ step: Math.max(state.step - 1, 1) })),
 
       updateField: (key, value) => set({ [key]: value }),
@@ -117,6 +123,8 @@ export const useOnboardingStore = create<OnboardingState & OnboardingActions>()(
         country: state.country,
         county: state.county,
         children: state.children,
+        learningPath: state.learningPath,
+        familyInterests: state.familyInterests,
         familyStyle: state.familyStyle,
         ideaTimes: state.ideaTimes,
         weekendPlanning: state.weekendPlanning,

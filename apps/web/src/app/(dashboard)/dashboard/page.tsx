@@ -229,16 +229,24 @@ export default async function DashboardPage() {
     }
   }
 
-  // Calculate activities this week
+  // Calculate activities this week and total logged
   let activitiesThisWeek = 0;
+  let activitiesLogged = 0;
   if (familyId) {
-    const { count } = await supabase
-      .from('activity_logs')
-      .select('*', { count: 'exact', head: true })
-      .eq('family_id', familyId)
-      .gte('date', start);
+    const [weekResult, totalResult] = await Promise.all([
+      supabase
+        .from('activity_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('family_id', familyId)
+        .gte('date', start),
+      supabase
+        .from('activity_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('family_id', familyId),
+    ]);
 
-    activitiesThisWeek = count || 0;
+    activitiesThisWeek = weekResult.count || 0;
+    activitiesLogged = totalResult.count || 0;
   }
 
   return (
@@ -257,6 +265,8 @@ export default async function DashboardPage() {
       activitiesThisWeek={activitiesThisWeek}
       planActivities={planActivities}
       isFreeUser={effectiveTier === 'free'}
+      learningPath={family?.family_style}
+      activitiesLogged={activitiesLogged}
     />
   );
 }

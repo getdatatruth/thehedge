@@ -15,7 +15,28 @@ import {
   DialogClose,
   DialogHeader,
 } from '@/components/ui/dialog';
-import { Star, CheckCircle, Users, Clock, Calendar, BookOpen, Camera, X } from 'lucide-react';
+import { Star, CheckCircle, Users, Clock, Calendar, BookOpen, Camera, X, TrendingUp, ArrowRight, Bell, Compass } from 'lucide-react';
+
+function ConfettiPiece({ delay, left }: { delay: number; left: number }) {
+  const colors = ['bg-forest', 'bg-moss', 'bg-sage', 'bg-terracotta', 'bg-gold', 'bg-sky', 'bg-berry'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const size = Math.random() * 8 + 4;
+  const rotation = Math.random() * 360;
+
+  return (
+    <div
+      className={`absolute ${color} rounded-sm opacity-0 animate-confetti`}
+      style={{
+        left: `${left}%`,
+        top: '-10px',
+        width: `${size}px`,
+        height: `${size}px`,
+        transform: `rotate(${rotation}deg)`,
+        animationDelay: `${delay}ms`,
+      }}
+    />
+  );
+}
 
 interface Child {
   id: string;
@@ -62,6 +83,8 @@ export function LogActivityModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [isFirstLog, setIsFirstLog] = useState(false);
   const [childrenLoading, setChildrenLoading] = useState(false);
 
   const fetchChildren = useCallback(async () => {
@@ -144,6 +167,20 @@ export function LogActivityModal({
 
     if (log) {
       setSuccess(true);
+      setShowConfetti(true);
+      // Check if this might be the first log (heuristic: check activity_logs count)
+      try {
+        const countRes = await fetch('/api/activity-logs?limit=2');
+        if (countRes.ok) {
+          const countData = await countRes.json();
+          if (countData.data && countData.data.length <= 1) {
+            setIsFirstLog(true);
+          }
+        }
+      } catch {
+        // Non-critical, just skip first-log detection
+      }
+      setTimeout(() => setShowConfetti(false), 4000);
       router.refresh();
     } else {
       const storeError = useActivityLogStore.getState().error;
@@ -159,21 +196,78 @@ export function LogActivityModal({
       <DialogTrigger render={<span />}>{triggerContent}</DialogTrigger>
       <DialogContent className="sm:max-w-md bg-linen border-stone">
         {success ? (
-          <div className="text-center space-y-5 py-6 animate-scale-in">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-lg">
-              <CheckCircle className="h-8 w-8 text-parchment" />
+          <div className="relative text-center space-y-5 py-6 animate-scale-in overflow-hidden">
+            {/* Confetti */}
+            {showConfetti && (
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {Array.from({ length: 30 }).map((_, i) => (
+                  <ConfettiPiece
+                    key={i}
+                    delay={Math.random() * 1500}
+                    left={Math.random() * 100}
+                  />
+                ))}
+              </div>
+            )}
+
+            <div className="relative z-10 space-y-5">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-lg">
+                <CheckCircle className="h-8 w-8 text-parchment" />
+              </div>
+
+              <DialogHeader>
+                <DialogTitle className="font-display text-center text-2xl font-light text-ink">
+                  {isFirstLog ? 'Your first activity!' : 'Logged!'}
+                </DialogTitle>
+                <DialogDescription className="text-center text-clay/60">
+                  &quot;{title}&quot; has been added to your family timeline.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Hedge Score gain */}
+              <div className="flex justify-center">
+                <span className="inline-flex items-center gap-2 bg-cat-nature/10 text-cat-nature rounded-full px-4 py-1 text-sm font-medium">
+                  <TrendingUp className="h-4 w-4" />
+                  +1 Hedge Score
+                </span>
+              </div>
+
+              {/* Try this next card */}
+              <a
+                href="/browse"
+                className="block bg-parchment rounded-2xl p-4 text-left group hover:shadow-md transition-shadow"
+              >
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-umber mb-2">
+                  Try this next
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cat-nature/10">
+                      <Compass className="h-5 w-5 text-cat-nature" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-ink">Browse more activities</p>
+                      <p className="text-xs text-clay/60">Keep the momentum going</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-clay/40 group-hover:text-cat-nature transition-colors" />
+                </div>
+              </a>
+
+              {/* Action buttons */}
+              <div className="flex flex-col gap-2">
+                <DialogClose>
+                  <button className="btn-primary w-full justify-center">Grand</button>
+                </DialogClose>
+                <a
+                  href="/settings"
+                  className="inline-flex items-center justify-center gap-2 text-sm text-clay/60 hover:text-moss transition-colors py-2"
+                >
+                  <Bell className="h-3.5 w-3.5" />
+                  Remind me tomorrow
+                </a>
+              </div>
             </div>
-            <DialogHeader>
-              <DialogTitle className="font-display text-center text-2xl font-light text-ink">
-                Logged!
-              </DialogTitle>
-              <DialogDescription className="text-center text-clay/60">
-                &quot;{title}&quot; has been added to your family timeline.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogClose>
-              <button className="btn-primary">Grand</button>
-            </DialogClose>
           </div>
         ) : (
           <>

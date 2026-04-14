@@ -22,6 +22,9 @@ import {
   Crown,
   Heart,
   CalendarDays,
+  Shuffle,
+  Clock,
+  Calendar,
 } from 'lucide-react';
 
 const FILTERS = [
@@ -65,6 +68,8 @@ interface TodayClientProps {
   activitiesThisWeek: number;
   planActivities?: PlanActivity[];
   isFreeUser?: boolean;
+  learningPath?: string | null;
+  activitiesLogged?: number;
 }
 
 const UPGRADE_PROMPTS = [
@@ -89,9 +94,12 @@ export function TodayClient({
   activitiesThisWeek,
   planActivities = [],
   isFreeUser = false,
+  learningPath,
+  activitiesLogged = 0,
 }: TodayClientProps) {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
+  const [heroShuffleIndex, setHeroShuffleIndex] = useState(0);
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const dayAbbrevs = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -105,6 +113,58 @@ export function TodayClient({
 
   const newActivities = MOCK_ACTIVITIES.filter((a) => a.is_new);
   const featuredCollections = MOCK_COLLECTIONS.filter((c) => c.featured);
+
+  // Hero recommendation: pick from plan or activities pool
+  const heroPool = useMemo(() => {
+    if (isRaining && todayPlanActivities.length > 0) {
+      // When raining, prioritise indoor plan activities
+      const indoor = todayPlanActivities.filter((a) => {
+        const match = activities.find((act) => act.id === a.activity_id || act.slug === a.slug);
+        return !match || match.location === 'indoor' || match.location === 'both' || match.location === 'anywhere';
+      });
+      if (indoor.length > 0) return indoor;
+    }
+    if (todayPlanActivities.length > 0) {
+      return todayPlanActivities.filter((a) => !a.completed);
+    }
+    return activities.slice(0, 10);
+  }, [isRaining, todayPlanActivities, activities]);
+
+  const heroActivity = heroPool.length > 0
+    ? heroPool[heroShuffleIndex % heroPool.length]
+    : null;
+
+  const heroLabel = activitiesLogged === 0
+    ? 'Start here'
+    : isRaining
+      ? 'Perfect for a rainy day'
+      : hasRealPlan
+        ? 'Up next'
+        : 'Try this today';
+
+  // Resolve hero details - could be PlanActivity or MockActivity
+  const heroIsPlan = heroActivity && 'time_slot' in heroActivity;
+  const heroTitle = heroActivity
+    ? heroIsPlan
+      ? (heroActivity as PlanActivity).title
+      : (heroActivity as MockActivity).title
+    : null;
+  const heroCategory = heroActivity
+    ? heroIsPlan
+      ? (heroActivity as PlanActivity).category
+      : (heroActivity as MockActivity).category
+    : 'nature';
+  const heroDuration = heroActivity
+    ? heroIsPlan
+      ? (heroActivity as PlanActivity).duration_minutes
+      : (heroActivity as MockActivity).duration_minutes
+    : 30;
+  const heroSlug = heroActivity
+    ? heroIsPlan
+      ? (heroActivity as PlanActivity).slug
+      : (heroActivity as MockActivity).slug
+    : '';
+  const heroCatConfig = CATEGORY_CONFIG[heroCategory] || CATEGORY_CONFIG.nature;
 
   const filtered = useMemo(() => {
     let result = [...activities];
@@ -236,6 +296,85 @@ export function TodayClient({
           </Link>
         </div>
       </div>
+
+      {/* ─── Hero Recommendation Card ─── */}
+      {heroActivity && (
+        <div className="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-l-cat-nature">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-cat-nature">
+              <Sparkles className="h-3 w-3 inline mr-1" />
+              {heroLabel}
+            </span>
+            <button
+              onClick={() => setHeroShuffleIndex((i) => i + 1)}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-parchment hover:bg-stone/20 transition-colors"
+              aria-label="Shuffle recommendation"
+            >
+              <Shuffle className="h-4 w-4 text-clay" />
+            </button>
+          </div>
+          <h2 className="text-2xl font-bold text-umber mb-2">{heroTitle}</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="inline-flex items-center gap-1 rounded-lg bg-cat-nature/10 px-2 py-1 text-[11px] font-semibold text-cat-nature">
+              {heroCatConfig.label}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] text-clay">
+              <Clock className="h-3 w-3" />
+              {heroDuration} min
+            </span>
+          </div>
+          <Link
+            href={heroSlug ? `/activity/${heroSlug}` : '/browse'}
+            className="inline-flex items-center gap-2 bg-cat-nature text-white font-semibold text-sm rounded-2xl px-5 py-2.5 hover:bg-cat-nature/90 transition-colors"
+          >
+            Let&apos;s do this
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      )}
+
+      {/* ─── Guided Pathway (new users) ─── */}
+      {activitiesLogged === 0 && (
+        <div className="bg-cat-nature/5 border border-cat-nature/20 rounded-2xl p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cat-nature/15 mt-0.5">
+              <Zap className="h-4 w-4 text-cat-nature" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-umber mb-1">
+                {learningPath === 'homeschool'
+                  ? 'Ready to plan your first week?'
+                  : learningPath === 'considering'
+                    ? 'Exploring homeschooling?'
+                    : 'Welcome to The Hedge!'}
+              </p>
+              <p className="text-[13px] text-clay leading-relaxed mb-3">
+                {learningPath === 'homeschool'
+                  ? 'Generate your first weekly plan and get a structured, curriculum-aligned schedule for your family.'
+                  : learningPath === 'considering'
+                    ? 'Try a few activities this week to see how homeschooling feels. No commitment needed.'
+                    : 'Pick an activity above and try it with your kids. It only takes 15 minutes to get started.'}
+              </p>
+              <Link
+                href={learningPath === 'homeschool' ? '/planner' : '/browse'}
+                className="inline-flex items-center gap-2 text-sm font-semibold text-cat-nature hover:text-cat-nature/80 transition-colors"
+              >
+                {learningPath === 'homeschool' ? (
+                  <>
+                    <Calendar className="h-4 w-4" />
+                    Generate your first weekly plan
+                  </>
+                ) : (
+                  <>
+                    <ArrowRight className="h-4 w-4" />
+                    Browse activities
+                  </>
+                )}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       <InsightCard
         type="today"
