@@ -32,11 +32,16 @@ function RootNavigator() {
   useEffect(() => {
     if (!isInitialized || isLoading) return;
 
+    const inOnboarding = segments.join('/').includes('onboarding');
+
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/login');
     } else if (session && inAuthGroup) {
       if (!profile || !profile.onboarding_completed) {
-        router.replace('/(auth)/onboarding');
+        // Only redirect to onboarding index if not already in the onboarding flow
+        if (!inOnboarding) {
+          router.replace('/(auth)/onboarding');
+        }
       } else {
         router.replace('/(tabs)');
       }

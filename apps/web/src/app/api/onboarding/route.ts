@@ -19,10 +19,14 @@ export async function POST(request: NextRequest) {
       county,
       children,
       familyStyle,
+      learningPath,
+      learningGoals,
+      activitiesPerWeek,
       ideaTimes,
       weekendPlanning,
       holidayPlanning,
       hasOutdoorSpace,
+      outdoorSpace,
       carActivities,
       messComfort,
     } = body;
@@ -54,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Determine subscription tier based on plan param and child school status
     const planParam = user.user_metadata?.plan as string | undefined;
-    const hasHomeschoolChild = children.some(
+    const hasHomeschoolChild = learningPath === 'homeschool' || learningPath === 'considering' || children.some(
       (child: { schoolStatus?: string }) =>
         child.schoolStatus === 'homeschool' || child.schoolStatus === 'considering'
     );

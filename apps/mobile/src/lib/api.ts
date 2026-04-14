@@ -1,12 +1,12 @@
 import { supabase } from './supabase';
 
 const API_BASE = __DEV__
-  ? 'http://192.168.68.104:3000/api/v1'
+  ? 'http://192.168.68.108:3000/api/v1'
   : 'https://app.thehedge.ie/api/v1';
 
 // Base URL without /v1 for routes outside the versioned API (e.g. /api/onboarding, /api/stripe/*)
 const API_ROOT = __DEV__
-  ? 'http://192.168.68.104:3000/api'
+  ? 'http://192.168.68.108:3000/api'
   : 'https://app.thehedge.ie/api';
 
 interface ApiResponse<T> {
