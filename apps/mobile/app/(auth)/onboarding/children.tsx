@@ -9,7 +9,7 @@ import { spacing, radius } from '@/theme/spacing';
 import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 
 export default function ChildrenScreen() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function ChildrenScreen() {
       title="Tell us about your children"
       subtitle="We'll tailor activities to each child's age and stage."
       canContinue={canContinue}
-      onContinue={() => router.push('/(auth)/onboarding/style')}
+      onContinue={() => router.push('/(auth)/onboarding/learning-path')}
     >
       {children.map((child, i) => (
         <View key={i} style={styles.childCard}>

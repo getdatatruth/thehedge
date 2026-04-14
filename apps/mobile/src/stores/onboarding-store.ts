@@ -12,6 +12,7 @@ interface OnboardingState {
   familyName: string;
   county: string;
   children: OnboardingChild[];
+  learningPath: string; // 'mainstream' | 'homeschool' | 'considering'
   familyStyle: string;
   outdoorSpace: string;
   learningGoals: string[];
@@ -24,6 +25,7 @@ interface OnboardingState {
   addChild: () => void;
   updateChild: (index: number, field: keyof OnboardingChild, value: string | string[]) => void;
   removeChild: (index: number) => void;
+  setLearningPath: (path: string) => void;
   setFamilyStyle: (style: string) => void;
   setOutdoorSpace: (space: string) => void;
   setLearningGoals: (goals: string[]) => void;
@@ -36,6 +38,7 @@ interface OnboardingState {
     familyName: string;
     county: string;
     children: { name: string; dateOfBirth: string; interests: string[]; schoolStatus: string }[];
+    learningPath: string;
     familyStyle: string;
     outdoorSpace: string;
     learningGoals: string[];
@@ -54,6 +57,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   familyName: '',
   county: '',
   children: [{ ...initialChild }],
+  learningPath: '',
   familyStyle: '',
   outdoorSpace: '',
   learningGoals: [],
@@ -75,6 +79,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       children: s.children.filter((_, i) => i !== index),
     })),
 
+  setLearningPath: (path) => set({ learningPath: path }),
   setFamilyStyle: (style) => set({ familyStyle: style }),
   setOutdoorSpace: (space) => set({ outdoorSpace: space }),
 
@@ -93,6 +98,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       familyName: '',
       county: '',
       children: [{ ...initialChild }],
+      learningPath: '',
       familyStyle: '',
       outdoorSpace: '',
       learningGoals: [],
@@ -110,6 +116,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         interests: c.interests,
         schoolStatus: c.schoolStatus,
       })),
+      learningPath: s.learningPath,
       familyStyle: s.familyStyle,
       outdoorSpace: s.outdoorSpace,
       learningGoals: s.learningGoals,

@@ -7,7 +7,7 @@ import { spacing, radius } from '@/theme/spacing';
 import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 
 export default function FamilyNameScreen() {
   const router = useRouter();

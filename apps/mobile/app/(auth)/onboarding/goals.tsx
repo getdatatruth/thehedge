@@ -7,7 +7,7 @@ import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { OptionCard } from '@/components/ui/OptionCard';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 
 const LEARNING_GOALS = [
   { id: 'outdoor_exploration', label: 'Outdoor exploration', emoji: '🌿' },
@@ -27,7 +27,7 @@ export default function GoalsScreen() {
 
   return (
     <OnboardingLayout
-      step={4}
+      step={6}
       totalSteps={TOTAL_STEPS}
       title="What matters most to you?"
       subtitle="Choose as many as you like. This shapes your activity suggestions."
