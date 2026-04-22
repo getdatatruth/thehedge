@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateActivities } from '@/lib/generate-activities';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 120; // Allow up to 120s for parallel AI generation
+export const maxDuration = 300; // Allow up to 5 min for 5 parallel age-group generations
 
 export async function GET(request: NextRequest) {
   // Verify cron secret to prevent unauthorized access
@@ -18,15 +18,20 @@ export async function GET(request: NextRequest) {
     const month = new Date().getMonth();
     const season = month >= 2 && month <= 4 ? 'spring' : month >= 5 && month <= 7 ? 'summer' : month >= 8 && month <= 10 ? 'autumn' : 'winter';
 
-    // Generate 10 activities per week: 5 seasonal + 5 general mix
-    const [seasonalResult, generalResult] = await Promise.all([
-      generateActivities(5, { focusSeason: season, includeParentGuide: true }),
-      generateActivities(5, { includeParentGuide: true }),
+    // Generate 50 activities per week across age groups and categories
+    // 10 per age band: baby (0-1), toddler (1-3), preschool (3-5), primary (5-8), older (8-12)
+    const [babyResult, toddlerResult, preschoolResult, primaryResult, olderResult] = await Promise.all([
+      generateActivities(10, { focusAgeRange: { min: 0, max: 1 }, focusSeason: season, includeParentGuide: true }),
+      generateActivities(10, { focusAgeRange: { min: 1, max: 3 }, focusSeason: season, includeParentGuide: true }),
+      generateActivities(10, { focusAgeRange: { min: 3, max: 5 }, includeParentGuide: true }),
+      generateActivities(10, { focusAgeRange: { min: 5, max: 8 }, includeParentGuide: true }),
+      generateActivities(10, { focusAgeRange: { min: 8, max: 12 }, includeParentGuide: true }),
     ]);
 
-    const totalGenerated = (seasonalResult.generated || 0) + (generalResult.generated || 0);
-    const allActivities = [...seasonalResult.activities, ...generalResult.activities];
-    const allErrors = [...seasonalResult.errors, ...generalResult.errors];
+    const allResults = [babyResult, toddlerResult, preschoolResult, primaryResult, olderResult];
+    const totalGenerated = allResults.reduce((s, r) => s + (r.generated || 0), 0);
+    const allActivities = allResults.flatMap(r => r.activities);
+    const allErrors = allResults.flatMap(r => r.errors);
 
     // Auto-publish generated activities
     if (allActivities.length > 0) {
@@ -39,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(
-      `[CRON] generate-activities: ${totalGenerated} created (${seasonalResult.generated} seasonal, ${generalResult.generated} general), ${allErrors.length} errors`
+      `[CRON] generate-activities: ${totalGenerated} created across 5 age groups, ${allErrors.length} errors`
     );
 
     if (allErrors.length > 0) {
