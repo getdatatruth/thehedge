@@ -11,6 +11,7 @@ import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 import { useAuthStore, type UserProfile, type Family, type Child } from '@/stores/auth-store';
+import { requestPermissions, scheduleDailyReminder, scheduleStreakReminder, setupNotificationChannel } from '@/lib/notifications';
 
 export default function CompleteScreen() {
   const router = useRouter();
@@ -68,6 +69,18 @@ export default function CompleteScreen() {
         setChildren(childrenWithAges);
       } catch {
         // Non-critical - the routing will still work
+      }
+
+      // Set up notifications
+      try {
+        await setupNotificationChannel();
+        const granted = await requestPermissions();
+        if (granted) {
+          await scheduleDailyReminder({ hour: 9, minute: 0 });
+          await scheduleStreakReminder();
+        }
+      } catch {
+        // Non-critical - notifications are optional
       }
 
       // Reset onboarding store

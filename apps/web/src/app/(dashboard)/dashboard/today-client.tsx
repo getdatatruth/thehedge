@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ActivityCard, CATEGORY_CONFIG } from '@/components/shared/activity-card';
 import { FilterChips } from '@/components/shared/filter-chips';
 import { InsightCard } from '@/components/shared/insight-card';
+import { MilestoneCard } from '@/components/shared/milestone-card';
+import { NewThisWeek } from '@/components/shared/new-this-week';
 import {
   MOCK_ACTIVITIES,
   MOCK_COLLECTIONS,
@@ -388,6 +390,9 @@ export function TodayClient({
         }}
       />
 
+      {/* TODO: Wire MilestoneCard here once milestone API data is available */}
+      {/* <MilestoneCard milestone={milestone} onClick={() => {}} /> */}
+
       {/* ─── Child Selector ─── */}
       {childNames.length > 1 && (
         <div className="flex gap-2 flex-wrap">
@@ -594,6 +599,9 @@ export function TodayClient({
           ))}
         </div>
       </div>
+
+      {/* ─── New This Week (from API) ─── */}
+      <NewThisWeek />
 
       {/* ─── Explore Section ─── */}
       <div>

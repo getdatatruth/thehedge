@@ -35,6 +35,8 @@ import { WeekStrip } from '@/components/today/WeekStrip';
 import { ActivityCard } from '@/components/today/ActivityCard';
 import { AnimatedCard } from '@/components/ui/AnimatedCard';
 import { InsightCard } from '@/components/ui/InsightCard';
+import { GuidedPathway } from '@/components/today/GuidedPathway';
+import { MilestoneCard } from '@/components/today/MilestoneCard';
 import { lightTheme, categoryColors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
@@ -163,6 +165,11 @@ export default function TodayScreen() {
     { staleTime: 300000 }
   );
 
+  // Milestones data
+  const { data: milestoneData } = useApiQuery<{
+    milestones: Array<{ id: string; name: string; emoji: string; achieved: boolean; achievedDate?: string; progress?: number; target?: number }>;
+  }>(['milestones'], '/milestones', { staleTime: 600000 });
+
   const isLoading = dashLoading || planLoading;
   const isRefetching = dashRefetching || planRefetching;
   const handleRefresh = () => { refetchDash(); refetchPlan(); };
@@ -207,37 +214,45 @@ export default function TodayScreen() {
     return [];
   }, [plannerWeek, dashboard?.todayActivities, selectedDay, todayDow]);
 
-  // Weather-aware hero activity - prioritise indoor when raining, outdoor when dry
+  // Interest-to-category mapping for recommendation scoring
+  const interestCategoryMap: Record<string, string[]> = {
+    nature: ['nature'], art: ['art'], science: ['science'], cooking: ['kitchen'],
+    sport: ['movement'], music: ['art'], stories: ['literacy'], numbers: ['maths'],
+    building: ['life_skills', 'science'], animals: ['nature', 'science'],
+    sensory: ['science', 'art', 'calm'], imaginative: ['social', 'literacy'],
+  };
+  const familyInterests = children.flatMap(c => c.interests || []);
+  const preferredCategories = new Set(familyInterests.flatMap(i => interestCategoryMap[i] || []));
+
+  // Weather + interest-aware hero activity
   const heroActivity = useMemo(() => {
     const isRaining = dashboard?.weather?.isRaining || false;
 
+    function scoreActivity(a: { category?: string; location?: string }): number {
+      let score = 0;
+      // Boost activities matching family interests
+      if (a.category && preferredCategories.has(a.category)) score += 2;
+      // Boost weather-appropriate activities
+      if (isRaining && (!a.location || a.location === 'indoor' || a.location === 'both' || a.location === 'anywhere')) score += 1;
+      if (!isRaining && (a.location === 'outdoor' || a.location === 'both')) score += 1;
+      return score;
+    }
+
     const todayActivities = selectedDayActivities.filter(a => !a.completed);
     if (todayActivities.length > 0) {
-      // If we have plan activities, prioritise weather-appropriate ones
-      const weatherFiltered = isRaining
-        ? todayActivities.filter(a => {
-            const loc = (a as any).location;
-            return !loc || loc === 'indoor' || loc === 'both' || loc === 'anywhere';
-          })
-        : todayActivities;
-      const pool = weatherFiltered.length > 0 ? weatherFiltered : todayActivities;
-      const idx = heroShuffle % pool.length;
-      return pool[idx];
+      // Sort by interest/weather score, then pick based on shuffle
+      const scored = [...todayActivities].sort((a, b) => scoreActivity(b as any) - scoreActivity(a as any));
+      const idx = heroShuffle % scored.length;
+      return scored[idx];
     }
-    // Fall back to dashboard today activities with weather filtering
+    // Fall back to dashboard today activities
     if (dashboard?.todayActivities?.length) {
-      const weatherFiltered = isRaining
-        ? dashboard.todayActivities.filter(a => {
-            const loc = (a as any).location;
-            return !loc || loc === 'indoor' || loc === 'both' || loc === 'anywhere';
-          })
-        : dashboard.todayActivities;
-      const pool = weatherFiltered.length > 0 ? weatherFiltered : dashboard.todayActivities;
-      const idx = heroShuffle % pool.length;
-      return { ...pool[idx], completed: false, child_name: '', time: '' };
+      const scored = [...dashboard.todayActivities].sort((a, b) => scoreActivity(b as any) - scoreActivity(a as any));
+      const idx = heroShuffle % scored.length;
+      return { ...scored[idx], completed: false, child_name: '', time: '' };
     }
     return null;
-  }, [selectedDayActivities, dashboard?.todayActivities, dashboard?.weather, heroShuffle]);
+  }, [selectedDayActivities, dashboard?.todayActivities, dashboard?.weather, heroShuffle, preferredCategories]);
 
   const hasMultipleChildren = children.length > 1;
   const isSelectedToday = selectedDay === todayDow;
@@ -488,6 +503,25 @@ export default function TodayScreen() {
             </View>
           )
         )}
+
+        {/* ─── GUIDED PATHWAY (new users, first 7 days) ─── */}
+        {isFirstTime && isSelectedToday && (
+          <GuidedPathway
+            learningPath={learningPath}
+            daysActive={0}
+            activitiesCompleted={dashboard?.activitiesThisWeek || 0}
+            onNavigate={(route) => router.push(route as any)}
+          />
+        )}
+
+        {/* ─── MILESTONE CARD (near achievement) ─── */}
+        {milestoneData?.milestones?.map(m => (
+          <MilestoneCard
+            key={m.id}
+            milestone={m}
+            onPress={() => router.push('/(tabs)/progress' as any)}
+          />
+        ))}
 
         {/* Compact stats row */}
         <View style={styles.statsRow}>

@@ -34,6 +34,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery, useApiPost, useApiDelete } from '@/hooks/use-api';
 import { ActivityDetailSkeleton } from '@/components/ui/ScreenSkeletons';
 import { LogActivityModal } from '@/components/shared/LogActivityModal';
+import { CelebrationOverlay } from '@/components/shared/CelebrationOverlay';
 import { hapticLight, hapticSuccess } from '@/lib/haptics';
 import { lightTheme, categoryColors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -89,6 +90,7 @@ export default function ActivityDetailScreen() {
   const heartScale = useRef(new Animated.Value(1)).current;
   const [checkedMaterials, setCheckedMaterials] = useState<Set<number>>(new Set());
   const [logged, setLogged] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const { data: activity, isLoading } = useApiQuery<ActivityDetail>(
     ['activity', slug],
@@ -439,7 +441,20 @@ export default function ActivityDetailScreen() {
         activityId={activity.id}
         activityTitle={activity.title}
         bottomSheetRef={bottomSheetRef}
-        onLogged={() => setLogged(true)}
+        onLogged={() => { setLogged(true); setShowCelebration(true); }}
+      />
+
+      {/* Celebration overlay after logging */}
+      <CelebrationOverlay
+        visible={showCelebration}
+        isFirstActivity={false}
+        activityTitle={activity?.title || ''}
+        hedgeScoreGain={1}
+        onDismiss={() => setShowCelebration(false)}
+        onNextActivity={() => {
+          setShowCelebration(false);
+          router.push('/(tabs)/browse');
+        }}
       />
     </SafeAreaView>
   );
