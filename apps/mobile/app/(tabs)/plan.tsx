@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Crown, RefreshCw, Check, Sparkles } from 'lucide-react-native';
+import { Crown, RefreshCw, Check, Sparkles, Leaf } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery } from '@/hooks/use-api';
@@ -98,7 +98,9 @@ export default function PlanScreen() {
   const router = useRouter();
   const effectiveTier = useAuthStore((s) => s.effectiveTier());
   const children = useAuthStore((s) => s.children);
+  const family = useAuthStore((s) => s.family);
   const isFree = effectiveTier === 'free';
+  const educationApproach = (family as any)?.education_approach || 'blended';
 
   // ALL hooks before any conditional returns
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
@@ -192,6 +194,33 @@ export default function PlanScreen() {
         coveredCategories: Array.from(cats),
       };
     }, [plannerData]);
+
+  // --- Unschool families see a gentle browse redirect ---
+  if (educationApproach === 'unschool') {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Ideas</Text>
+        </View>
+        <View style={styles.upgradeContainer}>
+          <View style={[styles.upgradeIcon, { backgroundColor: `${lightTheme.accent}15` }]}>
+            <Leaf size={36} color={lightTheme.accent} />
+          </View>
+          <Text style={styles.upgradeTitle}>Your family learns through living</Text>
+          <Text style={styles.upgradeBody}>
+            No schedules, no timetables. Browse activities whenever you want inspiration
+            and log what you do to build your family's story.
+          </Text>
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/browse')}
+            style={[styles.upgradeButton, { backgroundColor: lightTheme.accent }]}
+          >
+            <Text style={styles.upgradeButtonText}>Browse activities</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // --- Free user gate ---
   if (isFree) {

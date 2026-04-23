@@ -10,7 +10,7 @@ import { spacing, radius } from '@/theme/spacing';
 import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return '';

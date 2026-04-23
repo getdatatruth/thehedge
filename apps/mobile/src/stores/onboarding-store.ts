@@ -13,6 +13,7 @@ interface OnboardingState {
   county: string;
   children: OnboardingChild[];
   learningPath: string; // 'mainstream' | 'homeschool' | 'considering'
+  educationApproach: string; // 'structured' | 'blended' | 'child_led' | 'waldorf' | 'unschool'
   familyStyle: string;
   outdoorSpace: string;
   learningGoals: string[];
@@ -26,6 +27,7 @@ interface OnboardingState {
   updateChild: (index: number, field: keyof OnboardingChild, value: string | string[]) => void;
   removeChild: (index: number) => void;
   setLearningPath: (path: string) => void;
+  setEducationApproach: (approach: string) => void;
   setFamilyStyle: (style: string) => void;
   setOutdoorSpace: (space: string) => void;
   setLearningGoals: (goals: string[]) => void;
@@ -39,6 +41,7 @@ interface OnboardingState {
     county: string;
     children: { name: string; dateOfBirth: string; interests: string[]; schoolStatus: string }[];
     learningPath: string;
+    educationApproach: string;
     familyStyle: string;
     outdoorSpace: string;
     learningGoals: string[];
@@ -58,6 +61,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   county: '',
   children: [{ ...initialChild }],
   learningPath: '',
+  educationApproach: '',
   familyStyle: '',
   outdoorSpace: '',
   learningGoals: [],
@@ -80,6 +84,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     })),
 
   setLearningPath: (path) => set({ learningPath: path }),
+  setEducationApproach: (approach) => set({ educationApproach: approach }),
   setFamilyStyle: (style) => set({ familyStyle: style }),
   setOutdoorSpace: (space) => set({ outdoorSpace: space }),
 
@@ -99,6 +104,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       county: '',
       children: [{ ...initialChild }],
       learningPath: '',
+      educationApproach: '',
       familyStyle: '',
       outdoorSpace: '',
       learningGoals: [],
@@ -117,6 +123,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
         schoolStatus: c.schoolStatus,
       })),
       learningPath: s.learningPath,
+      educationApproach: s.educationApproach,
       familyStyle: s.familyStyle,
       outdoorSpace: s.outdoorSpace,
       learningGoals: s.learningGoals,

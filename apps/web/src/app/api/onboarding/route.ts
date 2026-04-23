@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       children,
       familyStyle,
       learningPath,
+      educationApproach,
       learningGoals,
       activitiesPerWeek,
       ideaTimes,

@@ -8,7 +8,7 @@ import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { OptionCard } from '@/components/ui/OptionCard';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 const LEARNING_PATHS = [
   {
@@ -43,7 +43,13 @@ export default function LearningPathScreen() {
       title="How does your family learn?"
       subtitle="This shapes your entire experience - you can always change it later."
       canContinue={learningPath.length > 0}
-      onContinue={() => router.push('/(auth)/onboarding/interests')}
+      onContinue={() => {
+        if (learningPath === 'homeschool' || learningPath === 'considering') {
+          router.push('/(auth)/onboarding/education-approach');
+        } else {
+          router.push('/(auth)/onboarding/interests');
+        }
+      }}
     >
       <View style={styles.options}>
         {LEARNING_PATHS.map(({ id, label, description, Icon }) => (

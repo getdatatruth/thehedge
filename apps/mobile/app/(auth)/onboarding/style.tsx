@@ -8,7 +8,7 @@ import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { OptionCard } from '@/components/ui/OptionCard';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 const FAMILY_STYLES = [
   {
@@ -44,7 +44,7 @@ export default function StyleScreen() {
 
   return (
     <OnboardingLayout
-      step={5}
+      step={6}
       totalSteps={TOTAL_STEPS}
       title="What's your family style?"
       subtitle="This helps us suggest the right mix of activities."

@@ -8,7 +8,7 @@ import { typography } from '@/theme/typography';
 import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 const INTEREST_OPTIONS = [
   { id: 'nature', label: 'Nature & outdoors', emoji: '🌿' },
@@ -53,7 +53,7 @@ export default function InterestsScreen() {
 
   return (
     <OnboardingLayout
-      step={4}
+      step={5}
       totalSteps={TOTAL_STEPS}
       title="What are they into?"
       subtitle={subtitle}

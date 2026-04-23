@@ -135,6 +135,7 @@ export default function TodayScreen() {
   const firstName = profile?.name?.split(' ')[0] || 'there';
   const familyStyle = (family as any)?.family_style;
   const learningPath = (family as any)?.learning_path || 'mainstream';
+  const educationApproach = (family as any)?.education_approach || 'blended';
 
   const now = new Date();
   const todayDow = (now.getDay() + 6) % 7;
@@ -326,7 +327,13 @@ export default function TodayScreen() {
                 <View style={styles.heroLabelRow}>
                   <Sparkles size={14} color={lightTheme.accent} />
                   <Text style={styles.heroLabel}>
-                    {isFirstTime ? 'Start here' : hasPlan ? 'Up next' : dashboard?.weather?.isRaining ? 'Perfect for a rainy day' : 'Try this today'}
+                    {isFirstTime ? 'Start here'
+                      : hasPlan ? (educationApproach === 'structured' ? "Today's schedule" : 'Up next')
+                      : dashboard?.weather?.isRaining ? 'Perfect for a rainy day'
+                      : educationApproach === 'child_led' ? 'Inspiration for today'
+                      : educationApproach === 'waldorf' ? 'Seasonal activity'
+                      : educationApproach === 'unschool' ? 'If you fancy it...'
+                      : 'Try this today'}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -375,21 +382,31 @@ export default function TodayScreen() {
             <View style={styles.guidanceCard}>
               <Text style={styles.guidanceTitle}>Welcome to The Hedge</Text>
               <Text style={styles.guidanceBody}>
-                {learningPath === 'homeschool'
-                  ? "Generate your first weekly plan - we'll balance curriculum areas and match activities to each child's age and interests."
+                {educationApproach === 'structured'
+                  ? "Generate your first weekly plan - we'll balance curriculum areas and match activities to each child's age and stage."
+                  : educationApproach === 'child_led'
+                    ? "Browse activities that match your children's interests. Log what you do and we'll track their learning journey."
+                  : educationApproach === 'waldorf'
+                    ? "Explore seasonal, nature-led activities. We'll suggest what's right for this time of year."
+                  : educationApproach === 'unschool'
+                    ? "Browse whenever you need inspiration. No schedules, no pressure - just ideas for when you want them."
+                  : learningPath === 'homeschool'
+                    ? "Generate your first weekly plan - we'll balance curriculum areas and match activities to each child's age and interests."
                   : learningPath === 'considering'
                     ? "Try a few activities this week to see how homeschooling feels. No pressure - just explore."
                     : "Pick an activity above and try it with your kids. Log it when you're done and we'll suggest what to try next."
                 }
               </Text>
               <View style={styles.guidanceActions}>
-                {learningPath === 'homeschool' || learningPath === 'considering' ? (
+                {educationApproach !== 'unschool' && (learningPath === 'homeschool' || learningPath === 'considering') ? (
                   <TouchableOpacity
                     onPress={() => router.push('/(tabs)/plan' as any)}
                     style={styles.guidancePrimaryBtn}
                   >
                     <Calendar size={14} color="#FFFFFF" />
-                    <Text style={styles.guidancePrimaryText}>Generate your plan</Text>
+                    <Text style={styles.guidancePrimaryText}>
+                      {educationApproach === 'child_led' ? 'Browse ideas' : educationApproach === 'waldorf' ? 'Seasonal activities' : 'Generate your plan'}
+                    </Text>
                   </TouchableOpacity>
                 ) : null}
                 <TouchableOpacity

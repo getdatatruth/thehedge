@@ -6,7 +6,7 @@ import { OnboardingLayout } from '@/components/ui/OnboardingLayout';
 import { OptionCard } from '@/components/ui/OptionCard';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
 const SCHEDULE_OPTIONS = [
   {
@@ -33,7 +33,7 @@ export default function ScheduleScreen() {
 
   return (
     <OnboardingLayout
-      step={7}
+      step={8}
       totalSteps={TOTAL_STEPS}
       title="How many activities per week?"
       subtitle="This helps us build your weekly plan. You can change this anytime."
