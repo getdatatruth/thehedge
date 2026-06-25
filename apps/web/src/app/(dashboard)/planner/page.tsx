@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { PlannerClient } from './planner-client';
+import { PlanTabs } from '@/components/dashboard/plan-tabs';
 import { getWeather } from '@/lib/weather';
 
 export const metadata = {
@@ -133,6 +134,8 @@ export default async function PlannerPage({
   }
 
   return (
+    <>
+    <PlanTabs active="week" />
     <PlannerClient
       children={children || []}
       weeklyPlans={familyPlans}
@@ -146,5 +149,6 @@ export default async function PlannerPage({
       weatherCondition={weatherCondition}
       temperature={weather?.temperature}
     />
+    </>
   );
 }
