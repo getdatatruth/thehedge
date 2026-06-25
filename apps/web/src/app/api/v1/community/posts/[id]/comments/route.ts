@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
+import { notify } from '@/lib/notify';
 
 export async function OPTIONS() {
   return apiOptions();
@@ -99,7 +100,7 @@ export async function POST(
   // Verify the post exists and get current comment_count
   const { data: post } = await supabase
     .from('community_posts')
-    .select('id, group_id, comment_count')
+    .select('id, group_id, comment_count, family_id, title')
     .eq('id', id)
     .single();
 
@@ -163,6 +164,22 @@ export async function POST(
 
   if (updateError) {
     return apiError('Failed to update comment count', 500);
+  }
+
+  // Let the post author know someone replied, unless they replied to themselves.
+  // Best-effort: a notification failure must never break posting a comment.
+  try {
+    if (post.family_id && post.family_id !== profile.family_id) {
+      await notify({
+        familyId: post.family_id,
+        type: 'community_reply',
+        title: 'New reply to your post',
+        body: `Someone replied to "${post.title}". Tap to see what they said.`,
+        actionUrl: `/community/posts/${id}`,
+      });
+    }
+  } catch {
+    // Ignore: notifications are best-effort.
   }
 
   return apiSuccess(comment, undefined, 201);

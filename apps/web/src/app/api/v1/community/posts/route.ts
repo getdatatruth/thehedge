@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiPaginated, apiOptions } from '@/lib/api-response';
+import { notifyMany } from '@/lib/notify';
 
 export async function OPTIONS() {
   return apiOptions();
@@ -136,6 +137,32 @@ export async function POST(request: NextRequest) {
 
   if (insertError) {
     return apiError('Failed to create post', 500);
+  }
+
+  // Let the rest of the group know there's something new to read.
+  // Bounded to keep it efficient; notifies other member families only.
+  try {
+    const { data: members } = await supabase
+      .from('community_memberships')
+      .select('family_id')
+      .eq('group_id', group_id)
+      .limit(500);
+
+    const otherFamilyIds = (members || [])
+      .map((m) => m.family_id)
+      .filter((id) => id && id !== profile.family_id);
+
+    if (otherFamilyIds.length > 0) {
+      const authorName = profile.name || 'A family';
+      await notifyMany(otherFamilyIds, {
+        type: 'community_post',
+        title: 'New post in your group',
+        body: `${authorName} shared "${title}". Tap to have a read.`,
+        actionUrl: `/community/posts/${post.id}`,
+      });
+    }
+  } catch {
+    // Notifications are best-effort and must never block creating a post.
   }
 
   return apiSuccess(post, undefined, 201);
