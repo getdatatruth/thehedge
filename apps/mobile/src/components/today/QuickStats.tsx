@@ -1,37 +1,30 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Flame, Activity, Leaf } from 'lucide-react-native';
+import { Activity, Calendar } from 'lucide-react-native';
 import { lightTheme, categoryColors } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 interface QuickStatsProps {
-  streak: number;
+  daysOfLearning: number;
   activitiesThisWeek: number;
-  hedgeScore?: number;
 }
 
 export function QuickStats({
-  streak,
+  daysOfLearning,
   activitiesThisWeek,
-  hedgeScore,
 }: QuickStatsProps) {
   return (
     <View style={styles.row}>
       <StatCard
-        icon={<Flame size={18} color={categoryColors.art} />}
-        value={streak}
-        label="Day streak"
+        icon={<Calendar size={18} color={categoryColors.art} />}
+        value={daysOfLearning}
+        label="Days of learning"
       />
       <StatCard
         icon={<Activity size={18} color={categoryColors.nature} />}
         value={activitiesThisWeek}
         label="This week"
-      />
-      <StatCard
-        icon={<Leaf size={18} color={lightTheme.accent} />}
-        value={hedgeScore ?? 0}
-        label="Hedge Score"
       />
     </View>
   );

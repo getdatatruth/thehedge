@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { CheckCircle, Leaf, ArrowRight, Bell } from 'lucide-react-native';
+import { CheckCircle, ArrowRight, Bell } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -19,7 +19,6 @@ interface CelebrationOverlayProps {
   visible: boolean;
   isFirstActivity: boolean;
   activityTitle: string;
-  hedgeScoreGain?: number;
   nextActivity?: { title: string; category: string; slug?: string };
   onDismiss: () => void;
   onNextActivity?: () => void;
@@ -68,7 +67,6 @@ export function CelebrationOverlay({
   visible,
   isFirstActivity,
   activityTitle,
-  hedgeScoreGain = 0,
   nextActivity,
   onDismiss,
   onNextActivity,
@@ -76,7 +74,6 @@ export function CelebrationOverlay({
 }: CelebrationOverlayProps) {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scoreAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
@@ -85,14 +82,9 @@ export function CelebrationOverlay({
         Animated.spring(scaleAnim, { toValue: 1, tension: 50, friction: 6, useNativeDriver: true }),
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
       ]).start();
-
-      if (hedgeScoreGain > 0) {
-        Animated.timing(scoreAnim, { toValue: hedgeScoreGain, duration: 1200, useNativeDriver: false }).start();
-      }
     } else {
       scaleAnim.setValue(0);
       fadeAnim.setValue(0);
-      scoreAnim.setValue(0);
     }
   }, [visible]);
 
@@ -122,18 +114,10 @@ export function CelebrationOverlay({
 
         <Text style={styles.subtitle}>
           {isFirstActivity
-            ? `You just started your family's learning journey with "${activityTitle}"`
-            : `"${activityTitle}" logged to your timeline`
+            ? `You just started your family's learning journey with "${activityTitle}". Lovely, that's one for the book.`
+            : `"${activityTitle}" logged to your timeline. Lovely, that's one for the book.`
           }
         </Text>
-
-        {/* Score gain */}
-        {hedgeScoreGain > 0 && (
-          <View style={styles.scoreRow}>
-            <Leaf size={18} color={lightTheme.accent} />
-            <Text style={styles.scoreText}>+{hedgeScoreGain} Hedge Score</Text>
-          </View>
-        )}
 
         {/* Next activity suggestion */}
         {nextActivity && (
@@ -214,21 +198,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: spacing.xl,
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: `${lightTheme.accent}10`,
-    borderRadius: 20,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    marginBottom: spacing.xl,
-  },
-  scoreText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: lightTheme.accent,
   },
   nextCard: {
     backgroundColor: lightTheme.background,

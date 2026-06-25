@@ -20,41 +20,18 @@ import {
   CreditCard,
   HelpCircle,
   LogOut,
-  Leaf,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
-import { useApiQuery } from '@/hooks/use-api';
 import { supabase } from '@/lib/supabase';
 import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
-interface TierData {
-  name: string;
-  emoji: string;
-  next_tier: string | null;
-  progress: number;
-}
-
-interface ProgressSummary {
-  hedge_score: { score: number };
-  tier: TierData;
-}
-
 export default function ProfileScreen() {
   const router = useRouter();
   const { profile, family, children } = useAuthStore();
   const effectiveTier = useAuthStore((s) => s.effectiveTier());
-
-  const { data: progressData } = useApiQuery<ProgressSummary>(
-    ['progress-summary'],
-    '/progress',
-    { staleTime: 300000 }
-  );
-
-  const tier = progressData?.tier || { name: 'Seedling', emoji: '🌱', next_tier: 'Sprout', progress: 0 };
-  const hedgeScore = progressData?.hedge_score?.score || 0;
 
   const handleSignOut = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -84,28 +61,6 @@ export default function ProfileScreen() {
           >
             <Text style={styles.editText}>EDIT PROFILE</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Tier card */}
-        <View style={styles.tierCard}>
-          <View style={styles.tierHeader}>
-            <Leaf size={24} color={lightTheme.accent} />
-            <View style={styles.tierInfo}>
-              <Text style={styles.tierName}>{tier.emoji} {tier.name}</Text>
-              <View style={styles.tierProgressTrack}>
-                <View
-                  style={[
-                    styles.tierProgressFill,
-                    { width: `${Math.min(tier.progress * 100, 100)}%` },
-                  ]}
-                />
-              </View>
-              <Text style={styles.tierNext}>
-                {tier.next_tier ? `${Math.round(tier.progress * 100)}% to ${tier.next_tier}` : 'Max tier reached!'}
-              </Text>
-            </View>
-            <ChevronRight size={18} color={lightTheme.textMuted} />
-          </View>
         </View>
 
         {/* Children section */}
@@ -298,42 +253,6 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: '#FFFFFF',
     fontWeight: '700',
-  },
-  // Tier card
-  tierCard: {
-    backgroundColor: lightTheme.surface,
-    borderRadius: 16,
-    padding: spacing.xl,
-    marginHorizontal: spacing.xl,
-    marginBottom: spacing.lg,
-  },
-  tierHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  tierInfo: { flex: 1 },
-  tierName: {
-    ...typography.uiBold,
-    color: lightTheme.text,
-    fontSize: 17,
-  },
-  tierProgressTrack: {
-    height: 4,
-    backgroundColor: lightTheme.borderLight,
-    borderRadius: 2,
-    marginTop: 6,
-    marginBottom: 4,
-    overflow: 'hidden',
-  },
-  tierProgressFill: {
-    height: '100%',
-    backgroundColor: lightTheme.accent,
-    borderRadius: 2,
-  },
-  tierNext: {
-    ...typography.uiSmall,
-    color: lightTheme.textMuted,
   },
   // Children
   childRow: {

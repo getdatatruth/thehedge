@@ -13,9 +13,7 @@ import {
   Bell,
   Sparkles,
   Plus,
-  Flame,
   Activity,
-  Leaf,
   Sun,
   Cloud,
   CloudRain,
@@ -47,7 +45,7 @@ interface DashboardData {
   greeting: string;
   firstName: string;
   weather: { temperature: number; condition: string; isRaining: boolean } | null;
-  streak: number;
+  daysOfLearning: number;
   activitiesThisWeek: number;
   todayActivities: Array<{
     id: string;
@@ -61,7 +59,6 @@ interface DashboardData {
     age_max?: number;
   }>;
   familyName: string;
-  hedgeScore?: number;
 }
 
 interface PlanDayBlock {
@@ -258,7 +255,7 @@ export default function TodayScreen() {
   const hasMultipleChildren = children.length > 1;
   const isSelectedToday = selectedDay === todayDow;
   const hasPlan = selectedDayActivities.length > 0;
-  const isFirstTime = (dashboard?.activitiesThisWeek || 0) === 0 && (dashboard?.streak || 0) === 0;
+  const isFirstTime = (dashboard?.activitiesThisWeek || 0) === 0 && (dashboard?.daysOfLearning || 0) === 0;
 
   // Day header
   const selectedDate = getDateForDayIndex(monday, selectedDay);
@@ -456,7 +453,7 @@ export default function TodayScreen() {
           context={{
             children,
             weather: dashboard?.weather,
-            streak: dashboard?.streak,
+            daysOfLearning: dashboard?.daysOfLearning,
             activitiesThisWeek: dashboard?.activitiesThisWeek,
             todayActivities: selectedDayActivities,
             categoryBreakdown: activitiesByDay,
@@ -541,11 +538,15 @@ export default function TodayScreen() {
         ))}
 
         {/* Compact stats row */}
-        <View style={styles.statsRow}>
+        <TouchableOpacity
+          style={styles.statsRow}
+          activeOpacity={0.8}
+          onPress={() => router.push('/(tabs)/progress' as any)}
+        >
           <View style={styles.statItem}>
-            <Flame size={14} color="#E8735A" />
-            <Text style={styles.statValue}>{dashboard?.streak || 0}</Text>
-            <Text style={styles.statLabel}>streak</Text>
+            <Calendar size={14} color="#9B7BD4" />
+            <Text style={styles.statValue}>{dashboard?.daysOfLearning || 0}</Text>
+            <Text style={styles.statLabel}>days of learning</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
@@ -553,16 +554,7 @@ export default function TodayScreen() {
             <Text style={styles.statValue}>{dashboard?.activitiesThisWeek || 0}</Text>
             <Text style={styles.statLabel}>this week</Text>
           </View>
-          <View style={styles.statDivider} />
-          <TouchableOpacity
-            style={styles.statItem}
-            onPress={() => router.push('/(tabs)/progress' as any)}
-          >
-            <Leaf size={14} color={lightTheme.accent} />
-            <Text style={styles.statValue}>{dashboard?.hedgeScore || 0}</Text>
-            <Text style={styles.statLabel}>score</Text>
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
 
       </ScrollView>
     </SafeAreaView>

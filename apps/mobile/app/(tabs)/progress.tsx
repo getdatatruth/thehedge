@@ -9,8 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
-import { Flame, Activity, Trophy, Leaf, Award } from 'lucide-react-native';
-import { ScoreRing } from '@/components/ui/ScoreRing';
+import { Activity, Trophy, Clock, Calendar, Compass } from 'lucide-react-native';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery } from '@/hooks/use-api';
 import { ProgressSkeleton } from '@/components/ui/ScreenSkeletons';
@@ -23,31 +22,11 @@ import { spacing, radius } from '@/theme/spacing';
 interface ProgressData {
   total_activities: number;
   total_minutes: number;
-  current_streak: number;
   this_week: number;
   average_rating: number | null;
   unique_days: number;
+  areas_explored: number;
   category_breakdown: Record<string, number>;
-  hedge_score: {
-    score: number;
-    max_score: number;
-    breakdown: { volume: number; consistency: number; breadth: number; depth: number };
-  };
-  tier: {
-    name: string;
-    emoji: string;
-    next_tier: string | null;
-    progress: number;
-    min_score: number;
-    max_score: number;
-  };
-  achievements: Array<{
-    id: string;
-    name: string;
-    emoji: string;
-    unlocked: boolean;
-    requirement: string;
-  }>;
 }
 
 type TabMode = 'activities' | 'insights';
@@ -154,12 +133,12 @@ export default function ProgressScreen() {
             <StatCard
               icon={<Activity size={20} color={lightTheme.accent} />}
               value={progress?.total_activities || 0}
-              label="Activities"
+              label="Moments kept"
             />
             <StatCard
-              icon={<Flame size={20} color="#E8735A" />}
-              value={progress?.current_streak || 0}
-              label="Day streak"
+              icon={<Calendar size={20} color="#9B7BD4" />}
+              value={progress?.unique_days || 0}
+              label="Days of learning"
             />
             <StatCard
               icon={<Trophy size={20} color="#F5A623" />}
@@ -177,103 +156,45 @@ export default function ProgressScreen() {
               context={{
                 children,
                 totalActivities: progress?.total_activities,
-                streak: progress?.current_streak,
                 uniqueDays: progress?.unique_days,
                 totalMinutes: progress?.total_minutes,
+                areasExplored: progress?.areas_explored,
                 categoryBreakdown: progress?.category_breakdown,
-                hedgeScore: progress?.hedge_score?.score,
-                tierName: progress?.tier?.name,
-                scoreBreakdown: progress?.hedge_score?.breakdown,
               }}
               enabled={!!progress}
             />
 
-            {/* Hedge Score + Tier */}
+            {/* Warm reflection */}
             <AnimatedCard delay={100}>
-              <View style={styles.scoreCard}>
-                <ScoreRing
-                  score={progress?.hedge_score?.score || 0}
-                  maxScore={progress?.hedge_score?.max_score || 1000}
-                  label={progress?.tier ? `${progress.tier.emoji} ${progress.tier.name}` : 'Hedge Score'}
-                  subtitle={progress?.tier?.next_tier
-                    ? `${Math.round((progress.tier.progress) * 100)}% to ${progress.tier.next_tier}`
-                    : 'Max tier reached!'
-                  }
-                />
-                {/* Score breakdown */}
-                {progress?.hedge_score?.breakdown && (
-                  <View style={styles.scoreBreakdown}>
-                    {[
-                      { label: 'Volume', value: progress.hedge_score.breakdown.volume, max: 250, color: lightTheme.accent },
-                      { label: 'Consistency', value: progress.hedge_score.breakdown.consistency, max: 250, color: '#F5A623' },
-                      { label: 'Breadth', value: progress.hedge_score.breakdown.breadth, max: 250, color: '#5B8DEF' },
-                      { label: 'Depth', value: progress.hedge_score.breakdown.depth, max: 250, color: '#9B7BD4' },
-                    ].map((dim) => (
-                      <View key={dim.label} style={styles.breakdownDim}>
-                        <View style={styles.breakdownDimHeader}>
-                          <Text style={styles.breakdownDimLabel}>{dim.label}</Text>
-                          <Text style={styles.breakdownDimValue}>{dim.value}/{dim.max}</Text>
-                        </View>
-                        <View style={styles.breakdownDimBar}>
-                          <View style={[styles.breakdownDimFill, { width: `${(dim.value / dim.max) * 100}%`, backgroundColor: dim.color }]} />
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            </AnimatedCard>
-
-            {/* Achievements */}
-            <AnimatedCard delay={200}>
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Achievements</Text>
-                  <TouchableOpacity>
-                    <Text style={styles.showMore}>SHOW MORE</Text>
-                  </TouchableOpacity>
+              <View style={styles.reflectionCard}>
+                <Text style={styles.reflectionTitle}>Your learning so far</Text>
+                <Text style={styles.reflectionBody}>
+                  No scores, no streaks. Just a record of the time you have spent together.
+                </Text>
+                <View style={styles.reflectionGrid}>
+                  <ReflectionStat
+                    icon={<Activity size={18} color={lightTheme.accent} />}
+                    value={`${progress?.total_activities || 0}`}
+                    label="moments kept"
+                  />
+                  <ReflectionStat
+                    icon={<Clock size={18} color="#F5A623" />}
+                    value={`${Math.round((progress?.total_minutes || 0) / 60)}h`}
+                    label="time together"
+                  />
+                  <ReflectionStat
+                    icon={<Calendar size={18} color="#9B7BD4" />}
+                    value={`${progress?.unique_days || 0}`}
+                    label="days of learning"
+                  />
+                  <ReflectionStat
+                    icon={<Compass size={18} color="#5B8DEF" />}
+                    value={`${progress?.areas_explored ?? Object.keys(breakdown).length} of 10`}
+                    label="areas explored"
+                  />
                 </View>
-                <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.achievementsRow}
-              >
-                {(progress?.achievements || []).map((badge, i) => (
-                  <View
-                    key={i}
-                    style={[styles.badgeCard, !badge.unlocked && styles.badgeLocked]}
-                  >
-                    <Text style={styles.badgeEmoji}>{badge.emoji}</Text>
-                    <Text style={[styles.badgeName, !badge.unlocked && styles.badgeNameLocked]}>
-                      {badge.name}
-                    </Text>
-                  </View>
-                ))}
-              </ScrollView>
               </View>
             </AnimatedCard>
-
-            {/* Milestones */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Milestones</Text>
-              <View style={styles.milestonesGrid}>
-                {[
-                  { label: 'First week complete', done: (progress?.unique_days || 0) >= 7 },
-                  { label: '10 activities logged', done: (progress?.total_activities || 0) >= 10 },
-                  { label: 'All categories explored', done: Object.keys(breakdown).length >= 5 },
-                  { label: '30-day streak', done: (progress?.current_streak || 0) >= 30 },
-                ].map((milestone, i) => (
-                  <View key={i} style={styles.milestoneRow}>
-                    <View style={[styles.milestoneCheck, milestone.done && styles.milestoneCheckDone]}>
-                      {milestone.done && <Award size={12} color="#FFFFFF" />}
-                    </View>
-                    <Text style={[styles.milestoneLabel, milestone.done && styles.milestoneLabelDone]}>
-                      {milestone.label}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </View>
 
             {/* Category Breakdown */}
             <View style={styles.section}>
@@ -400,6 +321,24 @@ function StatCard({
   );
 }
 
+function ReflectionStat({
+  icon,
+  value,
+  label,
+}: {
+  icon: React.ReactNode;
+  value: string;
+  label: string;
+}) {
+  return (
+    <View style={styles.reflectionStat}>
+      {icon}
+      <Text style={styles.reflectionStatValue}>{value}</Text>
+      <Text style={styles.reflectionStatLabel}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
@@ -490,110 +429,44 @@ const styles = StyleSheet.create({
     ...typography.eyebrow,
     color: lightTheme.textMuted,
   },
-  scoreCard: {
+  reflectionCard: {
     backgroundColor: lightTheme.surface,
     borderRadius: 16,
-    padding: spacing['2xl'],
-    alignItems: 'center',
-    gap: spacing.xl,
-  },
-  scoreBreakdown: {
-    width: '100%',
+    padding: spacing.xl,
     gap: spacing.md,
   },
-  breakdownDim: {
-    gap: 4,
+  reflectionTitle: {
+    ...typography.h3,
+    color: lightTheme.text,
   },
-  breakdownDimHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  breakdownDimLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+  reflectionBody: {
+    ...typography.bodySmall,
     color: lightTheme.textSecondary,
+    lineHeight: 20,
   },
-  breakdownDimValue: {
-    fontSize: 11,
-    color: lightTheme.textMuted,
-  },
-  breakdownDimBar: {
-    height: 6,
-    backgroundColor: lightTheme.borderLight,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  breakdownDimFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
-  sectionHeader: {
+  reflectionGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  showMore: {
-    ...typography.caption,
-    color: lightTheme.accent,
-  },
-  achievementsRow: {
+    flexWrap: 'wrap',
     gap: spacing.md,
+    marginTop: spacing.xs,
   },
-  badgeCard: {
-    width: 90,
-    backgroundColor: lightTheme.surface,
-    borderRadius: 16,
-    padding: spacing.md,
-    alignItems: 'center',
+  reflectionStat: {
+    flexBasis: '47%',
+    flexGrow: 1,
+    backgroundColor: lightTheme.background,
+    borderRadius: 14,
+    padding: spacing.lg,
+    alignItems: 'flex-start',
     gap: 6,
   },
-  badgeLocked: {
-    opacity: 0.4,
+  reflectionStatValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: lightTheme.text,
   },
-  badgeEmoji: {
-    fontSize: 32,
-  },
-  badgeName: {
+  reflectionStatLabel: {
     ...typography.uiSmall,
-    color: lightTheme.text,
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  badgeNameLocked: {
     color: lightTheme.textMuted,
-  },
-  milestonesGrid: {
-    backgroundColor: lightTheme.surface,
-    borderRadius: 16,
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
-  milestoneRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  milestoneCheck: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: lightTheme.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  milestoneCheckDone: {
-    backgroundColor: lightTheme.accent,
-    borderColor: lightTheme.accent,
-  },
-  milestoneLabel: {
-    ...typography.ui,
-    color: lightTheme.textSecondary,
-  },
-  milestoneLabelDone: {
-    color: lightTheme.text,
-    fontWeight: '600',
   },
   section: { gap: spacing.md },
   sectionTitle: {

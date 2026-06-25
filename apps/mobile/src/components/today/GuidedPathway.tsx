@@ -42,7 +42,7 @@ function getPathwayConfig(learningPath: LearningPath): { title: string; emoji: s
           { label: 'Complete your first planned activity', route: 'activities' },
           { label: 'Log 3 activities across different categories', route: 'activities' },
           { label: 'Check your curriculum coverage', route: 'progress' },
-          { label: 'Review your Hedge Score', route: 'progress' },
+          { label: 'See your learning so far', route: 'progress' },
         ],
       };
     case 'considering':

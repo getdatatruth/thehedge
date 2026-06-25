@@ -20,7 +20,7 @@ import {
   Calendar,
   Edit3,
   TrendingUp,
-  Flame,
+  CalendarDays,
   Layers,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -71,7 +71,7 @@ interface MonthData {
     totalActivities: number;
     totalMinutes: number;
     categories: Record<string, number>;
-    bestStreak: number;
+    daysLearning: number;
   };
 }
 
@@ -114,23 +114,9 @@ function isCurrentMonth(monthKey: string): boolean {
   return monthKey === currentKey;
 }
 
-function calculateStreak(logs: LogEntry[]): number {
+function countDaysLearning(logs: LogEntry[]): number {
   if (logs.length === 0) return 0;
-  const uniqueDates = [...new Set(logs.map((l) => l.date))].sort();
-  let maxStreak = 1;
-  let current = 1;
-  for (let i = 1; i < uniqueDates.length; i++) {
-    const prev = new Date(uniqueDates[i - 1] + 'T00:00:00');
-    const curr = new Date(uniqueDates[i] + 'T00:00:00');
-    const diffDays = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
-    if (diffDays === 1) {
-      current++;
-      maxStreak = Math.max(maxStreak, current);
-    } else {
-      current = 1;
-    }
-  }
-  return maxStreak;
+  return new Set(logs.map((l) => l.date)).size;
 }
 
 // Horizontal stacked category bar
@@ -215,10 +201,10 @@ function MonthReviewCard({ stats, isCurrent }: { stats: MonthData['stats']; isCu
 
         <View style={reviewStyles.stat}>
           <View style={reviewStyles.statIcon}>
-            <Flame size={14} color={lightTheme.accent} />
+            <CalendarDays size={14} color={lightTheme.accent} />
           </View>
-          <Text style={reviewStyles.statValue}>{stats.bestStreak}</Text>
-          <Text style={reviewStyles.statLabel}>day streak</Text>
+          <Text style={reviewStyles.statValue}>{stats.daysLearning}</Text>
+          <Text style={reviewStyles.statLabel}>days of learning</Text>
         </View>
       </View>
 
@@ -350,7 +336,7 @@ export default function TimelineScreen() {
             totalActivities: monthLogs.length,
             totalMinutes,
             categories,
-            bestStreak: calculateStreak(monthLogs),
+            daysLearning: countDaysLearning(monthLogs),
           },
         };
       });

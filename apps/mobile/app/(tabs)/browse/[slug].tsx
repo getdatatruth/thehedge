@@ -449,7 +449,6 @@ export default function ActivityDetailScreen() {
         visible={showCelebration}
         isFirstActivity={false}
         activityTitle={activity?.title || ''}
-        hedgeScoreGain={1}
         onDismiss={() => setShowCelebration(false)}
         onNextActivity={() => {
           setShowCelebration(false);

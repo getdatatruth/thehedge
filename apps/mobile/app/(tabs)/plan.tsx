@@ -351,7 +351,6 @@ export default function PlanScreen() {
               }))
             ),
             categoryBreakdown: coveredCategories,
-            hedgeScore: 0,
             tierName: effectiveTier,
           }}
           enabled={totalActivities > 0}
