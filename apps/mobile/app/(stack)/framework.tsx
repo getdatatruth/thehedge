@@ -1,30 +1,73 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, Leaf } from 'lucide-react-native';
 import type { KTFramework } from '@/lib/kitchen-table';
 import { FrameworkView } from '@/components/kitchen-table/FrameworkView';
+import { apiGet } from '@/lib/api';
 import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 
-// The Family Framework, revisitable from the profile area. The framework is
-// passed in as a serialized route param (there is no GET endpoint yet, only the
-// POST that authors it during onboarding). When opened cold without it, we offer
-// a gentle path back to the Kitchen Table to write a fresh one.
+// Shape of GET /api/v1/me/framework's data envelope. The stored `profile`
+// carries the rich one-page framework under `profile.framework` (see the web
+// kitchen-table route), which is what FrameworkView renders.
+interface FrameworkResponse {
+  framework: {
+    profile?: { framework?: KTFramework } | null;
+    rendered_markdown?: string;
+    version?: number;
+    created_at?: string;
+  } | null;
+}
+
+// The Family Framework, revisitable from the profile area. It can arrive as a
+// serialized route param (straight off the Kitchen Table reveal), but it also
+// loads cold from GET /api/v1/me/framework so the screen works when opened on
+// its own. If neither yields one, we offer a gentle path back to the table.
 export default function FrameworkScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ framework?: string }>();
 
-  let framework: KTFramework | null = null;
-  if (typeof params.framework === 'string' && params.framework.length > 0) {
-    try {
-      framework = JSON.parse(params.framework) as KTFramework;
-    } catch {
-      framework = null;
+  const paramFramework = useMemo<KTFramework | null>(() => {
+    if (typeof params.framework === 'string' && params.framework.length > 0) {
+      try {
+        return JSON.parse(params.framework) as KTFramework;
+      } catch {
+        return null;
+      }
     }
-  }
+    return null;
+  }, [params.framework]);
+
+  const [fetched, setFetched] = useState<KTFramework | null>(null);
+  const [loading, setLoading] = useState(!paramFramework);
+
+  useEffect(() => {
+    // If we already have one from the route param, no need to load cold.
+    if (paramFramework) {
+      setLoading(false);
+      return;
+    }
+    let active = true;
+    (async () => {
+      try {
+        const res = await apiGet<FrameworkResponse>('/me/framework');
+        const loaded = res.data?.framework?.profile?.framework ?? null;
+        if (active) setFetched(loaded);
+      } catch {
+        if (active) setFetched(null);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [paramFramework]);
+
+  const framework = paramFramework ?? fetched;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -36,7 +79,11 @@ export default function FrameworkScreen() {
         <View style={styles.backBtn} />
       </View>
 
-      {framework ? (
+      {loading ? (
+        <View style={styles.empty}>
+          <ActivityIndicator color={lightTheme.accent} />
+        </View>
+      ) : framework ? (
         <ScrollView
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}

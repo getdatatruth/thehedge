@@ -3,19 +3,16 @@ import { View, StyleSheet } from 'react-native';
 import { ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { darkTheme } from '@/theme/colors';
-import { useOnboardingStore } from '@/stores/onboarding-store';
 
 // Onboarding entry. New families now land in The Kitchen Table: a warm,
 // consultative chat that writes their Family Framework. The old multi-step
-// wizard files remain in this folder but are no longer routed to.
+// wizard has been removed; this screen simply redirects.
 export default function OnboardingEntry() {
   const router = useRouter();
-  const reset = useOnboardingStore((s) => s.reset);
 
   useEffect(() => {
-    reset();
     router.replace('/(auth)/kitchen-table' as never);
-  }, [reset, router]);
+  }, [router]);
 
   return (
     <View style={styles.container}>

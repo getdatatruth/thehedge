@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { Button } from './Button';
 
@@ -61,17 +61,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing['3xl'],
-    backgroundColor: colors.parchment,
+    backgroundColor: lightTheme.background,
     gap: spacing.md,
   },
   title: {
     fontSize: 18,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   message: {
     fontSize: 14,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
