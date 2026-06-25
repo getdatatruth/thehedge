@@ -3,23 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { Send, Sparkles, Clock, User, ArrowUpRight, Crown } from 'lucide-react';
-
-interface Suggestion {
-  title: string;
-  description: string;
-  duration: string;
-  materials: string[];
-  steps: string[];
-  learning_outcomes: string[];
-  age_suitability: string;
-  why_today: string;
-}
+import { Send, Sparkles, User, Crown } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  suggestions?: Suggestion[];
 }
 
 interface ChatInterfaceProps {
@@ -37,79 +25,120 @@ interface ChatInterfaceProps {
   isFreeUser?: boolean;
 }
 
-const FREE_AI_LIMIT = 5;
-
 const EXAMPLE_PROMPTS = [
-  "What should we do this afternoon?",
+  'What could we do this afternoon?',
   "We're stuck indoors on a rainy day",
-  "Something calm before bedtime",
-  "A science experiment with kitchen supplies",
-  "We're at the beach with the kids",
+  'Something calm before bedtime',
+  'How does Tusla home-ed registration work?',
+  'A science idea with kitchen supplies',
 ];
 
-export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProps) {
+export function ChatInterface({ context }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
+  const [limitReached, setLimitReached] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const suggestionsUsed = messages.filter((m) => m.role === 'assistant' && m.suggestions).length;
-  const isAtLimit = isFreeUser && suggestionsUsed >= FREE_AI_LIMIT;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
       behavior: 'smooth',
     });
-  }, [messages]);
+  }, [messages, streaming]);
 
   async function handleSubmit(prompt?: string) {
-    const text = prompt || input.trim();
-    if (!text || loading) return;
+    const text = (prompt || input).trim();
+    if (!text || streaming || limitReached) return;
 
     setInput('');
-    setMessages((prev) => [...prev, { role: 'user', content: text }]);
-    setLoading(true);
+    setLimitReached(null);
+
+    // Build the full history (including this new turn) to send to the model.
+    const history: Message[] = [...messages, { role: 'user', content: text }];
+    // Add the user turn plus an empty assistant turn we'll stream tokens into.
+    setMessages([...history, { role: 'assistant', content: '' }]);
+    setStreaming(true);
 
     try {
-      const res = await fetch('/api/v1/ai/suggest', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: text, context }),
+        body: JSON.stringify({ messages: history, context }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: data.error || 'Something went wrong. Try again.',
-          },
+        let message = 'Something went wrong. Please try again.';
+        try {
+          const data = await res.json();
+          message = data?.error?.message || message;
+        } catch {
+          // non-JSON error body, keep the default
+        }
+
+        if (res.status === 402) {
+          setLimitReached(message);
+          // Drop the empty assistant placeholder, keep the user's message.
+          setMessages(history);
+        } else {
+          setMessages([...history, { role: 'assistant', content: message }]);
+        }
+        return;
+      }
+
+      if (!res.body) {
+        setMessages([
+          ...history,
+          { role: 'assistant', content: 'Sorry, I lost my train of thought. Please try again.' },
         ]);
         return;
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: data.text,
-          suggestions: data.suggestions,
-        },
-      ]);
+      // Stream tokens into the last (assistant) message as they arrive.
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        const current = acc;
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = { role: 'assistant', content: current };
+          return next;
+        });
+      }
+
+      if (!acc.trim()) {
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            role: 'assistant',
+            content: "Sorry, I didn't quite catch that. Could you ask again?",
+          };
+          return next;
+        });
+      }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
+      setMessages((prev) => {
+        const next = [...prev];
+        next[next.length - 1] = {
           role: 'assistant',
           content: "Sorry, I couldn't connect. Please try again.",
-        },
-      ]);
+        };
+        return next;
+      });
     } finally {
-      setLoading(false);
+      setStreaming(false);
     }
   }
+
+  // The last message is "pending" if it's an empty assistant bubble mid-stream.
+  const lastMsg = messages[messages.length - 1];
+  const awaitingFirstToken =
+    streaming && lastMsg?.role === 'assistant' && lastMsg.content === '';
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-3rem)]">
@@ -120,7 +149,7 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
           Ask <em className="text-moss italic">The Hedge</em>
         </h1>
         <p className="text-clay mt-2 text-lg leading-relaxed">
-          Your family activity companion, powered by HedgeAI.
+          A calm companion for family learning and home education.
           {context.children.length > 0 && (
             <span className="text-moss">
               {' '}I know about{' '}
@@ -128,33 +157,10 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
             </span>
           )}
         </p>
-
-        {/* Free tier usage counter */}
-        {isFreeUser && (
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex-1 h-1.5 rounded-full bg-stone/30 overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${suggestionsUsed >= FREE_AI_LIMIT ? 'bg-terracotta' : suggestionsUsed >= 3 ? 'bg-amber' : 'bg-moss'}`}
-                style={{ width: `${Math.min((suggestionsUsed / FREE_AI_LIMIT) * 100, 100)}%` }}
-              />
-            </div>
-            <span className="text-[11px] font-bold text-clay/50 whitespace-nowrap">
-              {suggestionsUsed}/{FREE_AI_LIMIT} suggestions
-            </span>
-            {suggestionsUsed >= 3 && (
-              <Link href="/settings/billing" className="text-[11px] font-bold text-amber hover:text-forest transition-colors whitespace-nowrap">
-                Upgrade
-              </Link>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-5 pb-4"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-5 pb-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full space-y-10 animate-fade-up">
             <div className="text-center">
@@ -162,10 +168,11 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
                 <Sparkles className="h-8 w-8 text-parchment" />
               </div>
               <h2 className="text-2xl font-bold text-ink">
-                What would you like to do <em className="text-moss italic">today</em>?
+                What&apos;s on your <em className="text-moss italic">mind</em>?
               </h2>
               <p className="text-sm text-clay/60 mt-3 max-w-sm mx-auto leading-relaxed">
-                Ask me anything about activities for your family. I&apos;ll personalise ideas based on your children, the weather, and your family style.
+                Ask me anything about activities, your day, or home education. I&apos;ll
+                remember our conversation as we go.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2.5 max-w-lg">
@@ -182,92 +189,62 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
           </div>
         )}
 
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex gap-3 ${
-              msg.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}
-          >
-            {msg.role === 'assistant' && (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-sm">
-                <Sparkles className="h-4 w-4 text-parchment" />
-              </div>
-            )}
+        {messages.map((msg, i) => {
+          // Skip rendering the empty assistant placeholder; show dots instead.
+          if (msg.role === 'assistant' && msg.content === '' && i === messages.length - 1) {
+            return null;
+          }
+          return (
             <div
-              className={`max-w-[85%] space-y-3 ${
-                msg.role === 'user'
-                  ? 'rounded-2xl rounded-tr-sm bg-gradient-to-br from-forest to-moss text-parchment px-5 py-3 shadow-sm'
-                  : ''
+              key={i}
+              className={`flex gap-3 ${
+                msg.role === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
-              {msg.role === 'user' ? (
-                <p className="text-sm leading-relaxed">{msg.content}</p>
-              ) : msg.suggestions ? (
-                <div className="space-y-3 stagger-children">
-                  {msg.suggestions.map((suggestion, j) => (
-                    <div key={j} className="card-interactive p-5 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <h3 className="font-semibold text-ink text-[15px]">
-                          {suggestion.title}
-                        </h3>
-                        <span className="inline-flex items-center gap-1 shrink-0 ml-3 rounded-[3px] bg-linen border border-stone px-2.5 py-1 text-[11px] font-medium text-clay">
-                          <Clock className="h-3 w-3" />
-                          {suggestion.duration}
-                        </span>
-                      </div>
-                      <p className="text-[13px] text-clay/70 leading-relaxed">
-                        {suggestion.description}
-                      </p>
-                      {suggestion.why_today && (
-                        <p className="text-[12px] text-forest bg-forest/5 rounded-[4px] px-3 py-2 border border-forest/8">
-                          {suggestion.why_today}
-                        </p>
-                      )}
-                      {suggestion.materials.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {suggestion.materials.map((m, k) => (
-                            <span
-                              key={k}
-                              className="tag"
-                            >
-                              {m}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+              {msg.role === 'assistant' && (
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-sm">
+                  <Sparkles className="h-4 w-4 text-parchment" />
                 </div>
-              ) : (
-                <div className="card-elevated px-5 py-3">
-                  <p className="text-sm text-umber whitespace-pre-wrap leading-relaxed">
-                    {msg.content}
-                  </p>
+              )}
+              <div
+                className={`max-w-[85%] ${
+                  msg.role === 'user'
+                    ? 'rounded-2xl rounded-tr-sm bg-gradient-to-br from-forest to-moss text-parchment px-5 py-3 shadow-sm'
+                    : ''
+                }`}
+              >
+                {msg.role === 'user' ? (
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                ) : (
+                  <div className="card-elevated px-5 py-3">
+                    <p className="text-sm text-umber whitespace-pre-wrap leading-relaxed">
+                      {msg.content}
+                      {streaming && i === messages.length - 1 && (
+                        <span className="inline-block w-1.5 h-4 ml-0.5 align-text-bottom bg-moss/50 animate-pulse" />
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+              {msg.role === 'user' && (
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-linen border border-stone">
+                  <User className="h-4 w-4 text-clay/50" />
                 </div>
               )}
             </div>
-            {msg.role === 'user' && (
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-linen border border-stone">
-                <User className="h-4 w-4 text-clay/50" />
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
 
-        {loading && (
+        {awaitingFirstToken && (
           <div className="flex gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss shadow-sm">
               <Sparkles className="h-4 w-4 text-parchment animate-pulse" />
             </div>
             <div className="card-elevated px-5 py-3">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1">
-                  <div className="h-2 w-2 rounded-full bg-moss/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="h-2 w-2 rounded-full bg-moss/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="h-2 w-2 rounded-full bg-moss/40 animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-                <p className="text-sm text-clay/40">Thinking...</p>
+              <div className="flex gap-1">
+                <div className="h-2 w-2 rounded-full bg-moss/40 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="h-2 w-2 rounded-full bg-moss/40 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="h-2 w-2 rounded-full bg-moss/40 animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -276,14 +253,16 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
 
       {/* Input */}
       <div className="border-t border-stone pt-4">
-        {isAtLimit ? (
+        {limitReached ? (
           <div className="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-amber/5 via-amber/8 to-amber/5 border border-amber/15 p-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber/10">
               <Crown className="h-5 w-5 text-amber" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-ink">You&apos;ve used all {FREE_AI_LIMIT} free suggestions this week</p>
-              <p className="text-[12px] text-clay/60 mt-0.5">Upgrade to get unlimited AI-powered activity ideas.</p>
+              <p className="text-sm font-medium text-ink">{limitReached}</p>
+              <p className="text-[12px] text-clay/60 mt-0.5">
+                Upgrade to keep chatting with The Hedge.
+              </p>
             </div>
             <Link href="/settings/billing?upgrade=family" className="btn-primary text-sm shrink-0">
               Upgrade
@@ -301,14 +280,14 @@ export function ChatInterface({ context, isFreeUser = false }: ChatInterfaceProp
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about activities for your family..."
-                disabled={loading}
+                placeholder="Ask The Hedge anything..."
+                disabled={streaming}
                 className="h-12 rounded-[4px] border-stone bg-linen pr-4 pl-4 text-sm shadow-sm focus:border-moss focus:shadow-md transition-all"
               />
             </div>
             <button
               type="submit"
-              disabled={!input.trim() || loading}
+              disabled={!input.trim() || streaming}
               className="btn-primary h-12 w-12 !p-0 justify-center disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
             >
               <Send className="h-4 w-4" />
