@@ -121,6 +121,51 @@ export const familyFrameworks = pgTable('family_frameworks', {
   index('family_frameworks_family_id_idx').on(table.familyId),
 ]);
 
+// Previously created at runtime via an exec_sql hack; now real + migrated
+// (migrations 0003_tusla_registrations.sql). Notifications and
+// activity_favourites already existed in the DB; declared here so the schema
+// is the single source of truth.
+export const tuslaRegistrations = pgTable('tusla_registrations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  childId: uuid('child_id').notNull().references(() => children.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('not_started'),
+  notificationForm: jsonb('notification_form').$type<Record<string, unknown>>().notNull().default({}),
+  documents: jsonb('documents').$type<unknown[]>().notNull().default([]),
+  deadlines: jsonb('deadlines').$type<unknown[]>().notNull().default([]),
+  assessmentChecklist: jsonb('assessment_checklist').$type<unknown[]>().notNull().default([]),
+  notes: text('notes'),
+  submittedAt: timestamp('submitted_at', { withTimezone: true }),
+  approvedAt: timestamp('approved_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('tusla_registrations_family_child_idx').on(table.familyId, table.childId),
+  index('tusla_registrations_family_idx').on(table.familyId),
+]);
+
+export const notifications = pgTable('notifications', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  type: text('type').notNull().default('info'),
+  title: text('title').notNull(),
+  body: text('body'),
+  read: boolean('read').notNull().default(false),
+  actionUrl: text('action_url'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('notifications_family_id_idx').on(table.familyId),
+]);
+
+export const activityFavourites = pgTable('activity_favourites', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  activityId: uuid('activity_id').notNull().references(() => activities.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('activity_favourites_family_activity_idx').on(table.familyId, table.activityId),
+]);
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(), // references auth.users
   familyId: uuid('family_id').references(() => families.id, { onDelete: 'cascade' }),

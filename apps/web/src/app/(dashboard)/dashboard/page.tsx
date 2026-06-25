@@ -39,7 +39,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('name, families(name, county, latitude, longitude, family_style, approach, subscription_tier, subscription_status, trial_ends_at)')
+    .select('name, families(name, county, latitude, longitude, family_style, approach, doorway, subscription_tier, subscription_status, trial_ends_at)')
     .eq('id', user.id)
     .single();
 
@@ -52,6 +52,7 @@ export default async function DashboardPage() {
     longitude: number | null;
     family_style: string | null;
     approach: string | null;
+    doorway: string | null;
     subscription_tier: string | null;
     subscription_status: string | null;
     trial_ends_at: string | null;
@@ -91,10 +92,11 @@ export default async function DashboardPage() {
   let childNames: string[] = [];
   let childIds: string[] = [];
   let childCtxs: { age: number | null; interests: string[] }[] = [];
+  let childSchoolStatuses: string[] = [];
   if (familyId) {
     const { data: dbChildren } = await supabase
       .from('children')
-      .select('id, name, date_of_birth, interests')
+      .select('id, name, date_of_birth, interests, school_status')
       .eq('family_id', familyId);
     childNames = dbChildren?.map((c) => c.name) || [];
     childIds = dbChildren?.map((c) => c.id) || [];
@@ -102,7 +104,22 @@ export default async function DashboardPage() {
       age: ageInYears(c.date_of_birth, now),
       interests: (c.interests as string[] | null) || [],
     }));
+    childSchoolStatuses = (dbChildren || [])
+      .map((c) => (c.school_status as string | null) || '')
+      .filter(Boolean);
   }
+
+  // The "open door" path: prefer the doorway the family chose at the Kitchen
+  // Table; otherwise infer it from any child's school status. (Previously this
+  // was wired to family_style, an unrelated enum, so it never matched and the
+  // homeschool/considering CTA never rendered.)
+  const learningPath =
+    family?.doorway ||
+    (childSchoolStatuses.includes('homeschool')
+      ? 'homeschool'
+      : childSchoolStatuses.includes('considering')
+        ? 'considering'
+        : null);
 
   // Recent logs feed the invisible "rounded-childhood" warmth signal
   let warmth = {} as ReturnType<typeof computeAreaWarmth>;
@@ -271,7 +288,7 @@ export default async function DashboardPage() {
       activitiesThisWeek={activitiesThisWeek}
       planActivities={planActivities}
       isFreeUser={effectiveTier === 'free'}
-      learningPath={family?.family_style}
+      learningPath={learningPath}
       activitiesLogged={activitiesLogged}
       approach={family?.approach}
     />

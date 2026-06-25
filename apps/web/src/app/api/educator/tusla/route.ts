@@ -1,36 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 
-// ─── Helper: ensure tusla_registrations table exists ─────
-async function ensureTable() {
-  try {
-    const admin = createAdminClient();
-    // Create table if it doesn't exist (idempotent)
-    await admin.rpc('exec_sql', {
-      sql: `
-        CREATE TABLE IF NOT EXISTS tusla_registrations (
-          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-          family_id uuid NOT NULL REFERENCES families(id) ON DELETE CASCADE,
-          child_id uuid NOT NULL REFERENCES children(id) ON DELETE CASCADE,
-          status text NOT NULL DEFAULT 'not_started',
-          notification_form jsonb DEFAULT '{}',
-          documents jsonb DEFAULT '[]',
-          deadlines jsonb DEFAULT '[]',
-          assessment_checklist jsonb DEFAULT '[]',
-          notes text,
-          submitted_at timestamptz,
-          approved_at timestamptz,
-          created_at timestamptz NOT NULL DEFAULT now(),
-          updated_at timestamptz NOT NULL DEFAULT now(),
-          UNIQUE(family_id, child_id)
-        );
-      `,
-    });
-  } catch {
-    // RPC might not exist or table may already exist - ignore errors
-  }
-}
+// tusla_registrations is a real, migrated, RLS-protected table
+// (see migrations/0003_tusla_registrations.sql).
 
 // ─── GET: Fetch Tusla registration data ──────────────────
 
@@ -64,9 +36,8 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      // Table might not exist yet - return empty
-      console.warn('tusla_registrations fetch error (table may not exist):', error.message);
-      return NextResponse.json({ data: [] });
+      console.error('tusla_registrations fetch error:', error.message);
+      return NextResponse.json({ error: 'Failed to load registration data' }, { status: 500 });
     }
 
     return NextResponse.json({ data: registrations || [] });
@@ -129,9 +100,6 @@ export async function POST(request: NextRequest) {
     if (!child) {
       return NextResponse.json({ error: 'Child not found' }, { status: 404 });
     }
-
-    // Attempt to ensure table exists
-    await ensureTable();
 
     // Upsert registration data
     const record: Record<string, unknown> = {
