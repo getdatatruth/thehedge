@@ -295,6 +295,9 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
             </button>
           </form>
         )}
+        <p className="mt-3 text-center text-[11px] text-clay/50 leading-relaxed">
+          Your conversations stay private to your family. They are never used to train AI models, and your data is kept in the EU.
+        </p>
       </div>
     </div>
   );

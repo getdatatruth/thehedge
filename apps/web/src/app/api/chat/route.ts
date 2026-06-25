@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiError, apiOptions } from '@/lib/api-response';
+import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -23,7 +24,9 @@ What you can do:
 - Suggest activities when it helps, woven into your reply as ideas a parent can actually use, not rigid forms. Prefer household materials, nothing they would need to buy.
 - Answer home education questions, including Irish home-ed practicalities, Tusla registration, and the Assessment of Education in line with the Rights of the child (AEARS) process. Be accurate, calm, and practical, and gently suggest checking official Tusla guidance for anything formal.
 
-Keep replies conversational and to the point. You remember the whole conversation so far, so build on what the parent has already told you rather than starting fresh each time.`;
+Keep replies conversational and to the point. You remember the whole conversation so far, so build on what the parent has already told you rather than starting fresh each time.
+
+Privacy: you only ever use THIS family's own information to help them. Their details are private to them and are never used to help any other family.`;
 
 const RATE_LIMITS: Record<string, number> = {
   free: 5,
@@ -108,10 +111,19 @@ export async function POST(request: NextRequest) {
       return apiError('The conversation must end with a user message', 400);
     }
 
-    // Fold optional family context into the system prompt so it stays out of
-    // the visible transcript but still informs every turn.
-    const system = context
-      ? `${SYSTEM_PROMPT}\n\nWhat you already know about this family (use it naturally, do not read it back as a list): ${JSON.stringify(context)}`
+    // Assemble a rich, personalised picture of THIS family from their own real
+    // data (framework, children, what they've done lately, favourites, and the
+    // memory we've built up over time), and fold it into the system prompt so it
+    // shapes every turn without ever showing up in the visible transcript.
+    const { text: familyContextText } = await buildFamilyContext(supabase, familyId);
+
+    const contextBlocks: string[] = [];
+    if (familyContextText) contextBlocks.push(familyContextText);
+    // Any extra context the client passed (weather, season, etc).
+    if (context) contextBlocks.push(`Right now: ${JSON.stringify(context)}`);
+
+    const system = contextBlocks.length
+      ? `${SYSTEM_PROMPT}\n\nWhat you know about this family (use it naturally, do not read it back as a list):\n${contextBlocks.join('\n')}`
       : SYSTEM_PROMPT;
 
     // Record the spend before streaming so the limit means something even if
@@ -127,6 +139,14 @@ export async function POST(request: NextRequest) {
       messages: conversation,
       stream: true,
     });
+
+    // Learn this family a little more: jot down the gist of what they just
+    // asked about so future replies build on it. Fire-and-forget and safe; it
+    // must never delay or break the reply.
+    const lastUserAsk = conversation[conversation.length - 1]?.content;
+    if (familyId && lastUserAsk) {
+      void recordAiMemory(familyId, `Asked: ${lastUserAsk}`);
+    }
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream<Uint8Array>({

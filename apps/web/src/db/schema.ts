@@ -177,6 +177,20 @@ export const aiUsage = pgTable('ai_usage', {
   index('ai_usage_family_feature_idx').on(table.familyId, table.feature, table.createdAt),
 ]);
 
+// A lightweight, per-family memory the AI accumulates over time so every reply
+// is shaped by what we have learned about THIS family and no other
+// (migrations/0005_family_ai_memory.sql). `notes` is a capped list of short
+// gist-of-the-ask jottings; `summary` is an optional rolled-up digest.
+export const familyAiMemory = pgTable('family_ai_memory', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  notes: jsonb('notes').$type<{ at: string; note: string }[]>().notNull().default([]),
+  summary: text('summary'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('family_ai_memory_family_id_idx').on(table.familyId),
+]);
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(), // references auth.users
   familyId: uuid('family_id').references(() => families.id, { onDelete: 'cascade' }),

@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
+import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -28,7 +29,9 @@ When suggesting activities, respond with a JSON array of 3-5 suggestions. Each s
   "why_today": "Why this is a good idea right now"
 }
 
-Consider the family's context: children's ages, interests, the weather, time of year, and what they've done recently. Suggest household-only materials - nothing they'd need to buy.`;
+Consider the family's context: children's ages, interests, the weather, time of year, and what they've done recently. Suggest household-only materials - nothing they'd need to buy.
+
+Privacy: you only ever use THIS family's own information to help them. Their details are private to them and are never used to help any other family.`;
 
 const RATE_LIMITS: Record<string, number> = {
   free: 5,
@@ -91,9 +94,15 @@ export async function POST(request: NextRequest) {
       return apiError('Missing prompt', 400);
     }
 
-    const userMessage = context
-      ? `Family context: ${JSON.stringify(context)}\n\nUser request: ${prompt}`
-      : prompt;
+    // Build a rich picture of THIS family from their own real data so the ideas
+    // are genuinely theirs, then layer any live context the client passed.
+    const { text: familyContextText } = await buildFamilyContext(supabase, familyId);
+
+    const contextParts: string[] = [];
+    if (familyContextText) contextParts.push(`What you know about this family:\n${familyContextText}`);
+    if (context) contextParts.push(`Right now: ${JSON.stringify(context)}`);
+    contextParts.push(`User request: ${prompt}`);
+    const userMessage = contextParts.join('\n\n');
 
     const message = await anthropic.messages.create({
       model: CLAUDE_MODEL,
@@ -119,6 +128,8 @@ export async function POST(request: NextRequest) {
     // Record the spend so the limit means something.
     if (familyId) {
       await supabase.from('ai_usage').insert({ family_id: familyId, feature: 'ai_suggestions' });
+      // Learn this family a little more from what they asked for ideas about.
+      void recordAiMemory(familyId, `Looked for ideas: ${prompt}`);
     }
 
     return apiSuccess({
