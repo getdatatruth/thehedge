@@ -11,6 +11,7 @@ export default function StackLayout() {
       }}
     >
       <Stack.Screen name="favourites" />
+      <Stack.Screen name="framework" />
       <Stack.Screen name="timeline" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="settings" />
