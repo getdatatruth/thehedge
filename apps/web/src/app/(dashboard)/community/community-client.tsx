@@ -229,20 +229,41 @@ export function CommunityClient({
   const myGroups = groups.filter((g) => memberGroupIds.includes(g.id));
   const discoverGroups = groups.filter((g) => !memberGroupIds.includes(g.id));
 
+  // Local-first ("The Townland"): find the family's own county group so we can
+  // surface it prominently at the top of the Groups tab.
+  const normalizeCounty = (c: string | null | undefined) =>
+    (c || '').toLowerCase().replace(/^(county|co\.?)\s+/, '').trim();
+  const familyCountyKey = normalizeCounty(familyCounty);
+  const countyGroup = useMemo(
+    () =>
+      familyCountyKey
+        ? groups.find(
+            (g) => g.type === 'county' && normalizeCounty(g.county) === familyCountyKey
+          ) || null
+        : null,
+    [groups, familyCountyKey]
+  );
+  const isCountyGroupMember = countyGroup
+    ? memberGroupIds.includes(countyGroup.id)
+    : false;
+
   const filteredDiscover = useMemo(() => {
+    // The county group is surfaced separately in "Your area", so keep it out of
+    // the general discover list to avoid showing it twice.
+    const base = discoverGroups.filter((g) => g.id !== countyGroup?.id);
     const filtered = searchQuery
-      ? discoverGroups.filter(
+      ? base.filter(
           (g) =>
             g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (g.county && g.county.toLowerCase().includes(searchQuery.toLowerCase()))
         )
-      : discoverGroups.sort((a, b) => {
-          const aMatch = a.county === familyCounty ? 0 : 1;
-          const bMatch = b.county === familyCounty ? 0 : 1;
+      : [...base].sort((a, b) => {
+          const aMatch = normalizeCounty(a.county) === familyCountyKey ? 0 : 1;
+          const bMatch = normalizeCounty(b.county) === familyCountyKey ? 0 : 1;
           return aMatch - bMatch;
         });
     return filtered;
-  }, [discoverGroups, searchQuery, familyCounty]);
+  }, [discoverGroups, searchQuery, familyCountyKey, countyGroup]);
 
   const filteredPosts = useMemo(() => {
     let result = posts;
@@ -1075,6 +1096,68 @@ export function CommunityClient({
       {/* ====== GROUPS TAB ====== */}
       {activeTab === 'groups' && (
         <div className="space-y-8">
+          {/* Your area (local-first county group) */}
+          {countyGroup && !searchQuery && (
+            <div className="space-y-4">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-clay/50">
+                Your area
+              </p>
+              <div className="rounded-2xl border border-cat-nature/30 bg-cat-nature/[0.06] shadow-sm p-5">
+                <div className="flex items-start gap-4">
+                  <span className="text-3xl">
+                    {countyGroup.emoji || GROUP_EMOJI[countyGroup.type] || '🏠'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-display text-base font-semibold text-umber">
+                        {countyGroup.name}
+                      </p>
+                      <span className="text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full bg-cat-nature/15 text-cat-nature">
+                        Your county
+                      </span>
+                    </div>
+                    <p className="text-[13px] text-clay mt-1 leading-relaxed">
+                      {isCountyGroupMember
+                        ? `You are part of the ${familyCounty} home educators. Share a hello and meet families near you.`
+                        : `Home educators across ${familyCounty}. A calm place to meet families near you.`}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-[11px] text-clay flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        {countyGroup.county}
+                      </span>
+                      <span className="text-clay/20">&middot;</span>
+                      <span className="text-[11px] text-clay flex items-center gap-1">
+                        <Users className="h-3 w-3" />
+                        {countyGroup.member_count > 0
+                          ? `${countyGroup.member_count} ${countyGroup.member_count === 1 ? 'member' : 'members'}`
+                          : 'New group'}
+                      </span>
+                    </div>
+                  </div>
+                  {isCountyGroupMember ? (
+                    <span className="shrink-0 inline-flex items-center gap-1.5 rounded-2xl bg-cat-nature/10 text-cat-nature text-xs py-2 px-3 font-medium">
+                      Joined
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleJoinGroup(countyGroup.id)}
+                      disabled={loadingGroupId === countyGroup.id}
+                      className="shrink-0 rounded-2xl bg-forest text-parchment text-xs py-2 px-4 flex items-center gap-1.5 font-medium hover:bg-forest/90 transition-colors"
+                    >
+                      {loadingGroupId === countyGroup.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5" />
+                      )}
+                      Join your {familyCounty} group
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Your groups */}
           <div className="space-y-4">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-clay/50">
@@ -1114,8 +1197,9 @@ export function CommunityClient({
                         <div className="flex items-center gap-2 mt-1.5">
                           <span className="text-[11px] text-clay flex items-center gap-1">
                             <Users className="h-3 w-3" />
-                            {group.member_count}{' '}
-                            {group.member_count === 1 ? 'member' : 'members'}
+                            {group.member_count > 0
+                              ? `${group.member_count} ${group.member_count === 1 ? 'member' : 'members'}`
+                              : 'New group'}
                           </span>
                           {group.county && (
                             <>
@@ -1208,7 +1292,7 @@ export function CommunityClient({
                         <div className="flex items-center gap-2 mt-1.5">
                           <span className="text-[11px] text-clay flex items-center gap-1">
                             <Users className="h-3 w-3" />
-                            {group.member_count}
+                            {group.member_count > 0 ? group.member_count : 'New group'}
                           </span>
                           {group.county && (
                             <>
