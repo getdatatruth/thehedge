@@ -188,6 +188,11 @@ export function TodayClient({
           {county} · {dayOfWeek} · {temperature ? `${temperature}°C` : '14°C'}
           {weatherDescription ? `, ${weatherDescription.toLowerCase()}` : isRaining ? ', rain' : ', mixed'}
         </p>
+        {activitiesLogged === 0 && (
+          <p className="text-[13px] text-moss/90 mt-3 italic leading-relaxed">
+            Learning that feels like a breath, not a battle. One gentle idea below, whenever you are ready.
+          </p>
+        )}
       </header>
 
       {/* ─── The Thread: one breathing hero ─── */}
@@ -274,9 +279,11 @@ export function TodayClient({
         </section>
       ) : (
         <section className="rounded-3xl border border-dashed border-stone bg-linen/50 p-10 text-center">
-          <p className="font-medium text-umber">Nothing to suggest just yet</p>
+          <p className="font-medium text-umber">Nothing pressing just now</p>
           <p className="text-[13px] text-clay mt-1 italic">
-            {reframe ? 'Nothing matches that right now. Try another, or clear it.' : 'We are adding more ideas all the time.'}
+            {reframe
+              ? 'Nothing matches that this minute. Try another, or clear it and have a wander.'
+              : 'Take the breath. We are gathering a few more ideas, and they will be here when you are.'}
           </p>
           {reframe && (
             <button onClick={() => setReframe(null)} className="btn-secondary mt-4 text-[13px]">

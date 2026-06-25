@@ -26,7 +26,7 @@ export default async function KeepPage() {
       <header className="mb-8">
         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80">Your shelf</p>
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink mt-2">The Keep</h1>
-        <p className="text-[14px] text-clay mt-2">Everything you have gathered, kept in one place and read in whatever way helps.</p>
+        <p className="text-[14px] text-clay mt-2 leading-relaxed">No tallies, no scoreboard. Just the ordinary days you have spent together, gathered on one shelf and read in whatever way helps.</p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2">

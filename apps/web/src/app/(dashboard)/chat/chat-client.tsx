@@ -149,7 +149,7 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
           Ask <em className="text-moss italic">The Hedge</em>
         </h1>
         <p className="text-clay mt-2 text-lg leading-relaxed">
-          A calm companion for family learning and home education.
+          A calm companion at your shoulder for family learning and home education. Not a teacher marking the work, just a friend to think out loud with.
           {context.children.length > 0 && (
             <span className="text-moss">
               {' '}I know about{' '}
@@ -171,8 +171,9 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
                 What&apos;s on your <em className="text-moss italic">mind</em>?
               </h2>
               <p className="text-sm text-clay/60 mt-3 max-w-sm mx-auto leading-relaxed">
-                Ask me anything about activities, your day, or home education. I&apos;ll
-                remember our conversation as we go.
+                Ask me anything: a rainy-afternoon idea, how something fits the curriculum,
+                what to try next. No question too small. I&apos;ll hold the thread of our
+                chat as we go.
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-2.5 max-w-lg">
@@ -261,7 +262,7 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
             <div className="flex-1">
               <p className="text-sm font-medium text-ink">{limitReached}</p>
               <p className="text-[12px] text-clay/60 mt-0.5">
-                Upgrade to keep chatting with The Hedge.
+                We can pick the conversation back up whenever you are ready.
               </p>
             </div>
             <Link href="/settings/billing?upgrade=family" className="btn-primary text-sm shrink-0">
@@ -280,7 +281,7 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask The Hedge anything..."
+                placeholder="Ask away - a rainy-afternoon idea, what to try next..."
                 disabled={streaming}
                 className="h-12 rounded-[4px] border-stone bg-linen pr-4 pl-4 text-sm shadow-sm focus:border-moss focus:shadow-md transition-all"
               />

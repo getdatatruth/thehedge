@@ -1,3 +1,4 @@
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import type {
   AssessmentReportData,
   AttendanceReportData,
@@ -245,4 +246,105 @@ export function assessmentToCsv(data: AssessmentReportData): string {
   }
 
   return buildCsv(rows);
+}
+
+// ─── Real PDF export ──────────────────────────────────────
+// We already build correct, escaped CSV for every report. Rather than
+// duplicate each report's layout, we parse that CSV back into rows and render
+// a genuine, paginated PDF document - real bytes, not a print-to-PDF page.
+
+function parseCsv(csv: string): string[][] {
+  const text = csv.replace(/^\uFEFF/, '');
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else if (c === '"') {
+      inQuotes = true;
+    } else if (c === ',') {
+      row.push(field); field = '';
+    } else if (c === '\n') {
+      row.push(field); rows.push(row); row = []; field = '';
+    } else if (c !== '\r') {
+      field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+export async function csvToPdf(csv: string, title: string): Promise<Uint8Array> {
+  const rows = parseCsv(csv);
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const bold = await doc.embedFont(StandardFonts.HelveticaBold);
+
+  const A4 = { w: 595.28, h: 841.89 };
+  const margin = 48;
+  const maxW = A4.w - margin * 2;
+  const ink = rgb(0.1, 0.09, 0.07);
+  const moss = rgb(0.24, 0.38, 0.26);
+  const grey = rgb(0.42, 0.38, 0.34);
+
+  let page = doc.addPage([A4.w, A4.h]);
+  let y = A4.h - margin;
+
+  const wrap = (s: string, f: typeof font, size: number): string[] => {
+    const words = s.split(/\s+/);
+    const lines: string[] = [];
+    let line = '';
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w;
+      if (f.widthOfTextAtSize(test, size) > maxW && line) { lines.push(line); line = w; }
+      else line = test;
+    }
+    if (line) lines.push(line);
+    return lines.length ? lines : [''];
+  };
+  const newPageIfNeeded = (need: number) => {
+    if (y - need < margin) { page = doc.addPage([A4.w, A4.h]); y = A4.h - margin; }
+  };
+  const draw = (s: string, f: typeof font, size: number, color = ink, indent = 0) => {
+    for (const ln of wrap(s, f, size)) {
+      newPageIfNeeded(size + 4);
+      page.drawText(ln, { x: margin + indent, y: y - size, size, font: f, color });
+      y -= size + 5;
+    }
+  };
+
+  // Title
+  draw(title, bold, 18, moss);
+  y -= 6;
+
+  for (const r of rows) {
+    if (r.length === 0 || (r.length === 1 && r[0] === '')) { y -= 8; continue; } // blank separator
+    const label = (r[0] || '').trim();
+    const rest = r.slice(1).map((c) => (c ?? '').trim()).filter(Boolean);
+    // A label-only row reads as a section heading.
+    if (rest.length === 0) {
+      y -= 4;
+      draw(label, bold, 12, moss);
+    } else if (r.length === 2) {
+      draw(`${label}:  ${rest[0]}`, font, 11, ink);
+    } else {
+      // tabular row: label in bold, cells joined
+      newPageIfNeeded(16);
+      const line = [label, ...rest].join('   ·   ');
+      draw(line, label && rest.length ? font : font, 10.5, label === r[0] && r.indexOf(label) === 0 ? ink : grey);
+    }
+  }
+
+  const bytes = await doc.save();
+  return bytes;
+}
+
+export function pdfFilename(reportType: string, childName: string, startDate: string, endDate: string): string {
+  return csvFilename(reportType, childName, startDate, endDate).replace(/\.csv$/, '.pdf');
 }

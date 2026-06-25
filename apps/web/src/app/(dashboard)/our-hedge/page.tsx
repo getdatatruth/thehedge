@@ -51,7 +51,10 @@ export default async function OurHedgePage() {
         <h1 className="font-display text-3xl sm:text-4xl font-semibold text-ink mt-2 tracking-tight">
           {family?.name || 'Your family'}
         </h1>
-        {approachLine && <p className="text-[14px] text-clay mt-2">{approachLine}</p>}
+        <p className="text-[14px] text-clay mt-2 leading-relaxed">
+          Pull up a chair. This is the hearth of The Hedge, where everything is shaped around your family and the calm you are after.
+        </p>
+        {approachLine && <p className="text-[14px] text-umber mt-2">{approachLine}</p>}
       </header>
 
       {/* ─── Our Framework ─── */}
@@ -83,8 +86,8 @@ export default async function OurHedgePage() {
           </div>
         ) : (
           <div className="rounded-2xl bg-white border border-stone/40 shadow-sm p-6 text-center">
-            <p className="text-[14px] text-umber font-medium">You have not had your kitchen-table chat yet.</p>
-            <p className="text-[13px] text-clay mt-1">A few warm questions, and The Hedge writes your family its own framework.</p>
+            <p className="text-[14px] text-umber font-medium">You have not pulled up a chair at the Kitchen Table yet.</p>
+            <p className="text-[13px] text-clay mt-1">A few warm questions, no right answers, and The Hedge writes your family its own framework to lean on.</p>
             <Link href="/welcome" className="inline-flex items-center gap-2 bg-forest text-parchment font-semibold text-sm rounded-2xl px-5 py-2.5 mt-4 hover:bg-forest/90 transition-colors">
               Pull up a chair <ArrowRight className="h-4 w-4" />
             </Link>

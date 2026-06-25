@@ -1,7 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import {
+  buildAearsTimeline,
+  nextAearsMilestone,
+  describeDaysAway,
+  assessmentReadiness,
+  type AearsMilestone,
+} from '@/lib/aears';
 import {
   ArrowLeft,
   Shield,
@@ -30,6 +37,7 @@ import {
   Trash2,
   CalendarDays,
   Bell,
+  Printer,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -363,6 +371,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     existingReg?.deadlines?.length ? existingReg.deadlines : DEFAULT_DEADLINES
   );
   const [notes, setNotes] = useState(existingReg?.notes || '');
+  const [submittedAt, setSubmittedAt] = useState<string | null>(existingReg?.submitted_at || null);
+  const [approvedAt, setApprovedAt] = useState<string | null>(existingReg?.approved_at || null);
 
   // Expanded sections
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -434,6 +444,25 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     .filter((d) => d.date && !d.completed)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  // ─── Computed AEARS timeline (guidance, not legal advice) ──────────────
+  // Anchored to the family's own start date and the registration record's
+  // submitted/approved dates, so the dates shown are real and move with the
+  // calendar - never hardcoded blanks.
+  const aearsTimeline = useMemo(
+    () =>
+      buildAearsTimeline({
+        status: registrationStatus,
+        educationStartDate: notificationForm.educationStartDate || null,
+        submittedAt,
+        approvedAt,
+      }),
+    [registrationStatus, notificationForm.educationStartDate, submittedAt, approvedAt]
+  );
+  const nextMilestone = useMemo(() => nextAearsMilestone(aearsTimeline), [aearsTimeline]);
+
+  // Assessment readiness summary
+  const readiness = useMemo(() => assessmentReadiness(assessmentChecklist), [assessmentChecklist]);
+
   // ─── Save handler ─────────────────────────────────────
 
   const handleSave = useCallback(async () => {
@@ -457,6 +486,17 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
       });
 
       if (res.ok) {
+        // Pick up server-set submitted_at / approved_at so the timeline
+        // reflects the new status without a page reload.
+        try {
+          const saved = await res.json();
+          if (saved?.data) {
+            setSubmittedAt(saved.data.submitted_at ?? null);
+            setApprovedAt(saved.data.approved_at ?? null);
+          }
+        } catch {
+          // Non-fatal: timeline simply waits for next load.
+        }
         setSaveMessage('Saved successfully');
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
@@ -518,6 +558,122 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     setNotificationForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // ─── Notification of Intent: printable export ──────────
+  // Opens a clean, print-ready document of the SAVED notification details so
+  // "print or download to submit" is finally true. Falls back gracefully if
+  // the browser blocks popups.
+
+  const handlePrintNotification = useCallback(() => {
+    const f = notificationForm;
+    const childName = f.childName || selectedChild?.name || '';
+    const childDob = f.childDob || selectedChild?.date_of_birth || '';
+    const approach = f.educationApproach || selectedPlan?.approach || '';
+    const hoursPerDay = f.hoursPerDay || String(selectedPlan?.hours_per_day || '');
+    const daysPerWeek = f.daysPerWeek || String(selectedPlan?.days_per_week || '');
+
+    const esc = (s: string) =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const fmtDate = (d: string) => {
+      if (!d) return '';
+      const parsed = new Date(d.split('T')[0] + 'T12:00:00');
+      return Number.isNaN(parsed.getTime())
+        ? d
+        : parsed.toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    const row = (label: string, value: string) =>
+      value
+        ? `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>`
+        : `<tr><th>${esc(label)}</th><td class="empty">Not provided</td></tr>`;
+
+    const block = (label: string, value: string) =>
+      `<div class="block"><h3>${esc(label)}</h3><p>${value ? esc(value).replace(/\n/g, '<br/>') : '<span class="empty">Not provided</span>'}</p></div>`;
+
+    const printedOn = new Date().toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+      <title>Notification of Intent to Educate at Home${childName ? ' - ' + esc(childName) : ''}</title>
+      <style>
+        * { box-sizing: border-box; }
+        body { font-family: Georgia, 'Times New Roman', serif; color: #1f2a24; line-height: 1.6; max-width: 720px; margin: 40px auto; padding: 0 24px; }
+        h1 { font-size: 22px; font-weight: normal; margin-bottom: 4px; }
+        .sub { color: #5a6b60; font-size: 13px; margin-bottom: 4px; }
+        .law { color: #5a6b60; font-size: 12px; margin-bottom: 28px; }
+        h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #2f7d52; border-bottom: 1px solid #d8e0d8; padding-bottom: 6px; margin: 28px 0 12px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        th { text-align: left; width: 38%; vertical-align: top; padding: 6px 12px 6px 0; font-weight: bold; font-size: 13px; }
+        td { padding: 6px 0; font-size: 13px; }
+        .empty { color: #9aa69d; font-style: italic; }
+        .block { margin-bottom: 14px; }
+        .block h3 { font-size: 13px; margin: 0 0 2px; }
+        .block p { margin: 0; font-size: 13px; }
+        .disclaimer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #d8e0d8; color: #7a857d; font-size: 11px; font-style: italic; }
+        .sign { margin-top: 32px; font-size: 13px; }
+        .sign-line { display: inline-block; border-bottom: 1px solid #1f2a24; min-width: 240px; margin-left: 8px; }
+        @media print { body { margin: 0; } }
+      </style></head><body>
+      <h1>Notification of Intent to Educate at Home</h1>
+      <p class="sub">Prepared with The Hedge - printed ${esc(printedOn)}</p>
+      <p class="law">Under Section 14 of the Education (Welfare) Act 2000</p>
+
+      <h2>Parent / Guardian</h2>
+      <table>
+        ${row('Full name', f.parentName)}
+        ${row('Address', f.parentAddress)}
+        ${row('Phone', f.parentPhone)}
+        ${row('Email', f.parentEmail)}
+      </table>
+
+      <h2>Child</h2>
+      <table>
+        ${row('Full name', childName)}
+        ${row('Date of birth', fmtDate(childDob))}
+        ${row('PPS number', f.childPps)}
+        ${row('Previous school', f.previousSchool)}
+      </table>
+
+      <h2>Education Provision</h2>
+      <table>
+        ${row('Intended start date', fmtDate(f.educationStartDate))}
+        ${row('Approach', approach)}
+        ${row('Hours per day', hoursPerDay)}
+        ${row('Days per week', daysPerWeek)}
+      </table>
+      ${block('Curriculum description', f.curriculumDescription)}
+      ${block('Special educational needs', f.specialNeeds)}
+      ${block('Assessment methods', f.assessmentMethod)}
+      ${block('Additional information', f.additionalInfo)}
+
+      <div class="sign">
+        <p>Signed: <span class="sign-line"></span></p>
+        <p>Date: <span class="sign-line"></span></p>
+      </div>
+
+      <p class="disclaimer">
+        This summary was prepared using The Hedge to help organise the details an AEARS assessment tends to
+        look for. The Hedge is not affiliated with Tusla and this is not an official Tusla form. Please check
+        the current requirements with your regional Tusla Education Support Service office before submitting.
+      </p>
+      </body></html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) {
+      setSaveMessage('Error: Allow pop-ups to print the notification');
+      setTimeout(() => setSaveMessage(''), 4000);
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    // Give the new document a moment to lay out before invoking print.
+    setTimeout(() => win.print(), 250);
+  }, [notificationForm, selectedChild, selectedPlan]);
+
   // ─── Tab navigation items ─────────────────────────────
 
   const tabs = [
@@ -529,13 +685,6 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     { key: 'deadlines', label: 'Deadlines', icon: CalendarDays },
     { key: 'resources', label: 'Resources', icon: ExternalLink },
   ] as const;
-
-  // ─── Days until next deadline ─────────────────────────
-
-  const nextDeadline = upcomingDeadlines[0];
-  const daysUntilDeadline = nextDeadline
-    ? Math.ceil((new Date(nextDeadline.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    : null;
 
   // ─── Render ────────────────────────────────────────────
 
@@ -573,6 +722,16 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
         </div>
       </div>
 
+      {/* Honest framing - this is a helper, not an official Tusla product */}
+      <div className="flex items-start gap-3 rounded-2xl bg-linen border border-stone/60 px-5 py-3.5 print:hidden">
+        <Info className="h-4 w-4 shrink-0 text-clay/50 mt-0.5" />
+        <p className="text-xs text-clay/70 leading-relaxed">
+          The Hedge is not affiliated with Tusla and this is not an official Tusla product. It helps you
+          organise the evidence and dates an AEARS assessment tends to look for. The timings shown are
+          general guidance, not legal advice, and you can override any date with your own.
+        </p>
+      </div>
+
       {/* Child selector (if multiple children) */}
       {childrenProp.length > 1 && (
         <div className="flex gap-2 flex-wrap">
@@ -592,6 +751,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 setAssessmentChecklist(reg?.assessment_checklist?.length ? reg.assessment_checklist : DEFAULT_ASSESSMENT_CHECKLIST);
                 setDeadlines(reg?.deadlines?.length ? reg.deadlines : DEFAULT_DEADLINES);
                 setNotes(reg?.notes || '');
+                setSubmittedAt(reg?.submitted_at || null);
+                setApprovedAt(reg?.approved_at || null);
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-all ${
                 selectedChildId === child.id
@@ -758,32 +919,36 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
 
           {/* Upcoming deadlines + Curriculum coverage row */}
           <div className="grid gap-4 sm:grid-cols-2">
-            {/* Next deadline card */}
+            {/* Next milestone card (computed from your AEARS timeline) */}
             <div className="card-elevated p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Bell className="h-4 w-4 text-terracotta" />
-                <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Next Deadline</h3>
+                <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Next Up</h3>
               </div>
-              {nextDeadline ? (
+              {nextMilestone ? (
                 <div>
-                  <p className="text-sm font-medium text-ink">{nextDeadline.title}</p>
-                  <p className="text-xs text-clay/60 mt-1">{nextDeadline.description}</p>
-                  <div className="flex items-center gap-2 mt-3">
+                  <p className="text-sm font-medium text-ink">{nextMilestone.title}</p>
+                  <p className="text-xs text-clay/60 mt-1">{nextMilestone.guidance}</p>
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
                     <CalendarDays className="h-3.5 w-3.5 text-clay/40" />
                     <span className="text-xs font-medium text-umber">
-                      {new Date(nextDeadline.date).toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {nextMilestone.date
+                        ? new Date(nextMilestone.date + 'T12:00:00').toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })
+                        : 'Date fills in once you add your details'}
                     </span>
-                    {daysUntilDeadline !== null && (
-                      <span className={`tag ${
-                        daysUntilDeadline <= 7 ? 'tag-terra' : daysUntilDeadline <= 30 ? 'tag-amber' : 'tag-sage'
-                      }`}>
-                        {daysUntilDeadline > 0 ? `${daysUntilDeadline} days` : daysUntilDeadline === 0 ? 'Today' : 'Overdue'}
-                      </span>
-                    )}
+                    <span className={`tag ${
+                      nextMilestone.tone === 'overdue' ? 'tag-terra' : nextMilestone.tone === 'soon' ? 'tag-amber' : 'tag-sage'
+                    }`}>
+                      {describeDaysAway(nextMilestone.daysAway)}
+                    </span>
                   </div>
+                  <button onClick={() => setActiveTab('deadlines')} className="text-[11px] text-moss hover:text-forest font-medium mt-3 inline-flex items-center gap-1">
+                    See your full timeline
+                    <ChevronRight className="h-3 w-3" />
+                  </button>
                 </div>
               ) : (
-                <p className="text-sm text-clay/40">No upcoming deadlines. Add dates in the Deadlines tab.</p>
+                <p className="text-sm text-clay/40">Add your details in the Notification Form and your timeline will fill itself in.</p>
               )}
             </div>
 
@@ -1309,6 +1474,10 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 Save your progress and return anytime. When ready, print this form for submission.
               </p>
               <div className="flex gap-3">
+                <button onClick={handlePrintNotification} className="btn-secondary text-sm flex items-center gap-2">
+                  <Printer className="h-3.5 w-3.5" />
+                  Print / Save PDF
+                </button>
                 <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2">
                   {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                   Save Form
@@ -1331,15 +1500,29 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                   Annual Assessment <em className="text-moss italic">Preparation</em>
                 </h2>
                 <p className="text-sm text-clay">
-                  Use this checklist to prepare for your annual Tusla assessment. The assessor will review your
-                  educational provision, meet your child, and examine portfolio evidence.
+                  This helps you organise the evidence an AEARS assessment tends to look for. An assessment is a
+                  calm conversation about how the year went - the assessor looks over your provision, has a chat
+                  with your child, and glances through your portfolio. Tick things off as you go.
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <p className="text-2xl font-light text-ink">
-                  {completedAssessmentItems}/{totalAssessmentItems}
+                  {readiness.ready}<span className="text-sm font-normal text-clay/40"> / {readiness.total}</span>
                 </p>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Complete</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Ready</p>
+              </div>
+            </div>
+
+            {/* Readiness indicator */}
+            <div className="rounded-2xl bg-parchment p-4 border border-stone/40 mb-6 flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sage/15">
+                <span className="text-sm font-bold text-forest">{readiness.percent}%</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-ink">{readiness.label}</p>
+                <p className="text-xs text-clay/60 mt-0.5">
+                  {readiness.ready} of {readiness.total} items ready. Save your progress and it will be here when you return.
+                </p>
               </div>
             </div>
 
@@ -1347,7 +1530,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="h-2 rounded-full bg-stone/20 mb-8">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-moss to-sage transition-all"
-                style={{ width: `${totalAssessmentItems > 0 ? (completedAssessmentItems / totalAssessmentItems) * 100 : 0}%` }}
+                style={{ width: `${readiness.percent}%` }}
               />
             </div>
 
@@ -1417,6 +1600,16 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 </div>
               );
             })}
+
+            <div className="mt-2 pt-6 border-t border-stone/30 flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-xs text-clay/50">
+                There is no pass mark here. Ticking these simply helps you feel ready and gather what tends to be useful on the day.
+              </p>
+              <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2 shrink-0">
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Save Progress
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1426,14 +1619,44 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
          ═══════════════════════════════════════════════════ */}
       {activeTab === 'deadlines' && (
         <div className="space-y-6">
+          {/* Computed AEARS timeline */}
+          <div className="card-elevated p-6">
+            <div className="mb-2">
+              <h2 className="font-display text-xl font-light text-ink mb-2">
+                Your AEARS <em className="text-moss italic">Timeline</em>
+              </h2>
+              <p className="text-sm text-clay">
+                Worked out from where you are in the process and the dates you have entered. These are gentle
+                guidance dates, not legal deadlines, and you can always set your own below.
+              </p>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {aearsTimeline.map((m) => (
+                <AearsMilestoneRow key={m.id} milestone={m} />
+              ))}
+            </div>
+
+            {aearsTimeline.every((m) => m.date === null) && (
+              <div className="mt-4 rounded-2xl bg-parchment p-4 border border-stone/40 flex items-start gap-3">
+                <Info className="h-4 w-4 text-moss shrink-0 mt-0.5" />
+                <p className="text-xs text-clay/70">
+                  Add your intended start date in the Notification Form, then save. Your dates will fill
+                  themselves in here.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Your own dates */}
           <div className="card-elevated p-6">
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h2 className="font-display text-xl font-light text-ink mb-2">
-                  Important <em className="text-moss italic">Dates {'&'} Deadlines</em>
+                  Your Own <em className="text-moss italic">Dates</em>
                 </h2>
                 <p className="text-sm text-clay">
-                  Track registration deadlines, assessment dates, and review periods.
+                  Add anything specific to your family - a confirmed assessment date, a regional office reminder.
                 </p>
               </div>
               <button onClick={addDeadline} className="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5">
@@ -1756,6 +1979,59 @@ function FormField({
           placeholder={placeholder}
         />
       )}
+    </div>
+  );
+}
+
+// ─── AEARS Milestone Row ─────────────────────────────────
+
+function AearsMilestoneRow({ milestone }: { milestone: AearsMilestone }) {
+  const toneClasses: Record<AearsMilestone['tone'], string> = {
+    overdue: 'bg-terracotta/5 border-terracotta/20',
+    soon: 'bg-amber/8 border-amber/20',
+    upcoming: 'bg-linen border-stone',
+    done: 'bg-sage/5 border-sage/20',
+    guidance: 'bg-parchment border-stone/40',
+  };
+  const tagClass =
+    milestone.tone === 'overdue'
+      ? 'tag-terra'
+      : milestone.tone === 'soon'
+      ? 'tag-amber'
+      : 'tag-sage';
+
+  const Icon = milestone.done ? CheckCircle2 : milestone.kind === 'evidence' ? FileText : milestone.kind === 'notification' ? BookOpen : CalendarDays;
+
+  return (
+    <div className={`rounded-2xl border p-5 transition-all ${toneClasses[milestone.tone]}`}>
+      <div className="flex items-start gap-4">
+        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+          milestone.done ? 'bg-moss/10 text-moss' : 'bg-moss/8 text-moss'
+        }`}>
+          <Icon className="h-4.5 w-4.5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`text-sm font-medium ${milestone.done ? 'text-moss' : 'text-ink'}`}>
+              {milestone.title}
+            </p>
+            {!milestone.done && (
+              <span className={`tag ${tagClass}`}>{describeDaysAway(milestone.daysAway)}</span>
+            )}
+            {milestone.done && <span className="tag tag-sage">Done</span>}
+          </div>
+          <p className="text-xs text-clay/60 mt-1">{milestone.description}</p>
+          <div className="flex items-center gap-2 mt-2.5">
+            <CalendarDays className="h-3.5 w-3.5 text-clay/40" />
+            <span className="text-xs font-medium text-umber">
+              {milestone.date
+                ? new Date(milestone.date + 'T12:00:00').toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })
+                : 'Date not set yet'}
+            </span>
+          </div>
+          <p className="text-[11px] text-clay/50 mt-2 italic">{milestone.guidance}</p>
+        </div>
+      </div>
     </div>
   );
 }
