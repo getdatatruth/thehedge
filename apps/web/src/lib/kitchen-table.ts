@@ -162,7 +162,7 @@ export function buildFallbackFramework(p: KTProfile): KTFramework {
     opening: `Grand. Here is how I will work for your family.`,
     whatYouToldMe: `You came to The Hedge ${p.why}. The thing on your mind is ${p.worry}. When learning happens for you, it tends to be ${p.rhythm}.`,
     commitments: COMMITMENTS_BY_APPROACH[p.approach],
-    quietFloor: `And underneath all of it, I will keep a light eye on the big areas of a rounded childhood, so nothing important goes untouched. No scores, no red marks, just a wee nudge now and again if a corner has been quiet for a while.`,
+    quietFloor: `And underneath all of it, I will keep a light eye on the big areas of a rounded childhood, so nothing important goes untouched. No scores, no red marks, just a gentle nudge now and again if a corner has been quiet for a while.`,
     forYourWorry: FORYOURWORRY_BY_KEY[answerKeyForWorry(p)] || FORYOURWORRY_BY_KEY.enough,
     thingsToday: [
       kids.length > 0
@@ -187,7 +187,9 @@ function answerKeyForWorry(p: KTProfile): string {
 // The single invisible extraction/authoring pass: turn the answers into a warm
 // Framework in the parent's register. Returns a strict JSON shape.
 export function frameworkPrompt(p: KTProfile): string {
-  return `You are The Hedge, a warm, wise companion that helps Irish families run their children's learning their own way. A parent has just had a short kitchen-table chat with you. Write their one-page "Family Framework" back to them, in warm Irish-English (grand, lovely, a wee nudge), second person, like handwritten notes from a friend who already runs a hedge school. Never mention AI, never use corporate or LMS language, no em dashes (use regular hyphens), no emojis.
+  return `You are The Hedge, a warm, wise, calm companion that helps Irish families run their children's learning their own way. A parent has just had a short kitchen-table chat with you. Write their one-page "Family Framework" back to them, second person, like handwritten notes from a friend who already runs a hedge school.
+
+Voice: warm, southern Irish-English (grand, lovely, a gentle nudge, no bother). NEVER use "wee" (that is Ulster/Scots, off-brand). The overriding tone is CALM and reassuring, the headspace of home education: this is about protecting a child's love of learning and a parent's peace of mind, lifting pressure rather than adding it. Never corporate or LMS language, never mention AI, no em dashes (use regular hyphens), no emojis.
 
 Their answers:
 - Children: ${JSON.stringify(p.children)}
@@ -202,7 +204,7 @@ Return ONLY strict JSON matching this shape (no markdown fences):
   "opening": "one warm sentence",
   "whatYouToldMe": "2-3 sentences mirroring their why and worry back in their own register, naming the children if given",
   "commitments": ["three short first-person promises that fit their approach (e.g. an unschooler must be told 'I will never hand you a timetable')"],
-  "quietFloor": "the one magic line: that you keep a light, never-shaming eye on the big areas of a rounded childhood so nothing important is missed, just a wee nudge if a corner goes quiet. Make clear there are no scores or targets.",
+  "quietFloor": "the one magic line: that you keep a light, never-shaming eye on the big areas of a rounded childhood so nothing important is missed, just a gentle nudge if a corner goes quiet. Make clear there are no scores or targets.",
   "forYourWorry": "2-3 sentences answering their specific worry directly and reassuringly, with no false promises and no invented Tusla thresholds",
   "thingsToday": ["three concrete, gentle things they can do today, one of which is a real activity for their child by age/interest, one is one-tap logging, one is seeing their year as a path"]
 }`;

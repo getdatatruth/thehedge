@@ -82,7 +82,7 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
         style={styles.header}
       >
         <Leaf size={14} color={lightTheme.accent} />
-        <Text style={styles.label}>A wee note</Text>
+        <Text style={styles.label}>A quiet note</Text>
         <ChevronDown
           size={14}
           color={lightTheme.textMuted}

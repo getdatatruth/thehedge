@@ -87,7 +87,7 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
       >
         <Leaf className="h-3.5 w-3.5 text-cat-nature shrink-0" />
         <span className="flex-1 text-[12px] font-semibold text-cat-nature uppercase tracking-wider">
-          A wee note
+          A quiet note
         </span>
         <ChevronDown
           className={`h-3.5 w-3.5 text-sage transition-transform ${expanded ? 'rotate-180' : ''}`}
