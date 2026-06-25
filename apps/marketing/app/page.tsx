@@ -4,19 +4,20 @@ import Nav from '../components/Nav';
 import FAQ from '../components/FAQ';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icons';
+import KitchenTableDemo from '../components/KitchenTableDemo';
 
 export const metadata: Metadata = {
-  title: 'The Hedge - Personalised Family Activities for Irish Families',
-  description: "Ireland's family learning platform. An idea every morning that fits your weather, your county and your kids. Screen-free. Irish. Built for real family life.",
+  title: 'The Hedge - Learning that fits your family',
+  description: "The Hedge sits down with you at the Kitchen Table, learns your children, your values and your rhythm, then writes your family its own plan - daily ideas that fit, a plan that adapts, and an AEARS-ready record that keeps itself. Screen-free. Irish.",
   alternates: { canonical: 'https://thehedge.ie' },
-  openGraph: { title: 'The Hedge - Family Learning Platform for Irish Families', description: "Screen-free things to do every morning, personalised to your weather, your county and your children." }
+  openGraph: { title: 'The Hedge - Learning that fits your family', description: "It gets to know your family first, then builds learning around them. Screen-free, Irish, calm." }
 };
 
 const faqs = [
   { q: "What age children is The Hedge designed for?", a: "The Hedge is built for early years and primary, roughly ages 2 to 12 (Aistear and the NCCA primary curriculum). When you set up your family profile, you tell us your children's ages and the platform adjusts every suggestion accordingly - simpler sensory play for toddlers, more involved projects for older children. Multi-age families are very much catered for." },
   { q: "Do I need a subscription to use it?", a: "No - we have a free plan that gives you 1–2 activity ideas per day from a curated library. The Family plan (€6.99/month) unlocks suggestions tailored to your children and your county, weather integration, the weekly planner, and unlimited activity history. The Educator plan adds homeschool-specific tools." },
   { q: "How does the weather integration work?", a: "The Hedge pulls live weather data from Open-Meteo for your specific county every morning. If rain is forecast, it automatically surfaces indoor activities. If there's a rare sunny spell, it prioritises outdoor and nature activities. You never have to manually adjust for the weather." },
-  { q: "Is The Hedge only for homeschooling families?", a: "Not at all. Most families using The Hedge are in mainstream schools. The Hedge helps with after-school activities, weekends, school holidays, and summer. For homeschooling families, we have a dedicated Educator plan with curriculum mapping and learning logs." },
+  { q: "Is The Hedge for homeschoolers or for mainstream families?", a: "Both, and you choose your doorway when you join. Mainstream families use The Hedge for after-school, weekends, school holidays and summer. Home-educating families use the Educator plan for NCCA curriculum mapping, learning logs and records designed to help you organise the evidence an AEARS assessment looks for. Either way, it starts at the Kitchen Table and shapes itself around your family." },
   { q: "Is my data stored in Ireland / the EU?", a: "Yes. All data is stored in the EU - specifically in Frankfurt, Germany - and we are fully GDPR compliant. We do not sell data to third parties or use it for advertising." },
   { q: "Can I use The Hedge on my phone?", a: "Yes. The web app works beautifully on all mobile devices. A dedicated iOS and Android app is in development and coming soon." },
 ];
@@ -49,66 +50,32 @@ export default function Home() {
               <span className="eyebrow-text">Inspired by Ireland&apos;s hedge schools</span>
             </div>
             <h1 className="hero-headline">
-              What will your<br />family do<br /><em>today?</em>
+              Learning that fits<br />your <em>family.</em>
             </h1>
-            <p className="hero-body">Learning that feels like a breath, not a battle. Personalised, screen-free ideas shaped by your children, your weather, and your world.</p>
-            <p className="hero-sub">For homeschooling families and mainstream families who want something <strong>richer than a screen</strong> for their children every day.</p>
-            <div className="actions fade-up-2">
-              <Link href="https://app.thehedge.ie/signup" className="btn-primary">
-                Start free today <Icon id="arrow-r" size={16} color="currentColor" />
+            <p className="hero-body">Most apps hand every family the same list. The Hedge sits down with you at the Kitchen Table, learns your children, your values and your rhythm, then writes your family its own plan. Learning that feels like a breath, not a battle.</p>
+
+            <div className="doorways fade-up-2" role="navigation" aria-label="Choose your path">
+              <Link href="#kitchen-table" className="doorway">
+                <span className="doorway-eyebrow"><Icon id="sun" size={11} color="currentColor" /> Everyday family life</span>
+                <span className="doorway-title">Ideas that fit your day</span>
+                <span className="doorway-body">Screen-free things to do, shaped by your children, your county and the weather. See what we&apos;d write for you.</span>
               </Link>
-              <Link href="/how-it-works" className="btn-secondary">
-                See how it works
+              <Link href="/homeschool" className="doorway">
+                <span className="doorway-eyebrow"><Icon id="book" size={11} color="currentColor" /> Home education</span>
+                <span className="doorway-title">Organised for AEARS</span>
+                <span className="doorway-body">A plan that bends to your approach and a record that keeps itself, ready for your assessment.</span>
               </Link>
             </div>
+
             <div className="proof fade-up-3">
               <div style={{marginLeft:6}}>
-                <div className="proof-label"><strong>Over 500 screen-free activities</strong> · made for Irish family life</div>
+                <div className="proof-label">Screen-free · Irish · over 500 activities · live weather in all 32 counties</div>
               </div>
             </div>
           </div>
 
-          <div className="hero-panel">
-            <div className="app-card fade-up-2">
-              <div className="ach">
-                <div className="chip"><Icon id="sun" size={10} color="currentColor" /> Good morning</div>
-                <div className="greeting">Today for<br /><em>Sarah&apos;s family</em></div>
-              </div>
-              <div className="weather-row">
-                <span className="w-loc">Cork · Tuesday</span>
-                <span className="w-val">🌦 14°C · Mixed</span>
-              </div>
-              <div className="acts">
-                <div className="act-lbl">Today&apos;s ideas</div>
-                <div className="act-row ar-green">
-                  <div className="act-ic aic-g"><Icon id="leaf" size={16} color="var(--sage)" /></div>
-                  <div>
-                    <div className="act-name">Fairy house in the garden</div>
-                    <div className="act-meta"><span className="tag tag-g">Outdoor</span><span className="tag tag-g">Ages 4–8</span></div>
-                  </div>
-                </div>
-                <div className="act-row ar-terra">
-                  <div className="act-ic aic-t"><Icon id="flask" size={16} color="#E8A88A" /></div>
-                  <div>
-                    <div className="act-name">Kitchen chemistry: volcanoes</div>
-                    <div className="act-meta"><span className="tag tag-t">Science</span><span className="tag tag-t">Ages 6–12</span></div>
-                  </div>
-                </div>
-                <div className="act-row ar-stone">
-                  <div className="act-ic aic-s"><Icon id="book" size={16} color="var(--mist)" /></div>
-                  <div>
-                    <div className="act-name">Shadow tracking science</div>
-                    <div className="act-meta"><span className="tag tag-g">Curriculum</span><span className="tag tag-g">5th class</span></div>
-                  </div>
-                </div>
-              </div>
-              <div style={{padding:'12px 20px',borderTop:'1px solid rgba(245,240,228,0.08)'}}>
-                <div style={{background:'var(--terracotta)',borderRadius:8,padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:12,color:'white',fontWeight:600}}>Get started - it&apos;s free</span>
-                  <Icon id="arrow-r" size={14} color="white" />
-                </div>
-              </div>
-            </div>
+          <div className="hero-panel" id="kitchen-table">
+            <KitchenTableDemo />
           </div>
         </section>
 
@@ -136,13 +103,13 @@ export default function Home() {
             <div style={{maxWidth:540}}>
               <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">As easy as it gets</span></div>
               <h2 className="section-title" id="hiw-title">How The Hedge <em>works</em></h2>
-              <p className="section-body">From your first morning to your hundredth adventure - it gets better the more you use it.</p>
+              <p className="section-body">It begins with a conversation, not a form. Then everything is shaped around what you tell it.</p>
               <div className="steps">
                 {[
-                  { n:'01', id:'users', title:'Tell us about your family', body:'A quick 2-minute setup. Children\'s ages, what they love, your outdoor space. The Hedge does the rest.' },
-                  { n:'02', id:'sun', title:'We check the weather for you', body:'Every morning, The Hedge looks at your local forecast and plans accordingly. Rain means indoor ideas. Sun means go outside.' },
-                  { n:'03', id:'spark', title:'Your brief arrives each morning', body:'Open the app and see today\'s 3 personalised activity ideas, ready to go. No planning. No googling. Just do.' },
-                  { n:'04', id:'leaf', title:'Log it, remember it forever', body:'One tap to mark it done. Your family builds a beautiful timeline of everything you\'ve made, explored, and learned together.' },
+                  { n:'01', id:'leaf', title:'Sit down at the Kitchen Table', body:'A warm few questions about your children, your values and the shape of your days. A conversation, not a setup form.' },
+                  { n:'02', id:'spark', title:'Read back your Family Framework', body:'The Hedge writes your family its own framework and reflects it to you. The way you do things, respected, not overruled.' },
+                  { n:'03', id:'sun', title:'Your days, shaped to fit', body:'Today brings ideas that suit your crew and the weather. Plan gives you a timetable or a gentle rhythm. Keep quietly builds your record. Belong finds your local families.' },
+                  { n:'04', id:'users', title:'Ask, any time', body:'A calm companion that knows your framework. Honest about being an AI, never pretending to be a person.' },
                 ].map(s => (
                   <div key={s.n} className="step">
                     <div className="step-num">{s.n}</div>
@@ -214,14 +181,15 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── EARLY ACCESS ── */}
+        {/* ── FOUNDER / EARLY ACCESS ── */}
         <section className="section" aria-labelledby="early-title">
           <div className="container" style={{maxWidth:720}}>
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Built in Ireland</span></div>
-            <h2 className="section-title" id="early-title">For Irish families, <em>by an Irish family</em></h2>
-            <p className="section-body">The Hedge is early in its life and we are building it alongside the families who use it. There are no invented reviews here. If you join now, you are one of our founding families, and your feedback shapes what we build next.</p>
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">A note from the founder</span></div>
+            <h2 className="section-title" id="early-title">For Irish families, <em>by one of them</em></h2>
+            <p className="section-body">I&apos;m Adam, and I&apos;m building The Hedge on my own, in Ireland. It is early, and I am building it alongside the families who use it. So you have my word on a few things: I read every email, I will not invent testimonials or claim features The Hedge does not have, and your data is never sold or used for ads. Join now and you are one of our founding families - your feedback shapes what comes next.</p>
             <div className="actions" style={{marginTop:8}}>
               <Link href="https://app.thehedge.ie/signup" className="btn-primary">Become a founding family <Icon id="arrow-r" size={16} /></Link>
+              <Link href="/about" className="btn-secondary">Read our story</Link>
             </div>
           </div>
         </section>
@@ -336,11 +304,11 @@ export default function Home() {
         {/* ── FINAL CTA ── */}
         <div className="cta-band">
           <div className="container">
-            <h2>Your family&apos;s next adventure<br /><em>starts tomorrow morning.</em></h2>
-            <p>Wake up knowing exactly what to do with your children today.</p>
+            <h2>Pull up a chair.<br /><em>Let The Hedge get to know your family.</em></h2>
+            <p>A few warm questions, and you will see what it writes for you. No card needed.</p>
             <div className="actions">
-              <Link href="https://app.thehedge.ie/signup" className="btn-light">
-                Start free - no card needed <Icon id="arrow-r" size={16} />
+              <Link href="#kitchen-table" className="btn-light">
+                Start at the Kitchen Table <Icon id="arrow-r" size={16} />
               </Link>
               <Link href="/pricing" className="btn-ghost" style={{color:'var(--mist)'}}>
                 Compare plans

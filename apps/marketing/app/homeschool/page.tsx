@@ -4,6 +4,7 @@ import Nav from '../../components/Nav';
 import FAQ from '../../components/FAQ';
 import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
+import NewsletterSignup from '../../components/NewsletterSignup';
 
 export const metadata: Metadata = {
   title: 'Homeschool in Ireland - NCCA Curriculum & AEARS Support | The Hedge',
@@ -56,11 +57,51 @@ export default function Homeschool() {
         <div className="page-hero">
           <div className="container">
             <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">For home educators</span></div>
-            <h1>Ireland&apos;s homeschool <em>companion</em></h1>
-            <p className="page-hero-desc">NCCA primary curriculum mapping, learning logs designed to help you organise the evidence an AEARS assessment looks for, and a weekly planner that actually knows the Irish school calendar. Everything you need to run a rich, evidenced home education for your under-12s.</p>
-            <p style={{fontSize:13,color:'var(--clay)',marginTop:14,maxWidth:560,lineHeight:1.6}}>The Hedge is not an official Tusla product and is not affiliated with Tusla. It is a planning and record-keeping tool built to help you prepare for your AEARS assessment.</p>
+            <h1>The dread tends to <em>lift</em></h1>
+            <p className="page-hero-desc">The Hedge gets to know your family first, then builds the home education around them - daily ideas that fit, a plan that bends to your approach, and a learning record that quietly keeps itself. So you teach normally, and the evidence is already there when AEARS comes around. Learning that feels like a breath, not a battle.</p>
+            <div className="actions" style={{marginTop:26}}>
+              <Link href="https://app.thehedge.ie/signup?plan=educator" className="btn-primary">Try Educator free <Icon id="arrow-r" size={16} /></Link>
+              <Link href="#aears-guide" className="btn-ghost">Not ready? Get the AEARS checklist</Link>
+            </div>
+            <p style={{fontSize:13,color:'var(--clay)',marginTop:22,maxWidth:560,lineHeight:1.6}}>The Hedge is not an official Tusla product and is not affiliated with Tusla. It is a planning and record-keeping tool that helps you organise the kind of evidence an AEARS assessment looks for.</p>
           </div>
         </div>
+
+        {/* LEAD MAGNET - hero adjacent */}
+        <section className="section section-forest" id="aears-guide" aria-labelledby="hs-lead-title">
+          <div className="container" style={{maxWidth:600,textAlign:'center'}}>
+            <div className="eyebrow eyebrow-sage" style={{justifyContent:'center'}}><div className="eyebrow-line" /><span className="eyebrow-text">Free guide</span></div>
+            <h2 className="section-title section-title-light" id="hs-lead-title">Not ready to sign up? <em>Get our AEARS guide</em></h2>
+            <p style={{fontFamily:'var(--font-serif)',fontSize:16,color:'rgba(189,212,176,0.75)',lineHeight:1.7,marginBottom:28}}>Pop in your email and we will send you a free AEARS readiness checklist and a home-ed first-steps guide for Ireland - the plain-English version of what the assessment actually looks for, and how to get your evidence in order before the season starts.</p>
+            <NewsletterSignup source="homeschool-aears" variant="light" buttonLabel="Send me the AEARS checklist" />
+            <p style={{fontSize:11,color:'rgba(143,175,126,0.4)',marginTop:12}}>No spam. Just the checklist and the odd home-ed guide. We&apos;ll never share your email.</p>
+            <p style={{fontSize:13,marginTop:18}}>
+              <Link href="/blog/tusla-aears-guide" style={{color:'var(--sage)',textDecoration:'underline'}}>Or read our full guide to the Tusla AEARS process</Link>
+            </p>
+          </div>
+        </section>
+
+        {/* KITCHEN TABLE WEDGE */}
+        <section className="section section-linen" aria-labelledby="hs-kt-title">
+          <div className="container" style={{maxWidth:800}}>
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">How it works</span></div>
+            <h2 className="section-title" id="hs-kt-title">It learns your family <em>first</em></h2>
+            <p className="section-body">Most tools hand you a blank planner and wish you luck. The Hedge starts the other way around. We sit down at the kitchen table with a few gentle questions about your children, your days, and the kind of home education you want to run. From that, The Hedge builds your Family Framework - and everything after that bends to fit it.</p>
+            <div style={{display:'grid',gap:16,gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',marginTop:32}}>
+              {[
+                { step:'The Kitchen Table', title:'It gets to know you', body:'A short, warm chat about your family - ages, interests, your rhythm, what a good week looks like. No forms to wrestle with. The Hedge listens, then builds your Family Framework around the answers.' },
+                { step:'Your stance', title:'It adapts to your approach', body:'Run a structured timetable, or a gentle child-led rhythm, or something in between. The Hedge meets you where you are and suggests ideas that fit your way of doing things - never the other way around.' },
+                { step:'The record', title:'It keeps the evidence for you', body:'You teach normally. In the background, every activity is dated and tagged to the NCCA curriculum, so the AEARS record builds itself. When assessment season comes, the evidence is already organised and ready.' },
+              ].map(s => (
+                <div key={s.step} style={{background:'white',borderRadius:14,padding:'24px 20px',border:'1px solid var(--stone)'}}>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--terracotta)',marginBottom:8}}>{s.step}</div>
+                  <div style={{fontSize:15,fontWeight:700,color:'var(--ink)',marginBottom:8}}>{s.title}</div>
+                  <div style={{fontSize:13,color:'var(--clay)',lineHeight:1.65}}>{s.body}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
         {/* FEATURES */}
         <section className="section" aria-labelledby="hs-feats-title">
@@ -112,7 +153,7 @@ export default function Homeschool() {
           <div className="container" style={{maxWidth:800}}>
             <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">AEARS &amp; Tusla</span></div>
             <h2 className="section-title" id="aears-title">The AEARS process, <em>simplified</em></h2>
-            <p className="section-body">The Tusla AEARS assessment can feel daunting. The Hedge takes the administrative burden away entirely, so you can focus on the actual education.</p>
+            <p className="section-body">The Tusla AEARS assessment can feel daunting. The Hedge takes the administrative burden away entirely, so you can focus on the actual education. If you want to understand the process in full, our <Link href="/blog/tusla-aears-guide" style={{color:'var(--moss)',textDecoration:'underline'}}>plain-English guide to the Tusla AEARS process</Link> walks you through every step.</p>
             <div style={{display:'grid',gap:16,gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',marginTop:32}}>
               {[
                 { step:'Step 1', title:'Teach normally', body:'Go about your home education as usual. Every activity you log in The Hedge is automatically tagged, dated, and linked to the relevant curriculum strands.' },
@@ -138,6 +179,11 @@ export default function Homeschool() {
             <p className="section-body">The Hedge is new, and we are building the home education tools alongside the families who use them. We will not put words in other parents&apos; mouths here. If the AEARS season fills you with dread, come and help us make the tool you wish you had - and shape it as we go.</p>
             <div className="actions" style={{marginTop:8}}>
               <Link href="https://app.thehedge.ie/signup?plan=educator" className="btn-primary">Try the Educator plan <Icon id="arrow-r" size={16} /></Link>
+            </div>
+            <div style={{marginTop:36,padding:'28px 24px',background:'var(--linen)',borderRadius:14,border:'1px solid var(--stone)'}}>
+              <div style={{fontSize:15,fontWeight:700,color:'var(--ink)',marginBottom:6}}>Get the free AEARS prep checklist</div>
+              <p style={{fontSize:13,color:'var(--clay)',lineHeight:1.65,marginBottom:18,maxWidth:520}}>Still weighing it up? Take the checklist away with you. We will send the AEARS readiness checklist and our home-ed first-steps guide straight to your inbox - no account needed.</p>
+              <NewsletterSignup source="homeschool-aears" buttonLabel="Send me the AEARS checklist" />
             </div>
           </div>
         </section>

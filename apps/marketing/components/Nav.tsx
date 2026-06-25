@@ -6,7 +6,7 @@ import { SVGDefs, Icon } from './Icons';
 const links = [
   { href: '/how-it-works', label: 'How it works' },
   { href: '/features', label: 'Features' },
-  { href: '/homeschool', label: 'Homeschool' },
+  { href: '/homeschool', label: 'Home education', primary: true },
   { href: '/pricing', label: 'Pricing' },
   { href: '/community', label: 'Community' },
   { href: '/blog', label: 'Blog' },
@@ -45,14 +45,20 @@ export default function Nav({ active = '' }: { active?: string }) {
         <ul className="nav-links" role="list">
           {links.map(l => (
             <li key={l.href}>
-              <Link href={l.href} className={active === l.href ? 'active' : ''}>{l.label}</Link>
+              <Link
+                href={l.href}
+                className={active === l.href ? 'active' : ''}
+                style={l.primary ? { fontWeight: 700, color: 'var(--moss)' } : undefined}
+              >
+                {l.label}
+              </Link>
             </li>
           ))}
         </ul>
 
         <div className="nav-right">
           <Link href="https://app.thehedge.ie/signin" className="nav-signin">Sign in</Link>
-          <Link href="https://app.thehedge.ie/signup" className="nav-cta">Start free today</Link>
+          <Link href="https://app.thehedge.ie/signup" className="nav-cta">Pull up a chair</Link>
           <button
             className={`nav-hamburger${open ? ' open' : ''}`}
             onClick={() => setOpen(v => !v)}
@@ -67,10 +73,17 @@ export default function Nav({ active = '' }: { active?: string }) {
       <div className={`nav-mobile${open ? ' open' : ''}`} aria-hidden={!open}>
         <nav className="nav-mobile-links">
           {links.map(l => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</Link>
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setOpen(false)}
+              style={l.primary ? { fontWeight: 700, color: 'var(--moss)' } : undefined}
+            >
+              {l.label}
+            </Link>
           ))}
           <Link href="https://app.thehedge.ie/signup" className="nav-cta" onClick={() => setOpen(false)}>
-            Start free today - it&apos;s free
+            Pull up a chair - it&apos;s free
           </Link>
         </nav>
       </div>

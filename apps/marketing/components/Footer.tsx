@@ -20,36 +20,36 @@ export default function Footer() {
 
           <div className="ft-cols">
             {[
-              { title: 'Product', links: [
-                ['/', 'Home'],
+              { title: 'The product', links: [
                 ['/how-it-works', 'How it works'],
-                ['/features', 'Features'],
-                ['/homeschool', 'For Homeschoolers'],
+                ['/features', 'The Kitchen Table'],
+                ['/features', 'Today, Plan & Keep'],
+                ['/features', 'Ask, your calm companion'],
                 ['/pricing', 'Pricing'],
               ]},
-              { title: 'Community', links: [
-                ['/community', 'Family Groups'],
-                ['/blog', 'Blog & Guides'],
-                ['/about', 'Our Story'],
-                ['https://app.thehedge.ie/signup', 'Join for free'],
+              { title: 'Home education', links: [
+                ['/homeschool', 'Home education families'],
+                ['/homeschool', 'AEARS evidence, kept for you'],
+                ['/homeschool', 'NCCA strands at home'],
+                ['/blog', 'Guides & seasonal notes'],
+              ]},
+              { title: 'Belong', links: [
+                ['/community', 'Family groups'],
+                ['/community', 'County groups'],
+                ['/about', 'Our story'],
+                ['https://app.thehedge.ie/signup', 'Pull up a chair'],
               ]},
               { title: 'Support', links: [
-                ['mailto:hello@thehedge.ie', 'Contact Us'],
-                ['/privacy', 'Privacy Policy'],
-                ['/terms', 'Terms of Use'],
-              ]},
-              { title: 'Ireland', links: [
-                ['/homeschool', 'AEARS Support'],
-                ['/homeschool', 'NCCA Curriculum'],
-                ['/blog', 'Seasonal Guides'],
-                ['/community', 'County Groups'],
+                ['mailto:hello@thehedge.ie', 'Contact us'],
+                ['/privacy', 'Privacy policy'],
+                ['/terms', 'Terms of use'],
               ]},
             ].map(col => (
               <div className="ft-col" key={col.title}>
                 <h4>{col.title}</h4>
                 <ul>
-                  {col.links.map(([href, label]) => (
-                    <li key={href}><Link href={href}>{label}</Link></li>
+                  {col.links.map(([href, label], i) => (
+                    <li key={`${href}-${i}`}><Link href={href}>{label}</Link></li>
                   ))}
                 </ul>
               </div>

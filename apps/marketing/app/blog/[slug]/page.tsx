@@ -19,11 +19,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) {
-    return { title: 'Article not found - The Hedge' };
+    return { title: 'Article not found' };
   }
   const url = `https://thehedge.ie/blog/${post.slug}`;
   return {
-    title: `${post.title} | The Hedge`,
+    title: post.title,
     description: post.description,
     alternates: { canonical: url },
     openGraph: {
