@@ -100,7 +100,7 @@ export function PrintPlanModal({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<span />}>{trigger}</DialogTrigger>
+      <DialogTrigger nativeButton={false} render={<span />}>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-md bg-linen border-stone">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-ink flex items-center gap-2">

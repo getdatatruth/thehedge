@@ -169,7 +169,7 @@ export function LogActivityModal({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<span />}>{triggerContent}</DialogTrigger>
+      <DialogTrigger nativeButton={false} render={<span />}>{triggerContent}</DialogTrigger>
       <DialogContent className="sm:max-w-md bg-linen border-stone">
         {success ? (
           <div className="relative text-center space-y-5 py-6 animate-scale-in overflow-hidden">
