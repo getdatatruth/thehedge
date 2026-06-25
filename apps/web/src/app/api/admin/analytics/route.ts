@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/admin-auth';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   calcTotalFamilies, calcWeeklySignupTrend, calcMAU, calcWAU, calcDAU,
   calcChurnRate, calcTrialConversion, calcAvgActivitiesPerFamily,
@@ -10,24 +11,11 @@ import {
 } from '@/lib/admin/metrics';
 import { getCurrentMRR, getMRRHistory, getRevenueByTier } from '@/lib/admin/stripe-metrics';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  // Verify admin (check if user has admin role or is in admin list)
-  const { data: userRow } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (userRow?.role !== 'owner') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-  }
 
   // Fetch all data in parallel
   const [familiesRes, logsRes, activitiesRes, usersRes] = await Promise.all([

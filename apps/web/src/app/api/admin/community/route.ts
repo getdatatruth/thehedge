@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent } from '@/lib/audit';
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const entity = searchParams.get('entity');
@@ -238,6 +242,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const body = await request.json();
     const { entity, ...fields } = body;
@@ -294,6 +301,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const body = await request.json();
     const { entity, id, ...updates } = body;
@@ -365,6 +375,9 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const entity = searchParams.get('entity');

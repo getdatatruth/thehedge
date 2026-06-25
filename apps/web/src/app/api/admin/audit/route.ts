@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/admin-auth';
 import { getAuditEvents } from '@/lib/audit';
 
 export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const { searchParams } = new URL(request.url);
 

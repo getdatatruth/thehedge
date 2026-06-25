@@ -49,13 +49,41 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Public routes that don't require auth
-  const publicRoutes = ['/', '/login', '/signup', '/signin', '/auth/callback', '/pricing'];
-  const isPublicRoute = publicRoutes.some(
-    (route) => pathname === route || pathname.startsWith('/api/')
-  ) || pathname.startsWith('/admin');
+  // API routes authenticate themselves (their handlers return JSON 401/403 via
+  // createApiClient / requireAdmin, or verify a signature/secret for webhooks
+  // and cron). The middleware must not redirect them, and must NEVER treat them
+  // as blanket-public for page access.
+  if (pathname.startsWith('/api/')) {
+    return supabaseResponse;
+  }
 
-  // Not authenticated - redirect to login (unless on a public route)
+  // Admin area: require an authenticated admin (ADMIN_EMAILS allowlist). This
+  // was previously public, which let anyone open the admin UI.
+  if (pathname.startsWith('/admin')) {
+    if (!user || !user.email) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      url.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(url);
+    }
+    const adminEmails = (process.env.ADMIN_EMAILS || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    if (!adminEmails.includes(user.email.toLowerCase())) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/dashboard';
+      return NextResponse.redirect(url);
+    }
+    // Admins bypass the onboarding/tier gating below.
+    return supabaseResponse;
+  }
+
+  // Public pages that don't require auth
+  const publicRoutes = ['/', '/login', '/signup', '/signin', '/auth/callback', '/pricing'];
+  const isPublicRoute = publicRoutes.includes(pathname);
+
+  // Not authenticated - redirect to login (unless on a public page)
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
