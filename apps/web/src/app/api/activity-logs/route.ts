@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createNotification } from '@/lib/notifications';
+import { capture, AnalyticsEvent } from '@/lib/analytics';
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,6 +62,13 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // ── Analytics: activity logged (fire-and-forget) ──
+    await capture(AnalyticsEvent.ACTIVITY_LOGGED, user.id, {
+      family_id: profile.family_id,
+      activity_id: activity_id || null,
+      has_rating: rating != null,
+    });
 
     // ── Notification triggers (fire-and-forget) ──
     try {

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Cormorant_Garamond, Instrument_Serif } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { PostHogProvider } from '@/components/providers/posthog-provider';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -40,7 +41,9 @@ export default function RootLayout({
       <body
         className={`${cormorant.variable} ${instrumentSerif.variable} antialiased`}
       >
-        <TooltipProvider>{children}</TooltipProvider>
+        <PostHogProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </PostHogProvider>
       </body>
     </html>
   );
