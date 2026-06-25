@@ -24,7 +24,6 @@ const PREFS_STORAGE_KEY = '@thehedge/notification_prefs';
 interface NotificationPrefs {
   // Essential
   morning_plan: boolean;
-  streak_risk: boolean;
   weekly_plan: boolean;
   achievement: boolean;
   // Helpful
@@ -38,7 +37,6 @@ interface NotificationPrefs {
 
 const DEFAULT_PREFS: NotificationPrefs = {
   morning_plan: true,
-  streak_risk: true,
   weekly_plan: true,
   achievement: true,
   activity_reminder: true,
@@ -71,12 +69,6 @@ const SECTIONS: NotificationSection[] = [
         label: 'Morning plan reminder',
         description: 'Start your day with a plan overview',
         time: '8:00 AM',
-      },
-      {
-        key: 'streak_risk',
-        label: 'Streak at risk',
-        description: 'Reminder to log before your streak breaks',
-        time: '6:00 PM',
       },
       {
         key: 'weekly_plan',

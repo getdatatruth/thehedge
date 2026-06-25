@@ -32,7 +32,6 @@ function getRouteForType(type: string, data?: Record<string, unknown>): string |
         return `/(stack)/activity/${data.activityId}`;
       }
       return '/(tabs)';
-    case 'streak_risk':
     case 'day_review':
     case 'week_review':
     case 'month_review':

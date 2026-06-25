@@ -13,7 +13,7 @@ import {
   Clock,
   BookOpen,
   Users,
-  Flame,
+  CalendarCheck,
   FileText,
   FolderOpen,
   Calendar,
@@ -30,9 +30,9 @@ import { spacing, radius } from '@/theme/spacing';
 
 interface DashboardData {
   hours_this_week: number;
-  areas_covered: number;
+  curriculum_areas_covered: number;
   children_count: number;
-  streak: number;
+  active_days: number;
   aistear_coverage: Record<string, number>;
 }
 
@@ -119,7 +119,7 @@ function EducatorDashboardContent() {
           <View style={styles.statCard}>
             <BookOpen size={18} color={colors.terracotta} />
             <Text style={styles.statNumber}>
-              {dashboard?.areas_covered ?? 0}
+              {dashboard?.curriculum_areas_covered ?? 0}
             </Text>
             <Text style={styles.statLabel}>Areas</Text>
           </View>
@@ -131,11 +131,11 @@ function EducatorDashboardContent() {
             <Text style={styles.statLabel}>Children</Text>
           </View>
           <View style={styles.statCard}>
-            <Flame size={18} color={colors.sage} />
+            <CalendarCheck size={18} color={colors.sage} />
             <Text style={styles.statNumber}>
-              {dashboard?.streak ?? 0}
+              {dashboard?.active_days ?? 0}
             </Text>
-            <Text style={styles.statLabel}>Streak</Text>
+            <Text style={styles.statLabel}>Active days</Text>
           </View>
         </View>
 

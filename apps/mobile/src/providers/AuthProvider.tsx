@@ -205,7 +205,6 @@ export function AuthProvider({ children: childrenProp }: { children: React.React
               router.push('/(tabs)');
             }
             break;
-          case 'streak_risk':
           case 'day_review':
           case 'week_review':
           case 'month_review':

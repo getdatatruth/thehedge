@@ -11,7 +11,7 @@ import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 import { useOnboardingStore } from '@/stores/onboarding-store';
 import { useAuthStore, type UserProfile, type Family, type Child } from '@/stores/auth-store';
-import { requestPermissions, scheduleDailyReminder, scheduleStreakReminder, setupNotificationChannel } from '@/lib/notifications';
+import { requestPermissions, scheduleDailyReminder, setupNotificationChannel } from '@/lib/notifications';
 
 export default function CompleteScreen() {
   const router = useRouter();
@@ -77,7 +77,6 @@ export default function CompleteScreen() {
         const granted = await requestPermissions();
         if (granted) {
           await scheduleDailyReminder({ hour: 9, minute: 0 });
-          await scheduleStreakReminder();
         }
       } catch {
         // Non-critical - notifications are optional

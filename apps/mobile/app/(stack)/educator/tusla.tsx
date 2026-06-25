@@ -11,7 +11,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   ChevronLeft,
-  CheckCircle,
   AlertCircle,
   Info,
   FileText,
@@ -19,6 +18,9 @@ import {
   FolderOpen,
   CalendarCheck,
 } from 'lucide-react-native';
+// Note: AEARS (the Tusla assessment of education in a place other than a
+// recognised school) sets NO minimum number of hours or attendance days.
+// We show honest record summaries here, never fabricated pass/fail thresholds.
 import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -35,7 +37,6 @@ interface ChildCompliance {
   registration_status: 'registered' | 'pending' | 'not_registered';
   education_plan_filed: boolean;
   hours_logged: number;
-  hours_required: number;
   portfolio_entries: number;
   attendance_records: number;
 }
@@ -58,14 +59,13 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-interface ChecklistItemProps {
+interface RecordRowProps {
   icon: React.ReactNode;
   label: string;
   detail: string;
-  passed: boolean;
 }
 
-function ChecklistItem({ icon, label, detail, passed }: ChecklistItemProps) {
+function RecordRow({ icon, label, detail }: RecordRowProps) {
   return (
     <View style={checkStyles.item}>
       <View style={checkStyles.iconWrap}>
@@ -75,11 +75,6 @@ function ChecklistItem({ icon, label, detail, passed }: ChecklistItemProps) {
         <Text style={checkStyles.label}>{label}</Text>
         <Text style={checkStyles.detail}>{detail}</Text>
       </View>
-      {passed ? (
-        <CheckCircle size={20} color={colors.moss} />
-      ) : (
-        <AlertCircle size={20} color={colors.amber} />
-      )}
     </View>
   );
 }
@@ -169,44 +164,52 @@ export default function TuslaScreen() {
             </View>
 
             <Card variant="elevated" padding="lg">
-              <ChecklistItem
+              <RecordRow
                 icon={<FileText size={16} color={colors.moss} />}
-                label="Education plan filed"
+                label="Education plan"
                 detail={
                   child.education_plan_filed
-                    ? 'Plan submitted'
-                    : 'No plan on file'
+                    ? 'Plan on file'
+                    : 'No plan on file yet'
                 }
-                passed={child.education_plan_filed}
               />
-              <ChecklistItem
+              <RecordRow
+                icon={<CalendarCheck size={16} color={colors.moss} />}
+                label="Days of learning logged"
+                detail={`${child.attendance_records} ${
+                  child.attendance_records === 1 ? 'day' : 'days'
+                } recorded`}
+              />
+              <RecordRow
                 icon={<Clock size={16} color={colors.moss} />}
-                label="Hours logged"
-                detail={`${child.hours_logged} of ${child.hours_required} hours`}
-                passed={child.hours_logged >= child.hours_required}
+                label="Hours noted"
+                detail={`${child.hours_logged} ${
+                  child.hours_logged === 1 ? 'hour' : 'hours'
+                } noted this year`}
               />
-              <ChecklistItem
+              <RecordRow
                 icon={<FolderOpen size={16} color={colors.moss} />}
                 label="Portfolio entries"
-                detail={`${child.portfolio_entries} entries recorded`}
-                passed={child.portfolio_entries >= 5}
-              />
-              <ChecklistItem
-                icon={<CalendarCheck size={16} color={colors.moss} />}
-                label="Attendance records"
-                detail={`${child.attendance_records} days logged`}
-                passed={child.attendance_records >= 20}
+                detail={`${child.portfolio_entries} ${
+                  child.portfolio_entries === 1 ? 'entry' : 'entries'
+                } recorded`}
               />
             </Card>
+
+            <Text style={styles.recordNote}>
+              AEARS assesses whether a certain minimum education is being
+              provided. There is no minimum number of hours or attendance days.
+            </Text>
           </View>
         ))}
 
         {children.length === 0 && (
           <View style={styles.emptyState}>
             <AlertCircle size={32} color={`${colors.clay}40`} />
-            <Text style={styles.emptyTitle}>No compliance data</Text>
+            <Text style={styles.emptyTitle}>No records yet</Text>
             <Text style={styles.emptyBody}>
-              Create education plans to start tracking Tusla compliance.
+              Create an education plan to start keeping a record of your
+              learning together.
             </Text>
           </View>
         )}
@@ -218,14 +221,14 @@ export default function TuslaScreen() {
               <Info size={18} color={colors.moss} />
             </View>
             <View style={styles.infoContent}>
-              <Text style={styles.infoTitle}>About Tusla requirements</Text>
+              <Text style={styles.infoTitle}>About Tusla registration</Text>
               <Text style={styles.infoBody}>
-                Under Section 14 of the Education (Welfare) Act 2000, parents
-                who choose to educate their children outside of a recognised
-                school must register with Tusla. You are required to provide an
-                education that meets certain minimum standards, keep records of
-                educational activity, and make these available for assessment if
-                requested.
+                Under Section 14 of the Education (Welfare) Act 2000, parents who
+                choose to educate their children outside of a recognised school
+                register with Tusla. The assessment (AEARS) looks at whether a
+                certain minimum education is being provided. There is no minimum
+                number of hours or attendance days. The records here are simply a
+                helpful summary you can draw on if an assessment is requested.
               </Text>
             </View>
           </View>
@@ -285,6 +288,12 @@ const styles = StyleSheet.create({
   childMetaDot: {
     fontSize: 13,
     color: `${colors.clay}60`,
+  },
+  recordNote: {
+    fontSize: 12,
+    color: colors.clay,
+    lineHeight: 18,
+    paddingHorizontal: spacing.xs,
   },
   emptyState: {
     alignItems: 'center',
