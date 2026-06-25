@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { PlannerClient } from './planner-client';
-import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 import { getWeather } from '@/lib/weather';
 
 export const metadata = {
@@ -124,23 +123,8 @@ export default async function PlannerPage({
     .order('created_at', { ascending: false })
     .limit(100);
 
-  if (dbActivities && dbActivities.length > 0) {
-    activities = dbActivities;
-  } else {
-    activities = MOCK_ACTIVITIES.map((a) => ({
-      id: a.id,
-      title: a.title,
-      slug: a.slug,
-      category: a.category,
-      duration_minutes: a.duration_minutes,
-      age_min: a.age_min,
-      age_max: a.age_max,
-      description: a.description,
-      season: a.season,
-      weather: a.weather,
-      location: a.location,
-    }));
-  }
+  // Use real DB activities only (may be empty)
+  activities = dbActivities || [];
 
   // Determine weather condition for suggestions
   let weatherCondition: string | undefined;

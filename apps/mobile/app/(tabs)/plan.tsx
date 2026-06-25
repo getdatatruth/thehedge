@@ -196,7 +196,7 @@ export default function PlanScreen() {
     }, [plannerData]);
 
   // --- Unschool families see a gentle browse redirect ---
-  if (educationApproach === 'unschool') {
+  if (educationApproach === 'relaxed') {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.header}>

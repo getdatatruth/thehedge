@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { BrowseClient } from './browse-client';
-import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 
 export const metadata = {
   title: 'Browse - The Hedge',
@@ -43,8 +42,8 @@ export default async function BrowsePage() {
     tier = family?.subscription_tier || 'free';
   }
 
-  // Use DB activities if available, fall back to mock
-  const activities = dbActivities && dbActivities.length > 0 ? dbActivities : MOCK_ACTIVITIES;
+  // Use real DB activities only (may be an empty array)
+  const activities = dbActivities || [];
 
   // Map DB collections to the shape BrowseClient expects
   const collections = (dbCollections || []).map((c) => ({

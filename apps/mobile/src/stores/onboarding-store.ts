@@ -13,7 +13,7 @@ interface OnboardingState {
   county: string;
   children: OnboardingChild[];
   learningPath: string; // 'mainstream' | 'homeschool' | 'considering'
-  educationApproach: string; // 'structured' | 'blended' | 'child_led' | 'waldorf' | 'unschool'
+  educationApproach: string; // DB enum: 'structured' | 'relaxed' | 'child_led' | 'blended' | 'exploratory'
   familyStyle: string;
   outdoorSpace: string;
   learningGoals: string[];

@@ -30,13 +30,13 @@ const APPROACHES = [
     Icon: Compass,
   },
   {
-    id: 'waldorf',
+    id: 'exploratory',
     label: "We're nature and rhythm-led",
     description: 'Seasonal living, sensory play, creative expression. Learning through doing and being.',
     Icon: Leaf,
   },
   {
-    id: 'unschool',
+    id: 'relaxed',
     label: "We don't do school",
     description: 'Life is learning. We want ideas when we want them, no tracking or pressure.',
     Icon: Heart,

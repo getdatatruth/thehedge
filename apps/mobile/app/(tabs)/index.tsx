@@ -328,8 +328,8 @@ export default function TodayScreen() {
                       : hasPlan ? (educationApproach === 'structured' ? "Today's schedule" : 'Up next')
                       : dashboard?.weather?.isRaining ? 'Perfect for a rainy day'
                       : educationApproach === 'child_led' ? 'Inspiration for today'
-                      : educationApproach === 'waldorf' ? 'Seasonal activity'
-                      : educationApproach === 'unschool' ? 'If you fancy it...'
+                      : educationApproach === 'exploratory' ? 'Seasonal activity'
+                      : educationApproach === 'relaxed' ? 'If you fancy it...'
                       : 'Try this today'}
                   </Text>
                 </View>
@@ -383,9 +383,9 @@ export default function TodayScreen() {
                   ? "Generate your first weekly plan - we'll balance curriculum areas and match activities to each child's age and stage."
                   : educationApproach === 'child_led'
                     ? "Browse activities that match your children's interests. Log what you do and we'll track their learning journey."
-                  : educationApproach === 'waldorf'
+                  : educationApproach === 'exploratory'
                     ? "Explore seasonal, nature-led activities. We'll suggest what's right for this time of year."
-                  : educationApproach === 'unschool'
+                  : educationApproach === 'relaxed'
                     ? "Browse whenever you need inspiration. No schedules, no pressure - just ideas for when you want them."
                   : learningPath === 'homeschool'
                     ? "Generate your first weekly plan - we'll balance curriculum areas and match activities to each child's age and interests."
@@ -395,14 +395,14 @@ export default function TodayScreen() {
                 }
               </Text>
               <View style={styles.guidanceActions}>
-                {educationApproach !== 'unschool' && (learningPath === 'homeschool' || learningPath === 'considering') ? (
+                {educationApproach !== 'relaxed' && (learningPath === 'homeschool' || learningPath === 'considering') ? (
                   <TouchableOpacity
                     onPress={() => router.push('/(tabs)/plan' as any)}
                     style={styles.guidancePrimaryBtn}
                   >
                     <Calendar size={14} color="#FFFFFF" />
                     <Text style={styles.guidancePrimaryText}>
-                      {educationApproach === 'child_led' ? 'Browse ideas' : educationApproach === 'waldorf' ? 'Seasonal activities' : 'Generate your plan'}
+                      {educationApproach === 'child_led' ? 'Browse ideas' : educationApproach === 'exploratory' ? 'Seasonal activities' : 'Generate your plan'}
                     </Text>
                   </TouchableOpacity>
                 ) : null}

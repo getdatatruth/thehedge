@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { getWeather, getSeason } from '@/lib/weather';
 import { TodayClient } from './today-client';
-import { MOCK_ACTIVITIES } from '@/lib/mock-data';
+import type { MockActivity } from '@/lib/mock-data';
 
 export const metadata = {
   title: 'Today - The Hedge',
@@ -71,9 +71,7 @@ export default async function DashboardPage() {
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-  // Use real activities from DB if available, fall back to mock data
-  let activities = MOCK_ACTIVITIES;
-
+  // Use real activities from the DB only (may be empty)
   const { data: dbActivities } = await supabase
     .from('activities')
     .select('*')
@@ -81,9 +79,7 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  if (dbActivities && dbActivities.length > 0) {
-    activities = dbActivities;
-  }
+  let activities: MockActivity[] = (dbActivities as MockActivity[] | null) || [];
 
   // Filter for weather
   const isRaining = weather?.isRaining || false;

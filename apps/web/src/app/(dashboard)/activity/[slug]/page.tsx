@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 import { ActivityDetailClient } from './activity-detail-client';
 
 interface PageProps {
@@ -16,13 +15,8 @@ export async function generateMetadata({ params }: PageProps) {
     .eq('slug', slug)
     .single();
 
-  // Fall back to mock data for metadata
   if (!data) {
-    const mock = MOCK_ACTIVITIES.find((a) => a.slug === slug);
-    return {
-      title: mock ? `${mock.title} - The Hedge` : 'Activity - The Hedge',
-      description: mock?.description,
-    };
+    return { title: 'Activity - The Hedge' };
   }
 
   return {
@@ -35,32 +29,16 @@ export default async function ActivityDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const supabase = await createClient();
 
-  let activity = null;
-  let isFromDb = false;
-
-  // Try DB first
+  // Look up the activity in the DB only. If it does not exist, 404.
   const { data: dbActivity } = await supabase
     .from('activities')
     .select('*')
     .eq('slug', slug)
     .single();
 
-  if (dbActivity) {
-    activity = dbActivity;
-    isFromDb = true;
-  } else {
-    // Fall back to mock data
-    const mockActivity = MOCK_ACTIVITIES.find((a) => a.slug === slug);
-    if (mockActivity) {
-      activity = {
-        ...mockActivity,
-        instructions: { steps: mockActivity.instructions },
-        published: true,
-      };
-    }
-  }
+  if (!dbActivity) notFound();
 
-  if (!activity) notFound();
+  const activity = dbActivity;
 
   // Check if activity is premium and user is on free tier
   let isPremiumLocked = false;
@@ -87,31 +65,44 @@ export default async function ActivityDetailPage({ params }: PageProps) {
     }
   }
 
-  const instructions = isFromDb
-    ? (activity.instructions as { steps: string[] })
-    : (activity.instructions as { steps: string[] });
-  const materials = isFromDb
-    ? (activity.materials as { name: string; household_common: boolean }[])
-    : (activity.materials as { name: string; household_common: boolean }[]);
+  const instructions = activity.instructions as { steps: string[] };
+  const materials = activity.materials as {
+    name: string;
+    household_common: boolean;
+  }[];
 
-  // Find variations (activities with same parent or that are parent of this one)
-  const variations = MOCK_ACTIVITIES.filter(
-    (a) =>
-      a.id !== activity.id &&
-      a.slug !== activity.slug &&
-      (a.parent_activity_id === activity.id ||
-        activity.parent_activity_id === a.id ||
-        (activity.parent_activity_id &&
-          a.parent_activity_id === activity.parent_activity_id))
-  );
+  // Find variations from the DB: activities that share this activity's parent,
+  // are this activity's parent, or are children of this activity.
+  const variationFilters: string[] = [`parent_activity_id.eq.${activity.id}`];
+  if (activity.parent_activity_id) {
+    variationFilters.push(`id.eq.${activity.parent_activity_id}`);
+    variationFilters.push(
+      `parent_activity_id.eq.${activity.parent_activity_id}`
+    );
+  }
 
-  // Find "try next" suggestions - same category, different activity
-  const tryNext = MOCK_ACTIVITIES.filter(
-    (a) =>
-      a.slug !== activity.slug &&
-      a.category === activity.category &&
-      !variations.some((v) => v.id === a.id)
-  ).slice(0, 3);
+  const { data: variationRows } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('published', true)
+    .neq('id', activity.id)
+    .or(variationFilters.join(','));
+
+  const variations = variationRows || [];
+  const variationIds = new Set(variations.map((v) => v.id));
+
+  // "Try next" suggestions: same category, different activity, not a variation.
+  const { data: tryNextRows } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('published', true)
+    .eq('category', activity.category)
+    .neq('id', activity.id)
+    .limit(10);
+
+  const tryNext = (tryNextRows || [])
+    .filter((a) => !variationIds.has(a.id))
+    .slice(0, 3);
 
   // Only pass serializable data to the client component.
   // CATEGORY_CONFIG contains React component references (icons) which cannot

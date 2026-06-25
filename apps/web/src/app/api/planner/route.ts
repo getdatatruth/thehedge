@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 
 // ─── Helpers ────────────────────────────────────────────
 
@@ -220,17 +219,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 3. Get available activities from DB, with MOCK_ACTIVITIES as fallback
-    let activities: Array<{
-      id: string;
-      title: string;
-      category: string;
-      duration_minutes: number;
-      age_min: number;
-      age_max: number;
-      description: string;
-    }> = [];
-
+    // 3. Get available activities from the DB (real data only)
     const { data: dbActivities } = await supabase
       .from('activities')
       .select('id, title, category, duration_minutes, age_min, age_max, description')
@@ -238,19 +227,22 @@ export async function POST(request: NextRequest) {
       .order('created_at', { ascending: false })
       .limit(100);
 
-    if (dbActivities && dbActivities.length > 0) {
-      activities = dbActivities;
-    } else {
-      // Use mock activities as fallback
-      activities = MOCK_ACTIVITIES.map((a) => ({
-        id: a.id,
-        title: a.title,
-        category: a.category,
-        duration_minutes: a.duration_minutes,
-        age_min: a.age_min,
-        age_max: a.age_max,
-        description: a.description,
-      }));
+    const activities: Array<{
+      id: string;
+      title: string;
+      category: string;
+      duration_minutes: number;
+      age_min: number;
+      age_max: number;
+      description: string;
+    }> = dbActivities || [];
+
+    // If there are no activities to schedule, do not fabricate a plan.
+    if (activities.length === 0) {
+      return NextResponse.json(
+        { error: 'No activities are available to build a plan just yet. Please try again soon.' },
+        { status: 400 }
+      );
     }
 
     // 4. Delete existing daily_plans for this week (regenerate)

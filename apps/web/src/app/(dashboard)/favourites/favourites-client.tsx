@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { MOCK_ACTIVITIES } from '@/lib/mock-data';
 import type { MockActivity } from '@/lib/mock-data';
 import { ActivityCard, CATEGORY_CONFIG } from '@/components/shared/activity-card';
 import { useFavouritesStore } from '@/stores/favourites';
@@ -62,12 +61,8 @@ export function FavouritesClient() {
   }, []);
 
   const favourites = useMemo(() => {
-    const mockMatches = MOCK_ACTIVITIES.filter((a) => favouriteIds.has(a.id));
-    const mockIds = new Set(mockMatches.map((a) => a.id));
-    const dbMatches = dbActivities.filter(
-      (a) => favouriteIds.has(a.id) && !mockIds.has(a.id)
-    );
-    return [...mockMatches, ...dbMatches];
+    // Use only real activities fetched from the API that are favourited.
+    return dbActivities.filter((a) => favouriteIds.has(a.id));
   }, [favouriteIds, dbActivities]);
 
   const filtered = useMemo(() => {

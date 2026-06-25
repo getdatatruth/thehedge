@@ -7,11 +7,7 @@ import { FilterChips } from '@/components/shared/filter-chips';
 import { InsightCard } from '@/components/shared/insight-card';
 import { MilestoneCard } from '@/components/shared/milestone-card';
 import { NewThisWeek } from '@/components/shared/new-this-week';
-import {
-  MOCK_ACTIVITIES,
-  MOCK_COLLECTIONS,
-  type MockActivity,
-} from '@/lib/mock-data';
+import { type MockActivity } from '@/lib/mock-data';
 import {
   ChevronRight,
   Sparkles,
@@ -112,8 +108,11 @@ export function TodayClient({
   const todayPlanActivities = planActivities.filter((a) => a.day === today);
   const completedToday = todayPlanActivities.filter((a) => a.completed).length;
 
-  const newActivities = MOCK_ACTIVITIES.filter((a) => a.is_new);
-  const featuredCollections = MOCK_COLLECTIONS.filter((c) => c.featured);
+  // "New this week" activities and featured collections are not yet wired from
+  // the server, so we show nothing rather than fabricated content. The
+  // NewThisWeek component below fetches real new activities from the API.
+  const newActivities: MockActivity[] = [];
+  const featuredCollections: { id: string; slug: string; emoji: string; title: string; activity_ids: string[] }[] = [];
 
   // Hero recommendation: pick from plan or activities pool
   const heroPool = useMemo(() => {
@@ -569,30 +568,32 @@ export function TodayClient({
       )}
 
       {/* ─── Collections ─── */}
-      <div>
-        <div className="flex items-center justify-between mb-5">
-          <div className="eyebrow">Collections for you</div>
-          <Link href="/browse?tab=collections" className="btn-ghost text-[12px]">
-            View all <ArrowRight className="h-3 w-3 inline" />
-          </Link>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {featuredCollections.map((collection) => (
-            <Link
-              key={collection.id}
-              href={`/browse?collection=${collection.slug}`}
-              className="card-interactive p-5 flex items-center gap-4 group"
-            >
-              <span className="text-3xl transition-transform group-hover:scale-110">{collection.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-medium text-ink">{collection.title}</p>
-                <p className="text-[12px] text-clay">{collection.activity_ids.length} activities</p>
-              </div>
-              <ChevronRight className="h-4 w-4 text-stone transition-all group-hover:text-terracotta group-hover:translate-x-1" />
+      {featuredCollections.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-5">
+            <div className="eyebrow">Collections for you</div>
+            <Link href="/browse?tab=collections" className="btn-ghost text-[12px]">
+              View all <ArrowRight className="h-3 w-3 inline" />
             </Link>
-          ))}
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {featuredCollections.map((collection) => (
+              <Link
+                key={collection.id}
+                href={`/browse?collection=${collection.slug}`}
+                className="card-interactive p-5 flex items-center gap-4 group"
+              >
+                <span className="text-3xl transition-transform group-hover:scale-110">{collection.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-medium text-ink">{collection.title}</p>
+                  <p className="text-[12px] text-clay">{collection.activity_ids.length} activities</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-stone transition-all group-hover:text-terracotta group-hover:translate-x-1" />
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ─── New This Week (from API) ─── */}
       <NewThisWeek />
@@ -614,8 +615,17 @@ export function TodayClient({
           {filtered.length === 0 ? (
             <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
               <div className="text-center">
-                <p className="font-medium text-umber">No activities match your filters</p>
-                <p className="text-[13px] text-clay mt-1 italic">Try removing some filters to see more ideas.</p>
+                {activities.length === 0 ? (
+                  <>
+                    <p className="font-medium text-umber">No activities here just yet</p>
+                    <p className="text-[13px] text-clay mt-1 italic">We are adding more all the time. Check back soon.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-medium text-umber">No activities match your filters</p>
+                    <p className="text-[13px] text-clay mt-1 italic">Try removing some filters to see more ideas.</p>
+                  </>
+                )}
               </div>
             </div>
           ) : (
