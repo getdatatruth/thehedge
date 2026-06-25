@@ -383,9 +383,6 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
   const childDailyPlans = dailyPlans.filter((dp) => dp.child_id === selectedChildId);
   const totalPlannedDays = childDailyPlans.length;
   const daysAttended = childDailyPlans.filter((dp) => dp.attendance_logged).length;
-  const attendancePercentage = totalPlannedDays > 0
-    ? Math.round((daysAttended / totalPlannedDays) * 100)
-    : 0;
 
   const childActivityLogs = activityLogs.filter(
     (log) => log.child_ids?.includes(selectedChildId)
@@ -395,10 +392,6 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     0
   );
   const hoursLogged = Math.round(totalMinutesLogged / 60 * 10) / 10;
-  const requiredHours = selectedPlan
-    ? Math.round(selectedPlan.hours_per_day * selectedPlan.days_per_week * 36)
-    : 900;
-  const hoursPercentage = requiredHours > 0 ? Math.round((hoursLogged / requiredHours) * 100) : 0;
 
   const allAreasCovered = new Set<string>();
   (childActivityLogs.length > 0 ? childActivityLogs : activityLogs).forEach((log) => {
@@ -420,13 +413,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     return { month: monthName, days: attended, required: total };
   }).filter((m) => m.required > 0);
 
-  // Compliance alerts
+  // Gentle reminders (no invented legal thresholds - AEARS sets no minimum hours or attendance rate)
   const alerts: { type: 'warning' | 'danger'; message: string }[] = [];
-  if (attendancePercentage > 0 && attendancePercentage < 80) {
-    alerts.push({ type: 'danger', message: `Attendance is at ${attendancePercentage}% -- below the recommended 80% threshold.` });
-  } else if (attendancePercentage > 0 && attendancePercentage < 90) {
-    alerts.push({ type: 'warning', message: `Attendance is at ${attendancePercentage}% -- aim for 90%+ for compliance.` });
-  }
   if (registrationStatus === 'not_started') {
     alerts.push({ type: 'warning', message: 'Tusla registration has not been started yet.' });
   }
@@ -732,19 +720,12 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="card-elevated p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Calendar className="h-4 w-4 text-sky" />
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Attendance</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Days of Learning</p>
               </div>
               <p className="text-2xl font-light text-ink">
-                {attendancePercentage}%
+                {daysAttended}<span className="text-sm font-normal text-clay/40"> days logged</span>
               </p>
-              <div className="mt-3 h-1.5 rounded-full bg-stone/20">
-                <div
-                  className={`h-full rounded-full transition-all ${
-                    attendancePercentage >= 90 ? 'bg-moss' : attendancePercentage >= 80 ? 'bg-amber' : 'bg-terracotta'
-                  }`}
-                  style={{ width: `${attendancePercentage}%` }}
-                />
-              </div>
+              <p className="mt-2 text-[11px] text-clay/40">A record of days you did learning together. No minimum applies.</p>
             </div>
 
             <div className="card-elevated p-5">
@@ -753,14 +734,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Hours Logged</p>
               </div>
               <p className="text-2xl font-light text-ink">
-                {hoursLogged}<span className="text-sm font-normal text-clay/40"> / {requiredHours}h</span>
+                {hoursLogged}<span className="text-sm font-normal text-clay/40">h this year</span>
               </p>
-              <div className="mt-3 h-1.5 rounded-full bg-stone/20">
-                <div
-                  className="h-full rounded-full bg-amber transition-all"
-                  style={{ width: `${Math.min(hoursPercentage, 100)}%` }}
-                />
-              </div>
+              <p className="mt-2 text-[11px] text-clay/40">Time you have noted. AEARS sets no required number of hours.</p>
             </div>
 
             <div className="card-elevated p-5">
@@ -832,24 +808,21 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </div>
           </div>
 
-          {/* Monthly attendance chart */}
+          {/* Monthly learning-days chart */}
           {monthlyAttendance.length > 0 && (
             <div className="card-elevated p-6">
               <h2 className="font-display text-lg font-light text-ink mb-6">
-                Monthly <em className="text-moss italic">Attendance</em>
+                Days of <em className="text-moss italic">Learning</em> by month
               </h2>
               <div className="flex items-end gap-3 h-40">
                 {monthlyAttendance.map((month) => {
                   const percent = month.required > 0 ? (month.days / month.required) * 100 : 0;
-                  const isLow = percent < 80;
                   return (
                     <div key={month.month} className="flex-1 flex flex-col items-center gap-2">
                       <div className="w-full flex flex-col items-center" style={{ height: '120px' }}>
                         <div className="flex-1" />
                         <div
-                          className={`w-full rounded-t-lg transition-all ${
-                            isLow ? 'bg-amber/60' : 'bg-moss/60'
-                          }`}
+                          className="w-full rounded-t-lg transition-all bg-moss/60"
                           style={{ height: `${percent}%`, maxWidth: '40px', margin: '0 auto' }}
                         />
                       </div>

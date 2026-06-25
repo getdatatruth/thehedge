@@ -1116,41 +1116,35 @@ export function renderAttendanceHtml(data: AttendanceReportData): string {
   // Overall Stats
   body += `
     <div class="section">
-      <h3 class="section-title">Overall Attendance</h3>
+      <h3 class="section-title">Overall Record of Learning</h3>
       <div class="stats-row">
         <div class="stat-card">
-          <div class="stat-value">${totals.attendancePercentage}%</div>
-          <div class="stat-label">Attendance Rate</div>
-        </div>
-        <div class="stat-card">
           <div class="stat-value">${totals.totalDaysAttended}</div>
-          <div class="stat-label">Days Attended</div>
+          <div class="stat-label">Days of Learning</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${totals.totalHoursLogged}</div>
           <div class="stat-label">Hours Logged</div>
         </div>
         <div class="stat-card">
+          <div class="stat-value">${totals.totalDaysRequired}</div>
+          <div class="stat-label">Days in Your Plan</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-value">${totals.planCompletionRate}%</div>
-          <div class="stat-label">Plan Completion</div>
+          <div class="stat-label">Of Your Own Plan</div>
         </div>
       </div>
-      <div style="margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-          <span>Hours: ${totals.totalHoursLogged} of ${totals.totalHoursRequired} required</span>
-          <span>${totals.totalHoursRequired > 0 ? Math.round((totals.totalHoursLogged / totals.totalHoursRequired) * 100) : 0}%</span>
-        </div>
-        ${progressBar(totals.totalHoursRequired > 0 ? (totals.totalHoursLogged / totals.totalHoursRequired) * 100 : 0)}
-      </div>
+      <p style="font-size: 11px; color: #888; margin-top: 8px;">These figures reflect your own education plan and what you chose to record. AEARS does not set a minimum number of hours or days; a home education is assessed on whether a certain minimum education is being provided, not on attendance.</p>
     </div>`;
 
   // Monthly Breakdown
   if (monthlyBreakdown.length > 0) {
     body += `
     <div class="section">
-      <h3 class="section-title">Monthly Attendance Breakdown</h3>
+      <h3 class="section-title">Monthly Learning Record</h3>
       <table>
-        <thead><tr><th>Month</th><th>Days Attended</th><th>Days Planned</th><th>Hours Logged</th><th>Hours Required</th><th>Plan Completion</th></tr></thead>
+        <thead><tr><th>Month</th><th>Days of Learning</th><th>Days in Your Plan</th><th>Hours Logged</th><th>Of Your Own Plan</th></tr></thead>
         <tbody>`;
     for (const month of monthlyBreakdown) {
       body += `<tr>
@@ -1158,7 +1152,6 @@ export function renderAttendanceHtml(data: AttendanceReportData): string {
         <td>${month.daysAttended}</td>
         <td>${month.daysPlanned}</td>
         <td>${month.hoursLogged}</td>
-        <td>${month.hoursRequired}</td>
         <td>${month.completionRate}%</td>
       </tr>`;
     }
@@ -1286,8 +1279,8 @@ export function renderAnnualHtml(data: AnnualReportData): string {
           <div class="stat-label">Hours Learning</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${attendance.totals.attendancePercentage}%</div>
-          <div class="stat-label">Attendance</div>
+          <div class="stat-value">${attendance.totals.totalDaysAttended}</div>
+          <div class="stat-label">Days of Learning</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${portfolio.totalEntries}</div>
@@ -1381,19 +1374,19 @@ export function renderAnnualHtml(data: AnnualReportData): string {
   body += `
     <div class="annual-divider">
       <hr class="divider-line" />
-      <h2>Part 2: Attendance Record</h2>
+      <h2>Part 2: Record of Learning</h2>
     </div>`;
 
   body += `
     <div class="section">
       <div class="stats-row">
         <div class="stat-card">
-          <div class="stat-value">${attendance.totals.attendancePercentage}%</div>
-          <div class="stat-label">Attendance Rate</div>
+          <div class="stat-value">${attendance.totals.totalDaysAttended}</div>
+          <div class="stat-label">Days of Learning</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${attendance.totals.totalDaysAttended}</div>
-          <div class="stat-label">Days Attended</div>
+          <div class="stat-value">${attendance.totals.totalDaysRequired}</div>
+          <div class="stat-label">Days in Your Plan</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${attendance.totals.totalHoursLogged}</div>
@@ -1405,15 +1398,15 @@ export function renderAnnualHtml(data: AnnualReportData): string {
   if (attendance.monthlyBreakdown.length > 0) {
     body += `
     <div class="section">
-      <h3 class="section-title">Monthly Attendance</h3>
+      <h3 class="section-title">Monthly Learning Record</h3>
       <table>
-        <thead><tr><th>Month</th><th>Days</th><th>Hours</th><th>Plan Completion</th></tr></thead>
+        <thead><tr><th>Month</th><th>Days (of your plan)</th><th>Hours Logged</th><th>Of Your Own Plan</th></tr></thead>
         <tbody>`;
     for (const month of attendance.monthlyBreakdown) {
       body += `<tr>
         <td>${month.month}</td>
         <td>${month.daysAttended} / ${month.daysPlanned}</td>
-        <td>${month.hoursLogged} / ${month.hoursRequired}</td>
+        <td>${month.hoursLogged}</td>
         <td>${month.completionRate}%</td>
       </tr>`;
     }
