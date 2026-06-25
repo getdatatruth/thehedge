@@ -84,11 +84,13 @@ export async function GET(request: NextRequest) {
   // Distinct days with any learning logged (honest count, never a "streak")
   const daysOfLearning = new Set(allLogs.map((l) => l.date)).size;
 
-  // Get a few suggested activities for today
+  // Get a pool of suggested activities for today (the mobile Today "Thread"
+  // re-picks the hero from this pool using the reframe chips, so include the
+  // fields those filters need: location + energy_level).
   const { data: activities } = await supabase
     .from('activities')
-    .select('id, title, category, slug, duration_minutes')
-    .limit(5);
+    .select('id, title, category, slug, duration_minutes, location, energy_level')
+    .limit(24);
 
   // Get featured collections
   const { data: featuredCollections } = await supabase
