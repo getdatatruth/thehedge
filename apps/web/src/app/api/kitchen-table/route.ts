@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createClient } from '@/lib/supabase/server';
+import { coordsForCounty } from '@/lib/ie-counties';
 import {
   deriveProfile,
   buildFallbackFramework,
@@ -58,11 +59,17 @@ export async function POST(request: NextRequest) {
     // keep the warm deterministic fallback
   }
 
-  // Persist the spine. approach maps to the existing education_approach enum.
-  await supabase
-    .from('families')
-    .update({ approach: profile.approach, doorway: profile.doorway })
-    .eq('id', familyId);
+  // Persist the spine + finish onboarding. approach maps to the existing
+  // education_approach enum; geocode the county so weather works from day one.
+  const coords = coordsForCounty(profile.county);
+  const familyUpdate: Record<string, unknown> = {
+    approach: profile.approach,
+    doorway: profile.doorway,
+    onboarding_completed: true,
+  };
+  if (profile.county) familyUpdate.county = profile.county;
+  if (coords) { familyUpdate.latitude = coords.lat; familyUpdate.longitude = coords.lng; }
+  await supabase.from('families').update(familyUpdate).eq('id', familyId);
 
   // If this family has no children yet (a fresh onboarding), seed them.
   const { data: existingKids } = await supabase

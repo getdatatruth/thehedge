@@ -92,7 +92,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Authenticated - check onboarding status and subscription tier
-  if (user && !isPublicRoute && pathname !== '/onboarding') {
+  if (user && !isPublicRoute && pathname !== '/welcome') {
     const { data: profile } = await supabase
       .from('users')
       .select('family_id, families(onboarding_completed, subscription_tier, subscription_status, trial_ends_at)')
@@ -105,10 +105,10 @@ export async function updateSession(request: NextRequest) {
         : profile?.families
     ) as { onboarding_completed: boolean; subscription_tier: string; subscription_status: string; trial_ends_at: string | null } | null | undefined;
 
-    // Redirect to onboarding if not completed
+    // New family lands at The Kitchen Table (the conversational onboarding).
     if (!profile?.family_id || !family?.onboarding_completed) {
       const url = request.nextUrl.clone();
-      url.pathname = '/onboarding';
+      url.pathname = '/welcome';
       return NextResponse.redirect(url);
     }
 
