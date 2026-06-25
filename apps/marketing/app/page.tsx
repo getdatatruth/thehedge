@@ -57,7 +57,7 @@ export default function Home() {
             <h1 className="hero-headline">
               What will your<br />family do<br /><em>today?</em>
             </h1>
-            <p className="hero-body">Personalised activities for Irish families - shaped by your children, your weather, and your world.</p>
+            <p className="hero-body">Learning that feels like a breath, not a battle. Personalised, screen-free ideas shaped by your children, your weather, and your world.</p>
             <p className="hero-sub">For homeschooling families and mainstream families who want something <strong>richer than a screen</strong> for their children every day.</p>
             <div className="actions fade-up-2">
               <Link href="https://app.thehedge.ie/signup" className="btn-primary">
