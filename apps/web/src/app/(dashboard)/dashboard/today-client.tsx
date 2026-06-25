@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { CATEGORY_CONFIG } from '@/components/shared/activity-card';
+import { ActivityCard, CATEGORY_CONFIG } from '@/components/shared/activity-card';
 import { InsightCard } from '@/components/shared/insight-card';
 import { NewThisWeek } from '@/components/shared/new-this-week';
 import { type MockActivity } from '@/lib/mock-data';
@@ -121,6 +121,7 @@ export function TodayClient({
 
   const hero = pool.length > 0 ? pool[shuffle % pool.length] : null;
   const heroCat = hero ? CATEGORY_CONFIG[hero.category] || CATEGORY_CONFIG.nature : CATEGORY_CONFIG.nature;
+  const HeroCatIcon = heroCat.icon;
 
   // The hero is two-faced: planned families hear "today's plan"; emergent
   // families (child-led / relaxed / nature-led) hear an observational thread.
@@ -213,14 +214,17 @@ export function TodayClient({
             })}
           </div>
 
-          {/* Hero card */}
-          <div className="rounded-3xl bg-white shadow-sm overflow-hidden border-t-4 border-moss/40">
-            <div className="p-7 sm:p-8">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-moss">
+          {/* Hero card with a colourful category header band */}
+          <div className="rounded-3xl bg-white shadow-sm overflow-hidden border border-stone/40">
+            <div className={`relative h-32 sm:h-36 bg-gradient-to-br ${heroCat.gradient} overflow-hidden`}>
+              <HeroCatIcon className={`absolute -right-3 -bottom-3 h-32 w-32 ${heroCat.color} opacity-20`} strokeWidth={1.4} />
+              <span className={`absolute top-5 left-7 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] ${heroCat.color}`}>
                 <Leaf className="h-3.5 w-3.5" />
                 {heroLabel}
               </span>
-              <h2 className="font-display text-3xl sm:text-[2.4rem] leading-tight font-light text-ink mt-3">
+            </div>
+            <div className="p-7 sm:p-8 pt-6">
+              <h2 className="font-display text-3xl sm:text-[2.4rem] leading-tight font-semibold text-ink">
                 {hero.title}
               </h2>
               <div className="flex items-center gap-3 mt-4 text-[12px] text-clay">
@@ -348,6 +352,23 @@ export function TodayClient({
             : `You have kept ${moments} ${moments === 1 ? 'moment' : 'moments'} together this ${seasonLabel.toLowerCase()}. Lovely.`}
         </p>
       </Link>
+
+      {/* ─── A few more for today ─── */}
+      {activities.length > 1 && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display text-lg font-semibold text-ink">A few more for today</h3>
+            <Link href="/browse" className="btn-ghost text-[12px]">
+              Browse all <ArrowRight className="h-3 w-3 inline" />
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {activities.filter((a) => a.id !== heroId).slice(0, 6).map((a) => (
+              <ActivityCard key={a.id} activity={a} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ─── The open door (considering / homeschool) ─── */}
       {showOpenDoor && (
