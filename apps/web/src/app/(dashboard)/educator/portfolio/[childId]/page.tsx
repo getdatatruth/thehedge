@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { signPortfolioPhotos } from '@/lib/storage';
 import { PortfolioClient } from './portfolio-client';
 
 export const metadata = {
@@ -53,6 +54,15 @@ export default async function PortfolioPage({ params }: { params: Promise<{ chil
     .eq('child_id', childId)
     .order('date', { ascending: false });
 
+  // Photos are stored as private Storage paths; sign them for display
+  // (legacy data: URLs pass straight through).
+  const signedEntries = await Promise.all(
+    (entries || []).map(async (e) => ({
+      ...e,
+      photos: await signPortfolioPhotos(e.photos as string[] | null),
+    }))
+  );
+
   // Fetch recent activity logs for add-entry form (last 60 days)
   const sixtyDaysAgo = new Date();
   sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
@@ -75,7 +85,7 @@ export default async function PortfolioPage({ params }: { params: Promise<{ chil
   return (
     <PortfolioClient
       child={child}
-      entries={entries || []}
+      entries={signedEntries}
       activityLogs={activityLogs || []}
       allChildren={allChildren || []}
       outcomes={outcomes || []}

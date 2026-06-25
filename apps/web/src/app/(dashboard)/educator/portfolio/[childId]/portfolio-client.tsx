@@ -127,7 +127,10 @@ export function PortfolioClient({
   const [formLogId, setFormLogId] = useState('');
   const [formOutcomeIds, setFormOutcomeIds] = useState<string[]>([]);
   const [formPhotos, setFormPhotos] = useState<string[]>([]);
+  // path -> short-lived signed URL, for previewing freshly-uploaded photos
+  const [photoPreviews, setPhotoPreviews] = useState<Record<string, string>>({});
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   function resetForm() {
     setFormTitle('');
@@ -158,24 +161,28 @@ export function PortfolioClient({
     if (!files || files.length === 0 || !child) return;
 
     setUploadingPhoto(true);
+    setUploadError('');
 
     try {
-      // For now, we create a data URL as a placeholder
-      // In production, this would upload to Supabase Storage
+      // Upload each file to private Supabase Storage; store the durable path
+      // and keep the returned signed URL for an immediate preview.
       for (const file of Array.from(files)) {
-        const reader = new FileReader();
-        await new Promise<void>((resolve) => {
-          reader.onload = () => {
-            if (typeof reader.result === 'string') {
-              setFormPhotos((prev) => [...prev, reader.result as string]);
-            }
-            resolve();
-          };
-          reader.readAsDataURL(file);
-        });
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch('/api/educator/portfolio/photo', { method: 'POST', body: fd });
+        const json = await res.json();
+        if (!res.ok || !json.path) {
+          setUploadError(json.error || 'Could not upload that photo');
+          continue;
+        }
+        setFormPhotos((prev) => [...prev, json.path as string]);
+        if (json.url) {
+          setPhotoPreviews((prev) => ({ ...prev, [json.path]: json.url }));
+        }
       }
     } catch (err) {
-      console.error('Failed to process photo:', err);
+      console.error('Failed to upload photo:', err);
+      setUploadError('Could not upload that photo');
     } finally {
       setUploadingPhoto(false);
       if (fileInputRef.current) {
@@ -500,11 +507,16 @@ export function PortfolioClient({
                 Photos / Evidence
               </label>
               <div className="flex flex-wrap gap-3">
-                {formPhotos.map((photo, i) => (
+                {formPhotos.map((photo, i) => {
+                  const previewSrc =
+                    photo.startsWith('data:image') || photo.startsWith('http')
+                      ? photo
+                      : photoPreviews[photo];
+                  return (
                   <div key={i} className="relative h-20 w-20 rounded-xl overflow-hidden bg-linen group">
-                    {photo.startsWith('data:image') ? (
+                    {previewSrc ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={photo} alt={`Upload ${i + 1}`} className="h-full w-full object-cover" />
+                      <img src={previewSrc} alt={`Upload ${i + 1}`} className="h-full w-full object-cover" />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center">
                         <ImageIcon className="h-6 w-6 text-clay/20" />
@@ -517,7 +529,8 @@ export function PortfolioClient({
                       <X className="h-3 w-3" />
                     </button>
                   </div>
-                ))}
+                  );
+                })}
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingPhoto}

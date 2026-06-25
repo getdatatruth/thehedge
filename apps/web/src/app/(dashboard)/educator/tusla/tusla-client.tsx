@@ -844,12 +844,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </h2>
             <div className="space-y-2">
               {([
-                { title: 'Annual Assessment Report', description: 'Full compliance report for Tusla assessment', type: 'PDF' as const, reportType: 'annual' },
-                { title: 'Term Summary', description: 'Attendance, curriculum coverage, and portfolio summary', type: 'PDF' as const, reportType: 'assessment' },
-                { title: 'Attendance Record', description: 'Day-by-day attendance log', type: 'CSV' as const, reportType: 'attendance' },
-                { title: 'Curriculum Coverage', description: 'Detailed breakdown by subject area and strand', type: 'PDF' as const, reportType: 'portfolio' },
+                { title: 'Annual Assessment Report', description: 'Full compliance report for Tusla assessment', reportType: 'annual' },
+                { title: 'Term Summary', description: 'Attendance, curriculum coverage, and portfolio summary', reportType: 'assessment' },
+                { title: 'Attendance Record', description: 'Day-by-day attendance log', reportType: 'attendance' },
+                { title: 'Curriculum Coverage', description: 'Detailed breakdown by subject area and strand', reportType: 'portfolio' },
               ] as const).map((report) => {
                 const reportUrl = `/api/educator/reports?type=${report.reportType}&childId=${selectedChildId}`;
+                const disabled = !selectedChildId;
                 return (
                   <div key={report.title} className="flex items-center gap-3 rounded-2xl p-3.5 hover:bg-parchment/50 transition-colors">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-moss/8">
@@ -860,16 +861,22 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                       <p className="text-xs text-clay/50">{report.description}</p>
                     </div>
                     <a
+                      href={`${reportUrl}&format=csv`}
+                      className={`btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+                      aria-disabled={disabled}
+                    >
+                      <Download className="h-3 w-3" />
+                      CSV
+                    </a>
+                    <a
                       href={reportUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 ${
-                        !selectedChildId ? 'pointer-events-none opacity-40' : ''
-                      }`}
-                      aria-disabled={!selectedChildId}
+                      className={`btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+                      aria-disabled={disabled}
                     >
-                      <Download className="h-3 w-3" />
-                      {report.type}
+                      <FileText className="h-3 w-3" />
+                      View
                     </a>
                   </div>
                 );
