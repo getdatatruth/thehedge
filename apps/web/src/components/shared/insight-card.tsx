@@ -20,7 +20,7 @@ const CACHE_TTL = 3600000; // 1 hour
 
 function getCacheKey(type: string, context: Record<string, any>): string {
   const childNames = (context.children || []).map((c: any) => c.name).join(',');
-  return `${type}-${childNames}-${context.activityTitle || ''}-${context.hedgeScore || 0}`;
+  return `${type}-${childNames}-${context.activityTitle || ''}`;
 }
 
 export function InsightCard({ type, context, enabled = true }: InsightCardProps) {

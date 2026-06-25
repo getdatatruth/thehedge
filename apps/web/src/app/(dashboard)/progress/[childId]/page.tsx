@@ -1,16 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect, notFound } from 'next/navigation';
 import { ChildProgressClient } from './child-progress-client';
-import {
-  calculateBadges,
-  calculateStreak,
-  buildCalendarHeatmap,
-  type LogForBadges,
-} from '@/lib/badges';
 
 export const metadata = {
   title: 'Child Progress - The Hedge',
 };
+
+const ALL_CATEGORIES = ['nature', 'kitchen', 'science', 'art', 'movement', 'literacy', 'maths', 'life_skills', 'calm', 'social'];
 
 export default async function ChildProgressPage({ params }: { params: Promise<{ childId: string }> }) {
   const { childId } = await params;
@@ -68,7 +64,7 @@ export default async function ChildProgressPage({ params }: { params: Promise<{ 
   const logs = logsRes.data || [];
   const portfolioEntries = portfolioRes.data || [];
 
-  // Calculate stats
+  // Reflection stats
   const totalActivities = logs.length;
   const totalMinutes = logs.reduce((sum, l) => sum + (l.duration_minutes || 0), 0);
   const ratedLogs = logs.filter((l) => l.rating != null && l.rating > 0);
@@ -76,27 +72,17 @@ export default async function ChildProgressPage({ params }: { params: Promise<{ 
     ? (ratedLogs.reduce((sum, l) => sum + (l.rating || 0), 0) / ratedLogs.length).toFixed(1)
     : null;
 
-  // Build badge data
-  const logsForBadges: LogForBadges[] = logs.map((log) => {
-    const activity = Array.isArray(log.activities) ? log.activities[0] : log.activities;
-    return {
-      date: log.date,
-      category: activity?.category || null,
-      duration_minutes: log.duration_minutes,
-    };
-  });
-
-  const badges = calculateBadges(logsForBadges);
-  const dates = logsForBadges.map((l) => l.date);
-  const { current: currentStreak, longest: longestStreak } = calculateStreak(dates);
-  const calendarData = buildCalendarHeatmap(dates, 6);
-
-  // Category counts
+  // Category counts and days of learning
   const categoryCounts: Record<string, number> = {};
-  for (const log of logsForBadges) {
-    const cat = log.category || 'unknown';
+  const dates: string[] = [];
+  for (const log of logs) {
+    const activity = Array.isArray(log.activities) ? log.activities[0] : log.activities;
+    const cat = activity?.category || 'unknown';
     categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    dates.push(log.date);
   }
+  const uniqueDays = new Set(dates).size;
+  const areasExplored = Object.keys(categoryCounts).filter((k) => k !== 'unknown').length;
 
   // Serialize logs for the client
   const serializedLogs = logs.map((log) => {
@@ -133,12 +119,11 @@ export default async function ChildProgressPage({ params }: { params: Promise<{ 
       }}
       totalActivities={totalActivities}
       totalMinutes={totalMinutes}
+      uniqueDays={uniqueDays}
+      areasExplored={areasExplored}
+      totalAreas={ALL_CATEGORIES.length}
       avgRating={avgRating}
-      currentStreak={currentStreak}
-      longestStreak={longestStreak}
       categoryCounts={categoryCounts}
-      badges={badges}
-      calendarData={calendarData}
       activityLogs={serializedLogs}
       portfolioEntries={serializedPortfolio}
     />

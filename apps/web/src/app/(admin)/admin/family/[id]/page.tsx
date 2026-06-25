@@ -127,7 +127,7 @@ export default function FamilyHealthPage({ params }: { params: Promise<{ id: str
       {/* Health KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiCard title="Total Activities" value={health.totalActivities} sparklineData={weeklyActivity.map(w => w.count)} icon={<Activity className="h-4 w-4" />} />
-        <KpiCard title="Current Streak" value={health.currentStreak} subtitle="days" icon={<Flame className="h-4 w-4" />} />
+        <KpiCard title="Recent Active Days" value={health.currentStreak} subtitle="days" icon={<Flame className="h-4 w-4" />} />
         <KpiCard title="Last Active" value={health.daysSinceLastActivity !== null ? `${health.daysSinceLastActivity}d ago` : 'Never'} icon={<Clock className="h-4 w-4" />} />
         <KpiCard title="Avg Rating" value={health.avgRating || 'N/A'} subtitle={`${health.categoriesExplored}/10 categories`} icon={<Star className="h-4 w-4" />} />
       </div>

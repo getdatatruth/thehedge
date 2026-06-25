@@ -8,7 +8,7 @@ export async function OPTIONS() {
 
 /**
  * GET /api/v1/educator/dashboard
- * Returns educator dashboard stats: hours, curriculum coverage, streak, etc.
+ * Returns educator dashboard stats: hours, curriculum coverage, active days, etc.
  * Requires educator subscription tier.
  */
 export async function GET(request: NextRequest) {
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Calculate current streak (consecutive days with logs)
+  // Count unique active days over the last 90 days (an honest backward-looking measure, no streaks)
   const { data: recentLogs } = await supabase
     .from('activity_logs')
     .select('date')
@@ -76,22 +76,9 @@ export async function GET(request: NextRequest) {
     .order('date', { ascending: false })
     .limit(90);
 
-  let currentStreak = 0;
-  if (recentLogs && recentLogs.length > 0) {
-    const uniqueDates = [...new Set(recentLogs.map((l) => l.date))].sort().reverse();
-    const today = new Date().toISOString().split('T')[0];
-    let checkDate = new Date(today);
-
-    for (const dateStr of uniqueDates) {
-      const checkStr = checkDate.toISOString().split('T')[0];
-      if (dateStr === checkStr) {
-        currentStreak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else if (dateStr < checkStr) {
-        break;
-      }
-    }
-  }
+  const activeDays = recentLogs
+    ? new Set(recentLogs.map((l) => l.date)).size
+    : 0;
 
   // Aistear coverage by category
   const aistearThemes = ['wellbeing', 'identity', 'communicating', 'exploring'];
@@ -132,7 +119,7 @@ export async function GET(request: NextRequest) {
     hours_this_week: Math.round(hoursThisWeek * 10) / 10,
     curriculum_areas_covered: areasSet.size,
     children_count: childrenCount || 0,
-    current_streak: currentStreak,
+    active_days: activeDays,
     aistear_coverage: aistearCoverage,
     has_plans: (planCount || 0) > 0,
   });

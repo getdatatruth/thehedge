@@ -66,7 +66,7 @@ interface TodayClientProps {
   isRaining: boolean;
   temperature?: number | null;
   weatherDescription?: string | null;
-  streak: number;
+  streak?: number;
   activitiesThisWeek: number;
   planActivities?: PlanActivity[];
   isFreeUser?: boolean;
@@ -92,7 +92,6 @@ export function TodayClient({
   isRaining,
   temperature,
   weatherDescription,
-  streak,
   activitiesThisWeek,
   planActivities = [],
   isFreeUser = false,
@@ -383,7 +382,6 @@ export function TodayClient({
         context={{
           children: childNames.map(name => ({ name })),
           weather: { temperature, isRaining, description: weatherDescription },
-          streak,
           activitiesThisWeek,
           todayActivities: todayPlanActivities.map(a => ({ title: a.title, category: a.category })),
           categoryBreakdown: todayPlanActivities.reduce((acc, a) => { acc[a.category] = (acc[a.category] || 0) + 1; return acc; }, {} as Record<string, number>),
@@ -423,19 +421,15 @@ export function TodayClient({
       )}
 
       {/* ─── Stats Row ─── */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="stat text-center">
-          <p className="font-display text-3xl font-light text-ink">{streak}</p>
-          <p className="text-[11px] text-clay font-medium mt-1">day streak</p>
-        </div>
-        <Link href="/progress" className="stat text-center hover:border-moss/30 transition-all cursor-pointer">
-          <p className="font-display text-3xl font-light text-ink">0</p>
-          <p className="text-[11px] text-clay font-medium mt-1">badges earned</p>
-        </Link>
+      <div className="grid grid-cols-2 gap-3">
         <div className="stat text-center">
           <p className="font-display text-3xl font-light text-ink">{activitiesThisWeek}</p>
           <p className="text-[11px] text-clay font-medium mt-1">this week</p>
         </div>
+        <Link href="/progress" className="stat text-center hover:border-moss/30 transition-all cursor-pointer">
+          <p className="font-display text-3xl font-light text-ink">{activitiesLogged}</p>
+          <p className="text-[11px] text-clay font-medium mt-1">activities together</p>
+        </Link>
       </div>
 
       {/* ─── Upgrade card (free users) ─── */}

@@ -58,7 +58,7 @@ export async function sendWeeklySummary(
     activitiesCompleted: number;
     totalMinutes: number;
     topCategory: string;
-    streak: number;
+    daysOfLearning: number;
     weekStart: string;
     weekEnd: string;
   }

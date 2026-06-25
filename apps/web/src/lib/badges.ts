@@ -1,5 +1,12 @@
-// ─── Badge Definitions & Calculation Logic ───────────────
-// Real badge system that computes earned badges from activity log data.
+// ─── Badge / progress helper functions ───────────────────
+//
+// The Hedge has no points, no streaks, no leaderboards, no guilt.
+// These remain as pure, side-effect-free helpers for honest,
+// backward-looking reflection only. They must NOT be wired up to
+// drive streak or score notifications, nudges, or any competitive
+// "keep it going" / "X to go" framing. `buildCalendarHeatmap` is a
+// gentle activity view; the streak/badge calculators below are kept
+// for reference but are no longer used to push or rank families.
 
 export interface BadgeDefinition {
   id: string;

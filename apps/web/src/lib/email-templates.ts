@@ -159,7 +159,7 @@ export function weeklySummaryTemplate(stats: {
   activitiesCompleted: number;
   totalMinutes: number;
   topCategory: string;
-  streak: number;
+  daysOfLearning: number;
   weekStart: string;
   weekEnd: string;
 }): string {
@@ -191,8 +191,8 @@ export function weeklySummaryTemplate(stats: {
       </tr>
       <tr>
         <td style="padding:12px 0;">
-          <span style="font-size:14px;color:${COLORS.clay};">Current streak</span>
-          <span style="float:right;font-size:14px;font-weight:600;color:${COLORS.ink};">${stats.streak} day${stats.streak !== 1 ? 's' : ''}</span>
+          <span style="font-size:14px;color:${COLORS.clay};">Days of learning</span>
+          <span style="float:right;font-size:14px;font-weight:600;color:${COLORS.ink};">${stats.daysOfLearning} day${stats.daysOfLearning !== 1 ? 's' : ''}</span>
         </td>
       </tr>
     </table>

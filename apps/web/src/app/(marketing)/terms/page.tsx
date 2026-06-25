@@ -78,7 +78,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-ink">7. Intellectual property</h2>
-            <p>Activity content, designs, and the Hedge Score algorithm are the intellectual property of The Hedge. You may not reproduce, distribute, or create derivative works from our content without permission.</p>
+            <p>Our activity content, curriculum mapping, and software are the intellectual property of The Hedge. You may not reproduce, distribute, or create derivative works from our content without permission.</p>
             <p>Photos and diary entries you upload remain your property. By uploading them, you grant us permission to store and display them within your family account.</p>
           </section>
 

@@ -161,7 +161,6 @@ export default async function DashboardPage() {
   }
 
   // Transform to a shape the client can use
-  const todayStr = new Date().toISOString().split('T')[0];
   const dayNames = [
     'Sunday',
     'Monday',
@@ -201,34 +200,6 @@ export default async function DashboardPage() {
     });
   });
 
-  // Calculate streak
-  let streak = 0;
-  if (familyId) {
-    const { data: logDates } = await supabase
-      .from('activity_logs')
-      .select('date')
-      .eq('family_id', familyId)
-      .order('date', { ascending: false })
-      .limit(365);
-
-    if (logDates && logDates.length > 0) {
-      const uniqueDates = [...new Set(logDates.map((l) => l.date))]
-        .sort()
-        .reverse();
-      let checkDate = new Date(todayStr);
-
-      for (const dateStr of uniqueDates) {
-        const checkStr = checkDate.toISOString().split('T')[0];
-        if (dateStr === checkStr) {
-          streak++;
-          checkDate.setDate(checkDate.getDate() - 1);
-        } else if (dateStr < checkStr) {
-          break;
-        }
-      }
-    }
-  }
-
   // Calculate activities this week and total logged
   let activitiesThisWeek = 0;
   let activitiesLogged = 0;
@@ -261,7 +232,6 @@ export default async function DashboardPage() {
       isRaining={isRaining}
       temperature={weather?.temperature}
       weatherDescription={weather?.weatherLabel}
-      streak={streak}
       activitiesThisWeek={activitiesThisWeek}
       planActivities={planActivities}
       isFreeUser={effectiveTier === 'free'}

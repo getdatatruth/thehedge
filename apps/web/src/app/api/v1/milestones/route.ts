@@ -7,8 +7,14 @@ export async function OPTIONS() {
 }
 
 // ── Milestone Definitions ────────────────────────────────────
-// Each milestone has an ID, display info, and a check function
-// that determines whether it's achieved and what progress looks like.
+//
+// The Hedge has no points, no streaks, no leaderboards, no guilt.
+// "Milestones" here are gentle, backward-looking reflections on what
+// a family has actually done together (e.g. "10 activities so far").
+// There are no streaks, no competitive targets, and nothing to chase.
+//
+// Each milestone has an ID, display info, and a flag for whether it
+// has happened yet, with an optional warm description.
 
 interface MilestoneResult {
   id: string;
@@ -17,8 +23,6 @@ interface MilestoneResult {
   achieved: boolean;
   achievedDate?: string;
   description?: string;
-  progress?: number;
-  target?: number;
 }
 
 const ALL_CATEGORIES = [
@@ -36,56 +40,6 @@ function formatAge(months: number): string {
 
 function monthsBetween(from: Date, to: Date): number {
   return (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
-}
-
-/**
- * Calculate the longest streak from a sorted (descending) array of date strings.
- */
-function calculateLongestStreak(sortedDatesDesc: string[]): number {
-  if (sortedDatesDesc.length === 0) return 0;
-
-  // Deduplicate and sort ascending
-  const unique = [...new Set(sortedDatesDesc)].sort();
-  let longest = 1;
-  let current = 1;
-
-  for (let i = 1; i < unique.length; i++) {
-    const prev = new Date(unique[i - 1]);
-    const curr = new Date(unique[i]);
-    const diffDays = Math.round((curr.getTime() - prev.getTime()) / 86400000);
-    if (diffDays === 1) {
-      current++;
-      longest = Math.max(longest, current);
-    } else {
-      current = 1;
-    }
-  }
-
-  return longest;
-}
-
-/**
- * Calculate current streak from today backwards.
- */
-function calculateCurrentStreak(sortedDatesDesc: string[]): number {
-  if (sortedDatesDesc.length === 0) return 0;
-
-  const unique = [...new Set(sortedDatesDesc)].sort().reverse();
-  const todayStr = new Date().toISOString().split('T')[0];
-  let checkDate = new Date(todayStr);
-  let streak = 0;
-
-  for (const dateStr of unique) {
-    const checkStr = checkDate.toISOString().split('T')[0];
-    if (dateStr === checkStr) {
-      streak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    } else if (dateStr < checkStr) {
-      break;
-    }
-  }
-
-  return streak;
 }
 
 /**
@@ -148,8 +102,6 @@ export async function GET(request: NextRequest) {
 
   const dates = logs.map((l) => l.date as string);
   const uniqueDates = [...new Set(dates)].sort().reverse();
-  const currentStreak = calculateCurrentStreak(dates);
-  const longestStreak = calculateLongestStreak(dates);
 
   // Categories explored
   const categoriesSet = new Set<string>();
@@ -184,7 +136,7 @@ export async function GET(request: NextRequest) {
       emoji: '\u{1F331}',
       achieved: totalActivities >= 1,
       achievedDate: firstActivityDate || undefined,
-      description: 'You logged your first family activity!',
+      description: 'You logged your first family activity together.',
     },
     {
       id: 'first_week',
@@ -192,63 +144,48 @@ export async function GET(request: NextRequest) {
       emoji: '\u2B50',
       achieved: hasFirstWeekActivity && daysSinceJoined >= 7,
       achievedDate: firstWeekAchievedDate || undefined,
-      description: '7 days of learning together',
+      description: 'You shared some learning in your first week together.',
     },
     {
       id: '10_activities',
       name: '10 Activities',
       emoji: '\u{1F680}',
       achieved: totalActivities >= 10,
-      ...(totalActivities < 10
-        ? { progress: totalActivities, target: 10 }
-        : { description: 'Double digits - you are on a roll!' }),
-    },
-    {
-      id: '30_day_streak',
-      name: '30-Day Streak',
-      emoji: '\u{1F525}',
-      achieved: longestStreak >= 30,
-      ...(longestStreak < 30
-        ? { progress: Math.max(currentStreak, longestStreak), target: 30 }
-        : { description: 'A full month of daily learning!' }),
+      description: totalActivities >= 10
+        ? 'You have logged 10 activities so far. Lovely.'
+        : 'A note for when you have logged 10 activities together.',
     },
     {
       id: 'all_categories',
-      name: 'Category Explorer',
+      name: 'Every Area Explored',
       emoji: '\u{1F308}',
       achieved: categoriesExplored >= ALL_CATEGORIES.length,
-      ...(categoriesExplored < ALL_CATEGORIES.length
-        ? { progress: categoriesExplored, target: ALL_CATEGORIES.length }
-        : { description: 'You have explored every category!' }),
+      description: categoriesExplored >= ALL_CATEGORIES.length
+        ? 'You have explored every learning area together.'
+        : `You have explored ${categoriesExplored} of the learning areas so far.`,
     },
     {
       id: '100_activities',
-      name: 'Century Club',
+      name: 'A Hundred Moments',
       emoji: '\u{1F4AF}',
       achieved: totalActivities >= 100,
-      ...(totalActivities < 100
-        ? { progress: totalActivities, target: 100 }
-        : { description: '100 activities - incredible dedication!' }),
+      description: totalActivities >= 100
+        ? 'You have shared 100 activities together. What a journey.'
+        : 'A note for when you have shared 100 activities together.',
     },
     {
       id: '6_months',
       name: 'Half Year',
       emoji: '\u{1F389}',
       achieved: monthsSinceJoined >= 6,
-      description: '6 months with The Hedge',
-      ...(monthsSinceJoined < 6
-        ? { progress: monthsSinceJoined, target: 6 }
-        : {}),
+      description: '6 months with The Hedge.',
     },
     {
       id: '1_year',
       name: 'Anniversary',
       emoji: '\u{1F3C6}',
       achieved: monthsSinceJoined >= 12,
-      description: '1 year of family learning!',
-      ...(monthsSinceJoined < 12
-        ? { progress: monthsSinceJoined, target: 12 }
-        : {}),
+      description: '1 year of family learning.',
     },
   ];
 
@@ -301,8 +238,6 @@ export async function GET(request: NextRequest) {
       memberSince: family.created_at.split('T')[0],
       daysActive: uniqueDates.length,
       totalActivities,
-      longestStreak,
-      currentStreak,
       categoriesExplored,
       totalLearningHours: totalHours,
       childGrowth,

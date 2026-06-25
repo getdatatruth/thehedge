@@ -39,7 +39,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li>To personalise activity recommendations based on your children's ages and interests</li>
               <li>To provide weather-appropriate activity suggestions for your area</li>
-              <li>To track your family's learning progress and Hedge Score</li>
+              <li>To track your family's learning progress</li>
               <li>To generate curriculum-aligned weekly plans for homeschool families</li>
               <li>To send you activity reminders and progress updates (with your permission)</li>
               <li>To improve our service and develop new features</li>

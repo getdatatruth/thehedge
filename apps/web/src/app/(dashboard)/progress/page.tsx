@@ -1,82 +1,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ProgressClient } from './progress-client';
-import {
-  calculateBadges,
-  calculateStreak,
-  buildCalendarHeatmap,
-  type LogForBadges,
-} from '@/lib/badges';
 
 export const metadata = {
-  title: 'Progress & Badges - The Hedge',
+  title: 'Progress - The Hedge',
 };
 
-// ── Hedge Score Algorithm (mirrored from /api/v1/progress) ──
-
-const TIERS = [
-  { name: 'Seedling', emoji: '🌱', min: 0, max: 99 },
-  { name: 'Sprout', emoji: '🌿', min: 100, max: 249 },
-  { name: 'Sapling', emoji: '🌳', min: 250, max: 449 },
-  { name: 'Young Oak', emoji: '🌲', min: 450, max: 699 },
-  { name: 'Oak', emoji: '🏆', min: 700, max: 899 },
-  { name: 'Ancient Oak', emoji: '👑', min: 900, max: 1000 },
-];
-
-function calculateHedgeScore(stats: {
-  totalActivities: number;
-  currentStreak: number;
-  uniqueDays: number;
-  totalMinutes: number;
-  categoriesExplored: number;
-}) {
-  const volume = Math.min(250, stats.totalActivities);
-  const consistency = Math.min(250,
-    Math.min(150, stats.currentStreak * 5) +
-    Math.min(100, stats.uniqueDays)
-  );
-  const breadth = Math.min(250, stats.categoriesExplored * 25);
-  const depth = Math.min(250, Math.floor(stats.totalMinutes / 10));
-  return {
-    score: volume + consistency + breadth + depth,
-    breakdown: { volume, consistency, breadth, depth },
-  };
-}
-
-function getTierInfo(score: number) {
-  for (let i = TIERS.length - 1; i >= 0; i--) {
-    if (score >= TIERS[i].min) {
-      const tier = TIERS[i];
-      const nextTier = i < TIERS.length - 1 ? TIERS[i + 1] : null;
-      const tierRange = tier.max - tier.min;
-      const progress = tierRange > 0 ? Math.min(1, (score - tier.min) / tierRange) : 1;
-      return {
-        name: tier.name,
-        emoji: tier.emoji,
-        nextTier: nextTier?.name || null,
-        minScore: tier.min,
-        maxScore: tier.max,
-        progress,
-      };
-    }
-  }
-  return { name: 'Seedling', emoji: '🌱', nextTier: 'Sprout', minScore: 0, maxScore: 99, progress: 0 };
-}
-
-function computeAchievements(totalActivities: number, streak: number, categoriesExplored: number, totalMinutes: number, uniqueDays: number) {
-  return [
-    { id: 'first_activity', name: 'First Activity', emoji: '🌱', unlocked: totalActivities >= 1, requirement: 'Complete 1 activity', threshold: 1, current: totalActivities },
-    { id: 'streak_3', name: '3-Day Streak', emoji: '🔥', unlocked: streak >= 3 || uniqueDays >= 3, requirement: '3 days in a row', threshold: 3, current: streak },
-    { id: 'streak_7', name: 'Week Warrior', emoji: '⚡', unlocked: streak >= 7 || uniqueDays >= 7, requirement: '7 days in a row', threshold: 7, current: streak },
-    { id: 'ten_activities', name: 'Getting Going', emoji: '🚀', unlocked: totalActivities >= 10, requirement: '10 activities completed', threshold: 10, current: totalActivities },
-    { id: 'five_categories', name: 'Explorer', emoji: '🧭', unlocked: categoriesExplored >= 5, requirement: 'Try 5 different categories', threshold: 5, current: categoriesExplored },
-    { id: 'all_categories', name: 'Renaissance', emoji: '🌈', unlocked: categoriesExplored >= 10, requirement: 'Try all 10 categories', threshold: 10, current: categoriesExplored },
-    { id: 'fifty_activities', name: 'Half Century', emoji: '⭐', unlocked: totalActivities >= 50, requirement: '50 activities completed', threshold: 50, current: totalActivities },
-    { id: 'streak_30', name: 'Month Master', emoji: '👑', unlocked: streak >= 30, requirement: '30 days in a row', threshold: 30, current: streak },
-    { id: 'hundred_activities', name: 'Centurion', emoji: '🏆', unlocked: totalActivities >= 100, requirement: '100 activities completed', threshold: 100, current: totalActivities },
-    { id: 'ten_hours', name: 'Time Investor', emoji: '⏰', unlocked: totalMinutes >= 600, requirement: '10 hours of learning', threshold: 600, current: totalMinutes },
-  ];
-}
+const ALL_CATEGORIES = ['nature', 'kitchen', 'science', 'art', 'movement', 'literacy', 'maths', 'life_skills', 'calm', 'social'];
 
 export default async function ProgressPage() {
   const supabase = await createClient();
@@ -129,22 +59,13 @@ export default async function ProgressPage() {
     return activity?.category || null;
   }
 
-  const allLogsForBadges: LogForBadges[] = logs.map((log) => ({
-    date: log.date,
-    category: getCategory(log),
-    duration_minutes: log.duration_minutes,
-  }));
-
-  // Family-level calculations
-  const familyBadges = calculateBadges(allLogsForBadges);
-  const allDates = allLogsForBadges.map((l) => l.date);
-  const { current: currentStreak, longest: longestStreak } = calculateStreak(allDates);
-  const calendarData = buildCalendarHeatmap(allDates, 6);
-
+  // Family-level reflection stats
   const categoryCounts: Record<string, number> = {};
-  for (const log of allLogsForBadges) {
-    const cat = log.category || 'unknown';
+  const allDates: string[] = [];
+  for (const log of logs) {
+    const cat = getCategory(log) || 'unknown';
     categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+    allDates.push(log.date);
   }
 
   const now = new Date();
@@ -166,59 +87,31 @@ export default async function ProgressPage() {
     monthlyActivity.push({ month: monthName, count });
   }
 
-  // Hedge Score
-  const uniqueDates = [...new Set(allDates)];
+  const uniqueDays = new Set(allDates).size;
   const totalMinutes = logs.reduce((sum, l) => sum + (l.duration_minutes || 0), 0);
-  const categoriesExplored = Object.keys(categoryCounts).filter(k => k !== 'unknown').length;
-  const hedgeScore = calculateHedgeScore({
-    totalActivities: logs.length,
-    currentStreak,
-    uniqueDays: uniqueDates.length,
-    totalMinutes,
-    categoriesExplored,
-  });
-  const tier = getTierInfo(hedgeScore.score);
+  const areasExplored = Object.keys(categoryCounts).filter((k) => k !== 'unknown').length;
+  const ratedLogs = logs.filter((l) => l.rating != null && l.rating > 0);
+  const averageRating = ratedLogs.length > 0
+    ? (ratedLogs.reduce((sum, l) => sum + (l.rating || 0), 0) / ratedLogs.length)
+    : null;
 
-  // Achievements
-  const achievements = computeAchievements(logs.length, currentStreak, categoriesExplored, totalMinutes, uniqueDates.length);
-
-  // Milestones
-  const milestones = [
-    { id: 'first_week', name: 'First week complete', done: uniqueDates.length >= 7 },
-    { id: 'ten_activities', name: '10 activities logged', done: logs.length >= 10 },
-    { id: 'all_categories', name: 'All categories explored', done: categoriesExplored >= 10 },
-    { id: 'streak_30', name: '30-day streak', done: currentStreak >= 30 },
-  ];
-
-  // Per-child stats
+  // Per-child reflection stats
   const childStats = childrenWithAge.map((child) => {
     const childLogs = logs.filter(
       (l) => Array.isArray(l.child_ids) && l.child_ids.includes(child.id)
     );
-    const childLogsForBadges: LogForBadges[] = childLogs.map((log) => ({
-      date: log.date,
-      category: getCategory(log),
-      duration_minutes: log.duration_minutes,
-    }));
-    const childDates = childLogsForBadges.map((l) => l.date);
-    const childStreak = calculateStreak(childDates);
-    const childBadges = calculateBadges(childLogsForBadges);
     const childCategoryCounts: Record<string, number> = {};
-    for (const log of childLogsForBadges) {
-      const cat = log.category || 'unknown';
+    const childDates: string[] = [];
+    for (const log of childLogs) {
+      const cat = getCategory(log) || 'unknown';
       childCategoryCounts[cat] = (childCategoryCounts[cat] || 0) + 1;
+      childDates.push(log.date);
     }
     const childTotalMinutes = childLogs.reduce((sum, l) => sum + (l.duration_minutes || 0), 0);
-    const childUniqueDates = [...new Set(childDates)];
-    const childCatsExplored = Object.keys(childCategoryCounts).filter(k => k !== 'unknown').length;
-    const childHedgeScore = calculateHedgeScore({
-      totalActivities: childLogs.length,
-      currentStreak: childStreak.current,
-      uniqueDays: childUniqueDates.length,
-      totalMinutes: childTotalMinutes,
-      categoriesExplored: childCatsExplored,
-    });
-    const childTier = getTierInfo(childHedgeScore.score);
+    const childRated = childLogs.filter((l) => l.rating != null && l.rating > 0);
+    const childAverageRating = childRated.length > 0
+      ? (childRated.reduce((sum, l) => sum + (l.rating || 0), 0) / childRated.length)
+      : null;
 
     return {
       id: child.id,
@@ -227,15 +120,10 @@ export default async function ProgressPage() {
       interests: child.interests || [],
       totalActivities: childLogs.length,
       totalMinutes: childTotalMinutes,
-      currentStreak: childStreak.current,
-      longestStreak: childStreak.longest,
+      uniqueDays: new Set(childDates).size,
       categoryCounts: childCategoryCounts,
-      categoriesCovered: childCatsExplored,
-      badgesEarned: childBadges.filter((b) => b.unlocked).length,
-      badges: childBadges,
-      calendarData: buildCalendarHeatmap(childDates, 6),
-      hedgeScore: childHedgeScore,
-      tier: childTier,
+      areasExplored: Object.keys(childCategoryCounts).filter((k) => k !== 'unknown').length,
+      averageRating: childAverageRating,
     };
   });
 
@@ -243,19 +131,15 @@ export default async function ProgressPage() {
     <ProgressClient
       totalActivities={logs.length}
       totalMinutes={totalMinutes}
-      currentStreak={currentStreak}
-      longestStreak={longestStreak}
+      uniqueDays={uniqueDays}
       activitiesThisWeek={activitiesThisWeek}
+      areasExplored={areasExplored}
+      totalAreas={ALL_CATEGORIES.length}
+      averageRating={averageRating}
       categoryCounts={categoryCounts}
       childStats={childStats}
-      badges={familyBadges}
-      calendarData={calendarData}
       monthlyActivity={monthlyActivity}
-      hedgeScore={hedgeScore}
-      tier={tier}
-      achievements={achievements}
-      milestones={milestones}
-      children={childrenWithAge.map(c => ({ id: c.id, name: c.name, age: c.age }))}
+      children={childrenWithAge.map((c) => ({ id: c.id, name: c.name, age: c.age }))}
     />
   );
 }

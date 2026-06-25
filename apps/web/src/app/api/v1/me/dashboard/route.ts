@@ -81,21 +81,8 @@ export async function GET(request: NextRequest) {
   const allLogs = logs || [];
   const activitiesThisWeek = allLogs.filter((l) => l.date >= mondayStr).length;
 
-  // Streak calculation
-  const uniqueDates = [...new Set(allLogs.map((l) => l.date))].sort().reverse();
-  let streak = 0;
-  const todayStr = now.toISOString().split('T')[0];
-  const checkDate = new Date(todayStr);
-
-  for (const dateStr of uniqueDates) {
-    const checkStr = checkDate.toISOString().split('T')[0];
-    if (dateStr === checkStr) {
-      streak++;
-      checkDate.setDate(checkDate.getDate() - 1);
-    } else if (dateStr < checkStr) {
-      break;
-    }
-  }
+  // Distinct days with any learning logged (honest count, never a "streak")
+  const daysOfLearning = new Set(allLogs.map((l) => l.date)).size;
 
   // Get a few suggested activities for today
   const { data: activities } = await supabase
@@ -128,7 +115,7 @@ export async function GET(request: NextRequest) {
     firstName: profile.name?.split(' ')[0] || 'there',
     familyName: (family as any)?.name || 'Your family',
     weather,
-    streak,
+    daysOfLearning,
     activitiesThisWeek,
     todayActivities: activities || [],
     featuredCollections: collections,

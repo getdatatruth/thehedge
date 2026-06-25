@@ -1,6 +1,14 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { calculateBadges, calculateStreak, buildCalendarHeatmap, type LogForBadges } from '@/lib/badges';
+import { buildCalendarHeatmap, type LogForBadges } from '@/lib/badges';
+
+// ── Progress, the gentle way ───────────────────────────────
+//
+// The Hedge does not score, rank, or streak families. Our brand
+// promise is no points, no streaks, no leaderboards, no guilt. We
+// surface honest raw counts (activities, minutes, unique days,
+// breadth of areas) as warm, backward-looking reflection.
+//
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,14 +77,10 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Calculate badges
-    const badges = calculateBadges(logsForBadges);
-
-    // Calculate streaks
+    // Distinct days with any learning logged (honest count, never a "streak")
     const dates = logsForBadges.map((l) => l.date);
-    const { current: currentStreak, longest: longestStreak } = calculateStreak(dates);
 
-    // Calendar heatmap
+    // Calendar heatmap (a gentle backward-looking view, not a target)
     const calendarData = buildCalendarHeatmap(dates, 6);
 
     // Category breakdown
@@ -89,6 +93,8 @@ export async function GET(request: NextRequest) {
     // Total stats
     const totalActivities = filteredLogs.length;
     const totalMinutes = filteredLogs.reduce((sum, l) => sum + (l.duration_minutes || 0), 0);
+    const uniqueDays = new Set(dates).size;
+    const areasExplored = Object.keys(categoryCounts).filter((k) => k !== 'unknown').length;
 
     // This week
     const now = new Date();
@@ -124,15 +130,12 @@ export async function GET(request: NextRequest) {
       });
 
       const childDates = childLogsForBadges.map((l) => l.date);
-      const childStreak = calculateStreak(childDates);
 
       const childCategoryCounts: Record<string, number> = {};
       for (const log of childLogsForBadges) {
         const cat = log.category || 'unknown';
         childCategoryCounts[cat] = (childCategoryCounts[cat] || 0) + 1;
       }
-
-      const childBadges = calculateBadges(childLogsForBadges);
 
       return {
         id: child.id,
@@ -141,12 +144,9 @@ export async function GET(request: NextRequest) {
         interests: child.interests || [],
         totalActivities: childLogs.length,
         totalMinutes: childLogs.reduce((sum, l) => sum + (l.duration_minutes || 0), 0),
-        currentStreak: childStreak.current,
-        longestStreak: childStreak.longest,
+        uniqueDays: new Set(childDates).size,
         categoryCounts: childCategoryCounts,
         categoriesCovered: Object.keys(childCategoryCounts).filter((k) => k !== 'unknown').length,
-        badgesEarned: childBadges.filter((b) => b.unlocked).length,
-        badges: childBadges,
         calendarData: buildCalendarHeatmap(childDates, 6),
       };
     });
@@ -165,11 +165,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       totalActivities,
       totalMinutes,
-      currentStreak,
-      longestStreak,
+      uniqueDays,
+      areasExplored,
       activitiesThisWeek,
       categoryCounts,
-      badges,
       calendarData,
       childStats,
       monthlyActivity,

@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
   // Fetch additional data needed for personalized notifications
   let familyStats: Map<string, Record<string, unknown>> = new Map();
 
-  if (['streak_risk', 'day_review', 'week_review', 'month_review'].includes(type)) {
+  if (['day_review', 'week_review', 'month_review'].includes(type)) {
     // Get activity log counts for relevant families
     const today = new Date().toISOString().split('T')[0];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -200,32 +200,6 @@ export async function POST(request: NextRequest) {
         .gte('date', weekAgo);
 
       stats.weekCount = weekCount || 0;
-
-      // Calculate streak (count consecutive days with activity logs going back from today)
-      const { data: recentLogs } = await supabase
-        .from('activity_logs')
-        .select('date')
-        .eq('family_id', familyId)
-        .lte('date', today)
-        .order('date', { ascending: false })
-        .limit(60);
-
-      let streak = 0;
-      if (recentLogs?.length) {
-        const uniqueDates = [...new Set(recentLogs.map((l) => l.date))].sort().reverse();
-        const todayDate = new Date(today);
-        for (let i = 0; i < uniqueDates.length; i++) {
-          const expectedDate = new Date(todayDate);
-          expectedDate.setDate(todayDate.getDate() - i);
-          const expected = expectedDate.toISOString().split('T')[0];
-          if (uniqueDates[i] === expected) {
-            streak++;
-          } else {
-            break;
-          }
-        }
-      }
-      stats.streak = streak;
 
       // Get categories covered this week
       const { data: weekLogs } = await supabase
@@ -441,16 +415,10 @@ function generateContent(
     }
 
     case 'streak_risk': {
-      const streak = (stats?.streak as number) || 0;
-      if (streak > 0) {
-        return {
-          title: `Keep your streak alive!`,
-          body: `You're on a ${streak}-day streak! Log an activity before bed to keep it going.`,
-        };
-      }
+      // No streaks, no guilt. A warm, optional evening nudge with nothing to lose.
       return {
-        title: `Start a new streak!`,
-        body: `Log an activity today to start building your learning streak.`,
+        title: `A gentle nudge for your evening`,
+        body: `If you had a learning moment with ${childList} today, you might like to jot it down. No pressure at all.`,
       };
     }
 
@@ -497,11 +465,10 @@ function generateContent(
 
     case 'week_review': {
       const weekCount = (stats?.weekCount as number) || 0;
-      const streak = (stats?.streak as number) || 0;
       const hours = (stats?.weekHours as number) || 0;
       return {
         title: `Your week in review`,
-        body: `This week: ${weekCount} ${weekCount === 1 ? 'activity' : 'activities'}, ${hours} ${hours === 1 ? 'hour' : 'hours'}, ${streak}-day streak! Great work, ${userName}.`,
+        body: `This week you shared ${weekCount} ${weekCount === 1 ? 'activity' : 'activities'} and around ${hours} ${hours === 1 ? 'hour' : 'hours'} of learning with ${childList}. Lovely work, ${userName}.`,
       };
     }
 

@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         .select('*', { count: 'exact', head: true })
         .eq('family_id', profile.family_id);
 
-      // First activity ever
+      // First activity ever - a gentle, one-off welcome (no streaks, no points)
       if (totalLogs === 1) {
         await createNotification(supabase, profile.family_id, {
           type: 'achievement',
@@ -78,42 +78,6 @@ export async function POST(request: NextRequest) {
           body: 'This is the start of something wonderful. Keep exploring and learning together!',
           actionUrl: '/timeline',
         });
-      }
-
-      // Streak milestone check - count distinct dates in a row ending today
-      const { data: recentDates } = await supabase
-        .from('activity_logs')
-        .select('date')
-        .eq('family_id', profile.family_id)
-        .order('date', { ascending: false })
-        .limit(31);
-
-      if (recentDates && recentDates.length > 0) {
-        const uniqueDates = [...new Set(recentDates.map((r) => r.date))].sort(
-          (a, b) => new Date(b).getTime() - new Date(a).getTime()
-        );
-
-        let streak = 1;
-        for (let i = 1; i < uniqueDates.length; i++) {
-          const prev = new Date(uniqueDates[i - 1]);
-          const curr = new Date(uniqueDates[i]);
-          const diffDays = (prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24);
-          if (diffDays === 1) {
-            streak++;
-          } else {
-            break;
-          }
-        }
-
-        const milestones = [3, 7, 14, 30];
-        if (milestones.includes(streak)) {
-          await createNotification(supabase, profile.family_id, {
-            type: 'streak',
-            title: `${streak}-day streak!`,
-            body: `Amazing! Your family has logged activities ${streak} days in a row. Keep the momentum going!`,
-            actionUrl: '/timeline',
-          });
-        }
       }
     } catch (notifErr) {
       // Don't fail the main request if notification creation fails
