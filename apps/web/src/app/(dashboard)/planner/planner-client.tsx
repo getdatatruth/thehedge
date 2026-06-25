@@ -564,7 +564,7 @@ export function PlannerClient({
             Plan your <em className="text-moss italic">week</em>
           </h1>
         </div>
-        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone/40 bg-white">
           <div className="text-center px-4 max-w-sm">
             <TreePine className="mx-auto mb-4 h-10 w-10 text-stone" />
             <p className="font-display text-xl text-ink font-light mb-2">
@@ -605,7 +605,7 @@ export function PlannerClient({
           <div className="flex items-center gap-1">
             <button
               onClick={() => navigateWeek(-1)}
-              className="p-2 rounded border border-stone hover:border-moss/30 transition-colors text-clay hover:text-ink"
+              className="p-2 rounded-full border border-stone/40 bg-white hover:border-moss/40 transition-all text-clay hover:text-ink"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -617,7 +617,7 @@ export function PlannerClient({
             </button>
             <button
               onClick={() => navigateWeek(1)}
-              className="p-2 rounded border border-stone hover:border-moss/30 transition-colors text-clay hover:text-ink"
+              className="p-2 rounded-full border border-stone/40 bg-white hover:border-moss/40 transition-all text-clay hover:text-ink"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -643,16 +643,16 @@ export function PlannerClient({
           />
 
           {/* View toggle */}
-          <div className="flex items-center border border-stone rounded overflow-hidden print:hidden">
+          <div className="flex items-center gap-1 rounded-full border border-stone/40 bg-white p-1 print:hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 text-xs ${viewMode === 'grid' ? 'bg-forest text-parchment' : 'text-clay hover:bg-linen'}`}
+              className={`p-1.5 rounded-full text-xs transition-all ${viewMode === 'grid' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
             >
               <Calendar className="h-4 w-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 text-xs ${viewMode === 'list' ? 'bg-forest text-parchment' : 'text-clay hover:bg-linen'}`}
+              className={`p-1.5 rounded-full text-xs transition-all ${viewMode === 'list' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
             >
               <BarChart3 className="h-4 w-4" />
             </button>
@@ -703,10 +703,10 @@ export function PlannerClient({
             <button
               key={child.id}
               onClick={() => setSelectedChild(child.id)}
-              className={`rounded px-4 py-2 text-[12px] font-bold transition-all ${
+              className={`rounded-full px-4 py-2 text-[12px] font-bold transition-all ${
                 selectedChild === child.id
                   ? 'bg-forest text-parchment'
-                  : 'bg-linen text-clay border border-stone hover:border-moss/30'
+                  : 'bg-white text-clay border border-stone/40 hover:border-moss/40'
               }`}
             >
               {child.name}
@@ -786,7 +786,7 @@ export function PlannerClient({
               %
             </span>
           </div>
-          <div className="h-2.5 w-full rounded-full bg-linen">
+          <div className="h-2.5 w-full rounded-full bg-stone/20">
             <div
               className="h-full rounded-full bg-gradient-to-r from-forest to-fern transition-all duration-500"
               style={{
@@ -826,7 +826,7 @@ export function PlannerClient({
 
       {/* Empty state */}
       {!hasPlans && (
-        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone/40 bg-white">
           <div className="text-center px-4 max-w-md">
             <Calendar className="mx-auto mb-4 h-10 w-10 text-stone" />
             <p className="font-display text-2xl text-ink font-light mb-2">
@@ -862,10 +862,10 @@ export function PlannerClient({
         <div className="flex gap-2 overflow-x-auto pb-2 sm:hidden -mx-4 px-4 scrollbar-none print:hidden">
           <button
             onClick={() => setSelectedDay(null)}
-            className={`shrink-0 rounded px-3 py-2 text-[11px] font-bold transition-all ${
+            className={`shrink-0 rounded-full px-3 py-2 text-[11px] font-bold transition-all ${
               selectedDay === null
                 ? 'bg-forest text-parchment'
-                : 'bg-linen text-clay border border-stone'
+                : 'bg-white text-clay border border-stone/40'
             }`}
           >
             All
@@ -884,14 +884,14 @@ export function PlannerClient({
                 onClick={() =>
                   setSelectedDay(selectedDay === date ? null : date)
                 }
-                className={`shrink-0 rounded px-3 py-2 text-[11px] font-bold transition-all ${
+                className={`shrink-0 rounded-full px-3 py-2 text-[11px] font-bold transition-all ${
                   selectedDay === date
                     ? 'bg-forest text-parchment'
                     : today
-                      ? 'bg-moss/10 text-moss border border-moss/20'
+                      ? 'bg-white text-moss border border-moss/40'
                       : allDone
-                        ? 'bg-sage/10 text-moss border border-sage/20'
-                        : 'bg-linen text-clay border border-stone'
+                        ? 'bg-white text-moss border border-moss/30'
+                        : 'bg-white text-clay border border-stone/40'
                 }`}
               >
                 {DAY_NAMES[i]}
@@ -935,12 +935,12 @@ export function PlannerClient({
             return (
               <div
                 key={date}
-                className={`group rounded-xl border transition-all ${
+                className={`group rounded-2xl border bg-white shadow-sm transition-all ${
                   today
-                    ? 'border-moss/40 bg-moss/5 ring-1 ring-moss/20'
+                    ? 'border-moss/40 ring-1 ring-moss/20'
                     : isWeekend && !plan
-                      ? 'border-stone/50 bg-parchment/50'
-                      : 'border-stone bg-linen'
+                      ? 'border-stone/30'
+                      : 'border-stone/40 hover:border-moss/40'
                 }`}
               >
                 {/* Day header */}
@@ -1016,12 +1016,12 @@ export function PlannerClient({
                           return (
                             <div
                               key={blockIndex}
-                              className={`group/block relative rounded-lg border p-2 mb-1 transition-all ${
+                              className={`group/block relative rounded-xl border p-2 mb-1 transition-all ${
                                 block.completed
-                                  ? 'bg-sage/10 border-sage/20'
+                                  ? 'bg-white border-moss/30'
                                   : past
-                                    ? 'bg-parchment/80 border-stone/30 opacity-60'
-                                    : 'bg-parchment border-stone/40 hover:border-moss/30'
+                                    ? 'bg-white border-stone/30 opacity-60'
+                                    : 'bg-white border-stone/40 hover:border-moss/40'
                               }`}
                             >
                               {/* Controls row */}
@@ -1069,9 +1069,9 @@ export function PlannerClient({
                                       )
                                     }
                                     disabled={isUpdating}
-                                    className={`flex h-5 w-5 items-center justify-center rounded transition-all print:hidden ${
+                                    className={`flex h-5 w-5 items-center justify-center rounded-md transition-all print:hidden ${
                                       block.completed
-                                        ? 'bg-sage text-parchment'
+                                        ? 'bg-moss text-parchment'
                                         : 'border border-stone/40 hover:border-moss/50 text-transparent hover:text-moss/30'
                                     }`}
                                   >
@@ -1130,7 +1130,7 @@ export function PlannerClient({
                             onClick={() =>
                               setShowAddModal({ date, slot: slot.key })
                             }
-                            className="w-full rounded-lg border border-dashed border-stone/30 p-2 mb-1 text-[10px] text-clay/30 hover:border-moss/30 hover:text-moss/50 transition-all flex items-center justify-center gap-1 print:hidden"
+                            className="w-full rounded-xl border border-dashed border-stone/40 p-2 mb-1 text-[10px] text-clay/40 hover:border-moss/40 hover:text-moss/50 transition-all flex items-center justify-center gap-1 print:hidden"
                           >
                             <Plus className="h-3 w-3" />
                             Add
@@ -1205,8 +1205,8 @@ export function PlannerClient({
                 <div
                   className={`px-5 py-3 border-b flex items-center justify-between ${
                     today
-                      ? 'bg-moss/5 border-moss/20'
-                      : 'bg-linen border-stone/30'
+                      ? 'border-moss/20'
+                      : 'border-stone/30'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -1261,7 +1261,7 @@ export function PlannerClient({
                       <div
                         key={blockIndex}
                         className={`group flex items-center gap-4 px-5 py-3 transition-all ${
-                          block.completed ? 'bg-sage/5' : ''
+                          block.completed ? 'bg-moss/[0.03]' : ''
                         }`}
                       >
                         {/* Completion toggle */}
@@ -1272,7 +1272,7 @@ export function PlannerClient({
                           disabled={isUpdating}
                           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-all print:hidden ${
                             block.completed
-                              ? 'bg-sage text-parchment'
+                              ? 'bg-moss text-parchment'
                               : 'border border-stone/40 hover:border-moss/50 text-transparent hover:text-moss/30'
                           }`}
                         >
@@ -1423,7 +1423,7 @@ export function PlannerClient({
                         </span>
                       )}
                       {activity.season?.includes(getSeason()) && (
-                        <span className="tag bg-sage/10 text-sage text-[8px]">
+                        <span className="tag bg-moss/10 text-moss text-[8px]">
                           Seasonal
                         </span>
                       )}
@@ -1444,7 +1444,7 @@ export function PlannerClient({
                         'morning';
                       addActivityToSlot(activity, targetDate, freeSlot);
                     }}
-                    className="shrink-0 p-2 rounded-lg border border-stone/40 hover:border-moss/30 hover:bg-moss/5 transition-all"
+                    className="shrink-0 p-2 rounded-xl border border-stone/40 hover:border-moss/40 hover:bg-moss/5 transition-all"
                     title="Add to plan"
                   >
                     <Plus className="h-4 w-4 text-moss" />
@@ -1510,7 +1510,7 @@ export function PlannerClient({
                 placeholder="Search activities..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-stone bg-parchment pl-10 pr-4 py-2.5 text-sm text-ink placeholder:text-clay/40 focus:outline-none focus:ring-1 focus:ring-moss/30 focus:border-moss/30"
+                className="w-full rounded-xl border border-stone/40 bg-white pl-10 pr-4 py-2.5 text-sm text-ink placeholder:text-clay/40 focus:outline-none focus:ring-1 focus:ring-moss/30 focus:border-moss/40"
                 autoFocus
               />
             </div>

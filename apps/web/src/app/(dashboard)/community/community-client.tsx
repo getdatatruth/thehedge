@@ -538,7 +538,7 @@ export function CommunityClient({
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-cat-nature mb-2">Connect</p>
-          <h1 className="text-3xl sm:text-4xl font-light text-umber tracking-tight">
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold text-umber tracking-tight">
             Community
           </h1>
           <p className="text-clay mt-2 text-base">
@@ -555,7 +555,7 @@ export function CommunityClient({
                   setNewPostGroupId(myGroups[0].id);
                 }
               }}
-              className="rounded-2xl bg-forest text-parchment text-xs py-2 px-4 flex items-center gap-1.5 font-medium hover:bg-forest/90 transition-colors"
+              className="rounded-2xl bg-forest text-parchment text-xs py-2.5 px-4 flex items-center gap-1.5 font-medium hover:bg-forest/90 transition-colors"
             >
               <Plus className="h-3.5 w-3.5" />
               New Post
@@ -565,15 +565,15 @@ export function CommunityClient({
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-stone/30">
+      <div className="flex items-center gap-2">
         {tabs.map(({ id, label, icon: Icon, count }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-4 py-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all -mb-px ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-2xl transition-all ${
               activeTab === id
-                ? 'border-cat-nature text-umber'
-                : 'border-transparent text-clay/50 hover:text-clay'
+                ? 'bg-forest text-parchment'
+                : 'bg-white border border-stone/40 text-clay hover:border-moss/40 hover:text-umber'
             }`}
           >
             <Icon className="h-4 w-4" />
@@ -582,8 +582,8 @@ export function CommunityClient({
               <span
                 className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
                   activeTab === id
-                    ? 'bg-cat-nature/15 text-cat-nature'
-                    : 'bg-stone/20 text-clay/50'
+                    ? 'bg-parchment/20 text-parchment'
+                    : 'bg-stone/20 text-clay/60'
                 }`}
               >
                 {count}
@@ -604,7 +604,7 @@ export function CommunityClient({
                 ? 'Search groups...'
                 : 'Search events...'
           }
-          className="h-11 pl-10 rounded-2xl border-none bg-white shadow-sm"
+          className="h-11 pl-10 rounded-2xl border border-stone/40 bg-white shadow-sm focus-visible:border-moss/40"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -627,7 +627,7 @@ export function CommunityClient({
                 className={`rounded-2xl px-3 py-1.5 text-xs font-medium transition-all ${
                   !postTypeFilter && !selectedGroupFilter
                     ? 'bg-forest text-parchment'
-                    : 'bg-white text-clay shadow-sm hover:shadow'
+                    : 'bg-white border border-stone/40 text-clay hover:border-moss/40'
                 }`}
               >
                 All
@@ -639,19 +639,25 @@ export function CommunityClient({
                   <button
                     key={key}
                     onClick={() => setPostTypeFilter(postTypeFilter === key ? null : key)}
-                    className="rounded-2xl px-3 py-1.5 text-xs font-medium transition-all"
-                    style={{
-                      backgroundColor: isActive ? color : `${color}15`,
-                      color: isActive ? '#fff' : color,
-                    }}
+                    className={`rounded-2xl px-3 py-1.5 text-xs font-medium transition-all ${
+                      isActive
+                        ? 'bg-forest text-parchment'
+                        : 'bg-white border border-stone/40 text-clay hover:border-moss/40'
+                    }`}
                   >
-                    {label}
+                    <span className="inline-flex items-center gap-1.5">
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: isActive ? '#fff' : color }}
+                      />
+                      {label}
+                    </span>
                   </button>
                 );
               })}
               {myGroups.length > 1 && (
                 <>
-                  <span className="text-clay/20 mx-1">|</span>
+                  <span className="text-stone/40 mx-1">|</span>
                   {myGroups.map((g) => (
                     <button
                       key={g.id}
@@ -661,7 +667,7 @@ export function CommunityClient({
                       className={`rounded-2xl px-3 py-1.5 text-xs font-medium transition-all ${
                         selectedGroupFilter === g.id
                           ? 'bg-forest text-parchment'
-                          : 'bg-white text-clay shadow-sm hover:shadow'
+                          : 'bg-white border border-stone/40 text-clay hover:border-moss/40'
                       }`}
                     >
                       {g.name}
@@ -677,7 +683,7 @@ export function CommunityClient({
             const group = groups.find((g) => g.id === selectedGroupFilter);
             if (!group?.rules) return null;
             return (
-              <div className="bg-white rounded-2xl shadow-sm p-4">
+              <div className="bg-white border border-stone/40 shadow-sm rounded-2xl p-4">
                 <button
                   onClick={() =>
                     setRulesExpandedGroupId(
@@ -707,9 +713,9 @@ export function CommunityClient({
 
           {/* Create post form */}
           {showCreatePost && (
-            <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4 animate-fade-up">
+            <div className="bg-white border border-stone/40 shadow-sm rounded-2xl p-6 space-y-4 animate-fade-up">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-umber">Create a post</p>
+                <p className="font-display text-sm font-semibold text-umber">Create a post</p>
                 <button
                   onClick={() => setShowCreatePost(false)}
                   className="text-clay/30 hover:text-clay transition-colors"
@@ -721,7 +727,7 @@ export function CommunityClient({
                 <select
                   value={newPostGroupId}
                   onChange={(e) => setNewPostGroupId(e.target.value)}
-                  className="w-full h-10 rounded-2xl border-none bg-stone/10 px-3 text-sm text-umber"
+                  className="w-full h-10 rounded-2xl border border-stone/40 bg-white px-3 text-sm text-umber focus:outline-none focus:border-moss/40"
                 >
                   <option value="">Select a group</option>
                   {myGroups.map((g) => (
@@ -738,27 +744,32 @@ export function CommunityClient({
                       <button
                         key={t}
                         onClick={() => setNewPostType(t)}
-                        className="text-xs px-3 py-1.5 rounded-2xl capitalize transition-colors font-medium"
-                        style={{
-                          backgroundColor: isActive ? `${color}20` : 'transparent',
-                          color: isActive ? color : undefined,
-                          border: `1px solid ${isActive ? color : '#e5e2dd'}`,
-                        }}
+                        className={`text-xs px-3 py-1.5 rounded-2xl capitalize transition-all font-medium ${
+                          isActive
+                            ? 'bg-forest text-parchment'
+                            : 'bg-white border border-stone/40 text-clay hover:border-moss/40'
+                        }`}
                       >
-                        {t}
+                        <span className="inline-flex items-center gap-1.5">
+                          <span
+                            className="h-1.5 w-1.5 rounded-full"
+                            style={{ backgroundColor: isActive ? '#fff' : color }}
+                          />
+                          {t}
+                        </span>
                       </button>
                     );
                   })}
                 </div>
                 <Input
                   placeholder="Title"
-                  className="h-10 rounded-2xl border-none bg-stone/10"
+                  className="h-10 rounded-2xl border border-stone/40 bg-white focus-visible:border-moss/40"
                   value={newPostTitle}
                   onChange={(e) => setNewPostTitle(e.target.value)}
                 />
                 <textarea
                   placeholder="What's on your mind?"
-                  className="w-full h-24 rounded-2xl border-none bg-stone/10 px-4 py-3 text-sm text-umber resize-none focus:outline-none focus:ring-2 focus:ring-cat-nature/20"
+                  className="w-full h-24 rounded-2xl border border-stone/40 bg-white px-4 py-3 text-sm text-umber resize-none focus:outline-none focus:border-moss/40 focus:ring-2 focus:ring-moss/15"
                   value={newPostContent}
                   onChange={(e) => setNewPostContent(e.target.value)}
                 />
@@ -776,14 +787,14 @@ export function CommunityClient({
 
           {/* Posts list */}
           {filteredPosts.length === 0 ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-2xl bg-white shadow-sm">
+            <div className="flex min-h-[300px] items-center justify-center rounded-2xl bg-white border border-stone/40 shadow-sm">
               <div className="text-center px-6">
                 {myGroups.length === 0 ? (
                   <>
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cat-nature/10 mx-auto mb-4">
                       <Users className="h-7 w-7 text-cat-nature" />
                     </div>
-                    <p className="text-xl font-light text-umber mb-2">
+                    <p className="font-display text-xl font-semibold text-umber mb-2">
                       Join your first group
                     </p>
                     <p className="text-sm text-clay max-w-xs mx-auto mb-4">
@@ -808,7 +819,7 @@ export function CommunityClient({
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cat-nature/10 mx-auto mb-4">
                       <MessageCircle className="h-7 w-7 text-cat-nature" />
                     </div>
-                    <p className="text-xl font-light text-umber mb-2">
+                    <p className="font-display text-xl font-semibold text-umber mb-2">
                       Start the conversation
                     </p>
                     <p className="text-sm text-clay max-w-xs mx-auto mb-4">
@@ -845,7 +856,7 @@ export function CommunityClient({
                 return (
                   <div
                     key={post.id}
-                    className="bg-white rounded-2xl shadow-sm overflow-hidden transition-shadow hover:shadow-md"
+                    className="bg-white border border-stone/40 shadow-sm rounded-2xl overflow-hidden transition-all hover:border-moss/40"
                   >
                     <div className="p-5">
                       {/* Pinned indicator */}
@@ -897,7 +908,7 @@ export function CommunityClient({
                       </div>
 
                       {/* Post body */}
-                      <h3 className="text-[15px] font-medium text-umber mb-1.5">
+                      <h3 className="font-display text-[15px] font-semibold text-umber mb-1.5">
                         {post.title}
                       </h3>
                       <p className="text-[13px] text-clay leading-relaxed line-clamp-3">
@@ -955,7 +966,7 @@ export function CommunityClient({
 
                     {/* Comments section */}
                     {isExpanded && (
-                      <div className="border-t border-stone/20 bg-stone/5 px-5 py-4 space-y-4">
+                      <div className="border-t border-stone/30 bg-linen/40 px-5 py-4 space-y-4">
                         {loadingComments === post.id ? (
                           <div className="flex items-center justify-center py-4">
                             <Loader2 className="h-4 w-4 animate-spin text-clay" />
@@ -1021,7 +1032,7 @@ export function CommunityClient({
                           <input
                             type="text"
                             placeholder="Write a comment..."
-                            className="flex-1 h-9 rounded-2xl bg-white px-3.5 text-[13px] text-umber border-none focus:outline-none focus:ring-2 focus:ring-cat-nature/20 shadow-sm"
+                            className="flex-1 h-9 rounded-2xl bg-white px-3.5 text-[13px] text-umber border border-stone/40 focus:outline-none focus:border-moss/40 focus:ring-2 focus:ring-moss/15 shadow-sm"
                             value={commentInputs[post.id] || ''}
                             onChange={(e) =>
                               setCommentInputs((prev) => ({
@@ -1071,12 +1082,12 @@ export function CommunityClient({
             </p>
 
             {myGroups.length === 0 ? (
-              <div className="flex min-h-[200px] items-center justify-center rounded-2xl bg-white shadow-sm">
+              <div className="flex min-h-[200px] items-center justify-center rounded-2xl bg-white border border-stone/40 shadow-sm">
                 <div className="text-center px-6">
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cat-nature/10 mx-auto mb-4">
                     <Users className="h-7 w-7 text-cat-nature" />
                   </div>
-                  <p className="text-lg font-light text-umber mb-1">No groups yet</p>
+                  <p className="font-display text-lg font-semibold text-umber mb-1">No groups yet</p>
                   <p className="text-sm text-clay max-w-xs mx-auto">
                     Join a group below to start connecting with families.
                   </p>
@@ -1087,14 +1098,14 @@ export function CommunityClient({
                 {myGroups.map((group) => (
                   <div
                     key={group.id}
-                    className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow"
+                    className="bg-white border border-stone/40 shadow-sm rounded-2xl p-4 hover:border-moss/40 transition-all"
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">
                         {group.emoji || GROUP_EMOJI[group.type] || '\uD83C\uDFE0'}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-umber">{group.name}</p>
+                        <p className="font-display text-sm font-semibold text-umber">{group.name}</p>
                         {group.description && (
                           <p className="text-[12px] text-clay mt-0.5 line-clamp-2">
                             {group.description}
@@ -1181,14 +1192,14 @@ export function CommunityClient({
                 {filteredDiscover.map((group) => (
                   <div
                     key={group.id}
-                    className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow"
+                    className="bg-white border border-stone/40 shadow-sm rounded-2xl p-4 hover:border-moss/40 transition-all"
                   >
                     <div className="flex items-start gap-3">
                       <span className="text-2xl">
                         {group.emoji || GROUP_EMOJI[group.type] || '\uD83C\uDFE0'}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-umber">{group.name}</p>
+                        <p className="font-display text-sm font-semibold text-umber">{group.name}</p>
                         {group.description && (
                           <p className="text-[12px] text-clay mt-0.5 line-clamp-2">
                             {group.description}
@@ -1238,7 +1249,7 @@ export function CommunityClient({
           )}
 
           {filteredDiscover.length === 0 && searchQuery && (
-            <div className="flex min-h-[160px] items-center justify-center rounded-2xl bg-white shadow-sm">
+            <div className="flex min-h-[160px] items-center justify-center rounded-2xl bg-white border border-stone/40 shadow-sm">
               <div className="text-center px-4">
                 <Globe className="mx-auto mb-3 h-8 w-8 text-clay/30" />
                 <p className="font-medium text-umber">
@@ -1255,14 +1266,14 @@ export function CommunityClient({
       {activeTab === 'events' && (
         <div className="space-y-6">
           {filteredEvents.length === 0 ? (
-            <div className="flex min-h-[300px] items-center justify-center rounded-2xl bg-white shadow-sm">
+            <div className="flex min-h-[300px] items-center justify-center rounded-2xl bg-white border border-stone/40 shadow-sm">
               <div className="text-center px-6">
                 {myGroups.length === 0 ? (
                   <>
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cat-nature/10 mx-auto mb-4">
                       <Calendar className="h-7 w-7 text-cat-nature" />
                     </div>
-                    <p className="text-xl font-light text-umber mb-2">Discover events</p>
+                    <p className="font-display text-xl font-semibold text-umber mb-2">Discover events</p>
                     <p className="text-sm text-clay max-w-xs mx-auto mb-4">
                       Join a group to see upcoming meetups, workshops, and family activities
                       near you.
@@ -1279,7 +1290,7 @@ export function CommunityClient({
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 mx-auto mb-4">
                       <Calendar className="h-7 w-7 text-amber-600" />
                     </div>
-                    <p className="text-xl font-light text-umber mb-2">No upcoming events</p>
+                    <p className="font-display text-xl font-semibold text-umber mb-2">No upcoming events</p>
                     <p className="text-sm text-clay max-w-xs mx-auto">
                       Check back soon - events from your groups will show up here.
                     </p>
@@ -1298,9 +1309,9 @@ export function CommunityClient({
                 return (
                   <div
                     key={event.id}
-                    className="bg-white rounded-2xl shadow-sm p-5 flex items-start gap-4 hover:shadow-md transition-shadow"
+                    className="bg-white border border-stone/40 shadow-sm rounded-2xl p-5 flex items-start gap-4 hover:border-moss/40 transition-all"
                   >
-                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-cat-nature/8">
+                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-white border border-stone/40">
                       <span className="text-[9px] font-bold uppercase text-clay">
                         {weekday}
                       </span>
@@ -1312,7 +1323,7 @@ export function CommunityClient({
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[15px] font-medium text-umber">{event.title}</p>
+                      <p className="font-display text-[15px] font-semibold text-umber">{event.title}</p>
                       {event.description && (
                         <p className="text-[13px] text-clay mt-1 line-clamp-2">
                           {event.description}
@@ -1376,7 +1387,7 @@ export function CommunityClient({
       <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
         <DialogContent className="rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-umber">Report Content</DialogTitle>
+            <DialogTitle className="font-display font-semibold text-umber">Report Content</DialogTitle>
             <DialogDescription className="text-clay">
               Why are you reporting this? Your report will be reviewed by a moderator.
             </DialogDescription>
@@ -1386,10 +1397,10 @@ export function CommunityClient({
               <button
                 key={reason}
                 onClick={() => setReportReason(reason)}
-                className={`w-full text-left px-4 py-3 rounded-2xl text-sm transition-colors ${
+                className={`w-full text-left px-4 py-3 rounded-2xl text-sm transition-all border ${
                   reportReason === reason
-                    ? 'bg-cat-nature/10 text-cat-nature font-medium'
-                    : 'bg-stone/5 text-umber hover:bg-stone/10'
+                    ? 'bg-cat-nature/10 border-cat-nature/30 text-cat-nature font-medium'
+                    : 'bg-white border-stone/40 text-umber hover:border-moss/40'
                 }`}
               >
                 {reason}
@@ -1403,7 +1414,7 @@ export function CommunityClient({
                 setReportTarget(null);
                 setReportReason(null);
               }}
-              className="flex-1 rounded-2xl border border-stone/30 text-clay py-2.5 text-sm font-medium hover:bg-stone/5 transition-colors"
+              className="flex-1 rounded-2xl border border-stone/40 text-clay py-2.5 text-sm font-medium hover:border-moss/40 hover:text-umber transition-all"
             >
               Cancel
             </button>
