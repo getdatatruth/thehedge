@@ -72,11 +72,26 @@ export default async function CommunityPage() {
   if (memberGroupIds.length > 0) {
     const { data: postsData } = await supabase
       .from('community_posts')
-      .select('*, community_groups(name), families(name)')
+      .select('*, community_groups(name)')
       .in('group_id', memberGroupIds)
       .order('created_at', { ascending: false })
       .limit(20);
     posts = postsData || [];
+  }
+
+  // Resolve author family names via the name-only `family_public` view.
+  // `families` itself is private under RLS (billing + location), so we cannot
+  // embed families(name) for other families' posts.
+  const authorNames = new Map<string, string>();
+  const authorIds = [...new Set(posts.map((p) => p.family_id).filter(Boolean))];
+  if (authorIds.length > 0) {
+    const { data: names } = await supabase
+      .from('family_public')
+      .select('id, name')
+      .in('id', authorIds);
+    (names || []).forEach((f: { id: string; name: string | null }) =>
+      authorNames.set(f.id, f.name || 'A family')
+    );
   }
 
   // Normalize posts
@@ -84,9 +99,6 @@ export default async function CommunityPage() {
     const groupData = Array.isArray(post.community_groups)
       ? post.community_groups[0]
       : post.community_groups;
-    const familyData = Array.isArray(post.families)
-      ? post.families[0]
-      : post.families;
 
     return {
       id: post.id,
@@ -101,7 +113,7 @@ export default async function CommunityPage() {
       is_moderator: moderatorSet.has(`${post.group_id}:${post.family_id}`),
       created_at: post.created_at,
       group_name: groupData?.name || 'Unknown group',
-      family_name: familyData?.name || 'A family',
+      family_name: authorNames.get(post.family_id) || 'A family',
     };
   });
 

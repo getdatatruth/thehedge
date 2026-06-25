@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from('community_posts')
-    .select('*, families(name), community_groups(name)', { count: 'exact' })
+    .select('*, community_groups(name)', { count: 'exact' })
     .in('group_id', memberGroupIds);
 
   if (groupIdFilter) {
@@ -62,14 +62,26 @@ export async function GET(request: NextRequest) {
     return apiError('Failed to fetch posts', 500);
   }
 
+  // Resolve author family names via the name-only `family_public` view, since
+  // `families` is private under RLS (billing + location).
+  const authorNames = new Map<string, string>();
+  const authorIds = [...new Set((posts || []).map((p) => p.family_id).filter(Boolean))];
+  if (authorIds.length > 0) {
+    const { data: names } = await supabase
+      .from('family_public')
+      .select('id, name')
+      .in('id', authorIds);
+    (names || []).forEach((f: { id: string; name: string | null }) =>
+      authorNames.set(f.id, f.name || 'Unknown')
+    );
+  }
+
   const formatted = (posts || []).map((post) => {
-    const family = Array.isArray(post.families) ? post.families[0] : post.families;
     const group = Array.isArray(post.community_groups) ? post.community_groups[0] : post.community_groups;
     return {
       ...post,
-      author_name: family?.name || 'Unknown',
+      author_name: authorNames.get(post.family_id) || 'Unknown',
       group_name: group?.name || null,
-      families: undefined,
       community_groups: undefined,
     };
   });
