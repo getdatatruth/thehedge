@@ -67,7 +67,7 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-cat-nature/20 bg-cat-nature/5 overflow-hidden">
+      <div className="rounded-2xl border border-stone/40 bg-white shadow-sm overflow-hidden">
         <div className="flex items-center gap-2 px-5 py-3">
           <Leaf className="h-3.5 w-3.5 text-cat-nature" />
           <div className="h-2.5 w-10 rounded-full bg-cat-nature/15 animate-pulse" />
@@ -80,7 +80,7 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
   if (!data) return null;
 
   return (
-    <div className="rounded-2xl border border-cat-nature/20 bg-cat-nature/5 overflow-hidden animate-fade-up">
+    <div className="rounded-2xl border border-stone/40 bg-white shadow-sm overflow-hidden animate-fade-up">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-2 w-full px-5 py-3 text-left cursor-pointer"

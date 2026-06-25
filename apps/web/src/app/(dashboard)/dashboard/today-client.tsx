@@ -202,8 +202,8 @@ export function TodayClient({
                   onClick={() => { setReframe(active ? null : id); setShuffle(0); }}
                   className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-medium transition-all ${
                     active
-                      ? 'bg-forest text-parchment shadow-sm'
-                      : 'bg-linen text-clay hover:bg-stone/30'
+                      ? 'bg-forest text-parchment border border-forest shadow-sm'
+                      : 'bg-white border border-stone/40 text-clay hover:border-moss/50'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -328,7 +328,7 @@ export function TodayClient({
       />
 
       {/* ─── Your season so far: accumulating leaves (not a score) ─── */}
-      <Link href="/progress" className="block rounded-2xl bg-sage/8 border border-sage/15 p-5 transition-colors hover:bg-sage/12">
+      <Link href="/progress" className="block rounded-2xl bg-white border border-stone/40 p-5 shadow-sm transition-all hover:border-moss/40">
         <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80 mb-2">Your {seasonLabel.toLowerCase()} so far</p>
         <div className="flex items-center gap-1 mb-3">
           {Array.from({ length: SEASON_LEAF_SLOTS }).map((_, i) => (

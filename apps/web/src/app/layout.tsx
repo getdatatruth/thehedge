@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
-import { Cormorant_Garamond, Instrument_Serif } from 'next/font/google';
+import { Inter, Instrument_Serif } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { PostHogProvider } from '@/components/providers/posthog-provider';
 import './globals.css';
 
-const cormorant = Cormorant_Garamond({
+// Direction B: clean, modern Inter across the UI (display + body).
+const inter = Inter({
   variable: '--font-display',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
 });
 
@@ -39,7 +39,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
       <body
-        className={`${cormorant.variable} ${instrumentSerif.variable} antialiased`}
+        className={`${inter.variable} ${instrumentSerif.variable} antialiased`}
       >
         <PostHogProvider>
           <TooltipProvider>{children}</TooltipProvider>

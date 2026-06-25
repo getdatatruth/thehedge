@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-display), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-display);
   --font-serif: var(--font-serif);
@@ -215,7 +215,8 @@
 
 @layer utilities {
   .font-display {
-    font-family: var(--font-display), "Cormorant Garamond", Georgia, serif;
+    font-family: var(--font-display), "Inter", system-ui, sans-serif;
+    letter-spacing: -0.018em;
   }
   .font-body {
     font-family: system-ui, -apple-system, sans-serif;
@@ -274,24 +275,25 @@
    Card system (v2: white bg, no borders, subtle shadow)
    ────────────────────────────────────────────── */
 .card-elevated {
-  background: var(--color-linen);
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  transition: box-shadow 0.15s ease;
+  background: #ffffff;
+  border: 1px solid rgba(20,32,24,0.06);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(16,24,20,0.04), 0 12px 32px rgba(16,24,20,0.06);
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .card-interactive {
-  background: var(--color-linen);
-  border: none;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  transition: all 0.15s ease;
+  background: #ffffff;
+  border: 1px solid rgba(20,32,24,0.06);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(16,24,20,0.04), 0 8px 24px rgba(16,24,20,0.05);
+  transition: all 0.18s ease;
   cursor: pointer;
 }
 
 .card-interactive:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 4px rgba(16,24,20,0.05), 0 16px 40px rgba(16,24,20,0.09);
+  border-color: rgba(76,175,124,0.3);
 }
 
 .card-interactive:active {
