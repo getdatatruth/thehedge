@@ -29,17 +29,18 @@ export function TierGate({ requiredTier, children, featureName }: TierGateProps)
         <Crown size={28} color={lightTheme.warning} />
       </View>
       <Text style={styles.title}>
-        {featureName || 'This feature'} requires the {requiredTier} plan
+        {featureName || 'This part of the hedge'} opens with the {requiredTier} plan
       </Text>
       <Text style={styles.body}>
-        Upgrade to unlock {featureName?.toLowerCase() || 'this feature'} and more.
+        It's here whenever you're ready. Have a look at the plans and see what
+        suits your family.
       </Text>
       <Button
         variant="primary"
         size="md"
         onPress={() => router.push('/(stack)/settings/billing' as any)}
       >
-        View plans
+        Have a look at the plans
       </Button>
     </View>
   );

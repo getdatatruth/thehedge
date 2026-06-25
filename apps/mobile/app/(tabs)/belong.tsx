@@ -39,7 +39,7 @@ export default function BelongScreen() {
         <View style={styles.headerText}>
           <Text style={styles.title}>Belong</Text>
           <Text style={styles.subtitle}>
-            Other families on the same path, close to home.
+            Other families walking the same road, never far from home.
           </Text>
         </View>
         <TouchableOpacity
@@ -67,35 +67,36 @@ export default function BelongScreen() {
           <View style={styles.heroIcon}>
             <Users size={28} color={lightTheme.primary} />
           </View>
-          <Text style={styles.heroTitle}>Open the community</Text>
+          <Text style={styles.heroTitle}>Pull up a chair</Text>
           <Text style={styles.heroBody}>
-            Share what is working, ask for ideas, and find families nearby.
+            Share what's been working, ask when you're stuck, and find families
+            close by. No one here is doing it perfectly.
           </Text>
           <View style={styles.heroCta}>
-            <Text style={styles.heroCtaText}>Go to community</Text>
+            <Text style={styles.heroCtaText}>Join the conversation</Text>
             <ChevronRight size={16} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>WAYS IN</Text>
+          <Text style={styles.sectionLabel}>WAYS IN, WHENEVER YOU'RE READY</Text>
           <View style={styles.card}>
             <BelongItem
               icon={<MessageSquare size={22} color="#5B8DEF" />}
               label="Feed"
-              description="See what families are sharing"
+              description="The day-to-day of families like yours"
               onPress={openCommunity}
             />
             <BelongItem
               icon={<Users size={22} color={lightTheme.accent} />}
               label="Groups"
-              description="Join a circle that suits your family"
+              description="Find a circle that feels like your own"
               onPress={openCommunity}
             />
             <BelongItem
               icon={<Calendar size={22} color="#9B7BD4" />}
               label="Events"
-              description="Meet-ups and gatherings near you"
+              description="Gatherings and meet-ups a short journey away"
               onPress={openCommunity}
               last
             />

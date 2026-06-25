@@ -57,11 +57,14 @@ export default function ProfileScreen() {
           <Text style={styles.familyLabel}>
             {profile?.name ? `Kept by ${profile.name}` : 'Your family hearth'}
           </Text>
+          <Text style={styles.familyTagline}>
+            Learning that feels like a breath, not a battle.
+          </Text>
           <TouchableOpacity
             onPress={() => router.push('/(stack)/settings/profile' as any)}
             style={styles.editButton}
           >
-            <Text style={styles.editText}>EDIT PROFILE</Text>
+            <Text style={styles.editText}>TEND TO OUR HEDGE</Text>
           </TouchableOpacity>
         </View>
 
@@ -102,7 +105,7 @@ export default function ProfileScreen() {
             <MenuItem
               icon={<Users size={20} color="#5B8DEF" />}
               label="Children"
-              subtitle="Add or update who's learning"
+              subtitle="Add or tend to the ones at the heart of it"
               onPress={() => router.push('/(stack)/settings/children' as any)}
               last
             />
@@ -150,6 +153,7 @@ export default function ProfileScreen() {
             <MenuItem
               icon={<HelpCircle size={20} color={lightTheme.textSecondary} />}
               label="Help & Support"
+              subtitle="Anything at all, we're glad to hear from you"
               onPress={() => {
                 Linking.openURL(
                   'mailto:adam@ofmm.ie?subject=The%20Hedge%20support'
@@ -243,6 +247,14 @@ const styles = StyleSheet.create({
     ...typography.uiSmall,
     color: lightTheme.textMuted,
     marginTop: 2,
+  },
+  familyTagline: {
+    ...typography.uiSmall,
+    color: lightTheme.textSecondary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.lg,
   },
   editButton: {
     marginTop: spacing.lg,

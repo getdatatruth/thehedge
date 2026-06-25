@@ -39,7 +39,7 @@ export default function KeepScreen() {
         <View style={styles.headerText}>
           <Text style={styles.title}>Keep</Text>
           <Text style={styles.subtitle}>
-            Everything your family is gathering and holding onto.
+            A quiet shelf for the days worth holding onto. No rush to fill it.
           </Text>
         </View>
         <TouchableOpacity
@@ -60,18 +60,18 @@ export default function KeepScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>YOUR RECORD</Text>
+          <Text style={styles.sectionLabel}>WHAT YOU'VE DONE</Text>
           <View style={styles.card}>
             <KeepItem
               icon={<Clock size={22} color="#9B7BD4" />}
               label="Journal"
-              description="A timeline of what you've done together"
+              description="The days you've spent together, gathered in one place"
               onPress={() => router.push('/(stack)/timeline' as any)}
             />
             <KeepItem
               icon={<BookOpen size={22} color={lightTheme.accent} />}
               label="Portfolio"
-              description="Learning evidence, ready when you need it"
+              description="The learning, tidied and ready whenever it's asked for"
               onPress={() =>
                 router.push(
                   (effectiveTier === 'educator'
@@ -85,18 +85,18 @@ export default function KeepScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>SAVED FOR LATER</Text>
+          <Text style={styles.sectionLabel}>SET BY FOR LATER</Text>
           <View style={styles.card}>
             <KeepItem
               icon={<Heart size={22} color="#E8735A" />}
               label="Saved"
-              description="Activities you've favourited"
+              description="The ideas that caught your eye, kept for a quieter day"
               onPress={() => router.push('/(stack)/favourites' as any)}
             />
             <KeepItem
               icon={<FolderOpen size={22} color="#5B8DEF" />}
               label="Collections"
-              description="Your own grouped sets of ideas"
+              description="Your own gatherings of ideas, grouped however suits"
               onPress={() => router.push('/(stack)/collections' as any)}
               last
             />
@@ -104,12 +104,12 @@ export default function KeepScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>FIND MORE</Text>
+          <Text style={styles.sectionLabel}>WHEN YOU FANCY SOMETHING NEW</Text>
           <View style={styles.card}>
             <KeepItem
               icon={<Compass size={22} color={lightTheme.primary} />}
               label="Browse activities"
-              description="Explore the full library of ideas"
+              description="A wander through the full library, at your own pace"
               onPress={() => router.push('/(tabs)/browse' as any)}
               last
             />
