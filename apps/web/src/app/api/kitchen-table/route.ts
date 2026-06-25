@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { coordsForCounty } from '@/lib/ie-counties';
 import {
   deriveProfile,
@@ -19,14 +20,6 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { data: profileRow } = await supabase
-    .from('users')
-    .select('family_id')
-    .eq('id', user.id)
-    .single();
-  const familyId = profileRow?.family_id;
-  if (!familyId) return NextResponse.json({ error: 'No family' }, { status: 400 });
-
   let answers: KTAnswers;
   try {
     const body = await request.json();
@@ -34,6 +27,44 @@ export async function POST(request: NextRequest) {
     if (!answers || !Array.isArray(answers.children)) throw new Error('bad answers');
   } catch {
     return NextResponse.json({ error: 'Invalid answers' }, { status: 400 });
+  }
+
+  const { data: profileRow } = await supabase
+    .from('users')
+    .select('family_id')
+    .eq('id', user.id)
+    .single();
+  let familyId = profileRow?.family_id as string | undefined;
+
+  // A brand-new account has only an auth user: no family, no users row yet.
+  // The Kitchen Table is the first thing they do, so it bootstraps the family
+  // itself. Uses the service-role client because under RLS the user client
+  // cannot read back (RETURNING) a family it does not yet belong to.
+  if (!familyId) {
+    const admin = createAdminClient();
+    const firstChild = answers.children.find((c) => c?.name?.trim())?.name?.trim();
+    const familyName = firstChild
+      ? `${firstChild}'s family`
+      : (user.user_metadata?.name as string | undefined)?.trim() || 'Your family';
+    const { data: fam, error: famErr } = await admin
+      .from('families')
+      .insert({ name: familyName, country: 'IE' })
+      .select('id')
+      .single();
+    if (famErr || !fam) {
+      return NextResponse.json({ error: 'Could not set up your family' }, { status: 500 });
+    }
+    familyId = fam.id as string;
+    const { error: userErr } = await admin.from('users').upsert({
+      id: user.id,
+      family_id: familyId,
+      name: (user.user_metadata?.name as string | undefined)?.trim() || user.email?.split('@')[0] || 'Parent',
+      email: user.email,
+      role: 'owner',
+    });
+    if (userErr) {
+      return NextResponse.json({ error: 'Could not set up your account' }, { status: 500 });
+    }
   }
 
   const profile = deriveProfile(answers);
