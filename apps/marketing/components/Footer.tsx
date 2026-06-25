@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import NewsletterSignup from './NewsletterSignup';
 
 export default function Footer() {
   return (
@@ -7,8 +8,8 @@ export default function Footer() {
       <div className="ft-inner">
         <div className="ft-nl">
           <div className="ft-nl-title">Stay in the loop</div>
-          <div className="ft-nl-body">Activity ideas, seasonal guides & platform updates for Irish families. Drop us a line and we&apos;ll add you to the list.</div>
-          <a className="ft-nl-btn" href="mailto:hello@thehedge.ie?subject=Keep%20me%20in%20the%20loop" style={{display:'inline-flex',textDecoration:'none',alignItems:'center',justifyContent:'center'}}>Email us to subscribe</a>
+          <div className="ft-nl-body">Activity ideas, seasonal guides & platform updates for Irish families. No spam, ever.</div>
+          <NewsletterSignup source="footer" variant="footer" buttonLabel="Subscribe" />
         </div>
 
         <div className="ft-top">
