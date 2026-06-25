@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Sun, Search, CalendarDays, Trophy, Sparkles, Lock } from 'lucide-react';
+import { Sun, Search, CalendarDays, Trophy, MessageCircle, Lock } from 'lucide-react';
 import type { SubscriptionTier } from '@/types/database';
 
 const TIER_RANK: Record<SubscriptionTier, number> = {
@@ -15,7 +15,7 @@ const tabs: { href: string; icon: React.ElementType; label: string; requiredTier
   { href: '/dashboard', icon: Sun, label: 'Today' },
   { href: '/browse', icon: Search, label: 'Browse' },
   { href: '/planner', icon: CalendarDays, label: 'Plan', requiredTier: 'family' },
-  { href: '/chat', icon: Sparkles, label: 'Ask AI' },
+  { href: '/chat', icon: MessageCircle, label: 'Ask The Hedge' },
   { href: '/progress', icon: Trophy, label: 'Progress' },
 ];
 

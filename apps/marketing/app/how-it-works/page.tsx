@@ -53,7 +53,7 @@ const faqs = [
   { q:"How long does setup take?", a:"Most families are set up and receiving their first brief within 2–3 minutes. We ask for the essentials only - children's ages, a few interest categories, your county. You can fill in more detail later." },
   { q:"What if I don't have a garden?", a:"No problem at all. The Hedge knows whether you have outdoor space and adjusts accordingly. Apartment families get a completely different mix - community parks, indoor projects, sensory play, and urban exploration activities." },
   { q:"Can I use it for multiple children of different ages?", a:"Absolutely - this is one of The Hedge's strengths. You tell us each child's age and interests separately, and we suggest activities that work across the age range, as well as age-specific suggestions for one-on-one time." },
-  { q:"What if I want to skip a suggestion?", a:"Just swipe it away. The Hedge will generate a replacement. The more you skip and select, the better our suggestions get - the AI learns your family's preferences over time." },
+  { q:"What if I want to skip a suggestion?", a:"Just swipe it away. The Hedge will generate a replacement. The more you skip and select, the better our suggestions get - we learn your family's preferences over time." },
 ];
 
 export default function HowItWorks() {

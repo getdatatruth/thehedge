@@ -27,7 +27,7 @@ export default function Community() {
       <main className="page-pad">
         <div className="page-hero">
           <div className="container">
-            <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">2,400+ Irish families</span></div>
+            <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">Families across Ireland</span></div>
             <h1>The families of <em>The Hedge</em></h1>
             <p className="page-hero-desc">From Donegal to Cork, from apartment balconies to West Clare farms. A growing community of Irish families learning and exploring together.</p>
           </div>

@@ -25,11 +25,11 @@ const plans = [
     feats: [
       { t:'1–2 activity ideas per day', on:true },
       { t:'Curated activity library (limited)', on:true },
-      { t:'5 AI-personalised suggestions per week', on:true },
+      { t:'5 personalised suggestions per week', on:true },
       { t:'Basic weekly view', on:true },
       { t:'iOS & Android app', on:false },
       { t:'Weather integration', on:false },
-      { t:'Unlimited AI personalisation', on:false },
+      { t:'Unlimited personalised ideas', on:false },
       { t:'Full 1,200+ activity library', on:false },
       { t:'Weekly planner', on:false },
       { t:'Activity timeline', on:false },
@@ -89,7 +89,7 @@ const plans = [
 ];
 
 const faqs = [
-  { q:"Is there really a free plan?", a:"Yes, genuinely free - not a trial. Our free plan gives you 1–2 activity ideas per day from a curated library, and 5 AI-personalised suggestions per week. No credit card required to sign up." },
+  { q:"Is there really a free plan?", a:"Yes, genuinely free - not a trial. Our free plan gives you 1–2 activity ideas per day from a curated library, and 5 personalised suggestions per week. No credit card required to sign up." },
   { q:"What's included in the free trial?", a:"The 14-day free trial on paid plans gives you full access to every feature on your chosen plan - no restrictions. At the end of 14 days, you can continue by adding a payment method, or drop back to the free plan automatically." },
   { q:"Can I switch plans?", a:"Yes, any time. You can upgrade, downgrade, or cancel from your account settings. If you downgrade mid-cycle, you keep the current plan until the end of the billing period." },
   { q:"Do you offer annual billing?", a:"Yes - pay annually and get roughly 2 months free on both paid plans. Annual pricing: Family €59.99/year (saves €23.89), Educator €134.99/year (saves €44.89)." },
@@ -187,7 +187,7 @@ export default function Pricing() {
                   {[
                     ['Daily activity ideas', '1–2', 'Unlimited', 'Unlimited'],
                     ['Activity library', 'Limited', '1,200+', '1,200+'],
-                    ['AI personalisation', '5/week', '✓', '✓'],
+                    ['Personalised ideas', '5/week', '✓', '✓'],
                     ['Weather integration', '–', '✓', '✓'],
                     ['Weekly planner', '–', '✓', '✓'],
                     ['Activity timeline', '–', '✓', '✓'],

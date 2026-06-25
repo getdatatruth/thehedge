@@ -6,7 +6,7 @@ import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
   title: 'Features - 1,200+ Screen-Free Activities for Irish Families',
-  description: 'Explore The Hedge\'s full feature set: AI-powered activity suggestions, weather-aware planning, NCCA curriculum mapping, AEARS logging, and a library of 1,200+ Irish activities.',
+  description: 'Explore The Hedge\'s full feature set: activity ideas tailored to your children and your county, weather-aware planning, NCCA curriculum mapping, AEARS logging, and a library of 1,200+ Irish activities.',
   alternates: { canonical: 'https://thehedge.ie/features' },
 };
 
@@ -24,11 +24,11 @@ const featureGroups = [
     ]
   },
   {
-    title: 'Intelligence',
-    sub: 'Powered by AI that knows Ireland',
+    title: 'Personalisation',
+    sub: 'Ideas that fit your family and your corner of Ireland',
     features: [
       { id: 'sun', title: 'Live Weather Integration', body: 'Pulls real-time forecasts from Met Éireann for your exact county. Activities automatically shift indoors when rain is forecast. No manual adjusting needed.' },
-      { id: 'cpu', title: 'AI Personalisation Engine', body: 'Every suggestion is shaped by your children\'s ages, interests, recent activities, and upcoming events. The longer you use The Hedge, the smarter it gets.' },
+      { id: 'cpu', title: 'Shaped Around Your Children', body: 'Every suggestion is shaped by your children\'s ages, interests, recent activities, and upcoming events. The more you use The Hedge, the better it fits your family.' },
       { id: 'cal', title: 'School Calendar Awareness', body: 'Knows Irish school term dates, public holidays, and bank holidays. Adjusts activity intensity for term time vs school holidays automatically.' },
     ]
   },
@@ -45,7 +45,7 @@ const featureGroups = [
     title: 'On the Go',
     sub: 'Available on all your devices',
     features: [
-      { id: 'cpu', title: 'iOS & Android App', body: 'Take The Hedge with you wherever your family goes. Browse activities, log progress, and get AI suggestions - all from your phone. Available on any paid plan.' },
+      { id: 'cpu', title: 'iOS & Android App', body: 'Take The Hedge with you wherever your family goes. Browse activities, log progress, and get your daily idea - all from your phone. Available on any paid plan.' },
       { id: 'sun', title: 'Offline Access', body: 'Save activities for offline use. Perfect for trips to the woods, the beach, or anywhere signal drops. Your saved activities are always available.' },
       { id: 'palette', title: 'Family Sharing', body: 'Share your account with your partner or co-parent. Both of you see the same planner, timeline, and activity log. Stay on the same page, literally.' },
     ]

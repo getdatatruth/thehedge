@@ -7,9 +7,9 @@ import { Icon } from '../components/Icons';
 
 export const metadata: Metadata = {
   title: 'The Hedge - Personalised Family Activities for Irish Families',
-  description: "Ireland's family learning platform. AI-powered, weather-aware activity ideas for your children every morning. Screen-free. Irish. Built for real family life.",
+  description: "Ireland's family learning platform. An idea every morning that fits your weather, your county and your kids. Screen-free. Irish. Built for real family life.",
   alternates: { canonical: 'https://thehedge.ie' },
-  openGraph: { title: 'The Hedge - Family Learning Platform for Irish Families', description: "Personalised daily activities for Irish families, shaped by your weather, your children, and your world." }
+  openGraph: { title: 'The Hedge - Family Learning Platform for Irish Families', description: "Screen-free things to do every morning, personalised to your weather, your county and your children." }
 };
 
 const testimonials = [
@@ -20,7 +20,7 @@ const testimonials = [
 
 const faqs = [
   { q: "What age children is The Hedge designed for?", a: "The Hedge works for children aged 2–16. When you set up your family profile, you tell us your children's ages and the platform adjusts every suggestion accordingly - simpler sensory play for toddlers, more complex projects for older children. Multi-age families are very much catered for." },
-  { q: "Do I need a subscription to use it?", a: "No - we have a free plan that gives you 1–2 activity ideas per day from a curated library. The Family plan (€6.99/month) unlocks the full AI personalisation engine, weather integration, the weekly planner, and unlimited activity history. The Educator plan adds homeschool-specific tools." },
+  { q: "Do I need a subscription to use it?", a: "No - we have a free plan that gives you 1–2 activity ideas per day from a curated library. The Family plan (€6.99/month) unlocks suggestions tailored to your children and your county, weather integration, the weekly planner, and unlimited activity history. The Educator plan adds homeschool-specific tools." },
   { q: "How does the weather integration work?", a: "The Hedge pulls live weather data from Open-Meteo for your specific county every morning. If rain is forecast, it automatically surfaces indoor activities. If there's a rare sunny spell, it prioritises outdoor and nature activities. You never have to manually adjust for the weather." },
   { q: "Is The Hedge only for homeschooling families?", a: "Not at all. The majority of our families use mainstream schools. The Hedge helps with after-school activities, weekends, school holidays, and summer. For homeschooling families, we have a dedicated Educator plan with curriculum mapping and AEARS-compliant logging." },
   { q: "Is my data stored in Ireland / the EU?", a: "Yes. All data is stored in the EU - specifically in Frankfurt, Germany - and we are fully GDPR compliant. We do not sell data to third parties or use it for advertising." },
@@ -34,13 +34,12 @@ export default function Home() {
     name: 'The Hedge',
     applicationCategory: 'EducationApplication',
     operatingSystem: 'Web, iOS',
-    description: "Personalised, screen-free activity ideas for Irish families, powered by AI and live weather data.",
+    description: "Personalised, screen-free activity ideas for Irish families, shaped by your weather, your county and your children.",
     offers: [
       { '@type': 'Offer', price: '0', priceCurrency: 'EUR', name: 'Free Plan' },
       { '@type': 'Offer', price: '6.99', priceCurrency: 'EUR', name: 'Family Plan', billingPeriod: 'P1M' },
       { '@type': 'Offer', price: '14.99', priceCurrency: 'EUR', name: 'Educator Plan', billingPeriod: 'P1M' },
     ],
-    aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.9', reviewCount: '2400', bestRating: '5' },
   };
 
   return (
@@ -69,12 +68,8 @@ export default function Home() {
               </Link>
             </div>
             <div className="proof fade-up-3">
-              <div className="avatars">
-                {['SM','CÓ','LH','PB','AO'].map(i => <div key={i} className="av" style={{fontSize:8,fontWeight:700,color:'var(--forest)'}}>{i}</div>)}
-              </div>
               <div style={{marginLeft:6}}>
-                <div className="stars">★★★★★</div>
-                <div className="proof-label"><strong>2,400+ Irish families</strong> · 4.9 rating</div>
+                <div className="proof-label"><strong>1,200+ screen-free activities</strong> · made for Irish family life</div>
               </div>
             </div>
           </div>
@@ -232,14 +227,13 @@ export default function Home() {
             <h2 className="section-title" id="testi-title">What families <em>say</em></h2>
             <div className="testi-grid" style={{marginTop:32}}>
               {testimonials.map((t,i) => (
-                <article key={t.name} className={`tc ${t.forest ? 'tc-f' : 'tc-l'}`} itemScope itemType="https://schema.org/Review">
-                  <div className="tc-stars">{[1,2,3,4,5].map(s=><span key={s} style={{color:t.forest?'var(--amber)':'var(--amber)',fontSize:13}}>★</span>)}</div>
-                  <blockquote className="tc-quote" itemProp="reviewBody">&ldquo;{t.quote}&rdquo;</blockquote>
+                <article key={t.name} className={`tc ${t.forest ? 'tc-f' : 'tc-l'}`}>
+                  <blockquote className="tc-quote">&ldquo;{t.quote}&rdquo;</blockquote>
                   <div className="tc-author">
                     <div style={{display:'flex',alignItems:'center',gap:10}}>
                       <div className="tc-av" style={{fontSize:9,fontWeight:700,color:t.forest?'var(--sage)':'var(--forest)'}}>{t.initials}</div>
                       <div>
-                        <div className="tc-name" itemProp="author">{t.name}</div>
+                        <div className="tc-name">{t.name}</div>
                         <div className="tc-role">{t.role}</div>
                       </div>
                     </div>
@@ -254,14 +248,14 @@ export default function Home() {
         {/* ── STATS ── */}
         <section className="section section-forest" aria-labelledby="stats-title">
           <div className="container">
-            <div className="eyebrow eyebrow-sage"><div className="eyebrow-line" /><span className="eyebrow-text">The numbers</span></div>
-            <h2 className="section-title section-title-light" id="stats-title">Growing every <em>month</em></h2>
+            <div className="eyebrow eyebrow-sage"><div className="eyebrow-line" /><span className="eyebrow-text">What&apos;s inside</span></div>
+            <h2 className="section-title section-title-light" id="stats-title">Built for <em>Irish family life</em></h2>
             <div className="stats" style={{marginTop:32}}>
               {[
-                { n:'2,400+', l:'Irish families' },
-                { n:'1,200+', l:'Activities' },
-                { n:'4.9★', l:'App Store rating' },
+                { n:'1,200+', l:'Screen-free activities' },
                 { n:'32', l:'Counties covered' },
+                { n:'365', l:'Mornings a year sorted' },
+                { n:'2–16', l:'Ages catered for' },
               ].map(s => (
                 <div key={s.l} className="stat stat-dark">
                   <div className="stat-n">{s.n}</div>
@@ -322,7 +316,7 @@ export default function Home() {
             <p className="section-body" style={{maxWidth:540}}>Start free. Upgrade when you&apos;re ready. No contracts, no surprises. Cancel any time.</p>
             <div className="price-grid" style={{marginTop:32}}>
               {[
-                { name:'Free', tag:'Just get started', price:'€0', sub:'forever', btn:'pcb-outline', btnTxt:'Get started free', btnHref:'https://app.thehedge.ie/signup', feats:['1–2 ideas per day','Activity library (limited)','5 AI suggestions per week','Basic weekly view'], dark:false },
+                { name:'Free', tag:'Just get started', price:'€0', sub:'forever', btn:'pcb-outline', btnTxt:'Get started free', btnHref:'https://app.thehedge.ie/signup', feats:['1–2 ideas per day','Activity library (limited)','5 personalised ideas per week','Basic weekly view'], dark:false },
                 { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full 1,200+ activity library','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iOS & Android app'], dark:false, pop:'Most popular' },
                 { name:'Educator', tag:'Built for homeschoolers', price:'€14.99', sub:'/month', btn:'pcb-sage', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=educator', feats:['Everything in Family','NCCA curriculum mapping','AEARS-compliant learning logs','PDF report export','IEP support tools','Priority support'], dark:true },
               ].map(p => (
@@ -362,7 +356,7 @@ export default function Home() {
         <div className="cta-band">
           <div className="container">
             <h2>Your family&apos;s next adventure<br /><em>starts tomorrow morning.</em></h2>
-            <p>Join 2,400+ Irish families who wake up knowing exactly what to do with their children today.</p>
+            <p>Wake up knowing exactly what to do with your children today.</p>
             <div className="actions">
               <Link href="https://app.thehedge.ie/signup" className="btn-light">
                 Start free - no card needed <Icon id="arrow-r" size={16} />

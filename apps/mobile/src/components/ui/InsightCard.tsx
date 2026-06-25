@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Sparkles, ChevronDown } from 'lucide-react-native';
+import { Leaf, ChevronDown } from 'lucide-react-native';
 import { apiPost } from '@/lib/api';
 import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -65,7 +65,7 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Sparkles size={14} color={lightTheme.accent} />
+          <Leaf size={14} color={lightTheme.accent} />
           <View style={styles.loadingDot} />
           <View style={[styles.loadingDot, { width: 60 }]} />
         </View>
@@ -81,8 +81,8 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
         activeOpacity={0.8}
         style={styles.header}
       >
-        <Sparkles size={14} color={lightTheme.accent} />
-        <Text style={styles.label}>AI Insight</Text>
+        <Leaf size={14} color={lightTheme.accent} />
+        <Text style={styles.label}>A wee note</Text>
         <ChevronDown
           size={14}
           color={lightTheme.textMuted}

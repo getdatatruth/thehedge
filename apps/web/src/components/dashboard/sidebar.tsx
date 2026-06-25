@@ -15,7 +15,7 @@ import {
   LogOut,
   CreditCard,
   Menu,
-  Sparkles,
+  MessageCircle,
   CalendarDays,
   Heart,
   Trophy,
@@ -51,7 +51,7 @@ const mainNav: NavItem[] = [
   { label: 'Today', href: '/dashboard', icon: Sun },
   { label: 'Browse', href: '/browse', icon: Search },
   { label: 'Weekly Plan', href: '/planner', icon: CalendarDays, requiredTier: 'family' },
-  { label: 'Ask AI', href: '/chat', icon: Sparkles },
+  { label: 'Ask The Hedge', href: '/chat', icon: MessageCircle },
   { label: 'Favourites', href: '/favourites', icon: Heart, requiredTier: 'family' },
   { label: 'Timeline', href: '/timeline', icon: Clock },
 ];

@@ -11,7 +11,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   Bell,
-  Sparkles,
   Sun,
   Cloud,
   CloudRain,
@@ -394,7 +393,7 @@ export default function TodayScreen() {
             >
               <View style={styles.heroHeader}>
                 <View style={styles.heroLabelRow}>
-                  <Sparkles size={14} color={lightTheme.accent} />
+                  <Leaf size={14} color={lightTheme.accent} />
                   <Text style={styles.heroLabel}>
                     {reframe === 'calm' ? 'Something gentler'
                       : reframe === 'quick' ? 'A quick one'
