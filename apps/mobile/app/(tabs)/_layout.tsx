@@ -2,10 +2,10 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import {
   Sun,
-  Search,
   CalendarDays,
-  BarChart3,
-  User,
+  BookHeart,
+  Users,
+  Home,
 } from 'lucide-react-native';
 import { Platform, TouchableOpacity } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -56,15 +56,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="browse"
-        options={{
-          title: 'Browse',
-          tabBarIcon: ({ color, size }) => (
-            <Search size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="plan"
         options={{
           title: 'Plan',
@@ -74,25 +65,39 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="progress"
+        name="keep"
         options={{
-          title: 'Progress',
+          title: 'Keep',
           tabBarIcon: ({ color, size }) => (
-            <BarChart3 size={size} color={color} />
+            <BookHeart size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="belong"
+        options={{
+          title: 'Belong',
+          tabBarIcon: ({ color, size }) => (
+            <Users size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="more"
         options={{
-          title: 'Profile',
+          title: 'Our Hedge',
           tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} />
+            <Home size={size} color={color} />
           ),
         }}
       />
-      {/* Hidden tabs */}
+
+      {/* Hidden screens - reachable via navigation, not the tab bar.
+          Ask (chat) is surfaced as a prominent header action on Keep/Belong
+          and from Today; Browse and Progress are reachable from Keep. */}
       <Tabs.Screen name="chat" options={{ href: null }} />
+      <Tabs.Screen name="browse" options={{ href: null }} />
+      <Tabs.Screen name="progress" options={{ href: null }} />
       <Tabs.Screen name="educator" options={{ href: null }} />
     </Tabs>
   );
