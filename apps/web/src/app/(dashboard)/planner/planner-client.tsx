@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { InsightCard } from '@/components/shared/insight-card';
@@ -87,6 +87,12 @@ interface PlannerClientProps {
   familyName: string;
   weatherCondition?: string;
   temperature?: number | null;
+  /**
+   * The family's learning approach (from the Kitchen Table framework).
+   * Drives the default planning grammar: child-led / relaxed / exploratory
+   * families open on Rhythm (gentle day-parts), everyone else on Timetable.
+   */
+  approach?: string | null;
 }
 
 // ─── Constants ──────────────────────────────────────────
@@ -107,6 +113,64 @@ const TIME_SLOTS = [
   { key: 'afternoon', label: 'Afternoon', time: '14:00', icon: Sun },
   { key: 'evening', label: 'Evening', time: '18:00', icon: Moon },
 ] as const;
+
+// ─── Rhythm grammar ─────────────────────────────────────
+// The anti-timetable. Instead of clock slots, the week is shaped into a few
+// flexible day-parts. These map onto the SAME block/time model: a part is
+// derived from a block's time, and adding into a part uses a representative
+// time within it. "Anytime" catches blocks with no real time (it gives a
+// gentle, no-pressure landing spot and adds at midday so it reads as flexible).
+const DAY_PARTS = [
+  {
+    key: 'morning',
+    label: 'Morning',
+    hint: 'fresh and unhurried',
+    time: '09:00',
+    icon: Sunrise,
+  },
+  {
+    key: 'afternoon',
+    label: 'Afternoon',
+    hint: 'out and about',
+    time: '14:00',
+    icon: Sun,
+  },
+  {
+    key: 'evening',
+    label: 'Evening',
+    hint: 'winding down',
+    time: '18:00',
+    icon: Moon,
+  },
+  {
+    key: 'anytime',
+    label: 'Anytime',
+    hint: 'whenever it suits',
+    time: '12:00',
+    icon: Sparkles,
+  },
+] as const;
+
+type DayPartKey = (typeof DAY_PARTS)[number]['key'];
+
+// Map a block onto a day-part. A block with no usable time falls to Anytime.
+function getDayPart(time: string | undefined | null): DayPartKey {
+  if (!time || !/^\d{1,2}:/.test(time)) return 'anytime';
+  const hour = parseInt(time.split(':')[0], 10);
+  if (Number.isNaN(hour)) return 'anytime';
+  if (hour < 12) return 'morning';
+  if (hour < 17) return 'afternoon';
+  return 'evening';
+}
+
+// Child-led / relaxed / exploratory families open on Rhythm by default.
+function defaultGrammar(approach?: string | null): 'timetable' | 'rhythm' {
+  const a = (approach || '').toLowerCase();
+  if (a === 'child_led' || a === 'relaxed' || a === 'exploratory') {
+    return 'rhythm';
+  }
+  return 'timetable';
+}
 
 const CATEGORY_COLORS: Record<string, string> = {
   nature: 'bg-cat-nature/15 text-cat-nature border-cat-nature/20',
@@ -232,6 +296,7 @@ export function PlannerClient({
   weekOffset,
   familyName,
   weatherCondition,
+  approach,
 }: PlannerClientProps) {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -253,6 +318,35 @@ export function PlannerClient({
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+
+  // The planning "grammar": Timetable (clock slots) or Rhythm (flexible
+  // day-parts). Defaults from the family's approach; persisted to localStorage
+  // so a parent's choice sticks. We initialise from the approach default and
+  // hydrate any saved preference on mount (avoids SSR/client mismatch).
+  const [grammar, setGrammar] = useState<'timetable' | 'rhythm'>(() =>
+    defaultGrammar(approach)
+  );
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem('hedge.planner.grammar');
+      if (saved === 'timetable' || saved === 'rhythm') {
+        setGrammar(saved);
+      }
+    } catch {
+      // localStorage may be unavailable; the approach default is fine.
+    }
+    // Only hydrate once on mount.
+  }, []);
+
+  const chooseGrammar = useCallback((next: 'timetable' | 'rhythm') => {
+    setGrammar(next);
+    try {
+      window.localStorage.setItem('hedge.planner.grammar', next);
+    } catch {
+      // Ignore: persistence is a nicety, not a requirement.
+    }
+  }, []);
 
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
 
@@ -510,6 +604,60 @@ export function PlannerClient({
     [router, selectedChild]
   );
 
+  // Rhythm equivalent of addActivityToSlot: drop into a day-part using a
+  // representative time within it (morning 09:00, afternoon 14:00, evening
+  // 18:00, anytime 12:00). Same /api/planner/add endpoint, no new fields.
+  const addActivityToPart = useCallback(
+    async (activity: Activity, date: string, part: DayPartKey) => {
+      setUpdatingBlock(`add-${date}-${part}`);
+      try {
+        const partConfig = DAY_PARTS.find((p) => p.key === part);
+        const time = partConfig?.time || '12:00';
+
+        const res = await fetch('/api/planner/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            childId: selectedChild,
+            date,
+            time,
+            activityId: activity.id,
+            title: activity.title,
+            duration: activity.duration_minutes,
+            subject: SUBJECT_MAP[activity.category] || activity.category,
+          }),
+        });
+
+        if (res.ok) {
+          router.refresh();
+        } else {
+          const err = await res.json();
+          setError(err.error || 'Failed to add activity.');
+        }
+      } catch {
+        setError('Failed to add activity.');
+      } finally {
+        setUpdatingBlock(null);
+        setShowAddModal(null);
+        setSearchQuery('');
+      }
+    },
+    [router, selectedChild]
+  );
+
+  // The Add modal is shared by both grammars. Route to the right handler so a
+  // day-part (incl. Anytime) lands at its representative time.
+  const addFromModal = useCallback(
+    (activity: Activity, date: string, slot: string) => {
+      if (grammar === 'rhythm') {
+        addActivityToPart(activity, date, slot as DayPartKey);
+      } else {
+        addActivityToSlot(activity, date, slot);
+      }
+    },
+    [grammar, addActivityToPart, addActivityToSlot]
+  );
+
   const removeBlock = useCallback(
     async (planId: string, blockIndex: number) => {
       setUpdatingBlock(`${planId}-${blockIndex}`);
@@ -642,21 +790,43 @@ export function PlannerClient({
             }
           />
 
-          {/* View toggle */}
+          {/* Grammar toggle: Timetable vs Rhythm */}
           <div className="flex items-center gap-1 rounded-full border border-stone/40 bg-white p-1 print:hidden">
             <button
-              onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-full text-xs transition-all ${viewMode === 'grid' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
+              onClick={() => chooseGrammar('timetable')}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold transition-all ${grammar === 'timetable' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
+              title="A structured grid with clock times"
             >
-              <Calendar className="h-4 w-4" />
+              <Clock className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Timetable</span>
             </button>
             <button
-              onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-full text-xs transition-all ${viewMode === 'list' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
+              onClick={() => chooseGrammar('rhythm')}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold transition-all ${grammar === 'rhythm' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
+              title="A gentle week shaped by day-parts, not the clock"
             >
-              <BarChart3 className="h-4 w-4" />
+              <Leaf className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Rhythm</span>
             </button>
           </div>
+
+          {/* Layout toggle (Timetable only) */}
+          {grammar === 'timetable' && (
+            <div className="flex items-center gap-1 rounded-full border border-stone/40 bg-white p-1 print:hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-full text-xs transition-all ${viewMode === 'grid' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
+              >
+                <Calendar className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-full text-xs transition-all ${viewMode === 'list' ? 'bg-forest text-parchment' : 'text-clay hover:text-ink'}`}
+              >
+                <BarChart3 className="h-4 w-4" />
+              </button>
+            </div>
+          )}
 
           <button
             onClick={generatePlan}
@@ -903,7 +1073,7 @@ export function PlannerClient({
       )}
 
       {/* ─── GRID VIEW ─── */}
-      {hasPlans && viewMode === 'grid' && (
+      {hasPlans && grammar === 'timetable' && viewMode === 'grid' && (
         <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-7 sm:gap-3 stagger-children">
           {weekDates.map((date, dayIndex) => {
             const plan = plansByDate[date];
@@ -1186,7 +1356,7 @@ export function PlannerClient({
       )}
 
       {/* ─── LIST VIEW ─── */}
-      {hasPlans && viewMode === 'list' && (
+      {hasPlans && grammar === 'timetable' && viewMode === 'list' && (
         <div className="space-y-4 stagger-children">
           {weekDates.map((date, dayIndex) => {
             const plan = plansByDate[date];
@@ -1374,6 +1544,257 @@ export function PlannerClient({
         </div>
       )}
 
+      {/* ─── RHYTHM VIEW (the anti-timetable) ─── */}
+      {hasPlans && grammar === 'rhythm' && (
+        <div className="space-y-4 stagger-children">
+          {/* Gentle framing line */}
+          <p className="text-[13px] text-clay/70 italic">
+            A flexible week shaped by the rhythm of the day, not the clock.
+            Let things land where they suit.
+          </p>
+
+          {weekDates.map((date, dayIndex) => {
+            const plan = plansByDate[date];
+            const today = isToday(date);
+            const past = isPast(date);
+
+            // Quiet days that have already passed with nothing on them stay
+            // tucked away.
+            if (!plan && past) return null;
+
+            // Group this day's blocks by day-part.
+            const blocksByPart: Record<
+              DayPartKey,
+              { block: PlanBlock; index: number }[]
+            > = {
+              morning: [],
+              afternoon: [],
+              evening: [],
+              anytime: [],
+            };
+            plan?.blocks.forEach((block, index) => {
+              blocksByPart[getDayPart(block.time)].push({ block, index });
+            });
+
+            const dayTotal = plan?.blocks.length || 0;
+            const dayDone =
+              plan?.blocks.filter((b) => b.completed).length || 0;
+
+            return (
+              <div
+                key={date}
+                className={`card-elevated overflow-hidden ${
+                  today ? 'ring-1 ring-moss/20' : ''
+                }`}
+              >
+                {/* Day header */}
+                <div
+                  className={`px-5 py-3 border-b flex items-center justify-between ${
+                    today ? 'border-moss/20' : 'border-stone/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`text-[12px] font-bold uppercase tracking-wider ${
+                        today ? 'text-moss' : 'text-clay/60'
+                      }`}
+                    >
+                      {DAY_FULL_NAMES[dayIndex]}
+                    </span>
+                    <span className="text-[13px] text-clay">
+                      {formatDate(date)}
+                    </span>
+                    {today && (
+                      <span className="tag bg-moss/10 text-moss text-[9px]">
+                        Today
+                      </span>
+                    )}
+                  </div>
+                  {dayTotal > 0 && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-clay/40">
+                      {dayDone}/{dayTotal} done
+                    </span>
+                  )}
+                </div>
+
+                {/* Day-parts */}
+                <div className="p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {DAY_PARTS.map((part) => {
+                    const partBlocks = blocksByPart[part.key];
+                    const PartIcon = part.icon;
+
+                    return (
+                      <div
+                        key={part.key}
+                        className="rounded-2xl bg-parchment/50 border border-stone/20 p-3 flex flex-col"
+                      >
+                        {/* Part label */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-1.5">
+                            <PartIcon className="h-3.5 w-3.5 text-moss/60" />
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-clay/60">
+                              {part.label}
+                            </span>
+                          </div>
+                          {!past && (
+                            <button
+                              onClick={() =>
+                                setShowAddModal({ date, slot: part.key })
+                              }
+                              className="p-0.5 rounded hover:bg-moss/10 transition-all print:hidden"
+                              title={`Add to ${part.label}`}
+                            >
+                              <Plus className="h-3.5 w-3.5 text-moss/50" />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Blocks in this part */}
+                        <div className="space-y-2 flex-1">
+                          {partBlocks.map(({ block, index: blockIndex }) => {
+                            const blockKey = `${plan!.id}-${blockIndex}`;
+                            const isUpdating = updatingBlock === blockKey;
+                            const activity = block.activity_id
+                              ? activityById[block.activity_id]
+                              : null;
+                            const activityCategory = activity?.category || '';
+                            const categoryColor =
+                              CATEGORY_COLORS[activityCategory] ||
+                              'bg-stone/10 text-clay border-stone/20';
+
+                            return (
+                              <div
+                                key={blockIndex}
+                                className={`group/block relative rounded-xl border p-2.5 transition-all ${
+                                  block.completed
+                                    ? 'bg-moss/[0.04] border-moss/30'
+                                    : 'bg-white border-stone/40 hover:border-moss/40'
+                                }`}
+                              >
+                                <div className="flex items-start gap-2">
+                                  {/* Completion toggle */}
+                                  <button
+                                    onClick={() =>
+                                      toggleComplete(
+                                        plan!.id,
+                                        blockIndex,
+                                        block.completed
+                                      )
+                                    }
+                                    disabled={isUpdating}
+                                    className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md transition-all print:hidden ${
+                                      block.completed
+                                        ? 'bg-moss text-parchment'
+                                        : 'border border-stone/40 hover:border-moss/50 text-transparent hover:text-moss/30'
+                                    }`}
+                                  >
+                                    {isUpdating ? (
+                                      <Loader2 className="h-3 w-3 animate-spin text-clay" />
+                                    ) : (
+                                      <Check className="h-3 w-3" />
+                                    )}
+                                  </button>
+
+                                  <div className="flex-1 min-w-0">
+                                    {/* Title */}
+                                    {activity?.slug ? (
+                                      <Link
+                                        href={`/activity/${activity.slug}`}
+                                        className={`text-[12px] font-medium leading-snug block hover:text-moss transition-colors ${
+                                          block.completed
+                                            ? 'text-clay/60 line-through'
+                                            : 'text-ink'
+                                        }`}
+                                      >
+                                        {block.title}
+                                      </Link>
+                                    ) : (
+                                      <p
+                                        className={`text-[12px] font-medium leading-snug ${
+                                          block.completed
+                                            ? 'text-clay/60 line-through'
+                                            : 'text-ink'
+                                        }`}
+                                      >
+                                        {block.title}
+                                      </p>
+                                    )}
+
+                                    {/* Category + duration (no clock time) */}
+                                    <div className="flex items-center gap-1.5 flex-wrap mt-1">
+                                      <span
+                                        className={`inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-bold border ${categoryColor}`}
+                                      >
+                                        {CATEGORY_LABELS[activityCategory] ||
+                                          block.subject}
+                                      </span>
+                                      <span className="text-[9px] text-clay/40">
+                                        {block.duration}m
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Actions */}
+                                  {!block.completed && !past && (
+                                    <div className="flex items-center gap-0.5 opacity-0 group-hover/block:opacity-100 transition-opacity print:hidden">
+                                      <button
+                                        onClick={() =>
+                                          setSwapState({
+                                            planId: plan!.id,
+                                            blockIndex,
+                                            category: activityCategory,
+                                          })
+                                        }
+                                        className="p-1 rounded hover:bg-stone/20"
+                                        title="Swap"
+                                      >
+                                        <Shuffle className="h-3 w-3 text-clay/50" />
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          removeBlock(plan!.id, blockIndex)
+                                        }
+                                        className="p-1 rounded hover:bg-terracotta/10"
+                                        title="Remove"
+                                      >
+                                        <Trash2 className="h-3 w-3 text-terracotta/50" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                          {/* Empty part - gentle add */}
+                          {partBlocks.length === 0 && (
+                            <button
+                              onClick={() =>
+                                !past &&
+                                setShowAddModal({ date, slot: part.key })
+                              }
+                              disabled={past}
+                              className={`w-full rounded-xl border border-dashed border-stone/30 px-2 py-3 text-[10px] transition-all flex flex-col items-center justify-center gap-0.5 ${
+                                past
+                                  ? 'text-clay/25 cursor-default'
+                                  : 'text-clay/40 hover:border-moss/40 hover:text-moss/60 print:hidden'
+                              }`}
+                            >
+                              {!past && <Plus className="h-3 w-3" />}
+                              <span className="italic">{part.hint}</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* ─── Auto-Suggestions ─── */}
       {hasPlans && (
         <div className="print:hidden">
@@ -1488,7 +1909,8 @@ export function PlannerClient({
                 </h3>
                 <p className="text-[12px] text-clay">
                   {formatDateLong(showAddModal.date)} &middot;{' '}
-                  {TIME_SLOTS.find((s) => s.key === showAddModal.slot)?.label}
+                  {DAY_PARTS.find((p) => p.key === showAddModal.slot)?.label ||
+                    TIME_SLOTS.find((s) => s.key === showAddModal.slot)?.label}
                 </p>
               </div>
               <button
@@ -1527,7 +1949,7 @@ export function PlannerClient({
                     <button
                       key={activity.id}
                       onClick={() =>
-                        addActivityToSlot(
+                        addFromModal(
                           activity,
                           showAddModal.date,
                           showAddModal.slot
@@ -1571,7 +1993,7 @@ export function PlannerClient({
                     <button
                       key={activity.id}
                       onClick={() =>
-                        addActivityToSlot(
+                        addFromModal(
                           activity,
                           showAddModal.date,
                           showAddModal.slot
