@@ -60,6 +60,29 @@ export async function POST(request: NextRequest) {
 
     const tier = family?.subscription_tier || 'free';
     const weeklyLimit = RATE_LIMITS[tier] || 5;
+    const familyId = profile?.family_id;
+
+    // Enforce the weekly limit server-side against the real ai_usage ledger.
+    // (Monday-start week, matching the rest of the app.)
+    const now = new Date();
+    const day = now.getDay();
+    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day + (day === 0 ? -6 : 1));
+    let used = 0;
+    if (familyId) {
+      const { count } = await supabase
+        .from('ai_usage')
+        .select('*', { count: 'exact', head: true })
+        .eq('family_id', familyId)
+        .eq('feature', 'ai_suggestions')
+        .gte('created_at', weekStart.toISOString());
+      used = count || 0;
+    }
+    if (used >= weeklyLimit) {
+      return apiError(
+        `You've used all ${weeklyLimit} of this week's idea requests on the ${tier} plan. Upgrade to ask for more.`,
+        402
+      );
+    }
 
     const body = await request.json();
     const { prompt, context } = body;
@@ -93,11 +116,17 @@ export async function POST(request: NextRequest) {
       // If JSON parsing fails, return the text response
     }
 
+    // Record the spend so the limit means something.
+    if (familyId) {
+      await supabase.from('ai_usage').insert({ family_id: familyId, feature: 'ai_suggestions' });
+    }
+
     return apiSuccess({
       suggestions,
       text: responseText,
       tier,
       weeklyLimit,
+      used: used + 1,
     });
   } catch (err) {
     console.error('AI suggestion error:', err);

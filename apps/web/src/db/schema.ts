@@ -166,6 +166,17 @@ export const activityFavourites = pgTable('activity_favourites', {
   uniqueIndex('activity_favourites_family_activity_idx').on(table.familyId, table.activityId),
 ]);
 
+// Per-family AI usage ledger for server-side tier enforcement
+// (migrations/0004_ai_usage.sql).
+export const aiUsage = pgTable('ai_usage', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  feature: text('feature').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('ai_usage_family_feature_idx').on(table.familyId, table.feature, table.createdAt),
+]);
+
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(), // references auth.users
   familyId: uuid('family_id').references(() => families.id, { onDelete: 'cascade' }),

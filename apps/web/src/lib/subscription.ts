@@ -121,12 +121,12 @@ export async function getUsageCount(
 
   // Map feature to table/query
   if (feature === 'ai_suggestions') {
-    // Count chat messages from the family this period
-    // Uses activity_logs as a proxy - in production you'd have a usage_tracking table
+    // Real per-family AI usage ledger (see ai_usage table).
     const { count } = await supabase
-      .from('activity_logs')
+      .from('ai_usage')
       .select('*', { count: 'exact', head: true })
       .eq('family_id', familyId)
+      .eq('feature', 'ai_suggestions')
       .gte('created_at', startDate.toISOString());
 
     return count || 0;
