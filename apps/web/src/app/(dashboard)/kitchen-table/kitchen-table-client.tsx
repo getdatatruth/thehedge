@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Leaf, Plus, X } from 'lucide-react';
+import { ArrowRight, Leaf, Plus, X, Mic } from 'lucide-react';
 import type { KTChild, KTAnswers, KTFramework } from '@/lib/kitchen-table';
 
 const INTEREST_OPTIONS = [
@@ -143,14 +143,14 @@ export function KitchenTableClient() {
                     value={c.name}
                     onChange={(ev) => setChildren((cs) => cs.map((x, j) => j === i ? { ...x, name: ev.target.value } : x))}
                     placeholder="Name"
-                    className="flex-1 rounded-xl border border-stone/50 px-3 py-2 text-sm focus:outline-none focus:border-moss"
+                    className="flex-1 min-w-0 rounded-xl border border-stone/50 px-3 py-2.5 text-base focus:outline-none focus:border-moss"
                   />
                   <input
                     value={c.age ?? ''}
                     onChange={(ev) => setChildren((cs) => cs.map((x, j) => j === i ? { ...x, age: ev.target.value ? parseInt(ev.target.value) : null } : x))}
                     placeholder="Age"
                     inputMode="numeric"
-                    className="w-16 rounded-xl border border-stone/50 px-3 py-2 text-sm text-center focus:outline-none focus:border-moss"
+                    className="w-16 shrink-0 rounded-xl border border-stone/50 px-3 py-2.5 text-base text-center focus:outline-none focus:border-moss"
                   />
                   {children.length > 1 && (
                     <button onClick={() => setChildren((cs) => cs.filter((_, j) => j !== i))} className="text-clay/50 hover:text-terracotta">
@@ -175,9 +175,11 @@ export function KitchenTableClient() {
               </div>
             ))}
           </div>
-          <button onClick={() => setChildren((cs) => [...cs, { name: '', age: null, interests: [] }])} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-moss mt-3">
-            <Plus className="h-3.5 w-3.5" /> Add another
-          </button>
+          <div className="mt-4">
+            <button onClick={() => setChildren((cs) => [...cs, { name: '', age: null, interests: [] }])} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-moss">
+              <Plus className="h-3.5 w-3.5" /> Add another
+            </button>
+          </div>
           <PrimaryButton
             disabled={!children.some((c) => c.name.trim())}
             onClick={() => {
@@ -234,6 +236,7 @@ export function KitchenTableClient() {
         <ChipTurn
           question="When does learning usually happen for you?"
           chips={RHYTHM_CHIPS}
+          placeholder="or describe your week..."
           onSubmit={(key, text) => {
             setAnswers((a) => ({ ...a, rhythmKey: key, rhythmText: text }));
             record('When does learning happen?', text || RHYTHM_CHIPS.find((c) => c.key === key)?.label || '');
@@ -249,7 +252,7 @@ export function KitchenTableClient() {
             value={answers.county || ''}
             onChange={(ev) => setAnswers((a) => ({ ...a, county: ev.target.value }))}
             placeholder="Your county"
-            className="w-full rounded-xl border border-stone/50 px-3 py-2.5 text-sm focus:outline-none focus:border-moss"
+            className="w-full rounded-xl border border-stone/50 px-3 py-3 text-base focus:outline-none focus:border-moss"
           />
           <div className="flex flex-wrap gap-2 mt-4">
             {OUTDOOR_CHIPS.map((c) => (
@@ -308,6 +311,51 @@ function PrimaryButton({ children, onClick, disabled }: { children: React.ReactN
   );
 }
 
+interface SpeechRec {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void;
+  onend: () => void;
+  onerror: () => void;
+  start: () => void;
+  stop: () => void;
+}
+
+// Lightweight in-browser speech-to-text so a parent can just talk their answer.
+function useSpeech(onText: (t: string) => void) {
+  const [listening, setListening] = useState(false);
+  const recRef = useRef<SpeechRec | null>(null);
+  const supported = typeof window !== 'undefined' &&
+    (('SpeechRecognition' in window) || ('webkitSpeechRecognition' in window));
+
+  function toggle() {
+    if (!supported) return;
+    if (listening) { recRef.current?.stop(); setListening(false); return; }
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SpeechRec;
+      webkitSpeechRecognition?: new () => SpeechRec;
+    };
+    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!Ctor) return;
+    const rec = new Ctor();
+    rec.lang = 'en-IE';
+    rec.interimResults = true;
+    rec.continuous = true;
+    rec.onresult = (e) => {
+      let t = '';
+      for (let i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+      onText(t);
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    recRef.current = rec;
+    rec.start();
+    setListening(true);
+  }
+  return { supported, listening, toggle };
+}
+
 function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }: {
   question: string;
   chips: { key: string; label: string }[];
@@ -318,6 +366,7 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
 }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [text, setText] = useState('');
+  const speech = useSpeech((t) => { setText(t); setSelected(null); });
   const canGo = selected !== null || text.trim().length > 0;
   return (
     <Turn>
@@ -335,13 +384,30 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
         ))}
       </div>
       {placeholder && (
-        <textarea
-          value={text}
-          onChange={(e) => { setText(e.target.value); if (e.target.value) setSelected(null); }}
-          placeholder={placeholder}
-          rows={2}
-          className="w-full mt-3 rounded-2xl border border-stone/40 px-4 py-3 text-[14px] focus:outline-none focus:border-moss resize-none"
-        />
+        <div className="relative mt-3">
+          <textarea
+            value={text}
+            onChange={(e) => { setText(e.target.value); if (e.target.value) setSelected(null); }}
+            placeholder={speech.listening ? 'Listening, just talk away...' : placeholder}
+            rows={3}
+            className="w-full rounded-2xl border border-stone/40 px-4 py-3 pr-14 text-base focus:outline-none focus:border-moss resize-none"
+          />
+          {speech.supported && (
+            <button
+              type="button"
+              onClick={speech.toggle}
+              aria-label={speech.listening ? 'Stop recording' : 'Speak your answer'}
+              className={`absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+                speech.listening ? 'bg-terracotta text-white animate-pulse' : 'bg-moss/10 text-moss hover:bg-moss/20'
+              }`}
+            >
+              <Mic className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      )}
+      {placeholder && speech.supported && !speech.listening && (
+        <p className="text-[12px] text-clay/70 mt-2">Prefer to talk? Tap the mic and just say it.</p>
       )}
       <PrimaryButton disabled={!canGo} onClick={() => onSubmit(selected || 'other', text.trim() || undefined)}>
         {submitLabel || 'Continue'}
