@@ -14,6 +14,7 @@ import {
   CalendarDays,
   Bell,
   FolderOpen,
+  Leaf,
   ChevronsLeft,
   ChevronsRight,
   User,
@@ -282,6 +283,14 @@ function SidebarContent({
 
         {userMenuOpen && !collapsed && (
           <div className="absolute bottom-full left-2 right-2 mb-1 rounded-lg bg-[#1a3520] border border-parchment/8 py-1 shadow-xl shadow-black/30 animate-scale-in z-50">
+            <Link
+              href="/our-hedge"
+              onClick={() => setUserMenuOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 text-[12px] font-medium text-sage hover:bg-parchment/6 hover:text-sage transition-colors"
+            >
+              <Leaf className="h-3.5 w-3.5" />
+              Our Hedge
+            </Link>
             <Link
               href="/settings"
               onClick={() => setUserMenuOpen(false)}
