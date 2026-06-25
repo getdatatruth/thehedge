@@ -1,13 +1,16 @@
 import { supabase } from './supabase';
 
-const API_BASE = __DEV__
-  ? 'http://192.168.68.106:3000/api/v1'
-  : 'https://app.thehedge.ie/api/v1';
+// API base URL. In dev, override via EXPO_PUBLIC_API_URL (e.g. http://192.168.x.x:3000)
+// so it is not machine-specific. Production always uses the hosted platform.
+const PROD_API_ORIGIN = 'https://app.thehedge.ie';
+const API_ORIGIN = __DEV__
+  ? process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000'
+  : PROD_API_ORIGIN;
+
+const API_BASE = `${API_ORIGIN}/api/v1`;
 
 // Base URL without /v1 for routes outside the versioned API (e.g. /api/onboarding, /api/stripe/*)
-const API_ROOT = __DEV__
-  ? 'http://192.168.68.106:3000/api'
-  : 'https://app.thehedge.ie/api';
+const API_ROOT = `${API_ORIGIN}/api`;
 
 interface ApiResponse<T> {
   success: boolean;

@@ -26,7 +26,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { TierGate } from '@/components/shared/TierGate';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface ChildCompliance {
@@ -86,13 +86,13 @@ const checkStyles = StyleSheet.create({
     gap: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: `${colors.stone}40`,
+    borderBottomColor: `${lightTheme.border}40`,
   },
   iconWrap: {
     width: 36,
     height: 36,
     borderRadius: radius.md,
-    backgroundColor: `${colors.moss}10`,
+    backgroundColor: `${lightTheme.primary}10`,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -103,11 +103,11 @@ const checkStyles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   detail: {
     fontSize: 11,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
 });
 
@@ -129,7 +129,7 @@ export default function TuslaScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Tusla Compliance</Text>
       </View>
@@ -142,7 +142,7 @@ export default function TuslaScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.primary}
           />
         }
       >
@@ -165,7 +165,7 @@ export default function TuslaScreen() {
 
             <Card variant="elevated" padding="lg">
               <RecordRow
-                icon={<FileText size={16} color={colors.moss} />}
+                icon={<FileText size={16} color={lightTheme.primary} />}
                 label="Education plan"
                 detail={
                   child.education_plan_filed
@@ -174,21 +174,21 @@ export default function TuslaScreen() {
                 }
               />
               <RecordRow
-                icon={<CalendarCheck size={16} color={colors.moss} />}
+                icon={<CalendarCheck size={16} color={lightTheme.primary} />}
                 label="Days of learning logged"
                 detail={`${child.attendance_records} ${
                   child.attendance_records === 1 ? 'day' : 'days'
                 } recorded`}
               />
               <RecordRow
-                icon={<Clock size={16} color={colors.moss} />}
+                icon={<Clock size={16} color={lightTheme.primary} />}
                 label="Hours noted"
                 detail={`${child.hours_logged} ${
                   child.hours_logged === 1 ? 'hour' : 'hours'
                 } noted this year`}
               />
               <RecordRow
-                icon={<FolderOpen size={16} color={colors.moss} />}
+                icon={<FolderOpen size={16} color={lightTheme.primary} />}
                 label="Portfolio entries"
                 detail={`${child.portfolio_entries} ${
                   child.portfolio_entries === 1 ? 'entry' : 'entries'
@@ -205,7 +205,7 @@ export default function TuslaScreen() {
 
         {children.length === 0 && (
           <View style={styles.emptyState}>
-            <AlertCircle size={32} color={`${colors.clay}40`} />
+            <AlertCircle size={32} color={`${lightTheme.textSecondary}40`} />
             <Text style={styles.emptyTitle}>No records yet</Text>
             <Text style={styles.emptyBody}>
               Create an education plan to start keeping a record of your
@@ -218,7 +218,7 @@ export default function TuslaScreen() {
         <Card variant="elevated" padding="lg">
           <View style={styles.infoCard}>
             <View style={styles.infoIconWrap}>
-              <Info size={18} color={colors.moss} />
+              <Info size={18} color={lightTheme.primary} />
             </View>
             <View style={styles.infoContent}>
               <Text style={styles.infoTitle}>About Tusla registration</Text>
@@ -240,7 +240,7 @@ export default function TuslaScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  headerTitle: { fontSize: 20, fontWeight: '300', color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   childName: {
     fontSize: 18,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   childMeta: {
     flexDirection: 'row',
@@ -282,16 +282,16 @@ const styles = StyleSheet.create({
   },
   childMetaText: {
     fontSize: 13,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textTransform: 'capitalize',
   },
   childMetaDot: {
     fontSize: 13,
-    color: `${colors.clay}60`,
+    color: `${lightTheme.textSecondary}60`,
   },
   recordNote: {
     fontSize: 12,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     lineHeight: 18,
     paddingHorizontal: spacing.xs,
   },
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   emptyBody: {
     fontSize: 14,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     maxWidth: 280,
     lineHeight: 20,
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: `${colors.moss}10`,
+    backgroundColor: `${lightTheme.primary}10`,
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -332,11 +332,11 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   infoBody: {
     fontSize: 12,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     lineHeight: 18,
   },
 });

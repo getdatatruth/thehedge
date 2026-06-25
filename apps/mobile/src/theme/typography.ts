@@ -1,17 +1,22 @@
 import { Platform, TextStyle } from 'react-native';
 
 // Font families
-// Display: Cormorant Garamond (brand identity, elegant headers)
-// UI/Body: System font (clean, modern - Runna pattern)
+// No custom font files are bundled (assets/fonts is empty), so we use the
+// platform system font throughout. This matches the web app's clean, modern
+// direction (Inter on web -> system on native) and avoids broken font
+// references that silently fall back to system anyway.
+const systemFont = Platform.select({ ios: 'System', android: 'sans-serif' }) ?? 'System';
+const systemFontMedium = Platform.select({ ios: 'System', android: 'sans-serif-medium' }) ?? 'System';
+
 export const fonts = {
-  display: 'CormorantGaramond-Light',
-  displayItalic: 'CormorantGaramond-LightItalic',
-  displayMedium: 'CormorantGaramond-Medium',
-  ui: Platform.select({ ios: 'System', android: 'sans-serif' }) ?? 'System',
-  uiBold: Platform.select({ ios: 'System', android: 'sans-serif-medium' }) ?? 'System',
-  // Keep body aliases pointing to system font for v2
-  body: Platform.select({ ios: 'System', android: 'sans-serif' }) ?? 'System',
-  bodyItalic: Platform.select({ ios: 'System', android: 'sans-serif' }) ?? 'System',
+  // Display now uses the system font (weight carries the emphasis instead of a serif face).
+  display: systemFont,
+  displayItalic: systemFont,
+  displayMedium: systemFontMedium,
+  ui: systemFont,
+  uiBold: systemFontMedium,
+  body: systemFont,
+  bodyItalic: systemFont,
 } as const;
 
 // Type scale - modernized with tighter spacing and bolder weights
@@ -21,12 +26,14 @@ export const typography = {
     fontSize: 36,
     lineHeight: 40,
     letterSpacing: -0.5,
+    fontWeight: '700' as const,
   } as TextStyle,
   h1: {
     fontFamily: fonts.display,
     fontSize: 30,
     lineHeight: 36,
     letterSpacing: -0.3,
+    fontWeight: '700' as const,
   } as TextStyle,
   h2: {
     fontFamily: fonts.ui,

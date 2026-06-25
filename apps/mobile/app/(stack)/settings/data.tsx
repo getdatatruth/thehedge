@@ -14,7 +14,7 @@ import { supabase } from '@/lib/supabase';
 import { apiDelete } from '@/lib/api';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 export default function DataPrivacyScreen() {
@@ -67,7 +67,7 @@ export default function DataPrivacyScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Data & Privacy</Text>
       </View>
@@ -79,7 +79,7 @@ export default function DataPrivacyScreen() {
         {/* Export data */}
         <Card variant="elevated" padding="xl">
           <View style={styles.sectionHeader}>
-            <Download size={20} color={colors.moss} />
+            <Download size={20} color={lightTheme.primary} />
             <Text style={styles.sectionTitle}>Export your data</Text>
           </View>
           <Text style={styles.sectionDescription}>
@@ -99,8 +99,8 @@ export default function DataPrivacyScreen() {
         {/* Delete account */}
         <Card variant="elevated" padding="xl" style={styles.dangerCard}>
           <View style={styles.sectionHeader}>
-            <Trash2 size={20} color={colors.terracotta} />
-            <Text style={[styles.sectionTitle, { color: colors.terracotta }]}>
+            <Trash2 size={20} color={lightTheme.error} />
+            <Text style={[styles.sectionTitle, { color: lightTheme.error }]}>
               Delete account
             </Text>
           </View>
@@ -128,7 +128,7 @@ export default function DataPrivacyScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { fontSize: 20, fontWeight: '300', color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
@@ -159,24 +159,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   sectionDescription: {
     fontSize: 14,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     lineHeight: 20,
   },
   dangerCard: {
-    borderColor: `${colors.terracotta}30`,
+    borderColor: `${lightTheme.error}30`,
   },
   dangerDescription: {
     fontSize: 14,
-    color: colors.terracotta,
+    color: lightTheme.error,
     lineHeight: 20,
   },
   gdprNote: {
     fontSize: 12,
-    color: `${colors.clay}80`,
+    color: `${lightTheme.textSecondary}80`,
     textAlign: 'center',
     lineHeight: 18,
     paddingHorizontal: spacing.xl,

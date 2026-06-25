@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import * as Haptics from 'expo-haptics';
-import { Plus, Trash2, Calendar } from 'lucide-react-native';
+import { Plus, Trash2, Calendar, ChevronDown } from 'lucide-react-native';
 import { darkTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
@@ -12,23 +11,38 @@ import { useOnboardingStore } from '@/stores/onboarding-store';
 
 const TOTAL_STEPS = 9;
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 function formatDate(dateStr: string): string {
   if (!dateStr) return '';
   const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
+  return `${d.getDate()} ${MONTHS_FULL[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 function calcAge(dateStr: string): string {
   if (!dateStr) return '';
   const dob = new Date(dateStr + 'T00:00:00');
   const now = new Date();
-  const years = now.getFullYear() - dob.getFullYear();
-  const months = now.getMonth() - dob.getMonth();
-  const totalMonths = years * 12 + months;
-
-  if (totalMonths < 12) return `${totalMonths} months`;
-  if (totalMonths < 24) return `${years} year${months > 0 ? `, ${months} months` : ''}`;
+  const totalMonths = (now.getFullYear() - dob.getFullYear()) * 12 + (now.getMonth() - dob.getMonth());
+  if (totalMonths < 1) return 'Newborn';
+  if (totalMonths < 12) return `${totalMonths} month${totalMonths === 1 ? '' : 's'}`;
+  const years = Math.floor(totalMonths / 12);
+  const months = totalMonths % 12;
+  if (years < 2) return months > 0 ? `${years} year, ${months} months` : `${years} year`;
   return `${years} years old`;
+}
+
+// Generate year options from current year back to 2010
+function getYears(): number[] {
+  const currentYear = new Date().getFullYear();
+  const years: number[] = [];
+  for (let y = currentYear; y >= 2010; y--) years.push(y);
+  return years;
+}
+
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month + 1, 0).getDate();
 }
 
 export default function ChildrenScreen() {
@@ -38,18 +52,36 @@ export default function ChildrenScreen() {
   const updateChild = useOnboardingStore((s) => s.updateChild);
   const removeChild = useOnboardingStore((s) => s.removeChild);
 
-  const [showPickerIndex, setShowPickerIndex] = useState<number | null>(null);
+  const [activePickerIndex, setActivePickerIndex] = useState<number | null>(null);
+  const [pickerYear, setPickerYear] = useState(2022);
+  const [pickerMonth, setPickerMonth] = useState(0);
+  const [pickerDay, setPickerDay] = useState(1);
 
   const canContinue = children.length > 0 && children.every((c) => c.name.trim().length > 0 && c.dateOfBirth.length > 0);
 
-  function handleDateChange(index: number, event: DateTimePickerEvent, date?: Date) {
-    if (event.type === 'set' && date) {
-      const dateStr = date.toISOString().split('T')[0];
-      updateChild(index, 'dateOfBirth', dateStr);
+  function openPicker(index: number) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const child = children[index];
+    if (child.dateOfBirth) {
+      const d = new Date(child.dateOfBirth + 'T00:00:00');
+      setPickerYear(d.getFullYear());
+      setPickerMonth(d.getMonth());
+      setPickerDay(d.getDate());
+    } else {
+      setPickerYear(2022);
+      setPickerMonth(0);
+      setPickerDay(1);
     }
-    if (Platform.OS === 'android') {
-      setShowPickerIndex(null);
-    }
+    setActivePickerIndex(activePickerIndex === index ? null : index);
+  }
+
+  function confirmDate(index: number) {
+    const maxDay = getDaysInMonth(pickerYear, pickerMonth);
+    const day = Math.min(pickerDay, maxDay);
+    const dateStr = `${pickerYear}-${String(pickerMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    updateChild(index, 'dateOfBirth', dateStr);
+    setActivePickerIndex(null);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }
 
   return (
@@ -72,7 +104,6 @@ export default function ChildrenScreen() {
                   removeChild(i);
                 }}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                accessibilityLabel="Remove child"
               >
                 <Trash2 size={18} color={darkTheme.textMuted} />
               </TouchableOpacity>
@@ -88,15 +119,13 @@ export default function ChildrenScreen() {
             autoCapitalize="words"
           />
 
-          {/* Date of birth picker */}
+          {/* Date of birth selector */}
           <TouchableOpacity
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              setShowPickerIndex(showPickerIndex === i ? null : i);
-            }}
-            style={[styles.input, styles.dateButton]}
+            onPress={() => openPicker(i)}
+            style={[styles.input as ViewStyle, styles.dateButton]}
+            activeOpacity={0.7}
           >
-            <Calendar size={16} color={child.dateOfBirth ? darkTheme.text : darkTheme.textMuted} />
+            <Calendar size={16} color={child.dateOfBirth ? darkTheme.accent : darkTheme.textMuted} />
             <View style={{ flex: 1 }}>
               <Text style={[styles.dateText, !child.dateOfBirth && styles.datePlaceholder]}>
                 {child.dateOfBirth ? formatDate(child.dateOfBirth) : 'Date of birth'}
@@ -105,28 +134,65 @@ export default function ChildrenScreen() {
                 <Text style={styles.ageText}>{calcAge(child.dateOfBirth)}</Text>
               ) : null}
             </View>
+            <ChevronDown size={16} color={darkTheme.textMuted} style={activePickerIndex === i ? { transform: [{ rotate: '180deg' }] } : undefined} />
           </TouchableOpacity>
 
-          {showPickerIndex === i && (
+          {/* Inline date picker */}
+          {activePickerIndex === i && (
             <View style={styles.pickerContainer}>
-              <DateTimePicker
-                value={child.dateOfBirth ? new Date(child.dateOfBirth + 'T00:00:00') : new Date(2020, 0, 1)}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                maximumDate={new Date()}
-                minimumDate={new Date(2010, 0, 1)}
-                onChange={(event, date) => handleDateChange(i, event, date)}
-                themeVariant="dark"
-                textColor={darkTheme.text}
-              />
-              {Platform.OS === 'ios' && (
-                <TouchableOpacity
-                  onPress={() => setShowPickerIndex(null)}
-                  style={styles.doneButton}
-                >
-                  <Text style={styles.doneText}>Done</Text>
-                </TouchableOpacity>
-              )}
+              <View style={styles.pickerRow}>
+                {/* Day */}
+                <View style={styles.pickerColumn}>
+                  <Text style={styles.pickerLabel}>Day</Text>
+                  <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
+                    {Array.from({ length: getDaysInMonth(pickerYear, pickerMonth) }, (_, d) => d + 1).map(d => (
+                      <TouchableOpacity
+                        key={d}
+                        onPress={() => setPickerDay(d)}
+                        style={[styles.pickerItem, pickerDay === d && styles.pickerItemActive]}
+                      >
+                        <Text style={[styles.pickerItemText, pickerDay === d && styles.pickerItemTextActive]}>{d}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+
+                {/* Month */}
+                <View style={[styles.pickerColumn, { flex: 1.5 }]}>
+                  <Text style={styles.pickerLabel}>Month</Text>
+                  <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
+                    {MONTHS.map((m, idx) => (
+                      <TouchableOpacity
+                        key={m}
+                        onPress={() => setPickerMonth(idx)}
+                        style={[styles.pickerItem, pickerMonth === idx && styles.pickerItemActive]}
+                      >
+                        <Text style={[styles.pickerItemText, pickerMonth === idx && styles.pickerItemTextActive]}>{m}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+
+                {/* Year */}
+                <View style={styles.pickerColumn}>
+                  <Text style={styles.pickerLabel}>Year</Text>
+                  <ScrollView style={styles.pickerScroll} showsVerticalScrollIndicator={false}>
+                    {getYears().map(y => (
+                      <TouchableOpacity
+                        key={y}
+                        onPress={() => setPickerYear(y)}
+                        style={[styles.pickerItem, pickerYear === y && styles.pickerItemActive]}
+                      >
+                        <Text style={[styles.pickerItemText, pickerYear === y && styles.pickerItemTextActive]}>{y}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+
+              <TouchableOpacity onPress={() => confirmDate(i)} style={styles.confirmButton}>
+                <Text style={styles.confirmText}>Confirm</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -198,15 +264,50 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     overflow: 'hidden',
   },
-  doneButton: {
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: darkTheme.border,
+  pickerRow: {
+    flexDirection: 'row',
+    height: 180,
   },
-  doneText: {
-    ...typography.uiBold,
+  pickerColumn: {
+    flex: 1,
+    borderRightWidth: 1,
+    borderRightColor: darkTheme.border,
+  },
+  pickerLabel: {
+    ...typography.caption,
+    color: darkTheme.textMuted,
+    textAlign: 'center',
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: darkTheme.border,
+  },
+  pickerScroll: {
+    flex: 1,
+  },
+  pickerItem: {
+    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+  },
+  pickerItemActive: {
+    backgroundColor: `${darkTheme.accent}20`,
+  },
+  pickerItemText: {
+    ...typography.body,
+    color: darkTheme.textSecondary,
+  },
+  pickerItemTextActive: {
     color: darkTheme.accent,
+    fontWeight: '700',
+  },
+  confirmButton: {
+    backgroundColor: darkTheme.accent,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  confirmText: {
+    ...typography.button,
+    color: '#FFFFFF',
   },
   addButton: {
     flexDirection: 'row',

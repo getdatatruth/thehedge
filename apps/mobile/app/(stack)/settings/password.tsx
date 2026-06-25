@@ -13,7 +13,7 @@ import { ChevronLeft } from 'lucide-react-native';
 import { useApiPut } from '@/hooks/use-api';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 export default function PasswordScreen() {
@@ -56,7 +56,7 @@ export default function PasswordScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Change Password</Text>
       </View>
@@ -106,7 +106,7 @@ export default function PasswordScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  title: { fontSize: 20, fontWeight: '300', color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['4xl'],
