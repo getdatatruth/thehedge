@@ -6,6 +6,7 @@ import { CATEGORY_CONFIG } from '@/components/shared/activity-card';
 import { InsightCard } from '@/components/shared/insight-card';
 import { NewThisWeek } from '@/components/shared/new-this-week';
 import { type MockActivity } from '@/lib/mock-data';
+import { structureFromApproach } from '@/lib/personalisation';
 import {
   ArrowRight,
   Shuffle,
@@ -52,6 +53,7 @@ interface TodayClientProps {
   isFreeUser?: boolean;
   learningPath?: string | null;
   activitiesLogged?: number;
+  approach?: string | null;
 }
 
 // Reframe chips re-pick the single hero, they do not open a list.
@@ -86,9 +88,12 @@ export function TodayClient({
   isFreeUser = false,
   learningPath,
   activitiesLogged = 0,
+  approach,
 }: TodayClientProps) {
   const [reframe, setReframe] = useState<string | null>(null);
   const [shuffle, setShuffle] = useState(0);
+  const [loggedId, setLoggedId] = useState<string | null>(null);
+  const [logging, setLogging] = useState(false);
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const today = dayNames[new Date().getDay()];
@@ -117,13 +122,18 @@ export function TodayClient({
   const hero = pool.length > 0 ? pool[shuffle % pool.length] : null;
   const heroCat = hero ? CATEGORY_CONFIG[hero.category] || CATEGORY_CONFIG.nature : CATEGORY_CONFIG.nature;
 
+  // The hero is two-faced: planned families hear "today's plan"; emergent
+  // families (child-led / relaxed / nature-led) hear an observational thread.
+  const emergent = structureFromApproach(approach) < 0.4;
+  const firstChild = childNames[0];
   const heroLabel = (() => {
     if (reframe === 'calm') return 'Something gentler';
     if (reframe === 'quick') return 'A quick one';
     if (reframe === 'outdoor') return 'Out in the fresh air';
-    if (reframe === 'rain') return 'Cosy and indoors';
-    if (isRaining) return 'Good for a wet day';
+    if (reframe === 'rain') return emergent ? 'A cosy thread for a wet day' : 'Good for a wet day';
     if (activitiesLogged === 0) return 'A lovely place to start';
+    if (emergent) return firstChild ? `A thread ${firstChild} might love` : 'A thread worth pulling';
+    if (hasRealPlan) return 'Up next';
     if (greeting === 'Good morning') return 'To start the day';
     if (greeting === 'Good afternoon') return 'For this afternoon';
     return 'A gentle one for this evening';
@@ -134,6 +144,31 @@ export function TodayClient({
   const leavesFilled = Math.min(moments, SEASON_LEAF_SLOTS);
 
   const showOpenDoor = learningPath === 'considering' || learningPath === 'homeschool';
+
+  const heroId = hero ? (hero as { id?: string }).id ?? null : null;
+  const heroLogged = loggedId !== null && loggedId === heroId;
+
+  // One-tap "we did this": no form, just a warm note that quietly keeps the record.
+  async function quickLog() {
+    if (!hero || logging) return;
+    setLogging(true);
+    try {
+      await fetch('/api/activity-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          activity_id: heroId,
+          date: new Date().toISOString().split('T')[0],
+          child_ids: [],
+          duration_minutes: hero.duration_minutes,
+        }),
+      });
+      setLoggedId(heroId);
+    } catch {
+      // quietly ignore; the friend never scolds
+    }
+    setLogging(false);
+  }
 
   return (
     <div className="space-y-8 animate-fade-up max-w-2xl mx-auto">
@@ -199,22 +234,37 @@ export function TodayClient({
                 {hero.screen_free && <span className="text-sage">screen-free</span>}
               </div>
 
-              <div className="flex items-center gap-3 mt-7">
-                <Link
-                  href={hero.slug ? `/activity/${hero.slug}` : '/browse'}
-                  className="inline-flex items-center gap-2 bg-forest text-parchment font-semibold text-sm rounded-2xl px-6 py-3 hover:bg-forest/90 transition-colors"
-                >
-                  Let&apos;s do this
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <button
-                  onClick={() => setShuffle((s) => s + 1)}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-clay hover:text-ink transition-colors"
-                >
-                  <Shuffle className="h-3.5 w-3.5" />
-                  Show me another
-                </button>
-              </div>
+              {heroLogged ? (
+                <div className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-moss/10 px-5 py-3 text-[14px] text-moss font-medium">
+                  <Leaf className="h-4 w-4" fill="currentColor" />
+                  Lovely, that&apos;s one for the book.
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 mt-7 flex-wrap">
+                  <Link
+                    href={hero.slug ? `/activity/${hero.slug}` : '/browse'}
+                    className="inline-flex items-center gap-2 bg-forest text-parchment font-semibold text-sm rounded-2xl px-6 py-3 hover:bg-forest/90 transition-colors"
+                  >
+                    Let&apos;s do this
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <button
+                    onClick={quickLog}
+                    disabled={logging}
+                    className="inline-flex items-center gap-1.5 rounded-2xl border border-moss/30 px-4 py-3 text-[13px] font-medium text-moss hover:bg-moss/5 transition-colors disabled:opacity-50"
+                  >
+                    <Leaf className="h-3.5 w-3.5" />
+                    We did this
+                  </button>
+                  <button
+                    onClick={() => setShuffle((s) => s + 1)}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-medium text-clay hover:text-ink transition-colors"
+                  >
+                    <Shuffle className="h-3.5 w-3.5" />
+                    Show me another
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>

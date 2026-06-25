@@ -39,7 +39,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('name, families(name, county, latitude, longitude, family_style, subscription_tier, subscription_status, trial_ends_at)')
+    .select('name, families(name, county, latitude, longitude, family_style, approach, subscription_tier, subscription_status, trial_ends_at)')
     .eq('id', user.id)
     .single();
 
@@ -51,6 +51,7 @@ export default async function DashboardPage() {
     latitude: number | null;
     longitude: number | null;
     family_style: string | null;
+    approach: string | null;
     subscription_tier: string | null;
     subscription_status: string | null;
     trial_ends_at: string | null;
@@ -272,6 +273,7 @@ export default async function DashboardPage() {
       isFreeUser={effectiveTier === 'free'}
       learningPath={family?.family_style}
       activitiesLogged={activitiesLogged}
+      approach={family?.approach}
     />
   );
 }
