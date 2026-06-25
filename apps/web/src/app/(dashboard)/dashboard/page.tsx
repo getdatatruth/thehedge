@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getWeather, getSeason } from '@/lib/weather';
 import { TodayClient } from './today-client';
 import type { MockActivity } from '@/lib/mock-data';
+import { ageInYears, computeAreaWarmth, weightActivity } from '@/lib/personalisation';
 
 export const metadata = {
   title: 'Today - The Hedge',
@@ -71,31 +72,12 @@ export default async function DashboardPage() {
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-  // Use real activities from the DB only (may be empty)
-  const { data: dbActivities } = await supabase
-    .from('activities')
-    .select('*')
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  let activities: MockActivity[] = (dbActivities as MockActivity[] | null) || [];
-
-  // Filter for weather
   const isRaining = weather?.isRaining || false;
-  if (isRaining) {
-    activities = activities.filter(
-      (a) =>
-        a.location === 'indoor' ||
-        a.location === 'both' ||
-        a.location === 'anywhere'
-    );
-  }
-
   const familyName = family?.name || 'your family';
   const county = family?.county || 'Ireland';
+  const now = new Date();
 
-  // Get the user's family_id for stats queries
+  // Get the user's family_id
   const { data: userRow } = await supabase
     .from('users')
     .select('family_id')
@@ -104,17 +86,74 @@ export default async function DashboardPage() {
 
   const familyId = userRow?.family_id;
 
-  // Get real children from DB
+  // Real children (with the bits the personalisation engine needs)
   let childNames: string[] = [];
   let childIds: string[] = [];
+  let childCtxs: { age: number | null; interests: string[] }[] = [];
   if (familyId) {
     const { data: dbChildren } = await supabase
       .from('children')
-      .select('id, name')
+      .select('id, name, date_of_birth, interests')
       .eq('family_id', familyId);
     childNames = dbChildren?.map((c) => c.name) || [];
     childIds = dbChildren?.map((c) => c.id) || [];
+    childCtxs = (dbChildren || []).map((c) => ({
+      age: ageInYears(c.date_of_birth, now),
+      interests: (c.interests as string[] | null) || [],
+    }));
   }
+
+  // Recent logs feed the invisible "rounded-childhood" warmth signal
+  let warmth = {} as ReturnType<typeof computeAreaWarmth>;
+  if (familyId) {
+    const { data: recentLogs } = await supabase
+      .from('activity_logs')
+      .select('date, activity:activity_id(category)')
+      .eq('family_id', familyId)
+      .order('date', { ascending: false })
+      .limit(200);
+    warmth = computeAreaWarmth(
+      (recentLogs || []).map((l) => ({
+        date: l.date,
+        category: Array.isArray(l.activity) ? l.activity[0]?.category : (l.activity as { category?: string } | null)?.category,
+      })),
+      now,
+    );
+  }
+
+  // Candidate pool, then rank by the personalisation engine so the hero is
+  // age-appropriate, interest-bridged, weather-aware, and gently floor-balanced.
+  const { data: dbActivities } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('published', true)
+    .limit(80);
+
+  const candidates = (dbActivities as MockActivity[] | null) || [];
+  let activities: MockActivity[] = candidates
+    .map((a) => {
+      const af = {
+        category: a.category,
+        ageMin: (a as { age_min?: number }).age_min,
+        ageMax: (a as { age_max?: number }).age_max,
+        interests: (a as { interests?: string[] }).interests,
+        location: a.location,
+        season: (a as { season?: string[] }).season,
+      };
+      const w = childCtxs.length
+        ? Math.max(
+            ...childCtxs.map((cc) =>
+              weightActivity(af, { age: cc.age, childInterests: cc.interests, warmth, isRaining, season }),
+            ),
+          )
+        : weightActivity(af, { age: null, warmth, isRaining, season });
+      return { a, w };
+    })
+    // Rank age-appropriate + interest-bridged to the top (never hard-empty the
+    // day: a less-good fit still beats a blank Today).
+    .sort((x, y) => y.w - x.w)
+    .map((x) => x.a)
+    .slice(0, 24);
 
   // Fetch real weekly plan data
   const { start, end } = getWeekDates();

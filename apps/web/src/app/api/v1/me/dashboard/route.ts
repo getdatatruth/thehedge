@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
+import { ageInYears, computeAreaWarmth, weightActivity } from '@/lib/personalisation';
 
 export async function OPTIONS() {
   return apiOptions();
@@ -73,10 +74,10 @@ export async function GET(request: NextRequest) {
 
   const { data: logs } = await supabase
     .from('activity_logs')
-    .select('date')
+    .select('date, activity:activity_id(category)')
     .eq('family_id', profile.family_id)
     .order('date', { ascending: false })
-    .limit(100);
+    .limit(200);
 
   const allLogs = logs || [];
   const activitiesThisWeek = allLogs.filter((l) => l.date >= mondayStr).length;
@@ -84,13 +85,56 @@ export async function GET(request: NextRequest) {
   // Distinct days with any learning logged (honest count, never a "streak")
   const daysOfLearning = new Set(allLogs.map((l) => l.date)).size;
 
-  // Get a pool of suggested activities for today (the mobile Today "Thread"
-  // re-picks the hero from this pool using the reframe chips, so include the
-  // fields those filters need: location + energy_level).
-  const { data: activities } = await supabase
+  // Children for age/interest-aware selection
+  const { data: dbChildren } = await supabase
+    .from('children')
+    .select('id, name, date_of_birth, interests')
+    .eq('family_id', profile.family_id);
+  const childCtxs = (dbChildren || []).map((c) => ({
+    age: ageInYears(c.date_of_birth as string, now),
+    interests: (c.interests as string[] | null) || [],
+  }));
+
+  // The invisible "rounded-childhood" warmth signal from recent logs
+  const warmth = computeAreaWarmth(
+    allLogs.map((l) => ({
+      date: l.date,
+      category: Array.isArray(l.activity) ? l.activity[0]?.category : (l.activity as { category?: string } | null)?.category,
+    })),
+    now,
+  );
+
+  const isRaining = weather?.isRaining || false;
+
+  // Candidate pool, ranked by the personalisation engine so the mobile Thread
+  // hero is age-appropriate, interest-bridged and gently floor-balanced. Include
+  // the fields the engine + reframe chips need (age, interests, season, location).
+  const { data: candidatePool } = await supabase
     .from('activities')
-    .select('id, title, category, slug, duration_minutes, location, energy_level')
-    .limit(24);
+    .select('*')
+    .eq('published', true)
+    .limit(80);
+
+  const activities = (candidatePool || [])
+    .map((a) => {
+      const af = {
+        category: a.category,
+        ageMin: (a as { age_min?: number }).age_min,
+        ageMax: (a as { age_max?: number }).age_max,
+        interests: (a as { interests?: string[] }).interests,
+        location: a.location,
+        season: (a as { season?: string[] }).season,
+      };
+      const w = childCtxs.length
+        ? Math.max(...childCtxs.map((cc) => weightActivity(af, { age: cc.age, childInterests: cc.interests, warmth, isRaining })))
+        : weightActivity(af, { age: null, warmth, isRaining });
+      return { a, w };
+    })
+    // Rank age-appropriate + interest-bridged to the top (never hard-empty the
+    // day: a less-good fit still beats a blank Today).
+    .sort((x, y) => y.w - x.w)
+    .map((x) => x.a)
+    .slice(0, 24);
 
   // Get featured collections
   const { data: featuredCollections } = await supabase
