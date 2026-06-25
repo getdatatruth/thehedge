@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 const PLAN_NAMES: Record<string, string> = {
   free: 'Free',
@@ -25,7 +25,6 @@ export function SignupForm() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [confirmationSent, setConfirmationSent] = useState(false);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
@@ -38,50 +37,29 @@ export function SignupForm() {
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          ...(selectedPlan ? { plan: selectedPlan } : {}),
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+    // Create a ready-to-use account (no email-confirmation step), then sign in
+    // and head straight to The Kitchen Table.
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, name, plan: selectedPlan }),
     });
-
-    if (error) {
-      setError(error.message);
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(json.error || 'Could not create your account');
       setLoading(false);
       return;
     }
 
-    setConfirmationSent(true);
-    setLoading(false);
-  }
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (signInError) {
+      setError(signInError.message);
+      setLoading(false);
+      return;
+    }
 
-  if (confirmationSent) {
-    return (
-      <div className="bg-linen border border-stone rounded-2xl p-8 text-center space-y-4 animate-scale-in">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-forest to-moss">
-          <Mail className="h-7 w-7 text-parchment" />
-        </div>
-        <h2 className="font-display text-2xl font-bold text-ink">
-          Check your email
-        </h2>
-        <p className="text-clay">
-          We&apos;ve sent a confirmation link to <strong className="text-umber">{email}</strong>.
-          Click the link to activate your account, then you&apos;ll set up
-          your family.
-        </p>
-        <button
-          onClick={() => router.push('/login')}
-          className="text-sm text-moss hover:text-forest transition-colors"
-        >
-          Back to login
-        </button>
-      </div>
-    );
+    router.push('/welcome');
+    router.refresh();
   }
 
   return (
