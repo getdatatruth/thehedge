@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const sections = [
-  { title: 'Who we are', body: 'The Hedge is operated by [Company Name], a company registered in Ireland. Our registered address is [Address], Ireland. Our data controller email is privacy@thehedge.ie.' },
+  { title: 'Who we are', body: 'The Hedge is operated by The Hedge, based in Ireland. Our data controller can be contacted at adam@ofmm.ie (or privacy@thehedge.ie).' },
   { title: 'What data we collect', body: 'We collect the information you provide when creating an account (email address, name), information about your family (children\'s ages, interests, your county) to personalise activity suggestions, usage data about how you interact with the platform (activities viewed, completed, rated), and technical data such as browser type and IP address for security and performance purposes. We do not collect special category data about children. Children\'s profiles contain only age and interest tags - no names, photos, or identifying information are required.' },
   { title: 'How we use your data', body: 'Your data is used to: provide and personalise The Hedge service; generate your daily activity recommendations; send you platform updates and (where you have opted in) our fortnightly newsletter; provide customer support; improve the platform through aggregated, anonymised analytics. We do not use your data for advertising. We do not sell your data to third parties.' },
   { title: 'Where your data is stored', body: 'All user data is stored on servers located in Frankfurt, Germany (EU). This means your data is subject to EU law and GDPR protections at all times. We use Supabase (with EU data residency enabled) as our database provider.' },
@@ -40,6 +40,7 @@ export default function Privacy() {
                 <strong>Short version:</strong> We store your data in the EU (Frankfurt), we never sell it or use it for advertising, and you can delete everything at any time. Full details below.
               </p>
             </div>
+            {/* TODO: add registered trading address before launch */}
             {sections.map((s, i) => (
               <div key={i} style={{marginBottom:36}}>
                 <h2 style={{fontSize:20,fontWeight:700,color:'var(--ink)',marginBottom:12,fontFamily:'var(--font-display)',fontStyle:'italic'}}>{s.title}</h2>

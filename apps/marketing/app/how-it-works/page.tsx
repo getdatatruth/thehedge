@@ -17,14 +17,14 @@ const steps = [
     title:'Create your family profile',
     time:'Takes 2 minutes',
     body:"Tell us your children's names and ages, what they love (nature, art, science, sport), and what space you have - garden, apartment, access to the countryside. That's it. The Hedge handles everything else.",
-    details:["Children's ages 2–16 supported","Multi-child households handled gracefully","Update anytime as interests change","Optional: dietary, learning, and accessibility notes"],
+    details:["Children's ages 2–12 supported","Multi-child households handled gracefully","Update anytime as interests change","Optional: dietary, learning, and accessibility notes"],
   },
   {
     n:'02', id:'sun',
     title:'We check your weather every morning',
     time:'Automatic, every day',
     body:"Each morning, The Hedge pulls live weather data from Open-Meteo for your specific county. 16°C and sunny in Wicklow? Outdoor adventure it is. 8°C and horizontal rain in Mayo? We&apos;ve got a full day of indoor magic ready.",
-    details:["Live forecast data for all 32 counties","Adjusts for morning vs afternoon changes","Season-aware: activities shift as the year progresses","Met Éireann data integration"],
+    details:["Live forecast data for all 32 counties","Adjusts for morning vs afternoon changes","Season-aware: activities shift as the year progresses","Open-Meteo weather data integration"],
   },
   {
     n:'03', id:'spark',
@@ -45,7 +45,7 @@ const steps = [
     title:'Log it. Keep it forever.',
     time:'One tap, done',
     body:"Tap to mark an activity done and it joins your family&apos;s timeline - a rolling, searchable record of everything you&apos;ve made, explored, and learned together. The kind of thing you&apos;ll want to show your children when they&apos;re older.",
-    details:["One-tap activity logging","Photo attachment supported","Searchable timeline","AEARS-compliant reports (Educator plan)"],
+    details:["One-tap activity logging","Photo attachment supported","Searchable timeline","Reports to help with AEARS evidence (Educator plan)"],
   },
 ];
 

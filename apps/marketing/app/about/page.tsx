@@ -90,12 +90,12 @@ export default function About() {
           <div className="container" style={{maxWidth:700,textAlign:'center'}}>
             <div className="eyebrow eyebrow-sage" style={{justifyContent:'center'}}><div className="eyebrow-line" /><span className="eyebrow-text">Made in Ireland</span></div>
             <h2 className="section-title section-title-light" id="made-title">West Cork to <em>all 32 counties</em></h2>
-            <p style={{fontFamily:'var(--font-serif)',fontSize:'clamp(15px,2.5vw,18px)',color:'rgba(189,212,176,0.8)',lineHeight:1.75,marginBottom:32}}>The Hedge is built, hosted, and supported entirely within the EU. Our data never leaves Frankfurt. Our team is based in West Cork. And our test families live in Donegal, Tipperary, Galway, and everywhere in between.</p>
+            <p style={{fontFamily:'var(--font-serif)',fontSize:'clamp(15px,2.5vw,18px)',color:'rgba(189,212,176,0.8)',lineHeight:1.75,marginBottom:32}}>The Hedge is built, hosted, and supported entirely within the EU. Our data never leaves Frankfurt, and our weather works for every one of the 32 counties. We are a small operation in West Cork, building this for families the length and breadth of the island.</p>
             <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:14,maxWidth:440,margin:'0 auto'}}>
               {[
                 { n:'West Cork', l:'Where we build' },
                 { n:'Frankfurt', l:'Where data lives (EU)' },
-                { n:'32', l:'Counties covered' },
+                { n:'32', l:'Counties of live weather' },
                 { n:'2026', l:'Founded' },
               ].map(s => (
                 <div key={s.l} className="stat stat-dark">

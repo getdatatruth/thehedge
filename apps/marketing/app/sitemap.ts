@@ -12,11 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/community`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/blog`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${base}/blog/aears-assessment-guide-ireland`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${base}/blog/winter-activities-ireland`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${base}/blog/homeschool-ireland-beginners`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${base}/blog/screen-free-weekends`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${base}/blog/irish-seasons-activities`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${base}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${base}/terms`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ];

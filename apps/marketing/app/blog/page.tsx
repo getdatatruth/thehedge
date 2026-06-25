@@ -127,12 +127,11 @@ export default function Blog() {
           <div className="container" style={{maxWidth:600,textAlign:'center'}}>
             <div className="eyebrow eyebrow-sage" style={{justifyContent:'center'}}><div className="eyebrow-line" /><span className="eyebrow-text">Stay in the loop</span></div>
             <h2 className="section-title section-title-light" id="nl-title">New guides <em>every fortnight</em></h2>
-            <p style={{fontFamily:'var(--font-serif)',fontSize:16,color:'rgba(189,212,176,0.75)',lineHeight:1.7,marginBottom:28}}>Seasonal activity ideas, homeschool guides, and platform updates - delivered to Irish families every fortnight. No spam, ever.</p>
+            <p style={{fontFamily:'var(--font-serif)',fontSize:16,color:'rgba(189,212,176,0.75)',lineHeight:1.7,marginBottom:28}}>Seasonal activity ideas, homeschool guides, and platform updates for Irish families. No spam, ever - just send us an email and we&apos;ll keep you posted.</p>
             <div style={{display:'flex',gap:10,flexDirection:'column',maxWidth:440,margin:'0 auto'}}>
-              <input type="email" placeholder="your@email.ie" style={{background:'rgba(245,240,228,0.08)',border:'1px solid rgba(245,240,228,0.15)',color:'var(--parchment)',borderRadius:4,padding:'14px 18px',fontSize:14,fontFamily:'var(--font-heading)',outline:'none',width:'100%'}} />
-              <button style={{background:'var(--sage)',color:'var(--forest)',border:'none',borderRadius:4,padding:'14px 22px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'var(--font-heading)'}}>Subscribe - it&apos;s free</button>
+              <a href="mailto:hello@thehedge.ie?subject=Keep%20me%20in%20the%20loop" style={{background:'var(--sage)',color:'var(--forest)',border:'none',borderRadius:4,padding:'14px 22px',fontSize:13,fontWeight:700,cursor:'pointer',fontFamily:'var(--font-heading)',textDecoration:'none',display:'inline-flex',alignItems:'center',justifyContent:'center'}}>Email us to subscribe</a>
             </div>
-            <p style={{fontSize:11,color:'rgba(143,175,126,0.4)',marginTop:12}}>Unsubscribe any time. We&apos;ll never share your email.</p>
+            <p style={{fontSize:11,color:'rgba(143,175,126,0.4)',marginTop:12}}>We&apos;ll never share your email.</p>
           </div>
         </section>
 

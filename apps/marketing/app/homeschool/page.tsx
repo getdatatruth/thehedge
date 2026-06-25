@@ -6,23 +6,23 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'Homeschool in Ireland - NCCA Curriculum & AEARS Compliance | The Hedge',
-  description: 'Ireland\'s dedicated homeschool companion. NCCA curriculum mapping, Tusla AEARS-compliant learning logs, weekly planners, and PDF reports. Built for Irish home educators.',
+  title: 'Homeschool in Ireland - NCCA Curriculum & AEARS Support | The Hedge',
+  description: 'Ireland\'s home education companion. NCCA primary curriculum mapping, learning logs to help organise your AEARS evidence, weekly planners, and PDF reports. Built for Irish home educators of under-12s.',
   alternates: { canonical: 'https://thehedge.ie/homeschool' },
   keywords: ['homeschool Ireland','AEARS Ireland','Tusla homeschool','NCCA homeschool','home education Ireland'],
 };
 
 const feats = [
-  { id:'book', title:'NCCA Curriculum Mapping', body:'Every activity is tagged to the NCCA primary curriculum strands and JCSP outcomes. Your children learn through doing - The Hedge tracks the curriculum automatically in the background.' },
-  { id:'file', title:'AEARS-Compliant Learning Logs', body:"The Tusla Assessment and Evaluation of a Child's Education in a Re-enrolment Setting (AEARS) process requires evidence of learning. The Hedge auto-generates date-stamped, curriculum-tagged records of everything your child does." },
-  { id:'folder', title:'PDF Report Export', body:'Generate a formatted PDF learning report at any time - covering any date range, any subject areas, any children. Exactly what assessors want to see, with one click.' },
-  { id:'cal', title:'Weekly Curriculum Planner', body:"Plan your week across all NCCA subject areas. The Hedge suggests activities that fit your plan, balances subjects automatically, and flags any areas that haven't been covered recently." },
+  { id:'book', title:'NCCA Curriculum Mapping', body:'Every activity is tagged to the NCCA primary curriculum strands. Your children learn through doing - The Hedge tracks the curriculum automatically in the background.' },
+  { id:'file', title:'Learning Logs for AEARS', body:"The Tusla Assessment of Education in Places other than Recognised Schools (AEARS) process looks for evidence of learning. The Hedge auto-generates date-stamped, curriculum-tagged records of everything your child does, designed to help you organise that evidence." },
+  { id:'folder', title:'PDF Report Export', body:'Generate a formatted PDF learning report at any time - covering any date range, any subject areas, any children. A clear, organised record to bring to your AEARS assessment, with one click.' },
+  { id:'cal', title:'Weekly Curriculum Planner', body:"Plan your week across the NCCA primary subject areas. The Hedge suggests activities that fit your plan, balances subjects automatically, and flags any areas that haven't been covered recently." },
   { id:'users', title:'Multi-Child Management', body:"Running a household school? Manage each child's curriculum, interests, and learning records completely separately - or together, for activities that work across ages." },
   { id:'spark', title:'IEP Support Tools', body:'For children with additional learning needs, The Hedge supports Individual Education Plan (IEP) goal setting, tracking, and evidence gathering alongside the main curriculum.' },
 ];
 
 const stages = [
-  'Junior Infants – 2nd Class', '3rd – 6th Class', 'Junior Cycle', 'Transition Year', 'Senior Cycle',
+  'Junior Infants – 2nd Class', '3rd – 4th Class', '5th – 6th Class',
 ];
 
 const subjects = [
@@ -30,16 +30,10 @@ const subjects = [
   'Arts Education','Drama','Music','Physical Education','SPHE','Religious Education',
 ];
 
-const testimonials = [
-  { quote:"The AEARS reports used to take me the whole of August. Now I generate them in 90 seconds. It has genuinely transformed how I feel about the annual assessment process.", name:'Aoife Ní Dhubhghaill', role:'Homeschool parent, Galway · 3 children', initials:'AÓ' },
-  { quote:"I was nervous about homeschooling. The Hedge gave me confidence that we were covering what we needed to cover - without turning every day into a formal lesson.", name:'Mark Brennan', role:'Homeschool parent, Kilkenny · 2 children', initials:'MB', forest:true },
-  { quote:"The curriculum mapping showed me we&apos;d done more science in a month of real-life activities than my daughter&apos;s previous school year. That was the moment I knew we were doing the right thing.", name:'Deirdre Ó Catháin', role:'Homeschool parent, Clare · 4 children', initials:'DÓ' },
-];
-
 const faqs = [
-  { q:"Is The Hedge officially approved by Tusla?", a:"The Hedge is not an official Tusla product, but the learning logs it generates are designed to meet the evidencing requirements of the Tusla AEARS process. Many of our Educator families have used The Hedge's PDF reports in their AEARS submissions." },
-  { q:"What curriculum does The Hedge map to?", a:"The primary NCCA curriculum (Junior Infants to 6th Class) is fully mapped. We also have coverage of the Junior Cycle Framework (1st–3rd Year) and are working on Senior Cycle integration." },
-  { q:"Do I need to be formally registered with Tusla?", a:"The Hedge works for all home-educating families, whether you are registered under Section 14 of the Education (Welfare) Act 2000 or educating under Section 9. Our tools support both formal AEARS assessments and informal learning record keeping." },
+  { q:"Is The Hedge officially approved by Tusla?", a:"The Hedge is not an official Tusla product. The learning logs it generates are designed to help you organise the kind of evidence an AEARS assessment looks for, so you can walk in with a clear, dated record of what you have covered." },
+  { q:"What curriculum does The Hedge map to?", a:"The primary NCCA curriculum (Junior Infants to 6th Class) and the Aistear early childhood framework. The Hedge is focused on early years and primary, so it is built around the under-12 stages of Irish education." },
+  { q:"Do I need to be formally registered with Tusla?", a:"The Hedge works for all home-educating families. Our tools support both AEARS assessment preparation and everyday learning record keeping, whatever stage of registration you are at." },
   { q:"Can The Hedge replace a formal curriculum?", a:"The Hedge is a supplement and planning tool, not a standalone curriculum provider. It works beautifully alongside structured programmes like Classical Conversations, Charlotte Mason, or your own bespoke approach." },
 ];
 
@@ -48,9 +42,9 @@ export default function Homeschool() {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name: 'The Hedge Educator Plan - Irish Homeschool Companion',
-    description: "NCCA curriculum mapping, AEARS-compliant learning logs, and weekly planners for Irish home-educating families.",
+    description: "NCCA primary curriculum mapping, learning logs to help organise your AEARS evidence, and weekly planners for Irish home-educating families.",
     provider: { '@type': 'Organization', name: 'The Hedge', sameAs: 'https://thehedge.ie' },
-    educationalLevel: 'Primary, Junior Cycle',
+    educationalLevel: 'Early years and primary (Aistear, NCCA primary)',
     inLanguage: ['en-IE', 'ga'],
   };
 
@@ -63,7 +57,8 @@ export default function Homeschool() {
           <div className="container">
             <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">For home educators</span></div>
             <h1>Ireland&apos;s homeschool <em>companion</em></h1>
-            <p className="page-hero-desc">NCCA curriculum mapping, AEARS-compliant learning logs, and a weekly planner that actually knows the Irish school calendar. Everything you need to run a rich, evidenced home education.</p>
+            <p className="page-hero-desc">NCCA primary curriculum mapping, learning logs designed to help you organise the evidence an AEARS assessment looks for, and a weekly planner that actually knows the Irish school calendar. Everything you need to run a rich, evidenced home education for your under-12s.</p>
+            <p style={{fontSize:13,color:'var(--clay)',marginTop:14,maxWidth:560,lineHeight:1.6}}>The Hedge is not an official Tusla product and is not affiliated with Tusla. It is a planning and record-keeping tool built to help you prepare for your AEARS assessment.</p>
           </div>
         </div>
 
@@ -96,7 +91,7 @@ export default function Homeschool() {
                 <p className="section-body section-body-light">Every activity in The Hedge is tagged to at least one NCCA strand. Over time, the platform helps you see where your children are thriving - and which areas could use more attention.</p>
                 <div className="ncca-band" style={{marginTop:0}}>
                   <h3>Curriculum stages covered</h3>
-                  <p>From early childhood through Senior Cycle, The Hedge grows with your children.</p>
+                  <p>From early childhood through the end of primary, The Hedge grows with your children.</p>
                   <div className="stages">
                     {stages.map(s => <span key={s} className="stage">{s}</span>)}
                   </div>
@@ -122,8 +117,8 @@ export default function Homeschool() {
               {[
                 { step:'Step 1', title:'Teach normally', body:'Go about your home education as usual. Every activity you log in The Hedge is automatically tagged, dated, and linked to the relevant curriculum strands.' },
                 { step:'Step 2', title:'Review your log', body:"At any time, open the Learning Log to see a chronological record of everything you've covered - searchable by subject, strand, or date range." },
-                { step:'Step 3', title:'Generate your report', body:"When assessment time comes, click 'Generate AEARS Report'. Choose your date range and the system produces a formatted PDF in under 10 seconds." },
-                { step:'Step 4', title:'Submit with confidence', body:'Your report shows dated evidence of curriculum-aligned learning across all required subject areas - everything an assessor needs to see.' },
+                { step:'Step 3', title:'Generate your report', body:"When assessment time comes, generate a learning report. Choose your date range and the system produces a formatted PDF in under 10 seconds." },
+                { step:'Step 4', title:'Walk in prepared', body:'Your report shows dated evidence of curriculum-aligned learning across the subject areas you have covered - a clear, organised record to bring to your AEARS assessment.' },
               ].map(s => (
                 <div key={s.step} style={{background:'white',borderRadius:14,padding:'24px 20px',border:'1px solid var(--stone)'}}>
                   <div style={{fontSize:11,fontWeight:700,letterSpacing:'0.12em',textTransform:'uppercase',color:'var(--terracotta)',marginBottom:8}}>{s.step}</div>
@@ -135,28 +130,14 @@ export default function Homeschool() {
           </div>
         </section>
 
-        {/* TESTIMONIALS */}
-        <section className="section" aria-labelledby="hs-testi-title">
-          <div className="container">
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">From our community</span></div>
-            <h2 className="section-title" id="hs-testi-title">Irish homeschoolers <em>love it</em></h2>
-            <div className="testi-grid" style={{marginTop:32}}>
-              {testimonials.map(t => (
-                <article key={t.name} className={`tc ${t.forest ? 'tc-f' : 'tc-l'}`} itemScope itemType="https://schema.org/Review">
-                  <div className="tc-stars">{[1,2,3,4,5].map(s=><span key={s} style={{color:'var(--amber)',fontSize:13}}>★</span>)}</div>
-                  <blockquote className="tc-quote" itemProp="reviewBody">&ldquo;{t.quote}&rdquo;</blockquote>
-                  <div className="tc-author">
-                    <div style={{display:'flex',alignItems:'center',gap:10}}>
-                      <div className="tc-av" style={{fontSize:9,fontWeight:700,color:t.forest?'var(--sage)':'var(--forest)'}}>{t.initials}</div>
-                      <div>
-                        <div className="tc-name" itemProp="author">{t.name}</div>
-                        <div className="tc-role">{t.role}</div>
-                      </div>
-                    </div>
-                    <span className="tc-plan">Educator</span>
-                  </div>
-                </article>
-              ))}
+        {/* EARLY ACCESS */}
+        <section className="section" aria-labelledby="hs-early-title">
+          <div className="container" style={{maxWidth:720}}>
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Early access</span></div>
+            <h2 className="section-title" id="hs-early-title">Built with Irish <em>home educators</em></h2>
+            <p className="section-body">The Hedge is new, and we are building the home education tools alongside the families who use them. We will not put words in other parents&apos; mouths here. If the AEARS season fills you with dread, come and help us make the tool you wish you had - and shape it as we go.</p>
+            <div className="actions" style={{marginTop:8}}>
+              <Link href="https://app.thehedge.ie/signup?plan=educator" className="btn-primary">Try the Educator plan <Icon id="arrow-r" size={16} /></Link>
             </div>
           </div>
         </section>
@@ -173,7 +154,7 @@ export default function Homeschool() {
         <div className="cta-band">
           <div className="container">
             <h2>Start your home education <em>journey</em></h2>
-            <p>Join hundreds of Irish homeschooling families. 14-day free trial on the Educator plan - no card needed.</p>
+            <p>Become one of our founding home education families. 14-day free trial on the Educator plan - no card needed.</p>
             <div className="actions">
               <Link href="https://app.thehedge.ie/signup?plan=educator" className="btn-light">Try Educator free - 14 days <Icon id="arrow-r" size={16} /></Link>
               <Link href="/pricing" className="btn-ghost" style={{color:'var(--mist)'}}>Compare plans</Link>

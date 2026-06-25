@@ -12,19 +12,13 @@ export const metadata: Metadata = {
   openGraph: { title: 'The Hedge - Family Learning Platform for Irish Families', description: "Screen-free things to do every morning, personalised to your weather, your county and your children." }
 };
 
-const testimonials = [
-  { quote: "It knows when it's wet and cold in Donegal and suggests indoor activities automatically. No other app even knows what county we're in.", name: 'Sinéad McGuinness', role: 'Mam of 2, Donegal', plan: 'Family', initials: 'SM' },
-  { quote: "We've done things this year I'd never have thought of - a fairy door trail in our garden, pressing autumn leaves, making Irish butter. The kids ask for it every morning.", name: 'Ciarán Ó Briain', role: 'Dad of 3, Galway', plan: 'Family', initials: 'CÓ', forest: true },
-  { quote: "As a homeschooler, the AEARS logging alone is worth the subscription. It would have taken me hours each week to do manually.", name: 'Laura Hennessy', role: 'Homeschool parent, Tipperary', plan: 'Educator', initials: 'LH' },
-];
-
 const faqs = [
-  { q: "What age children is The Hedge designed for?", a: "The Hedge works for children aged 2–16. When you set up your family profile, you tell us your children's ages and the platform adjusts every suggestion accordingly - simpler sensory play for toddlers, more complex projects for older children. Multi-age families are very much catered for." },
+  { q: "What age children is The Hedge designed for?", a: "The Hedge is built for early years and primary, roughly ages 2 to 12 (Aistear and the NCCA primary curriculum). When you set up your family profile, you tell us your children's ages and the platform adjusts every suggestion accordingly - simpler sensory play for toddlers, more involved projects for older children. Multi-age families are very much catered for." },
   { q: "Do I need a subscription to use it?", a: "No - we have a free plan that gives you 1–2 activity ideas per day from a curated library. The Family plan (€6.99/month) unlocks suggestions tailored to your children and your county, weather integration, the weekly planner, and unlimited activity history. The Educator plan adds homeschool-specific tools." },
   { q: "How does the weather integration work?", a: "The Hedge pulls live weather data from Open-Meteo for your specific county every morning. If rain is forecast, it automatically surfaces indoor activities. If there's a rare sunny spell, it prioritises outdoor and nature activities. You never have to manually adjust for the weather." },
-  { q: "Is The Hedge only for homeschooling families?", a: "Not at all. The majority of our families use mainstream schools. The Hedge helps with after-school activities, weekends, school holidays, and summer. For homeschooling families, we have a dedicated Educator plan with curriculum mapping and AEARS-compliant logging." },
+  { q: "Is The Hedge only for homeschooling families?", a: "Not at all. Most families using The Hedge are in mainstream schools. The Hedge helps with after-school activities, weekends, school holidays, and summer. For homeschooling families, we have a dedicated Educator plan with curriculum mapping and learning logs." },
   { q: "Is my data stored in Ireland / the EU?", a: "Yes. All data is stored in the EU - specifically in Frankfurt, Germany - and we are fully GDPR compliant. We do not sell data to third parties or use it for advertising." },
-  { q: "Can I use The Hedge on my phone?", a: "Yes. The web app works beautifully on all mobile devices. A dedicated iOS app is in development and coming soon for Family and Educator subscribers." },
+  { q: "Can I use The Hedge on my phone?", a: "Yes. The web app works beautifully on all mobile devices. A dedicated iOS and Android app is in development and coming soon." },
 ];
 
 export default function Home() {
@@ -33,7 +27,7 @@ export default function Home() {
     '@type': 'SoftwareApplication',
     name: 'The Hedge',
     applicationCategory: 'EducationApplication',
-    operatingSystem: 'Web, iOS',
+    operatingSystem: 'Web',
     description: "Personalised, screen-free activity ideas for Irish families, shaped by your weather, your county and your children.",
     offers: [
       { '@type': 'Offer', price: '0', priceCurrency: 'EUR', name: 'Free Plan' },
@@ -69,7 +63,7 @@ export default function Home() {
             </div>
             <div className="proof fade-up-3">
               <div style={{marginLeft:6}}>
-                <div className="proof-label"><strong>1,200+ screen-free activities</strong> · made for Irish family life</div>
+                <div className="proof-label"><strong>Over 500 screen-free activities</strong> · made for Irish family life</div>
               </div>
             </div>
           </div>
@@ -123,8 +117,8 @@ export default function Home() {
           <div className="trust-inner">
             {[
               { id:'shield', text:'GDPR · EU data storage' },
-              { id:'leaf', text:'1,200+ activities' },
-              { id:'map', text:'All 32 counties' },
+              { id:'leaf', text:'Over 500 activities' },
+              { id:'map', text:'Live weather, all 32 counties' },
               { id:'check', text:'NCCA curriculum mapped' },
               { id:'lock', text:'No ads, ever' },
             ].map(t => (
@@ -205,7 +199,7 @@ export default function Home() {
             <div style={{display:'grid',gap:16,gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',marginTop:32}}>
               {[
                 { icon:'users', title:'Mainstream families', body:'After school, weekends, school holidays, summer. The Hedge gives you an endless supply of ideas that are better than the TV and more interesting than "go play outside".' },
-                { icon:'book', title:'Homeschooling families', body:'Full NCCA curriculum mapping, weekly planners, and AEARS-compliant learning logs. Everything you need to run a rich, evidenced home education.' },
+                { icon:'book', title:'Homeschooling families', body:'NCCA primary curriculum mapping, weekly planners, and learning logs designed to help you organise the evidence an AEARS assessment looks for. Everything you need to run a rich, evidenced home education.' },
                 { icon:'leaf', title:'Nature & outdoor families', body:'Half your activities are outdoors by default. Foraging, nature journalling, garden science, bog walks, beach explorations - all tailored to your county and season.' },
               ].map(c => (
                 <div key={c.title} style={{background:'white',borderRadius:16,padding:'28px 24px',border:'1px solid var(--stone)'}}>
@@ -220,27 +214,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── TESTIMONIALS ── */}
-        <section className="section" aria-labelledby="testi-title">
-          <div className="container">
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Real Irish families</span></div>
-            <h2 className="section-title" id="testi-title">What families <em>say</em></h2>
-            <div className="testi-grid" style={{marginTop:32}}>
-              {testimonials.map((t,i) => (
-                <article key={t.name} className={`tc ${t.forest ? 'tc-f' : 'tc-l'}`}>
-                  <blockquote className="tc-quote">&ldquo;{t.quote}&rdquo;</blockquote>
-                  <div className="tc-author">
-                    <div style={{display:'flex',alignItems:'center',gap:10}}>
-                      <div className="tc-av" style={{fontSize:9,fontWeight:700,color:t.forest?'var(--sage)':'var(--forest)'}}>{t.initials}</div>
-                      <div>
-                        <div className="tc-name">{t.name}</div>
-                        <div className="tc-role">{t.role}</div>
-                      </div>
-                    </div>
-                    <span className="tc-plan">{t.plan}</span>
-                  </div>
-                </article>
-              ))}
+        {/* ── EARLY ACCESS ── */}
+        <section className="section" aria-labelledby="early-title">
+          <div className="container" style={{maxWidth:720}}>
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Built in Ireland</span></div>
+            <h2 className="section-title" id="early-title">For Irish families, <em>by an Irish family</em></h2>
+            <p className="section-body">The Hedge is early in its life and we are building it alongside the families who use it. There are no invented reviews here. If you join now, you are one of our founding families, and your feedback shapes what we build next.</p>
+            <div className="actions" style={{marginTop:8}}>
+              <Link href="https://app.thehedge.ie/signup" className="btn-primary">Become a founding family <Icon id="arrow-r" size={16} /></Link>
             </div>
           </div>
         </section>
@@ -252,10 +233,10 @@ export default function Home() {
             <h2 className="section-title section-title-light" id="stats-title">Built for <em>Irish family life</em></h2>
             <div className="stats" style={{marginTop:32}}>
               {[
-                { n:'1,200+', l:'Screen-free activities' },
-                { n:'32', l:'Counties covered' },
+                { n:'520', l:'Screen-free activities' },
+                { n:'32', l:'Counties of live weather' },
                 { n:'365', l:'Mornings a year sorted' },
-                { n:'2–16', l:'Ages catered for' },
+                { n:'2–12', l:'Ages catered for' },
               ].map(s => (
                 <div key={s.l} className="stat stat-dark">
                   <div className="stat-n">{s.n}</div>
@@ -272,7 +253,7 @@ export default function Home() {
             <div style={{maxWidth:520}}>
               <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">For homeschoolers</span></div>
               <h2 className="section-title" id="hs-teaser-title">Ireland&apos;s homeschool <em>companion</em></h2>
-              <p className="section-body">NCCA curriculum mapping, AEARS-compliant learning logs, and a weekly planner that actually knows the Irish school calendar.</p>
+              <p className="section-body">NCCA primary curriculum mapping, learning logs designed to help you keep the records an AEARS assessment looks for, and a weekly planner that actually knows the Irish school calendar.</p>
               <div className="actions">
                 <Link href="/homeschool" className="btn-primary">Homeschool features <Icon id="arrow-r" size={16} /></Link>
               </div>
@@ -280,7 +261,7 @@ export default function Home() {
             <div className="sched-card">
               <div className="sched-hd">
                 <div><h3>This week&apos;s plan</h3><p>Éabha · 9 yrs · 3rd class equiv.</p></div>
-                <span style={{fontSize:9,fontWeight:700,background:'rgba(143,175,126,0.2)',color:'var(--sage)',padding:'4px 10px',borderRadius:3,letterSpacing:'0.1em',textTransform:'uppercase'}}>AEARS Ready</span>
+                <span style={{fontSize:9,fontWeight:700,background:'rgba(143,175,126,0.2)',color:'var(--sage)',padding:'4px 10px',borderRadius:3,letterSpacing:'0.1em',textTransform:'uppercase'}}>For AEARS</span>
               </div>
               <div className="sched-body">
                 <div className="sched-lbl">Wednesday - curriculum blocks</div>
@@ -317,8 +298,8 @@ export default function Home() {
             <div className="price-grid" style={{marginTop:32}}>
               {[
                 { name:'Free', tag:'Just get started', price:'€0', sub:'forever', btn:'pcb-outline', btnTxt:'Get started free', btnHref:'https://app.thehedge.ie/signup', feats:['1–2 ideas per day','Activity library (limited)','5 personalised ideas per week','Basic weekly view'], dark:false },
-                { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full 1,200+ activity library','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iOS & Android app'], dark:false, pop:'Most popular' },
-                { name:'Educator', tag:'Built for homeschoolers', price:'€14.99', sub:'/month', btn:'pcb-sage', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=educator', feats:['Everything in Family','NCCA curriculum mapping','AEARS-compliant learning logs','PDF report export','IEP support tools','Priority support'], dark:true },
+                { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full activity library (over 500)','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iOS & Android app (coming soon)'], dark:false, pop:'Most popular' },
+                { name:'Educator', tag:'Built for homeschoolers', price:'€14.99', sub:'/month', btn:'pcb-sage', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=educator', feats:['Everything in Family','NCCA primary curriculum mapping','Learning logs for AEARS evidence','PDF report export','IEP support tools','Priority support'], dark:true },
               ].map(p => (
                 <div key={p.name} className={`pc ${p.dark ? 'pc-forest' : 'pc-paper'}`} style={{position:'relative'}}>
                   {p.pop && <div className="pc-pop">{p.pop}</div>}

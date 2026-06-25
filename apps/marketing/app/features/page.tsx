@@ -5,17 +5,17 @@ import Footer from '../../components/Footer';
 import { Icon } from '../../components/Icons';
 
 export const metadata: Metadata = {
-  title: 'Features - 1,200+ Screen-Free Activities for Irish Families',
-  description: 'Explore The Hedge\'s full feature set: activity ideas tailored to your children and your county, weather-aware planning, NCCA curriculum mapping, AEARS logging, and a library of 1,200+ Irish activities.',
+  title: 'Features - Over 500 Screen-Free Activities for Irish Families',
+  description: 'Explore The Hedge\'s full feature set: activity ideas tailored to your children and your county, weather-aware planning, NCCA primary curriculum mapping, learning logs for AEARS evidence, and a library of over 500 Irish activities.',
   alternates: { canonical: 'https://thehedge.ie/features' },
 };
 
 const featureGroups = [
   {
     title: 'Activity Library',
-    sub: '1,200+ screen-free ideas',
+    sub: 'Over 500 screen-free ideas',
     features: [
-      { id: 'leaf', title: 'Nature & Outdoor Activities', body: '240+ outdoor activities across all Irish seasons. Rock pooling in Connemara, bog walks in Roscommon, coastal foraging in Cork. Every activity designed for real Irish environments.' },
+      { id: 'leaf', title: 'Nature & Outdoor Activities', body: 'A large share of the library is outdoor activities, across all Irish seasons. Rock pooling in Connemara, bog walks in Roscommon, coastal foraging in Cork. Every activity designed for real Irish environments.' },
       { id: 'flask', title: 'Science & Discovery', body: 'Kitchen chemistry, garden experiments, cloud identification, and citizen science projects. Learning through curiosity, not worksheets.' },
       { id: 'palette', title: 'Arts & Creativity', body: 'Painting, printmaking, weaving, pottery, nature journalling, seasonal crafts. Activities that produce something real - and beautiful - to keep.' },
       { id: 'calc', title: 'Maths in the Wild', body: 'Measurement, patterns, data collection, shapes in nature. Maths happens everywhere - The Hedge shows children where to find it.' },
@@ -27,7 +27,7 @@ const featureGroups = [
     title: 'Personalisation',
     sub: 'Ideas that fit your family and your corner of Ireland',
     features: [
-      { id: 'sun', title: 'Live Weather Integration', body: 'Pulls real-time forecasts from Met Éireann for your exact county. Activities automatically shift indoors when rain is forecast. No manual adjusting needed.' },
+      { id: 'sun', title: 'Live Weather Integration', body: 'Pulls real-time forecasts from Open-Meteo for your exact county. Activities automatically shift indoors when rain is forecast. No manual adjusting needed.' },
       { id: 'cpu', title: 'Shaped Around Your Children', body: 'Every suggestion is shaped by your children\'s ages, interests, recent activities, and upcoming events. The more you use The Hedge, the better it fits your family.' },
       { id: 'cal', title: 'School Calendar Awareness', body: 'Knows Irish school term dates, public holidays, and bank holidays. Adjusts activity intensity for term time vs school holidays automatically.' },
     ]
@@ -38,15 +38,15 @@ const featureGroups = [
     features: [
       { id: 'cal', title: 'Weekly Planner', body: 'Drag and drop activities into your week. See a balanced view across subjects, energy levels, and outdoor vs indoor. Share with your partner or co-parent.' },
       { id: 'leaf', title: 'Activity Timeline', body: 'A rolling record of everything your family has done. Scrollable, searchable, beautiful. The kind of thing you\'ll want to show your children when they\'re older.' },
-      { id: 'book', title: 'Learning Log (Educator)', body: 'Auto-generated, date-stamped, NCCA-tagged records of every activity. Export as a formatted PDF report - exactly what AEARS assessors want to see.' },
+      { id: 'book', title: 'Learning Log (Educator)', body: 'Auto-generated, date-stamped, NCCA-tagged records of every activity. Export as a formatted PDF report - a clear, organised record to bring to your AEARS assessment.' },
     ]
   },
   {
     title: 'On the Go',
-    sub: 'Available on all your devices',
+    sub: 'Works on every device, with native apps on the way',
     features: [
-      { id: 'cpu', title: 'iOS & Android App', body: 'Take The Hedge with you wherever your family goes. Browse activities, log progress, and get your daily idea - all from your phone. Available on any paid plan.' },
-      { id: 'sun', title: 'Offline Access', body: 'Save activities for offline use. Perfect for trips to the woods, the beach, or anywhere signal drops. Your saved activities are always available.' },
+      { id: 'cpu', title: 'iOS & Android App (coming soon)', body: 'Native apps for iOS and Android are in development. For now, The Hedge works beautifully in the browser on your phone - and the apps will land for everyone when they are ready.' },
+      { id: 'sun', title: 'Works in the Browser', body: 'The Hedge runs in any modern browser, on phone, tablet, or laptop. Browse activities, log progress, and get your daily idea wherever you are.' },
       { id: 'palette', title: 'Family Sharing', body: 'Share your account with your partner or co-parent. Both of you see the same planner, timeline, and activity log. Stay on the same page, literally.' },
     ]
   },
