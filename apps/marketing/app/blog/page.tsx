@@ -12,9 +12,50 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://thehedge.ie/blog' },
 };
 
-const categories = ['All','Seasonal Guide','Homeschool','Early Years','Nature & Outdoors'];
+const categories = ['All','Homeschool','Seasonal Guide','Early Years','Nature & Outdoors'];
+
+// The home-education cluster is the heart of the journal: the high-intent pieces
+// anxious Irish families search for. We surface them first, then everything else.
+const HOMESCHOOL_ORDER = [
+  'register-home-education-ireland-tusla',
+  'aears-assessment-what-happens',
+  'taking-child-out-of-school-ireland',
+  'home-ed-approaches-structured-child-led',
+  'home-educating-and-working',
+  'tusla-aears-guide',
+  'thinking-about-homeschooling-ireland',
+];
+
+function BlogCard({ p }: { p: typeof POSTS[number] }) {
+  return (
+    <article className="blog-card" itemScope itemType="https://schema.org/Article">
+      <div className="blog-img-placeholder" style={{background:p.bg}}>
+        <Icon id="leaf" size={32} color="rgba(255,255,255,0.15)" />
+      </div>
+      <div className="blog-content">
+        <div className="blog-meta">
+          <span className="blog-cat" itemProp="articleSection">{p.cat}</span>
+          <span className="blog-date"><time itemProp="datePublished" dateTime={p.isoDate}>{p.date}</time></span>
+          <span style={{fontSize:11,color:'var(--clay)'}}>{p.readTime}</span>
+        </div>
+        <h2 className="blog-title" itemProp="headline">{p.title.replace(p.titleEm, '')}<em>{p.titleEm}</em></h2>
+        <p className="blog-excerpt" itemProp="description">{p.excerpt}</p>
+        <Link href={`/blog/${p.slug}`} className="blog-read" aria-label={`Read: ${p.title}`}>
+          Read article <Icon id="arrow-r" size={12} />
+        </Link>
+      </div>
+    </article>
+  );
+}
 
 export default function Blog() {
+  const homeschoolPosts = HOMESCHOOL_ORDER
+    .map(slug => POSTS.find(p => p.slug === slug))
+    .filter((p): p is typeof POSTS[number] => Boolean(p));
+  const otherPosts = POSTS
+    .filter(p => !HOMESCHOOL_ORDER.includes(p.slug))
+    .sort((a, b) => b.isoDate.localeCompare(a.isoDate));
+
   return (
     <>
       <Nav active="/blog" />
@@ -23,7 +64,7 @@ export default function Blog() {
           <div className="container">
             <div className="page-hero-eyebrow"><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">Guides &amp; ideas</span></div>
             <h1>The Hedge <em>journal</em></h1>
-            <p className="page-hero-desc">Seasonal activity guides, homeschooling in Ireland, outdoor learning, and practical ideas for making family life richer - wherever you live in Ireland.</p>
+            <p className="page-hero-desc">Home education in Ireland, seasonal activity guides, and outdoor learning - calm, accurate, plain-English help for families, wherever you live in Ireland.</p>
           </div>
         </div>
 
@@ -36,28 +77,24 @@ export default function Blog() {
               ))}
             </div>
 
-            <h2 className="section-title" id="blog-title" style={{marginBottom:32}}>Latest <em>articles</em></h2>
-            <div className="blog-grid">
-              {POSTS.map(p => (
-                <article key={p.slug} className="blog-card" itemScope itemType="https://schema.org/Article">
-                  <div className="blog-img-placeholder" style={{background:p.bg}}>
-                    <Icon id="leaf" size={32} color="rgba(255,255,255,0.15)" />
-                  </div>
-                  <div className="blog-content">
-                    <div className="blog-meta">
-                      <span className="blog-cat" itemProp="articleSection">{p.cat}</span>
-                      <span className="blog-date"><time itemProp="datePublished" dateTime={p.isoDate}>{p.date}</time></span>
-                      <span style={{fontSize:11,color:'var(--clay)'}}>{p.readTime}</span>
-                    </div>
-                    <h2 className="blog-title" itemProp="headline">{p.title.replace(p.titleEm, '')}<em>{p.titleEm}</em></h2>
-                    <p className="blog-excerpt" itemProp="description">{p.excerpt}</p>
-                    <Link href={`/blog/${p.slug}`} className="blog-read" aria-label={`Read: ${p.title}`}>
-                      Read article <Icon id="arrow-r" size={12} />
-                    </Link>
-                  </div>
-                </article>
-              ))}
+            {/* HOME EDUCATION HUB */}
+            <div id="home-education">
+              <div className="page-hero-eyebrow" style={{marginBottom:12}}><div className="page-hero-eyebrow-line" /><span className="page-hero-eyebrow-text">For home-educating families</span></div>
+              <h2 className="section-title" id="blog-title" style={{marginBottom:12}}>Home education <em>in Ireland</em></h2>
+              <p style={{fontFamily:'var(--font-serif)',fontSize:16,color:'var(--clay)',lineHeight:1.7,marginBottom:32,maxWidth:640}}>Registering with Tusla, the AEARS assessment, taking a child out of school, choosing your approach, and making the days fit around work. Plain-English, accurate, and on your side. Not affiliated with Tusla.</p>
+              <div className="blog-grid">
+                {homeschoolPosts.map(p => <BlogCard key={p.slug} p={p} />)}
+              </div>
             </div>
+
+            {otherPosts.length > 0 && (
+              <div style={{marginTop:64}}>
+                <h2 className="section-title" style={{marginBottom:32}}>More from the <em>journal</em></h2>
+                <div className="blog-grid">
+                  {otherPosts.map(p => <BlogCard key={p.slug} p={p} />)}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
