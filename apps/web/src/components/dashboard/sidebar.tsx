@@ -6,9 +6,7 @@ import Link from 'next/link';
 import {
   Sun,
   Users,
-  Settings,
   LogOut,
-  CreditCard,
   Menu,
   MessageCircle,
   CalendarDays,
@@ -17,7 +15,6 @@ import {
   Leaf,
   ChevronsLeft,
   ChevronsRight,
-  User,
   ChevronDown,
   HelpCircle,
   Lock,
@@ -282,7 +279,7 @@ function SidebarContent({
         <div className="h-px bg-parchment/6 mb-2 mx-0.5" />
 
         {userMenuOpen && !collapsed && (
-          <div className="absolute bottom-full left-2 right-2 mb-1 rounded-lg bg-[#1a3520] border border-parchment/8 py-1 shadow-xl shadow-black/30 animate-scale-in z-50">
+          <div className="absolute bottom-full left-2 right-2 mb-1 max-h-[70vh] overflow-y-auto rounded-lg bg-[#1a3520] border border-parchment/8 py-1 shadow-xl shadow-black/30 animate-scale-in z-50">
             <Link
               href="/our-hedge"
               onClick={() => setUserMenuOpen(false)}
@@ -291,44 +288,12 @@ function SidebarContent({
               <Leaf className="h-3.5 w-3.5" />
               Our Hedge
             </Link>
-            <Link
-              href="/settings"
-              onClick={() => setUserMenuOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-parchment/60 hover:bg-parchment/6 hover:text-parchment/90 transition-colors"
-            >
-              <Settings className="h-3.5 w-3.5" />
-              Settings
-            </Link>
-            <Link
-              href="/settings?tab=profile"
-              onClick={() => setUserMenuOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-parchment/60 hover:bg-parchment/6 hover:text-parchment/90 transition-colors"
-            >
-              <User className="h-3.5 w-3.5" />
-              Profile
-            </Link>
-            <Link
-              href="/settings?tab=children"
-              onClick={() => setUserMenuOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-parchment/60 hover:bg-parchment/6 hover:text-parchment/90 transition-colors"
-            >
-              <Users className="h-3.5 w-3.5" />
-              Children
-            </Link>
-            <Link
-              href="/settings/billing"
-              onClick={() => setUserMenuOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-parchment/60 hover:bg-parchment/6 hover:text-parchment/90 transition-colors"
-            >
-              <CreditCard className="h-3.5 w-3.5" />
-              Billing & Plans
-            </Link>
             <a
               href="mailto:hello@thehedge.ie"
               className="flex items-center gap-2.5 px-3 py-2 text-[12px] text-parchment/60 hover:bg-parchment/6 hover:text-parchment/90 transition-colors"
             >
               <HelpCircle className="h-3.5 w-3.5" />
-              Help & Support
+              Help &amp; Support
             </a>
             <div className="h-px bg-parchment/6 my-1 mx-2" />
             <button
