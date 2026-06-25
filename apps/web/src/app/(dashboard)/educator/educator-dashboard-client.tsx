@@ -123,11 +123,6 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
     activityLogs.reduce((sum, log) => sum + (log.duration_minutes || 0), 0) / 60 * 10
   ) / 10;
 
-  // Calculate target hours this week
-  const targetHoursWeek = firstPlan
-    ? firstPlan.hours_per_day * firstPlan.days_per_week
-    : 20;
-
   // Calculate attendance days this week
   const attendanceDays = dailyPlans.filter((dp) => dp.attendance_logged).length;
   const totalSchoolDays = firstPlan ? firstPlan.days_per_week : 5;
@@ -238,7 +233,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
           </div>
           <div>
             <p className="text-2xl font-light text-ink">{hoursThisWeek}</p>
-            <p className="text-xs text-clay/50">Hours / {targetHoursWeek}h target</p>
+            <p className="text-xs text-clay/50">hours of learning this week</p>
           </div>
         </div>
         <div className="card-elevated p-5 flex items-center gap-4">
@@ -351,13 +346,13 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
                       <span className="text-sm font-medium text-umber">{areaName}</span>
                     </div>
                     <span className="text-xs font-medium text-clay/50">
-                      {isCovered ? 'Active' : 'Not started'}
+                      {isCovered ? 'Explored' : 'Room to grow'}
                     </span>
                   </div>
                   <div className="h-1.5 w-full rounded-full bg-linen">
                     <div
-                      className={`h-full rounded-full ${priorityColor} transition-all`}
-                      style={{ width: isCovered ? '100%' : '0%', opacity: 0.7 }}
+                      className={`h-full rounded-full ${isCovered ? priorityColor : 'bg-sage/30'} transition-all`}
+                      style={{ width: isCovered ? '100%' : '14%', opacity: 0.7 }}
                     />
                   </div>
                   <p className="text-[10px] text-clay/40 capitalize">
