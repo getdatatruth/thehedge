@@ -171,6 +171,10 @@ export default function ChatScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+              <Text style={styles.privacyNote}>
+                Your conversations stay private to your family. They are never
+                used to train AI models, and your data is kept in the EU.
+              </Text>
             </View>
           )}
 
@@ -291,6 +295,11 @@ export default function ChatScreen() {
           {isFreeUser && !isAtLimit && (
             <Text style={styles.usageText}>
               {suggestionsUsed}/5 suggestions used
+            </Text>
+          )}
+          {messages.length > 0 && (
+            <Text style={styles.privacyFootnote}>
+              Private to your family, never used to train AI, kept in the EU.
             </Text>
           )}
         </View>
@@ -542,6 +551,18 @@ const styles = StyleSheet.create({
     color: lightTheme.textSecondary,
   },
   usageText: {
+    fontSize: 11,
+    color: lightTheme.textMuted,
+    textAlign: 'center',
+  },
+  privacyNote: {
+    ...typography.bodySmall,
+    color: lightTheme.textMuted,
+    textAlign: 'center',
+    maxWidth: 300,
+    marginTop: spacing.xl,
+  },
+  privacyFootnote: {
     fontSize: 11,
     color: lightTheme.textMuted,
     textAlign: 'center',

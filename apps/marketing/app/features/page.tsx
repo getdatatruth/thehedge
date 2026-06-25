@@ -116,6 +116,14 @@ export default function Features() {
                 </div>
               ))}
             </div>
+
+            {/* Trust line: the personalisation stays private to the family */}
+            <div style={{marginTop:24,display:'flex',alignItems:'flex-start',gap:12,padding:'18px 20px',background:'rgba(61,97,66,0.06)',borderRadius:14,borderLeft:'3px solid var(--moss)'}}>
+              <Icon id="shield" size={18} color="var(--moss)" />
+              <div style={{fontSize:13,color:'var(--clay)',lineHeight:1.65}}>
+                It learns your family, and your data stays yours. Everything is kept private to your account and stored in the EU. It is never sold, never used for advertising, and never used to train AI models.
+              </div>
+            </div>
           </div>
         </section>
 
