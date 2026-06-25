@@ -29,6 +29,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid answers' }, { status: 400 });
   }
 
+  const profile = deriveProfile(answers);
+
   const { data: profileRow } = await supabase
     .from('users')
     .select('family_id')
@@ -46,9 +48,22 @@ export async function POST(request: NextRequest) {
     const familyName = firstChild
       ? `${firstChild}'s family`
       : (user.user_metadata?.name as string | undefined)?.trim() || 'Your family';
+    // Give every newly-onboarded family a 14-day trial of the tier that fits
+    // their doorway, so they experience the whole product (Plan, and the
+    // AEARS tooling for home-educators) rather than hitting a paywall on the
+    // verbs the nav shows them. It lapses to free automatically after 14 days.
+    const isHomeEd = profile.doorway === 'homeschool' || profile.doorway === 'considering';
+    const trialEnds = new Date();
+    trialEnds.setDate(trialEnds.getDate() + 14);
     const { data: fam, error: famErr } = await admin
       .from('families')
-      .insert({ name: familyName, country: 'IE' })
+      .insert({
+        name: familyName,
+        country: 'IE',
+        subscription_tier: isHomeEd ? 'educator' : 'family',
+        subscription_status: 'trialing',
+        trial_ends_at: trialEnds.toISOString(),
+      })
       .select('id')
       .single();
     if (famErr || !fam) {
@@ -66,8 +81,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Could not set up your account' }, { status: 500 });
     }
   }
-
-  const profile = deriveProfile(answers);
 
   // One invisible authoring pass, with a deterministic fallback so it never fails.
   let framework: KTFramework = buildFallbackFramework(profile);
