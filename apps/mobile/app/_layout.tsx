@@ -53,9 +53,10 @@ function RootNavigator() {
       } else {
         router.replace('/(tabs)');
       }
-    } else if (profile && !profile.onboarding_completed && !inOnboarding) {
-      // Signed in but slipped onto the app without finishing onboarding (only
-      // act once the profile has loaded, so returning users do not flash this).
+    } else if (notOnboarded && !inOnboarding) {
+      // Signed in but not finished onboarding (incl. a 404 /me with no profile
+      // row): never leave them on the tabs. isInitialized gating means the
+      // profile is settled here, so returning, onboarded users do not flash this.
       router.replace('/(auth)/onboarding');
     }
   }, [session, profile, isInitialized, isLoading, segments, router]);

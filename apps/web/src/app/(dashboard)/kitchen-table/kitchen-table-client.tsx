@@ -59,6 +59,7 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
   const [answers, setAnswers] = useState<Partial<KTAnswers>>({});
   const [thinking, setThinking] = useState(false);
   const [framework, setFramework] = useState<KTFramework | null>(null);
+  const [notes, setNotes] = useState('');
 
   const isHomeEdLeaning = ['considering', 'school_not_working', 'homeschool'].includes(answers.whyKey || '');
   const totalQuestions = isHomeEdLeaning ? 7 : 6;
@@ -79,6 +80,7 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
       county: final.county ?? answers.county,
       outdoor: final.outdoor || answers.outdoor,
       tuslaKey: final.tuslaKey || answers.tuslaKey,
+      notes: final.notes ?? (notes.trim() || undefined),
     };
     try {
       const res = await fetch('/api/kitchen-table', {
@@ -94,8 +96,12 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
     setThinking(false);
   }
 
-  if (framework) {
-    return <FrameworkReveal framework={framework} onDone={() => router.push('/dashboard')} />;
+  // The family read their framework back and wants to add context. Fold the note
+  // into what we know and write the whole thing again, so it genuinely reshapes.
+  async function refine(note: string) {
+    const combined = [notes.trim(), note.trim()].filter(Boolean).join('\n');
+    setNotes(combined);
+    await finish({ notes: combined });
   }
 
   if (thinking) {
@@ -108,6 +114,10 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
         <p className="text-sm text-clay mt-2 italic">Gathering what you said into something that feels like your family.</p>
       </div>
     );
+  }
+
+  if (framework) {
+    return <FrameworkReveal framework={framework} onDone={() => router.push('/dashboard')} onRefine={refine} />;
   }
 
   return (
@@ -247,6 +257,7 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
           note="AEARS sets no minimum hours and no attendance bar, and I'll never pretend it does."
           chips={TUSLA_CHIPS}
           onSubmit={(key) => {
+            setAnswers((a) => ({ ...a, tuslaKey: key }));
             record('Where are you with Tusla?', TUSLA_CHIPS.find((c) => c.key === key)?.label || '');
             finish({ tuslaKey: key });
           }}
@@ -540,7 +551,9 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
   );
 }
 
-function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone: () => void }) {
+function FrameworkReveal({ framework, onDone, onRefine }: { framework: KTFramework; onDone: () => void; onRefine: (note: string) => void }) {
+  const [refineOpen, setRefineOpen] = useState(false);
+  const [note, setNote] = useState('');
   return (
     <>
     <div className="mx-auto w-full max-w-6xl px-4 pb-28 animate-fade-up">
@@ -603,6 +616,44 @@ function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone
             ))}
           </div>
         </Panel>
+      </div>
+
+      {/* Refine: the family reads it back and can add what was missed */}
+      <div className="mt-4">
+        {!refineOpen ? (
+          <div className="text-center">
+            <button
+              onClick={() => setRefineOpen(true)}
+              className="inline-flex items-center gap-2 rounded-2xl border border-stone/60 bg-white/60 px-5 py-3 text-[13.5px] font-medium text-moss transition-colors hover:border-moss/50 hover:bg-white"
+            >
+              Not quite us? Tell me a bit more
+            </button>
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-stone/50 bg-white p-5 shadow-[0_12px_36px_rgba(28,53,32,0.06)] sm:p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss">Tell me a bit more</p>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-clay">Anything I missed or got wrong, in your own words. I&apos;ll write the whole thing again with this in mind.</p>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={3}
+              placeholder="e.g. We also have a baby, weekends are mad, River is dyslexic, we do a lot of music together..."
+              className="mt-3 w-full resize-none rounded-2xl border border-stone bg-white px-4 py-3 text-base shadow-sm focus:border-moss focus:outline-none focus:ring-2 focus:ring-moss/15"
+            />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => { if (note.trim()) { onRefine(note.trim()); setRefineOpen(false); setNote(''); } }}
+                disabled={!note.trim()}
+                className="inline-flex items-center gap-2 rounded-2xl bg-forest px-5 py-2.5 text-sm font-semibold text-parchment transition-colors hover:bg-forest/90 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Write it again <ArrowRight className="h-4 w-4" />
+              </button>
+              <button onClick={() => { setRefineOpen(false); setNote(''); }} className="rounded-2xl px-4 py-2.5 text-sm font-medium text-clay transition-colors hover:text-ink">
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <p className="mt-6 text-center text-[12px] italic text-clay/70">This is yours. Tweak anything from Our Hedge whenever you like.</p>

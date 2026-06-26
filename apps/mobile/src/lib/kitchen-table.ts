@@ -144,6 +144,7 @@ export interface OnboardingBootstrapPayload {
   outdoorSpace: string;
   learningGoals: string[];
   activitiesPerWeek: string;
+  completeOnboarding: boolean;
 }
 
 // Build the bootstrap payload for /api/onboarding from the warm KT answers.
@@ -175,6 +176,10 @@ export function answersToOnboardingPayload(
     outdoorSpace: a.outdoor || '',
     learningGoals: [],
     activitiesPerWeek: '',
+    // The Kitchen Table framework step marks onboarding complete, so do not let
+    // this bootstrap mark it - otherwise a failed framework leaves a family
+    // "onboarded" with no framework and they land on Today.
+    completeOnboarding: false,
   };
 }
 

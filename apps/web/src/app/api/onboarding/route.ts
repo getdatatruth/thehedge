@@ -31,7 +31,12 @@ export async function POST(request: NextRequest) {
       outdoorSpace,
       carActivities,
       messComfort,
+      // When false, leave onboarding incomplete so a later step (the Kitchen
+      // Table framework) is what marks it done. Prevents a half-finished family
+      // from being treated as onboarded if the framework step then fails.
+      completeOnboarding,
     } = body;
+    const markComplete = completeOnboarding !== false;
 
     // Validate required fields
     if (!familyName?.trim()) {
@@ -95,7 +100,7 @@ export async function POST(request: NextRequest) {
           country: country || 'IE',
           county: county || null,
           family_style: familyStyle || 'balanced',
-          onboarding_completed: true,
+          onboarding_completed: markComplete,
           subscription_tier: initialTier,
           subscription_status: initialStatus,
           trial_ends_at: trialEndsAt,
@@ -121,7 +126,7 @@ export async function POST(request: NextRequest) {
           country: country || 'IE',
           county: county || null,
           family_style: familyStyle || 'balanced',
-          onboarding_completed: true,
+          onboarding_completed: markComplete,
           subscription_tier: initialTier,
           subscription_status: initialStatus,
           trial_ends_at: trialEndsAt,

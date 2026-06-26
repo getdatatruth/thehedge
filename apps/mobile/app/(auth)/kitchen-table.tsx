@@ -44,6 +44,10 @@ import {
 } from '@/stores/auth-store';
 import { ChipTurn } from '@/components/kitchen-table/ChipTurn';
 import { FrameworkView } from '@/components/kitchen-table/FrameworkView';
+import { CountyDropdown } from '@/components/kitchen-table/CountyDropdown';
+
+// Pills read nicer with a capital first letter; we still store the lowercase key.
+const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 type Exchange = { q: string; a: string };
 
@@ -61,8 +65,23 @@ export default function KitchenTableScreen() {
   const [thinking, setThinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [framework, setFramework] = useState<KTFramework | null>(null);
+  // Per-child draft text for the "anything else?" free-text interest box.
+  const [interestDraft, setInterestDraft] = useState<Record<number, string>>({});
 
   const isHomeEdLeaning = HOME_ED_WHY_KEYS.includes(answers.whyKey || '');
+
+  // Add a typed interest to a child, normalised to a lowercase key so it stores
+  // and reads back like the preset chips. Dedupes against what is already there.
+  const addCustomInterest = (i: number) => {
+    const raw = (interestDraft[i] || '').trim().toLowerCase();
+    if (!raw) return;
+    setChildren((cs) =>
+      cs.map((x, j) =>
+        j === i && !x.interests.includes(raw) ? { ...x, interests: [...x.interests, raw] } : x,
+      ),
+    );
+    setInterestDraft((d) => ({ ...d, [i]: '' }));
+  };
 
   const record = (q: string, a: string) => setExchanges((e) => [...e, { q, a }]);
 
@@ -302,11 +321,52 @@ export default function KitchenTableScreen() {
                           style={[styles.interest, on && styles.interestOn]}
                         >
                           <Text style={[styles.interestText, on && styles.interestTextOn]}>
-                            {opt}
+                            {cap(opt)}
                           </Text>
                         </TouchableOpacity>
                       );
                     })}
+                    {c.interests
+                      .filter((t) => !INTEREST_OPTIONS.includes(t as (typeof INTEREST_OPTIONS)[number]))
+                      .map((t) => (
+                        <TouchableOpacity
+                          key={t}
+                          activeOpacity={0.85}
+                          onPress={() =>
+                            setChildren((cs) =>
+                              cs.map((x, j) =>
+                                j === i ? { ...x, interests: x.interests.filter((v) => v !== t) } : x,
+                              ),
+                            )
+                          }
+                          style={[styles.interest, styles.interestOn]}
+                        >
+                          <Text style={[styles.interestText, styles.interestTextOn]}>
+                            {cap(t)}  ×
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                  </View>
+
+                  <View style={styles.interestAddRow}>
+                    <TextInput
+                      value={interestDraft[i] || ''}
+                      onChangeText={(t) => setInterestDraft((d) => ({ ...d, [i]: t }))}
+                      onSubmitEditing={() => addCustomInterest(i)}
+                      returnKeyType="done"
+                      placeholder="Anything else they're mad about?"
+                      placeholderTextColor={lightTheme.textMuted}
+                      style={[styles.field, styles.interestInput]}
+                    />
+                    {(interestDraft[i] || '').trim().length > 0 && (
+                      <TouchableOpacity
+                        onPress={() => addCustomInterest(i)}
+                        style={styles.interestAddBtn}
+                        activeOpacity={0.85}
+                      >
+                        <Plus size={18} color="#FFFFFF" />
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               ))}
@@ -396,20 +456,24 @@ export default function KitchenTableScreen() {
           {/* Step 6: place + outdoor space */}
           {step === 6 && (
             <View>
-              <Text style={styles.question}>Last bit, where are you, and is there outdoor space?</Text>
-              <TextInput
-                value={answers.county || ''}
-                onChangeText={(t) => setAnswers((a) => ({ ...a, county: t }))}
-                placeholder="Your county"
-                placeholderTextColor={lightTheme.textMuted}
-                style={[styles.field, styles.fieldFull]}
+              <Text style={styles.question}>Last bit, where are you?</Text>
+
+              <Text style={styles.fieldLabel}>Your county</Text>
+              <CountyDropdown
+                value={answers.county}
+                onChange={(c) => setAnswers((a) => ({ ...a, county: c }))}
               />
+
+              <Text style={[styles.fieldLabel, styles.fieldLabelSpaced]}>
+                Any outdoor space?
+              </Text>
               <View style={styles.outdoorWrap}>
                 {OUTDOOR_CHIPS.map((c) => {
                   const on = answers.outdoor === c.key;
                   return (
                     <TouchableOpacity
                       key={c.key}
+                      activeOpacity={0.85}
                       onPress={() => setAnswers((a) => ({ ...a, outdoor: c.key }))}
                       style={[styles.outdoor, on && styles.outdoorOn]}
                     >
@@ -571,6 +635,13 @@ const styles = StyleSheet.create({
   fieldName: { flex: 1 },
   fieldAge: { width: 64, textAlign: 'center' },
   fieldFull: { marginTop: spacing.xs },
+  fieldLabel: {
+    ...typography.uiBold,
+    color: lightTheme.textSecondary,
+    marginBottom: spacing.sm,
+    marginTop: spacing.lg,
+  },
+  fieldLabelSpaced: { marginTop: spacing['2xl'] },
   removeBtn: { padding: spacing.sm },
 
   interestWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
@@ -583,6 +654,21 @@ const styles = StyleSheet.create({
   interestOn: { backgroundColor: lightTheme.accent },
   interestText: { ...typography.uiSmall, color: lightTheme.textSecondary },
   interestTextOn: { color: '#FFFFFF', fontWeight: '600' },
+  interestAddRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  interestInput: { flex: 1 },
+  interestAddBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: lightTheme.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
   addChild: {
     flexDirection: 'row',
@@ -592,7 +678,7 @@ const styles = StyleSheet.create({
   },
   addChildText: { ...typography.uiBold, color: lightTheme.accent },
 
-  outdoorWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.lg },
+  outdoorWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   outdoor: {
     backgroundColor: lightTheme.surface,
     borderRadius: 999,
