@@ -666,6 +666,16 @@ input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
   --ring: #4CAF7C;
 }
 
+/* The auth card itself renders light (Tailwind @theme inline keeps literal
+   light values for utilities), so the primary button must stay readable:
+   light text on forest, not the dark-flipped parchment variable. */
+.dark-auth .btn-primary {
+  color: #F2F5F0;
+}
+.dark-auth .btn-primary:hover {
+  color: #F2F5F0;
+}
+
 /* ──────────────────────────────────────────────
    Print styles for planner
    ────────────────────────────────────────────── */

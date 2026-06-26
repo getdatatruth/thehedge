@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 
 const PLAN_NAMES: Record<string, string> = {
   free: 'Free',
@@ -66,14 +66,27 @@ export function SignupForm() {
     <div className="bg-linen border border-stone rounded-2xl p-8 animate-scale-in">
       <div className="text-center mb-6">
         <h2 className="font-display text-2xl font-bold text-ink">
-          Join The Hedge
+          Create your free account
         </h2>
-        <p className="text-clay mt-1">
-          Where curious families learn. Create your account to get started.
+        <p className="text-clay mt-2 text-sm leading-relaxed">
+          In a couple of minutes, The Hedge writes your family its own plan: daily
+          ideas that fit, a gentle weekly rhythm, and a record that keeps itself.
         </p>
+
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          {['Free to start', 'No card needed', 'Ready in 2 minutes'].map((t) => (
+            <span
+              key={t}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-forest bg-forest/5 rounded-full px-3 py-1"
+            >
+              <Check className="h-3 w-3" /> {t}
+            </span>
+          ))}
+        </div>
+
         {planName && (
-          <p className="mt-2 text-sm font-semibold text-forest bg-forest/5 inline-block px-3 py-1 rounded-full">
-            {planName} plan selected
+          <p className="mt-3 text-xs font-semibold text-forest bg-forest/5 inline-block px-3 py-1 rounded-full">
+            {planName} plan: 14-day free trial, no card today
           </p>
         )}
       </div>
@@ -125,6 +138,10 @@ export function SignupForm() {
           {loading ? 'Creating account...' : 'Create account'}
           {!loading && <ArrowRight className="h-4 w-4" />}
         </button>
+        <p className="text-center text-xs text-clay/70 leading-relaxed">
+          No payment now. Next, you&apos;ll answer a few warm questions at the
+          Kitchen Table, then your plan is ready.
+        </p>
       </form>
 
       <div className="mt-6 text-center">
