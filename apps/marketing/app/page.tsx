@@ -6,7 +6,7 @@ import Footer from '../components/Footer';
 import { Icon } from '../components/Icons';
 import KitchenTableDemo from '../components/KitchenTableDemo';
 import HowItWorks from '../components/HowItWorks';
-import ProductTour from '../components/ProductTour';
+import ProductBento from '../components/ProductBento';
 
 export const metadata: Metadata = {
   title: 'The Hedge - Learning that fits your family',
@@ -111,9 +111,9 @@ export default function Home() {
           <div className="container">
             <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">See it for yourself</span></div>
             <h2 className="section-title" id="showcase-title">The whole product, <em>shaped around your family</em></h2>
-            <p className="section-body" style={{ maxWidth: 560 }}>One calm home for your days, your plan, your record, and your questions. Have a look around.</p>
+            <p className="section-body" style={{ maxWidth: 560 }}>One calm home for your days, your plan, your record, your people, and your questions. Five quiet corners, all shaped around your family.</p>
 
-            <ProductTour />
+            <ProductBento />
           </div>
         </section>
 
