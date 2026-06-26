@@ -9,7 +9,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { ArrowRight } from 'lucide-react-native';
 import type { Chip } from '@/lib/kitchen-table';
-import { darkTheme } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 
@@ -68,7 +68,7 @@ export function ChipTurn({
             if (t) setSelected(null);
           }}
           placeholder={placeholder}
-          placeholderTextColor={darkTheme.textMuted}
+          placeholderTextColor={lightTheme.textMuted}
           multiline
           style={styles.textarea}
         />
@@ -93,12 +93,12 @@ export function ChipTurn({
 const styles = StyleSheet.create({
   question: {
     ...typography.onboardingTitle,
-    color: darkTheme.text,
+    color: lightTheme.text,
     marginBottom: spacing.sm,
   },
   note: {
     ...typography.bodySmall,
-    color: darkTheme.accent,
+    color: lightTheme.accent,
     fontStyle: 'italic',
     marginBottom: spacing.md,
   },
@@ -107,32 +107,32 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   chip: {
-    backgroundColor: darkTheme.surface,
+    backgroundColor: lightTheme.surface,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: darkTheme.border,
+    borderColor: lightTheme.border,
     paddingVertical: 16,
     paddingHorizontal: spacing.lg,
   },
   chipOn: {
-    backgroundColor: darkTheme.accentLight,
-    borderColor: darkTheme.accent,
+    backgroundColor: lightTheme.accentLight,
+    borderColor: lightTheme.accent,
   },
   chipText: {
     ...typography.body,
-    color: darkTheme.text,
+    color: lightTheme.text,
   },
   chipTextOn: {
-    color: darkTheme.text,
+    color: lightTheme.text,
     fontWeight: '600',
   },
   textarea: {
     ...typography.body,
-    color: darkTheme.text,
-    backgroundColor: darkTheme.surface,
+    color: lightTheme.text,
+    backgroundColor: lightTheme.surface,
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: darkTheme.border,
+    borderColor: lightTheme.border,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: darkTheme.accent,
+    backgroundColor: lightTheme.accent,
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: spacing['2xl'],

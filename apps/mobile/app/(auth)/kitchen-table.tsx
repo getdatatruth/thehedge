@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { StatusBar } from 'expo-status-bar';
 import { Leaf, ArrowRight, Plus, X } from 'lucide-react-native';
 import { apiRootPost, apiGet } from '@/lib/api';
 import {
@@ -32,7 +33,7 @@ import {
   type KTFramework,
   type KTTranscript,
 } from '@/lib/kitchen-table';
-import { darkTheme } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 import {
@@ -147,11 +148,12 @@ export default function KitchenTableScreen() {
   if (framework) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
+        <StatusBar style="dark" />
         <ScrollView
           contentContainerStyle={styles.frameworkScroll}
           showsVerticalScrollIndicator={false}
         >
-          <FrameworkView framework={framework} theme={darkTheme} />
+          <FrameworkView framework={framework} theme={lightTheme} />
           <Text style={styles.frameworkFooter}>
             This is yours. You can shape any of it from your profile whenever you like.
           </Text>
@@ -172,7 +174,8 @@ export default function KitchenTableScreen() {
   if (thinking) {
     return (
       <SafeAreaView style={[styles.container, styles.centered]}>
-        <ActivityIndicator color={darkTheme.accent} size="large" />
+        <StatusBar style="dark" />
+        <ActivityIndicator color={lightTheme.accent} size="large" />
         <Text style={styles.thinkingTitle}>Let me read that back to you...</Text>
         <Text style={styles.thinkingSub}>
           Gathering what you said into something that feels like your family.
@@ -184,6 +187,7 @@ export default function KitchenTableScreen() {
   // ── Conversation ──────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <StatusBar style="dark" />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -193,15 +197,21 @@ export default function KitchenTableScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Past exchanges, like handwritten notes */}
-          {exchanges.length > 0 && (
-            <View style={styles.history}>
-              {exchanges.map((e, i) => (
-                <View key={i} style={styles.exchange}>
-                  <Text style={styles.exchangeQ}>{e.q}</Text>
-                  <Text style={styles.exchangeA}>{e.a}</Text>
-                </View>
-              ))}
+          {/* One question at a time with a calm progress bar - no growing
+              transcript pushing the question and button off-screen. */}
+          {step >= 1 && (
+            <View style={styles.progressWrap}>
+              <View style={styles.progressTrack}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${Math.min(100, (step / (isHomeEdLeaning ? 7 : 6)) * 100)}%` },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {Math.min(step, isHomeEdLeaning ? 7 : 6)} of {isHomeEdLeaning ? 7 : 6}
+              </Text>
             </View>
           )}
 
@@ -215,7 +225,7 @@ export default function KitchenTableScreen() {
           {step === 0 && (
             <View>
               <View style={styles.leafCircle}>
-                <Leaf size={28} color={darkTheme.accent} strokeWidth={1.5} />
+                <Leaf size={28} color={lightTheme.accent} strokeWidth={1.5} />
               </View>
               <Text style={styles.bigTitle}>Pull up a chair.</Text>
               <Text style={styles.lede}>
@@ -242,7 +252,7 @@ export default function KitchenTableScreen() {
                         setChildren((cs) => cs.map((x, j) => (j === i ? { ...x, name: t } : x)))
                       }
                       placeholder="Name"
-                      placeholderTextColor={darkTheme.textMuted}
+                      placeholderTextColor={lightTheme.textMuted}
                       style={[styles.field, styles.fieldName]}
                     />
                     <TextInput
@@ -255,7 +265,7 @@ export default function KitchenTableScreen() {
                         )
                       }
                       placeholder="Age"
-                      placeholderTextColor={darkTheme.textMuted}
+                      placeholderTextColor={lightTheme.textMuted}
                       keyboardType="number-pad"
                       style={[styles.field, styles.fieldAge]}
                     />
@@ -264,7 +274,7 @@ export default function KitchenTableScreen() {
                         onPress={() => setChildren((cs) => cs.filter((_, j) => j !== i))}
                         style={styles.removeBtn}
                       >
-                        <X size={18} color={darkTheme.textMuted} />
+                        <X size={18} color={lightTheme.textMuted} />
                       </TouchableOpacity>
                     )}
                   </View>
@@ -307,7 +317,7 @@ export default function KitchenTableScreen() {
                   setChildren((cs) => [...cs, { name: '', age: null, interests: [] }])
                 }
               >
-                <Plus size={16} color={darkTheme.accent} />
+                <Plus size={16} color={lightTheme.accent} />
                 <Text style={styles.addChildText}>Add another</Text>
               </TouchableOpacity>
 
@@ -391,7 +401,7 @@ export default function KitchenTableScreen() {
                 value={answers.county || ''}
                 onChangeText={(t) => setAnswers((a) => ({ ...a, county: t }))}
                 placeholder="Your county"
-                placeholderTextColor={darkTheme.textMuted}
+                placeholderTextColor={lightTheme.textMuted}
                 style={[styles.field, styles.fieldFull]}
               />
               <View style={styles.outdoorWrap}>
@@ -468,7 +478,7 @@ function PrimaryButton({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: darkTheme.background },
+  container: { flex: 1, backgroundColor: lightTheme.background },
   flex: { flex: 1 },
   centered: { alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing['3xl'] },
   scroll: {
@@ -482,25 +492,35 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['5xl'],
   },
 
-  history: { marginBottom: spacing['2xl'], gap: spacing.lg },
-  exchange: {},
-  exchangeQ: {
-    ...typography.body,
-    color: darkTheme.textSecondary,
-    fontStyle: 'italic',
+  progressWrap: {
+    marginBottom: spacing['2xl'],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
   },
-  exchangeA: {
+  progressTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: lightTheme.borderLight,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 3,
+    backgroundColor: lightTheme.accent,
+  },
+  progressText: {
     ...typography.bodySmall,
-    color: darkTheme.accent,
+    color: lightTheme.textMuted,
     fontWeight: '600',
-    marginTop: 4,
   },
 
   leafCircle: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: darkTheme.surface,
+    backgroundColor: lightTheme.accentLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.xl,
@@ -511,27 +531,27 @@ const styles = StyleSheet.create({
     lineHeight: 38,
     fontWeight: '700',
     letterSpacing: -0.5,
-    color: darkTheme.text,
+    color: lightTheme.text,
   },
   lede: {
     ...typography.bodyLarge,
-    color: darkTheme.textSecondary,
+    color: lightTheme.textSecondary,
     marginTop: spacing.md,
   },
 
   question: {
     ...typography.onboardingTitle,
-    color: darkTheme.text,
+    color: lightTheme.text,
     marginBottom: spacing.sm,
   },
   sub: {
     ...typography.bodySmall,
-    color: darkTheme.textSecondary,
+    color: lightTheme.textSecondary,
     marginBottom: spacing.lg,
   },
 
   childCard: {
-    backgroundColor: darkTheme.surface,
+    backgroundColor: lightTheme.surface,
     borderRadius: 16,
     padding: spacing.lg,
     marginBottom: spacing.md,
@@ -540,11 +560,11 @@ const styles = StyleSheet.create({
   childRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   field: {
     ...typography.body,
-    color: darkTheme.text,
-    backgroundColor: darkTheme.surfaceElevated,
+    color: lightTheme.text,
+    backgroundColor: lightTheme.surfaceElevated,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: darkTheme.borderLight,
+    borderColor: lightTheme.borderLight,
     paddingHorizontal: spacing.md,
     paddingVertical: 12,
   },
@@ -555,13 +575,13 @@ const styles = StyleSheet.create({
 
   interestWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   interest: {
-    backgroundColor: darkTheme.surfaceElevated,
+    backgroundColor: lightTheme.surfaceElevated,
     borderRadius: 999,
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
   },
-  interestOn: { backgroundColor: darkTheme.accent },
-  interestText: { ...typography.uiSmall, color: darkTheme.textSecondary },
+  interestOn: { backgroundColor: lightTheme.accent },
+  interestText: { ...typography.uiSmall, color: lightTheme.textSecondary },
   interestTextOn: { color: '#FFFFFF', fontWeight: '600' },
 
   addChild: {
@@ -570,27 +590,27 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.sm,
   },
-  addChildText: { ...typography.uiBold, color: darkTheme.accent },
+  addChildText: { ...typography.uiBold, color: lightTheme.accent },
 
   outdoorWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.lg },
   outdoor: {
-    backgroundColor: darkTheme.surface,
+    backgroundColor: lightTheme.surface,
     borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: darkTheme.border,
+    borderColor: lightTheme.border,
     paddingHorizontal: spacing.lg,
     paddingVertical: 10,
   },
-  outdoorOn: { backgroundColor: darkTheme.accentLight, borderColor: darkTheme.accent },
-  outdoorText: { ...typography.bodySmall, color: darkTheme.textSecondary },
-  outdoorTextOn: { color: darkTheme.text, fontWeight: '600' },
+  outdoorOn: { backgroundColor: lightTheme.accentLight, borderColor: lightTheme.accent },
+  outdoorText: { ...typography.bodySmall, color: lightTheme.textSecondary },
+  outdoorTextOn: { color: lightTheme.text, fontWeight: '600' },
 
   primaryCta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: darkTheme.accent,
+    backgroundColor: lightTheme.accent,
     borderRadius: 14,
     paddingVertical: 16,
     marginTop: spacing['2xl'],
@@ -600,13 +620,13 @@ const styles = StyleSheet.create({
 
   thinkingTitle: {
     ...typography.h3,
-    color: darkTheme.text,
+    color: lightTheme.text,
     textAlign: 'center',
     marginTop: spacing.xl,
   },
   thinkingSub: {
     ...typography.bodySmall,
-    color: darkTheme.textSecondary,
+    color: lightTheme.textSecondary,
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: spacing.sm,
@@ -615,19 +635,19 @@ const styles = StyleSheet.create({
 
   frameworkFooter: {
     ...typography.bodySmall,
-    color: darkTheme.textMuted,
+    color: lightTheme.textMuted,
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: spacing.lg,
   },
 
   errorBox: {
-    backgroundColor: `${darkTheme.error}15`,
+    backgroundColor: `${lightTheme.error}15`,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: `${darkTheme.error}30`,
+    borderColor: `${lightTheme.error}30`,
     padding: spacing.md,
     marginBottom: spacing.lg,
   },
-  errorText: { ...typography.bodySmall, color: darkTheme.error },
+  errorText: { ...typography.bodySmall, color: lightTheme.error },
 });
