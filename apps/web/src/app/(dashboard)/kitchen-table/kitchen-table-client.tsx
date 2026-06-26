@@ -372,12 +372,12 @@ function ChildCard({ child, canRemove, onChange, onRemove }: {
           {initial || <Leaf className="h-5 w-5" />}
         </span>
         <div className="min-w-0 flex-1">
-          <label className="text-[10.5px] font-bold uppercase tracking-wide text-clay/70">Name</label>
+          <label className="mb-1 block text-[10.5px] font-bold uppercase tracking-wide text-clay/70">Name</label>
           <input
             value={child.name}
             onChange={(e) => onChange({ name: e.target.value })}
-            placeholder="Their name"
-            className="w-full bg-transparent text-lg font-medium text-ink placeholder:font-normal placeholder:text-clay/50 focus:outline-none"
+            placeholder="Type their name"
+            className="w-full rounded-xl border border-stone bg-white px-3 py-2.5 text-base font-medium text-ink shadow-sm placeholder:font-normal placeholder:text-clay/50 focus:border-moss focus:outline-none focus:ring-2 focus:ring-moss/15"
           />
         </div>
         {canRemove && (
@@ -542,9 +542,9 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
 
 function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone: () => void }) {
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-20 animate-fade-up">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-20 animate-fade-up">
       {/* Header band - the keepsake cover */}
-      <div className="relative overflow-hidden rounded-t-[28px] bg-forest px-6 pb-9 pt-8 text-center sm:px-10 sm:pt-10">
+      <div className="relative overflow-hidden rounded-3xl bg-forest px-6 pb-10 pt-9 text-center sm:px-10">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_10%,rgba(94,139,82,0.45),transparent),radial-gradient(ellipse_70%_70%_at_20%_100%,rgba(61,97,66,0.5),transparent)]" />
         <div className="relative">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-parchment/15">
@@ -556,50 +556,52 @@ function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone
         </div>
       </div>
 
-      {/* Document body */}
-      <div className="rounded-b-[28px] border border-t-0 border-stone/50 bg-white px-6 py-8 shadow-[0_24px_60px_rgba(28,53,32,0.10)] sm:px-10 sm:py-10">
-        <Block label="What you told me">
-          <p className="border-l-2 border-moss/40 pl-4 text-[16.5px] leading-[1.75] text-ink">{framework.whatYouToldMe}</p>
-        </Block>
+      {/* Bento panels - fills the width, scannable, the promises as the centrepiece */}
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-12">
+        <Panel className="md:col-span-7">
+          <PanelLabel>What you told me</PanelLabel>
+          <p className="text-[16px] leading-[1.75] text-ink">{framework.whatYouToldMe}</p>
+        </Panel>
 
-        <Divider />
-
-        <Block label="How The Hedge will work for you">
-          <ul className="space-y-3.5">
-            {framework.commitments.map((c, i) => (
-              <li key={i} className="flex gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-moss/12">
-                  <Leaf className="h-3.5 w-3.5 text-moss" />
-                </span>
-                <span className="text-[15.5px] leading-[1.7] text-ink">{c}</span>
-              </li>
-            ))}
-          </ul>
-        </Block>
-
-        <Divider />
-
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Block label="The quiet floor">
-            <p className="text-[15px] leading-[1.7] text-umber">{framework.quietFloor}</p>
-          </Block>
-          <Block label="For your worry">
-            <p className="text-[15px] leading-[1.7] text-umber">{framework.forYourWorry}</p>
-          </Block>
+        {/* Promises - the accent centrepiece */}
+        <div className="relative overflow-hidden rounded-3xl bg-forest p-6 text-parchment shadow-[0_18px_50px_rgba(13,31,18,0.18)] sm:p-7 md:col-span-5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_80%_10%,rgba(94,139,82,0.4),transparent)]" />
+          <div className="relative">
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.16em] text-sage">How The Hedge will work for you</p>
+            <ul className="space-y-3.5">
+              {framework.commitments.map((c, i) => (
+                <li key={i} className="flex gap-3">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-parchment/15">
+                    <Leaf className="h-3.5 w-3.5 text-parchment" />
+                  </span>
+                  <span className="text-[15px] leading-[1.65] text-parchment/95">{c}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        <Divider />
+        <Panel className="bg-linen/60 md:col-span-4">
+          <PanelLabel>The quiet floor</PanelLabel>
+          <p className="text-[14.5px] leading-[1.7] text-umber">{framework.quietFloor}</p>
+        </Panel>
 
-        <Block label="Three things you can do today">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <Panel className="bg-linen/60 md:col-span-4">
+          <PanelLabel>For your worry</PanelLabel>
+          <p className="text-[14.5px] leading-[1.7] text-umber">{framework.forYourWorry}</p>
+        </Panel>
+
+        <Panel className="md:col-span-4">
+          <PanelLabel>Three things to try today</PanelLabel>
+          <div className="space-y-3">
             {framework.thingsToday.map((t, i) => (
-              <div key={i} className="rounded-2xl border border-stone/40 bg-linen/50 p-4">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-forest font-display text-[13px] font-semibold text-parchment">{i + 1}</span>
-                <p className="mt-3 text-[13.5px] leading-relaxed text-ink">{t}</p>
+              <div key={i} className="flex gap-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-forest font-display text-[13px] font-semibold text-parchment">{i + 1}</span>
+                <p className="text-[13.5px] leading-snug text-ink">{t}</p>
               </div>
             ))}
           </div>
-        </Block>
+        </Panel>
       </div>
 
       <div className="mt-7 text-center">
@@ -612,15 +614,14 @@ function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone
   );
 }
 
-function Block({ label, children }: { label: string; children: React.ReactNode }) {
+function Panel({ className = '', children }: { className?: string; children: React.ReactNode }) {
   return (
-    <div>
-      <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-moss">{label}</p>
+    <div className={`rounded-3xl border border-stone/50 bg-white p-6 shadow-[0_12px_36px_rgba(28,53,32,0.06)] sm:p-7 ${className}`}>
       {children}
     </div>
   );
 }
 
-function Divider() {
-  return <div className="my-7 h-px bg-stone/50" />;
+function PanelLabel({ children }: { children: React.ReactNode }) {
+  return <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-moss">{children}</p>;
 }
