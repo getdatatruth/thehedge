@@ -50,9 +50,9 @@ const TUSLA_CHIPS = [
 
 type Exchange = { q: string; a: string };
 
-export function KitchenTableClient() {
+export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number } = {}) {
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(initialStep);
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [children, setChildren] = useState<KTChild[]>([{ name: '', age: null, interests: [] }]);
   const [answers, setAnswers] = useState<Partial<KTAnswers>>({});
