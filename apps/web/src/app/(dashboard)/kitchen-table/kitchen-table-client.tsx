@@ -542,64 +542,85 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
 
 function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone: () => void }) {
   return (
-    <div className="mx-auto max-w-xl px-4 pb-16 animate-fade-up">
-      <div className="mb-8 text-center">
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-moss/12">
-          <Leaf className="h-6 w-6 text-moss" />
-        </span>
-        <h1 className="mt-4 font-display text-3xl font-light text-ink">Your Family Framework</h1>
-        <p className="mt-2 text-[14px] italic text-clay">{framework.opening}</p>
+    <div className="mx-auto max-w-2xl px-4 pb-20 animate-fade-up">
+      {/* Header band - the keepsake cover */}
+      <div className="relative overflow-hidden rounded-t-[28px] bg-forest px-6 pb-9 pt-8 text-center sm:px-10 sm:pt-10">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_10%,rgba(94,139,82,0.45),transparent),radial-gradient(ellipse_70%_70%_at_20%_100%,rgba(61,97,66,0.5),transparent)]" />
+        <div className="relative">
+          <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-parchment/15">
+            <Leaf className="h-6 w-6 text-parchment" />
+          </span>
+          <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-sage">Your Family Framework</p>
+          <h1 className="mt-1 font-display text-[30px] font-light leading-tight text-parchment sm:text-4xl">Written for your family</h1>
+          <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-parchment/75">{framework.opening}</p>
+        </div>
       </div>
 
-      <Section title="What you told me">
-        <p className="text-[15px] leading-relaxed text-umber">{framework.whatYouToldMe}</p>
-      </Section>
+      {/* Document body */}
+      <div className="rounded-b-[28px] border border-t-0 border-stone/50 bg-white px-6 py-8 shadow-[0_24px_60px_rgba(28,53,32,0.10)] sm:px-10 sm:py-10">
+        <Block label="What you told me">
+          <p className="border-l-2 border-moss/40 pl-4 text-[16.5px] leading-[1.75] text-ink">{framework.whatYouToldMe}</p>
+        </Block>
 
-      <Section title="How The Hedge will work for you">
-        <ul className="space-y-2.5">
-          {framework.commitments.map((c, i) => (
-            <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-umber">
-              <Leaf className="mt-1 h-4 w-4 shrink-0 text-moss" />
-              <span>{c}</span>
-            </li>
-          ))}
-        </ul>
-      </Section>
+        <Divider />
 
-      <Section title="The quiet floor">
-        <p className="text-[15px] leading-relaxed text-umber">{framework.quietFloor}</p>
-      </Section>
+        <Block label="How The Hedge will work for you">
+          <ul className="space-y-3.5">
+            {framework.commitments.map((c, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-moss/12">
+                  <Leaf className="h-3.5 w-3.5 text-moss" />
+                </span>
+                <span className="text-[15.5px] leading-[1.7] text-ink">{c}</span>
+              </li>
+            ))}
+          </ul>
+        </Block>
 
-      <Section title="For your worry">
-        <p className="text-[15px] leading-relaxed text-umber">{framework.forYourWorry}</p>
-      </Section>
+        <Divider />
 
-      <Section title="Three things you can do today">
-        <ul className="space-y-2.5">
-          {framework.thingsToday.map((t, i) => (
-            <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-umber">
-              <span className="font-display font-medium text-moss">{i + 1}</span>
-              <span>{t}</span>
-            </li>
-          ))}
-        </ul>
-      </Section>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Block label="The quiet floor">
+            <p className="text-[15px] leading-[1.7] text-umber">{framework.quietFloor}</p>
+          </Block>
+          <Block label="For your worry">
+            <p className="text-[15px] leading-[1.7] text-umber">{framework.forYourWorry}</p>
+          </Block>
+        </div>
 
-      <p className="mt-8 text-center text-[12px] italic text-clay/70">This is yours. Tweak anything from Our Hedge whenever you like.</p>
-      <div className="text-center">
-        <button onClick={onDone} className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-forest px-7 py-3.5 text-sm font-semibold text-parchment transition-colors hover:bg-forest/90">
+        <Divider />
+
+        <Block label="Three things you can do today">
+          <div className="grid gap-3 sm:grid-cols-3">
+            {framework.thingsToday.map((t, i) => (
+              <div key={i} className="rounded-2xl border border-stone/40 bg-linen/50 p-4">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-forest font-display text-[13px] font-semibold text-parchment">{i + 1}</span>
+                <p className="mt-3 text-[13.5px] leading-relaxed text-ink">{t}</p>
+              </div>
+            ))}
+          </div>
+        </Block>
+      </div>
+
+      <div className="mt-7 text-center">
+        <button onClick={onDone} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-7 py-4 text-sm font-semibold text-parchment transition-colors hover:bg-forest/90 sm:w-auto">
           This is us, into The Hedge <ArrowRight className="h-4 w-4" />
         </button>
+        <p className="mt-3 text-[12px] italic text-clay/70">This is yours. Tweak anything from Our Hedge whenever you like.</p>
       </div>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mb-4 rounded-2xl border border-sage/15 bg-sage/8 p-5">
-      <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80">{title}</p>
+    <div>
+      <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.16em] text-moss">{label}</p>
       {children}
     </div>
   );
+}
+
+function Divider() {
+  return <div className="my-7 h-px bg-stone/50" />;
 }
