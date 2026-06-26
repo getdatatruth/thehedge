@@ -27,6 +27,8 @@ export interface KTAnswers {
   county?: string;
   outdoor?: string;
   tuslaKey?: string;
+  // Free-text the family adds when refining a framework that was not quite right.
+  notes?: string;
 }
 
 export interface KTProfile {
@@ -38,6 +40,7 @@ export interface KTProfile {
   county?: string;
   outdoor?: string;
   tusla?: string;
+  notes?: string;
   children: KTChild[];
 }
 
@@ -85,6 +88,7 @@ export function deriveProfile(a: KTAnswers): KTProfile {
     county: a.county?.trim() || undefined,
     outdoor: a.outdoor || undefined,
     tusla: a.tuslaKey || undefined,
+    notes: a.notes?.trim() || undefined,
     children: a.children,
   };
 }
@@ -197,7 +201,9 @@ Their answers:
 - The worry on their mind: ${p.worry}
 - Their approach: ${p.approach}
 - Their rhythm: ${p.rhythm}
-- County: ${p.county || 'unknown'}; outdoor space: ${p.outdoor || 'unknown'}
+- County: ${p.county || 'unknown'}; outdoor space: ${p.outdoor || 'unknown'}${p.notes ? `
+
+The family read a first version of this back and added more in their own words. Take this to heart, let it genuinely reshape what you write (not just append it), and reflect that you have heard it: "${p.notes}"` : ''}
 
 Return ONLY strict JSON matching this shape (no markdown fences):
 {
