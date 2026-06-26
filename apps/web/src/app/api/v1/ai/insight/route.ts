@@ -12,6 +12,12 @@ export async function OPTIONS() {
 const PRIVACY_NOTE =
   'Use only THIS family\'s own information to help them. Their details are private to them and are never used to help any other family.';
 
+// A hard guard against the model mistaking a fresh, empty first day for a
+// technical fault. It must never tell the family the app is broken, that data
+// has not loaded, or to refresh or re-check their setup.
+const GUARD =
+  'You always have everything you need. NEVER say that information is missing or has not loaded, NEVER tell the family to refresh, reload, or re-check their profiles or setup, and NEVER imply anything is broken. If there is little or nothing planned yet because the family is new, treat it as a fresh start: write a warm, welcoming note and gently point them to choosing or starting their first activity for today.';
+
 const SYSTEM_PROMPTS: Record<string, string> = {
   today: `You're a warm, knowledgeable Irish parenting coach for The Hedge family learning app. Give a 2-3 sentence morning briefing. Reference the weather, what's planned today, and which children benefit from today's activities. Be encouraging, specific, and natural - not cheesy. Never mention points, scores, streaks or leaderboards. Use Irish English. Never use em dashes.`,
 
@@ -110,8 +116,8 @@ Provide a personalised progress narrative with actionable next steps.`;
     // theirs, not a generic one. Degrades gracefully if the context is empty.
     const { text: familyContextText } = await buildFamilyContext(supabase, familyId);
     const system = familyContextText
-      ? `${SYSTEM_PROMPTS[type]} ${PRIVACY_NOTE}\n\nWhat you know about this family (use it naturally, do not list it back):\n${familyContextText}`
-      : `${SYSTEM_PROMPTS[type]} ${PRIVACY_NOTE}`;
+      ? `${SYSTEM_PROMPTS[type]} ${PRIVACY_NOTE} ${GUARD}\n\nWhat you know about this family (use it naturally, do not list it back):\n${familyContextText}`
+      : `${SYSTEM_PROMPTS[type]} ${PRIVACY_NOTE} ${GUARD}`;
 
     const response = await anthropic.messages.create({
       model: CLAUDE_MODEL,

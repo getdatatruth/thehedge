@@ -162,20 +162,25 @@ export async function seedStarterWeek(
         ctx,
       );
 
-      // Create the anchoring education plan for this child.
-      const { data: eduPlan } = await supabase
+      // Create the anchoring education plan for this child. We mint the id
+      // ourselves rather than depend on an INSERT ... RETURNING read, so a
+      // brand-new family (whose RLS scope can lag a returning SELECT) still gets
+      // a usable id for the daily_plans below.
+      const educationPlanId = crypto.randomUUID();
+      const { error: eduErr } = await supabase
         .from('education_plans')
         .insert({
+          id: educationPlanId,
           family_id: familyId,
           child_id: child.id,
           academic_year: academicYear,
           approach: 'blended',
-        })
-        .select('id')
-        .single();
+        });
 
-      if (!eduPlan) continue;
-      const educationPlanId = eduPlan.id as string;
+      if (eduErr) {
+        console.error('starter-week: education_plans insert failed:', eduErr.message);
+        continue;
+      }
 
       // Spread the ranked picks across the gentle number of days, a calm few per
       // day, without repeating an activity. Keep a little variety by avoiding
@@ -250,13 +255,16 @@ export async function seedStarterWeek(
           attendance_logged: false,
         });
 
-        if (!insertErr) created += 1;
+        if (insertErr) console.error('starter-week: daily_plans insert failed:', insertErr.message);
+        else created += 1;
       }
     }
 
     return created;
-  } catch {
-    // Best-effort: never let a starter-week hiccup break onboarding.
+  } catch (err) {
+    // Best-effort: never let a starter-week hiccup break onboarding, but do not
+    // fail silently - log it so a regression here is visible.
+    console.error('starter-week: seeding failed:', err instanceof Error ? err.message : err);
     return 0;
   }
 }
