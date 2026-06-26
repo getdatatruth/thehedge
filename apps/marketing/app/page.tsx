@@ -4,7 +4,8 @@ import Nav from '../components/Nav';
 import FAQ from '../components/FAQ';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icons';
-import KitchenTableDemo from '../components/KitchenTableDemo';
+import HeroDemo from '../components/HeroDemo';
+import OnboardingWalkthrough from '../components/OnboardingWalkthrough';
 import ProductTour from '../components/ProductTour';
 
 export const metadata: Metadata = {
@@ -55,11 +56,16 @@ export default function Home() {
             </h1>
             <p className="hero-body">Most apps hand every family the same list. The Hedge sits down with you at the Kitchen Table, learns your children, your values and your rhythm, then writes your family its own plan. Learning that feels like a breath, not a battle.</p>
 
+            <div className="hero-cta-row fade-up-2">
+              <HeroDemo />
+              <Link href="#how" className="btn-ghost">See how it works <Icon id="arrow-r" size={14} /></Link>
+            </div>
+
             <div className="doorways fade-up-2" role="navigation" aria-label="Choose your path">
-              <Link href="#kitchen-table" className="doorway">
+              <Link href="https://app.thehedge.ie/signup" className="doorway">
                 <span className="doorway-eyebrow"><Icon id="sun" size={11} color="currentColor" /> Everyday family life</span>
                 <span className="doorway-title">Ideas that fit your day</span>
-                <span className="doorway-body">Screen-free things to do, shaped by your children, your county and the weather. See what we&apos;d write for you.</span>
+                <span className="doorway-body">Screen-free things to do, shaped by your children, your county and the weather.</span>
               </Link>
               <Link href="/homeschool" className="doorway">
                 <span className="doorway-eyebrow"><Icon id="book" size={11} color="currentColor" /> Home education</span>
@@ -75,8 +81,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hero-panel" id="kitchen-table">
-            <KitchenTableDemo />
+          <div className="hero-panel">
+            <div className="hero-phone fade-up-2">
+              <div className="hero-phone-screen">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/product/framework-mobile.png" alt="A Family Framework written for one family by The Hedge, reading back what was shared at the Kitchen Table" />
+              </div>
+              <span className="hero-phone-cap">Written for your family</span>
+            </div>
           </div>
         </section>
 
@@ -98,63 +110,17 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── HOW IT WORKS (teaser) ── */}
-        <section className="section" aria-labelledby="hiw-title">
-          <div className="container" style={{display:'grid',gap:48}}>
-            <div style={{maxWidth:540}}>
-              <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">As easy as it gets</span></div>
-              <h2 className="section-title" id="hiw-title">How The Hedge <em>works</em></h2>
-              <p className="section-body">It begins with a conversation, not a form. Then everything is shaped around what you tell it.</p>
-              <div className="steps">
-                {[
-                  { n:'01', id:'leaf', title:'Sit down at the Kitchen Table', body:'A warm few questions about your children, your values and the shape of your days. A conversation, not a setup form.' },
-                  { n:'02', id:'spark', title:'Read back your Family Framework', body:'The Hedge writes your family its own framework and reflects it to you. The way you do things, respected, not overruled.' },
-                  { n:'03', id:'sun', title:'Your days, shaped to fit', body:'Today brings ideas that suit your crew and the weather. Plan gives you a timetable or a gentle rhythm. Keep quietly builds your record. Belong finds your local families.' },
-                  { n:'04', id:'users', title:'Ask, any time', body:'A calm companion that knows your framework. Honest about being an AI, never pretending to be a person.' },
-                ].map(s => (
-                  <div key={s.n} className="step">
-                    <div className="step-num">{s.n}</div>
-                    <div>
-                      <div className="step-ic"><Icon id={s.id} size={18} color="var(--moss)" /></div>
-                      <div className="step-title">{s.title}</div>
-                      <div className="step-body">{s.body}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{marginTop:28}}>
-                <Link href="/how-it-works" className="btn-ghost">See full walkthrough <Icon id="arrow-r" size={14} /></Link>
-              </div>
-            </div>
+        {/* ── HOW IT WORKS (interactive walkthrough) ── */}
+        <section className="section" id="how" aria-labelledby="hiw-title">
+          <div className="container">
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">As easy as it gets</span></div>
+            <h2 className="section-title" id="hiw-title">How The Hedge <em>works</em></h2>
+            <p className="section-body" style={{maxWidth:560}}>It begins with a conversation, not a form. Then everything is shaped around what you tell it. Step through the real setup below.</p>
 
-            <div>
-              <div className="week-card">
-                <div className="week-card-title">This week for your family</div>
-                <div className="week-card-sub" style={{fontFamily:'var(--font-serif)',fontStyle:'italic'}}>Cork · October · Mixed weather</div>
-                <div className="week">
-                  {[
-                    { d:'MON', acts:['Nature walk','Baking'], cls:'wd-past' },
-                    { d:'TUE', acts:['Science','Art'], cls:'wd-past' },
-                    { d:'WED', acts:['Fairy house','Science'], cls:'wd-today' },
-                    { d:'THU', acts:['Rock pool','Reading'], cls:'wd-future' },
-                    { d:'FRI', acts:['Active','Writing'], cls:'wd-future' },
-                  ].map(row => (
-                    <div key={row.d} className={`wd ${row.cls}`}>
-                      <span className="wd-day">{row.d}</span>
-                      <div className="wd-acts">
-                        {row.acts.map(a => <span key={a} className="wd-act">{a}</span>)}
-                      </div>
-                      {row.cls === 'wd-today' && <Icon id="arrow-r" size={12} color="var(--sage)" />}
-                    </div>
-                  ))}
-                </div>
-                <div style={{marginTop:16,padding:'12px 14px',background:'rgba(61,97,66,0.06)',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontSize:12,color:'var(--clay)'}}>Get started - it&apos;s free</span>
-                  <Link href="https://app.thehedge.ie/signup" style={{fontSize:12,fontWeight:700,color:'var(--forest)',display:'flex',alignItems:'center',gap:4}}>
-                    Try it now <Icon id="arrow-r" size={12} />
-                  </Link>
-                </div>
-              </div>
+            <OnboardingWalkthrough />
+
+            <div style={{marginTop:36,textAlign:'center'}}>
+              <Link href="/how-it-works" className="btn-ghost">See the full walkthrough <Icon id="arrow-r" size={14} /></Link>
             </div>
           </div>
         </section>
