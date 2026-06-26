@@ -1004,14 +1004,58 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </div>
           )}
 
-          {/* Reports */}
+          {/* AEARS pack - the flagship assessment-ready document */}
+          <div className="card-elevated overflow-hidden">
+            <div className="bg-forest p-6 sm:p-7">
+              <div className="flex items-start gap-4 flex-wrap">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-parchment/10">
+                  <ClipboardCheck className="h-6 w-6 text-parchment" />
+                </div>
+                <div className="flex-1 min-w-[220px]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-parchment/60 mb-1.5">Your Assessment Pack</p>
+                  <h2 className="font-display text-2xl font-light text-parchment leading-tight">
+                    Generate your <em className="italic">AEARS pack</em>
+                  </h2>
+                  <p className="text-sm text-parchment/75 mt-2 leading-relaxed max-w-prose">
+                    {selectedChild
+                      ? `One calm, assessor-ready document for ${selectedChild.name}, assembled from everything you have logged. It gathers a warm summary of the year, curriculum coverage mapped to the NCCA areas, your record of learning, and the full portfolio with its photo evidence embedded. Print it or save it as a PDF to bring to an AEARS assessment or review.`
+                      : 'Add a child to assemble their assessor-ready AEARS pack.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 mt-5 flex-wrap">
+                <a
+                  href={`/api/educator/reports?type=annual&childId=${selectedChildId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 rounded-[12px] bg-parchment px-5 py-2.5 text-sm font-bold text-forest transition-all hover:bg-white ${!selectedChildId ? 'pointer-events-none opacity-40' : ''}`}
+                  aria-disabled={!selectedChildId}
+                >
+                  <FileText className="h-4 w-4" />
+                  Generate AEARS pack
+                </a>
+                <a
+                  href={`/api/educator/reports?type=annual&childId=${selectedChildId}&format=csv`}
+                  className={`inline-flex items-center gap-2 rounded-[12px] border border-parchment/30 px-4 py-2.5 text-sm font-medium text-parchment/90 transition-all hover:bg-parchment/10 ${!selectedChildId ? 'pointer-events-none opacity-40' : ''}`}
+                  aria-disabled={!selectedChildId}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Data (CSV)
+                </a>
+              </div>
+              <p className="text-[11px] text-parchment/50 mt-4 leading-relaxed">
+                Prepared by your family using The Hedge. Not affiliated with Tusla. There is no required curriculum, no minimum hours, and no attendance requirement; the pack simply shows the breadth of your child{"'"}s learning.
+              </p>
+            </div>
+          </div>
+
+          {/* Other reports */}
           <div className="card-elevated p-6">
             <h2 className="font-display text-lg font-light text-ink mb-5">
-              Available <em className="text-moss italic">Reports</em>
+              Other <em className="text-moss italic">Reports</em>
             </h2>
             <div className="space-y-2">
               {([
-                { title: 'Assessment Summary Report', description: 'A summary to help with your Tusla assessment or review', reportType: 'annual' },
                 { title: 'Term Summary', description: 'Learning days, curriculum coverage, and portfolio summary', reportType: 'assessment' },
                 { title: 'Record of Learning Days', description: 'Day-by-day record of learning (optional, no attendance requirement)', reportType: 'attendance' },
                 { title: 'Curriculum Coverage', description: 'Breakdown by area and strand (the NCCA areas are a helpful map, not required)', reportType: 'portfolio' },

@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { signPortfolioPhotos } from '@/lib/storage';
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -55,6 +56,7 @@ interface PortfolioEntry {
   description: string | null;
   curriculumAreas: string[];
   activityLogTitle: string | null;
+  photos: string[];
 }
 
 interface DailyPlanEntry {
@@ -126,6 +128,32 @@ function formatCategory(cat: string): string {
   };
   return labels[cat] || cat;
 }
+
+// Map an activity category to the NCCA primary curriculum areas it nourishes.
+// Framed as a helpful map, not a required curriculum: the standard in Ireland is
+// 'a certain minimum education suitable to the child's age, ability and aptitude'.
+const NCCA_AREA_MAP: Record<string, string[]> = {
+  nature: ['Social, Environmental & Scientific Education'],
+  science: ['Social, Environmental & Scientific Education', 'Mathematics'],
+  art: ['Arts Education'],
+  literacy: ['Language'],
+  maths: ['Mathematics'],
+  movement: ['Physical Education'],
+  kitchen: ['Social, Environmental & Scientific Education', 'Social, Personal & Health Education'],
+  life_skills: ['Social, Personal & Health Education'],
+  calm: ['Social, Personal & Health Education'],
+  social: ['Social, Personal & Health Education', 'Language'],
+};
+
+// The six NCCA primary curriculum areas, in their conventional order.
+const NCCA_AREAS = [
+  'Language',
+  'Mathematics',
+  'Social, Environmental & Scientific Education',
+  'Arts Education',
+  'Physical Education',
+  'Social, Personal & Health Education',
+] as const;
 
 function formatTuslaStatus(status: string): string {
   const labels: Record<string, string> = {
@@ -248,7 +276,7 @@ async function fetchPortfolioEntries(
 ): Promise<PortfolioEntry[]> {
   const { data } = await supabase
     .from('portfolio_entries')
-    .select('id, date, title, description, curriculum_areas, activity_logs(id, activities(title))')
+    .select('id, date, title, description, curriculum_areas, photos, activity_logs(id, activities(title))')
     .eq('child_id', childId)
     .gte('date', startDate)
     .lte('date', endDate)
@@ -272,6 +300,7 @@ async function fetchPortfolioEntries(
       description: entry.description as string | null,
       curriculumAreas: (entry.curriculum_areas as string[]) || [],
       activityLogTitle: (activity?.title as string) || null,
+      photos: (entry.photos as string[]) || [],
     };
   });
 }
@@ -598,11 +627,89 @@ export async function buildPortfolioReport(params: ReportParams): Promise<Portfo
 
 // ─── Annual Report (combines all) ────────────────────────
 
+// A portfolio entry with its Storage photo paths already signed into
+// displayable URLs, ready to embed as <img> evidence in the AEARS pack.
+export interface PortfolioEntryWithPhotos extends PortfolioEntry {
+  signedPhotos: string[];
+}
+
+export interface NccaAreaCoverage {
+  area: string;
+  activityCount: number;
+  covered: boolean;
+}
+
 export interface AnnualReportData {
   type: 'annual';
   assessment: AssessmentReportData;
   attendance: AttendanceReportData;
   portfolio: PortfolioReportData;
+  // ── AEARS pack additions ──────────────────────────────
+  // A warm, honest narrative of the child's year, assembled from real data.
+  narrative: string;
+  // Coverage across the six NCCA primary areas (a map, not a requirement).
+  nccaCoverage: NccaAreaCoverage[];
+  // Portfolio entries with their photo evidence signed for embedding.
+  portfolioWithPhotos: PortfolioEntryWithPhotos[];
+  academicYear: string;
+}
+
+// Build a calm, honest few-sentence summary of the child's year from real data.
+function buildAnnualNarrative(
+  assessment: AssessmentReportData,
+  portfolio: PortfolioReportData,
+  nccaCoverage: NccaAreaCoverage[]
+): string {
+  const child = assessment.child;
+  const total = assessment.activitySummary.totalActivities;
+  const categoriesCovered = Object.keys(assessment.activitySummary.categoryCounts).filter(
+    (k) => k !== 'unknown'
+  );
+  const areasTouched = nccaCoverage.filter((a) => a.covered).length;
+
+  // Standout areas: the two most active categories.
+  const ranked = Object.entries(assessment.activitySummary.categoryCounts)
+    .filter(([cat]) => cat !== 'unknown')
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat]) => formatCategory(cat));
+  const standout = ranked.slice(0, 2);
+
+  if (total === 0 && portfolio.totalEntries === 0) {
+    return `This pack gathers ${child.name}'s home education for the year. As learning is recorded through the year, it will fill out here with the activities, areas covered, and portfolio evidence that show the breadth of ${child.name}'s days.`;
+  }
+
+  const parts: string[] = [];
+  parts.push(
+    `Over this academic year, ${child.name} (age ${child.age}) has learned through ${total} recorded ${total === 1 ? 'activity' : 'activities'} across ${categoriesCovered.length} ${categoriesCovered.length === 1 ? 'area of life' : 'areas of life'} at home.`
+  );
+
+  if (areasTouched > 0) {
+    parts.push(
+      `This learning touched ${areasTouched} of the six NCCA primary curriculum areas, a breadth that reflects a rounded, everyday education suited to ${child.name}'s age, ability and aptitude.`
+    );
+  }
+
+  if (standout.length > 0) {
+    parts.push(
+      standout.length === 1
+        ? `${standout[0]} was a particular thread running through the year.`
+        : `${standout[0]} and ${standout[1]} were particular threads running through the year.`
+    );
+  }
+
+  if (portfolio.totalEntries > 0) {
+    parts.push(
+      `Alongside the day-to-day learning, the family kept a portfolio of ${portfolio.totalEntries} ${portfolio.totalEntries === 1 ? 'piece' : 'pieces'} of work and moments worth holding onto, included later in this pack with their photo evidence.`
+    );
+  }
+
+  if (child.interests.length > 0) {
+    parts.push(
+      `${child.name}'s interests this year included ${child.interests.slice(0, 4).join(', ')}, which helped guide what the days looked like.`
+    );
+  }
+
+  return parts.join(' ');
 }
 
 export async function buildAnnualReport(params: ReportParams): Promise<AnnualReportData> {
@@ -612,30 +719,57 @@ export async function buildAnnualReport(params: ReportParams): Promise<AnnualRep
     buildPortfolioReport(params),
   ]);
 
+  // ── NCCA area coverage (a helpful map, not a requirement) ──
+  // Count activities per NCCA area via the category mapping, and fold in any
+  // portfolio entries tagged to those underlying categories.
+  const nccaCounts: Record<string, number> = {};
+  for (const area of NCCA_AREAS) nccaCounts[area] = 0;
+  for (const [cat, count] of Object.entries(assessment.activitySummary.categoryCounts)) {
+    for (const area of NCCA_AREA_MAP[cat] || []) {
+      nccaCounts[area] = (nccaCounts[area] || 0) + count;
+    }
+  }
+  for (const entry of portfolio.entries) {
+    for (const cat of entry.curriculumAreas) {
+      for (const area of NCCA_AREA_MAP[cat] || []) {
+        nccaCounts[area] = (nccaCounts[area] || 0) + 1;
+      }
+    }
+  }
+  const nccaCoverage: NccaAreaCoverage[] = NCCA_AREAS.map((area) => ({
+    area,
+    activityCount: nccaCounts[area] || 0,
+    covered: (nccaCounts[area] || 0) > 0,
+  }));
+
+  // ── Sign portfolio photos for embedding as evidence ──
+  // Storage paths become time-limited signed URLs; legacy data/http URLs pass
+  // through unchanged. This is the key gap the AEARS pack now closes.
+  const portfolioWithPhotos: PortfolioEntryWithPhotos[] = await Promise.all(
+    portfolio.entries.map(async (entry) => ({
+      ...entry,
+      signedPhotos: await signPortfolioPhotos(entry.photos),
+    }))
+  );
+
+  const narrative = buildAnnualNarrative(assessment, portfolio, nccaCoverage);
+
   return {
     type: 'annual',
     assessment,
     attendance,
     portfolio,
+    narrative,
+    nccaCoverage,
+    portfolioWithPhotos,
+    academicYear: assessment.educationPlan?.academicYear || '',
   };
 }
 
 // ─── HTML Report Renderer ─────────────────────────────────
 
-function htmlShell(title: string, childName: string, dateRange: string, generatedAt: string, body: string): string {
-  const genDate = new Date(generatedAt).toLocaleDateString('en-IE', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} - ${childName}</title>
-  <style>
+function htmlStyleBlock(): string {
+  return `<style>
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
     :root {
@@ -900,6 +1034,190 @@ function htmlShell(title: string, childName: string, dateRange: string, generate
       .no-print { display: none !important; }
     }
 
+    /* ── AEARS pack: cover page ── */
+    .cover {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      padding: 48px 24px;
+    }
+    .cover .cover-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px;
+      font-weight: 300;
+      color: var(--forest);
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .cover .cover-eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--clay);
+      margin-bottom: 48px;
+    }
+    .cover .cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .cover .cover-child {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--forest);
+      margin-bottom: 40px;
+    }
+    .cover .cover-meta {
+      display: inline-block;
+      text-align: left;
+      background: var(--parchment);
+      border: 1px solid var(--stone);
+      border-radius: 12px;
+      padding: 20px 28px;
+      margin: 0 auto 40px;
+    }
+    .cover .cover-meta div {
+      font-size: 13px;
+      color: var(--ink);
+      padding: 3px 0;
+    }
+    .cover .cover-meta strong {
+      display: inline-block;
+      min-width: 140px;
+      color: var(--clay);
+      font-weight: 500;
+    }
+    .cover .cover-note {
+      max-width: 460px;
+      margin: 0 auto;
+      font-size: 12px;
+      font-style: italic;
+      color: var(--clay);
+      line-height: 1.6;
+    }
+
+    /* ── Narrative block ── */
+    .narrative {
+      background: var(--parchment);
+      border-left: 3px solid var(--moss);
+      border-radius: 4px;
+      padding: 20px 24px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--ink);
+    }
+
+    /* ── NCCA coverage grid ── */
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .coverage-card {
+      border: 1px solid var(--stone);
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fff;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .coverage-card.covered {
+      background: var(--parchment);
+      border-color: var(--sage);
+    }
+    .coverage-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+      background: var(--stone);
+    }
+    .coverage-card.covered .coverage-dot { background: var(--moss); }
+    .coverage-card .coverage-area {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .coverage-card .coverage-count {
+      font-size: 11px;
+      color: var(--clay);
+      margin-top: 2px;
+    }
+
+    /* ── Portfolio evidence (with photos) ── */
+    .portfolio-entry {
+      border: 1px solid var(--stone);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      break-inside: avoid;
+    }
+    .portfolio-entry .entry-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .portfolio-entry .entry-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--forest);
+    }
+    .portfolio-entry .entry-date {
+      font-size: 12px;
+      color: var(--clay);
+      white-space: nowrap;
+    }
+    .portfolio-entry .entry-desc {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .portfolio-entry .entry-tags { margin-bottom: 12px; }
+    .photo-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .photo-gallery img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--stone);
+      background: var(--parchment);
+    }
+    .no-photo-note {
+      font-size: 11px;
+      color: var(--clay);
+      font-style: italic;
+    }
+
+    /* ── Disclaimer panel ── */
+    .disclaimer-panel {
+      background: var(--parchment);
+      border: 1px solid var(--stone);
+      border-radius: 10px;
+      padding: 20px 24px;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--clay);
+    }
+    .disclaimer-panel strong { color: var(--umber); }
+
     /* Print button */
     .print-button {
       position: fixed;
@@ -921,7 +1239,23 @@ function htmlShell(title: string, childName: string, dateRange: string, generate
     .print-button:hover {
       background: var(--moss);
     }
-  </style>
+  </style>`;
+}
+
+function htmlShell(title: string, childName: string, dateRange: string, generatedAt: string, body: string): string {
+  const genDate = new Date(generatedAt).toLocaleDateString('en-IE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} - ${childName}</title>
+  ${htmlStyleBlock()}
 </head>
 <body>
   <button class="print-button no-print" onclick="window.print()">Print / Save as PDF</button>
@@ -948,6 +1282,15 @@ function htmlShell(title: string, childName: string, dateRange: string, generate
 
 function formatDateDisplay(d: string): string {
   return new Date(d).toLocaleDateString('en-IE', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+// Escape user-supplied text so titles/descriptions/photo URLs render safely.
+function esc(value: string | null | undefined): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 function formatDateRange(start: string, end: string): string {
@@ -1248,35 +1591,97 @@ export function renderPortfolioHtml(data: PortfolioReportData): string {
 
 // ─── Annual Report HTML ──────────────────────────────────
 
+// A dedicated shell for the AEARS pack: it leads with a full cover page and
+// closes with the honest Tusla disclaimer, reusing the shared report styling.
+function aearsShell(childName: string, body: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEARS Pack - ${esc(childName)}</title>
+  ${htmlStyleBlock()}
+</head>
+<body>
+  <button class="print-button no-print" onclick="window.print()">Print / Save as PDF</button>
+  <div class="report">
+    ${body}
+  </div>
+</body>
+</html>`;
+}
+
 export function renderAnnualHtml(data: AnnualReportData): string {
-  const { assessment, attendance, portfolio } = data;
+  const { assessment, attendance, portfolio, narrative, nccaCoverage, portfolioWithPhotos, academicYear } = data;
   const child = assessment.child;
   const family = assessment.family;
   const dateRange = assessment.dateRange;
   const generatedAt = assessment.generatedAt;
 
+  const genDate = new Date(generatedAt).toLocaleDateString('en-IE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+  const periodLabel = academicYear
+    ? `${esc(academicYear)} academic year`
+    : `${formatDateDisplay(dateRange.start)} to ${formatDateDisplay(dateRange.end)}`;
+
   let body = '';
 
-  // Executive Summary
+  // ── Cover page ──────────────────────────────────────────
+  body += `
+    <div class="cover">
+      <div class="cover-brand">The Hedge</div>
+      <div class="cover-eyebrow">Home Education Portfolio</div>
+      <div class="cover-title">Assessment Pack</div>
+      <div class="cover-child">${esc(child.name)} &middot; age ${child.age}</div>
+      <div class="cover-meta">
+        <div><strong>Family</strong> ${esc(family.name)}</div>
+        <div><strong>Child</strong> ${esc(child.name)} (${formatDateDisplay(child.dateOfBirth)})</div>
+        <div><strong>Period</strong> ${periodLabel}</div>
+        ${family.county ? `<div><strong>County</strong> ${esc(family.county)}</div>` : ''}
+        <div><strong>Prepared</strong> ${genDate}</div>
+      </div>
+      <p class="cover-note">
+        Prepared by the family using The Hedge. Not affiliated with Tusla.
+        A portfolio assembled to support an application or review under the
+        Alternative Education Assessment and Registration Service (AEARS).
+      </p>
+    </div>`;
+
+  // ── Narrative summary of the year ───────────────────────
+  body += `
+    <div class="section page-break">
+      <h3 class="section-title">${esc(child.name)}&rsquo;s Year</h3>
+      <div class="narrative">${esc(narrative)}</div>
+    </div>`;
+
+  // ── Child & family details ──────────────────────────────
   body += `
     <div class="section">
-      <h3 class="section-title">Annual Overview</h3>
+      <h3 class="section-title">Child &amp; Family</h3>
       <div class="info-grid">
-        <div class="info-row"><span class="info-label">Family Name</span><span class="info-value">${family.name}</span></div>
-        <div class="info-row"><span class="info-label">County</span><span class="info-value">${family.county || 'Not specified'}</span></div>
-        <div class="info-row"><span class="info-label">Child&rsquo;s Name</span><span class="info-value">${child.name}</span></div>
+        <div class="info-row"><span class="info-label">Family Name</span><span class="info-value">${esc(family.name)}</span></div>
+        <div class="info-row"><span class="info-label">County</span><span class="info-value">${family.county ? esc(family.county) : 'Not specified'}</span></div>
+        <div class="info-row"><span class="info-label">Child&rsquo;s Name</span><span class="info-value">${esc(child.name)}</span></div>
         <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-value">${formatDateDisplay(child.dateOfBirth)}</span></div>
         <div class="info-row"><span class="info-label">Age</span><span class="info-value">${child.age} years</span></div>
-        <div class="info-row"><span class="info-label">Interests</span><span class="info-value">${child.interests.length > 0 ? child.interests.join(', ') : 'Not specified'}</span></div>
+        <div class="info-row"><span class="info-label">Interests</span><span class="info-value">${child.interests.length > 0 ? esc(child.interests.join(', ')) : 'Not specified'}</span></div>
       </div>
-      <div class="stats-row" style="margin-top: 24px;">
+    </div>`;
+
+  // ── At-a-glance figures ─────────────────────────────────
+  body += `
+    <div class="section">
+      <div class="stats-row">
         <div class="stat-card">
           <div class="stat-value">${assessment.activitySummary.totalActivities}</div>
-          <div class="stat-label">Activities</div>
+          <div class="stat-label">Activities Recorded</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${assessment.activitySummary.totalHours}</div>
-          <div class="stat-label">Hours Learning</div>
+          <div class="stat-value">${nccaCoverage.filter((a) => a.covered).length}<span style="font-size:18px;">/6</span></div>
+          <div class="stat-label">NCCA Areas Touched</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${attendance.totals.totalDaysAttended}</div>
@@ -1284,179 +1689,123 @@ export function renderAnnualHtml(data: AnnualReportData): string {
         </div>
         <div class="stat-card">
           <div class="stat-value">${portfolio.totalEntries}</div>
-          <div class="stat-label">Portfolio Entries</div>
+          <div class="stat-label">Portfolio Pieces</div>
         </div>
       </div>
     </div>`;
 
-  // Education Plan
-  if (assessment.educationPlan) {
-    const plan = assessment.educationPlan;
+  // ── Curriculum coverage (NCCA / Aistear), correctly framed ──
+  body += `
+    <div class="section page-break">
+      <h3 class="section-title">Curriculum Coverage</h3>
+      <p style="font-size:13px; color: var(--clay); margin-bottom:16px; line-height:1.7;">
+        Home education in Ireland is assessed on whether a child is receiving
+        <em>a certain minimum education suitable to their age, ability and aptitude</em>.
+        The national curriculum is <strong>not</strong> required. The six NCCA primary areas below
+        are used here only as a familiar map, to show the breadth of ${esc(child.name)}&rsquo;s learning across the year.
+      </p>
+      <div class="coverage-grid">`;
+  for (const area of nccaCoverage) {
     body += `
-    <div class="section">
-      <h3 class="section-title">Education Plan</h3>
-      <div class="info-grid">
-        <div class="info-row"><span class="info-label">Academic Year</span><span class="info-value">${plan.academicYear}</span></div>
-        <div class="info-row"><span class="info-label">Approach</span><span class="info-value">${formatApproach(plan.approach)}</span></div>
-        <div class="info-row"><span class="info-label">Hours per Day</span><span class="info-value">${plan.hoursPerDay}</span></div>
-        <div class="info-row"><span class="info-label">Days per Week</span><span class="info-value">${plan.daysPerWeek}</span></div>
-        <div class="info-row"><span class="info-label">Tusla Status</span><span class="info-value">${formatTuslaStatus(plan.tuslaStatus)}</span></div>
+        <div class="coverage-card${area.covered ? ' covered' : ''}">
+          <div class="coverage-dot"></div>
+          <div>
+            <div class="coverage-area">${esc(area.area)}</div>
+            <div class="coverage-count">${area.covered ? `${area.activityCount} ${area.activityCount === 1 ? 'activity' : 'activities'} contributing` : 'Room to grow into next'}</div>
+          </div>
+        </div>`;
+  }
+  body += `
       </div>
     </div>`;
-  }
 
-  // Section: Assessment
-  body += `
-    <div class="annual-divider">
-      <hr class="divider-line" />
-      <h2>Part 1: Assessment &amp; Curriculum</h2>
-    </div>`;
-
-  // Category Breakdown
-  if (Object.keys(assessment.activitySummary.categoryCounts).length > 0) {
-    body += `
-    <div class="section">
-      <h3 class="section-title">Category Breakdown</h3>
-      <table>
-        <thead><tr><th>Category</th><th>Activities</th><th>Proportion</th></tr></thead>
-        <tbody>`;
-    const total = assessment.activitySummary.totalActivities || 1;
-    for (const [cat, count] of Object.entries(assessment.activitySummary.categoryCounts).sort((a, b) => b[1] - a[1])) {
-      const pct = Math.round((count / total) * 100);
-      body += `<tr><td>${formatCategory(cat)}</td><td>${count}</td><td>${pct}% ${progressBar(pct)}</td></tr>`;
-    }
-    body += `</tbody></table></div>`;
-  }
-
-  // Aistear Themes
+  // Aistear early-years themes (a gentle complement for younger children).
   if (Object.keys(assessment.activitySummary.aistearThemes).length > 0) {
     body += `
     <div class="section">
-      <h3 class="section-title">Aistear Theme Coverage</h3>
+      <h3 class="section-title">Aistear Themes (early years)</h3>
       <table>
         <thead><tr><th>Theme</th><th>Activities Contributing</th></tr></thead>
         <tbody>`;
     for (const [theme, count] of Object.entries(assessment.activitySummary.aistearThemes).sort((a, b) => b[1] - a[1])) {
-      body += `<tr><td>${theme}</td><td>${count}</td></tr>`;
+      body += `<tr><td>${esc(theme)}</td><td>${count}</td></tr>`;
     }
-    body += `</tbody></table></div>`;
+    body += `</tbody></table>
+      <p style="font-size:12px; color: var(--clay); margin-top:8px;">Aistear themes: Well-being, Identity &amp; Belonging, Communicating, and Exploring &amp; Thinking. Activities may contribute to more than one.</p>
+    </div>`;
   }
 
-  // Curriculum Coverage
-  if (assessment.curriculumCoverage.length > 0) {
-    body += `
-    <div class="section">
-      <h3 class="section-title">Curriculum Area Coverage</h3>
-      <table>
-        <thead><tr><th>Area</th><th>Priority</th><th>Activities</th><th>Notes</th></tr></thead>
-        <tbody>`;
-    for (const area of assessment.curriculumCoverage) {
-      body += `<tr><td>${area.area}</td><td>${area.priority}</td><td>${area.activityCount}</td><td>${area.notes || '&mdash;'}</td></tr>`;
-    }
-    body += `</tbody></table></div>`;
-  }
-
-  // Recent Activities
-  if (assessment.recentActivities.length > 0) {
-    body += `
-    <div class="section">
-      <h3 class="section-title">Sample Activities</h3>
-      <table>
-        <thead><tr><th>Date</th><th>Activity</th><th>Category</th><th>Duration</th></tr></thead>
-        <tbody>`;
-    for (const act of assessment.recentActivities) {
-      body += `<tr><td>${formatDateDisplay(act.date)}</td><td>${act.title}</td><td>${act.category}</td><td>${act.duration ? act.duration + ' min' : '&mdash;'}</td></tr>`;
-    }
-    body += `</tbody></table></div>`;
-  }
-
-  // Section: Attendance
+  // ── Learning record summary (by category) ───────────────
   body += `
-    <div class="annual-divider">
-      <hr class="divider-line" />
-      <h2>Part 2: Record of Learning</h2>
+    <div class="section page-break">
+      <h3 class="section-title">Learning Record</h3>`;
+  if (Object.keys(assessment.activitySummary.categoryCounts).length > 0) {
+    body += `
+      <table>
+        <thead><tr><th>Area of Life</th><th>Activities</th><th>Proportion</th></tr></thead>
+        <tbody>`;
+    const total = assessment.activitySummary.totalActivities || 1;
+    for (const [cat, count] of Object.entries(assessment.activitySummary.categoryCounts).filter(([c]) => c !== 'unknown').sort((a, b) => b[1] - a[1])) {
+      const pct = Math.round((count / total) * 100);
+      body += `<tr><td>${formatCategory(cat)}</td><td>${count}</td><td>${pct}% ${progressBar(pct)}</td></tr>`;
+    }
+    body += `</tbody></table>`;
+  } else {
+    body += `<p style="color: var(--clay);">No activities recorded for this period yet.</p>`;
+  }
+  body += `
+      <p style="font-size:12px; color: var(--clay); margin-top:12px; line-height:1.7;">
+        There is <strong>no minimum number of hours</strong> and <strong>no attendance requirement</strong> for home education in Ireland.
+        These figures simply reflect what the family chose to record over the year.${attendance.totals.totalHoursLogged > 0 ? ` Time noted across the year came to roughly ${attendance.totals.totalHoursLogged} hours.` : ''}
+      </p>
     </div>`;
 
+  // ── Portfolio of evidence WITH PHOTOS ───────────────────
   body += `
-    <div class="section">
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-value">${attendance.totals.totalDaysAttended}</div>
-          <div class="stat-label">Days of Learning</div>
+    <div class="section page-break">
+      <h3 class="section-title">Portfolio of Evidence</h3>`;
+  if (portfolioWithPhotos.length > 0) {
+    body += `<p style="font-size:13px; color: var(--clay); margin-bottom:20px;">Dated pieces of ${esc(child.name)}&rsquo;s work and learning, with photo evidence where the family captured it.</p>`;
+    for (const entry of portfolioWithPhotos) {
+      const tags = entry.curriculumAreas.map((a) => `<span class="tag">${formatCategory(a)}</span>`).join('');
+      body += `
+      <div class="portfolio-entry">
+        <div class="entry-head">
+          <span class="entry-title">${esc(entry.title)}</span>
+          <span class="entry-date">${formatDateDisplay(entry.date)}</span>
         </div>
-        <div class="stat-card">
-          <div class="stat-value">${attendance.totals.totalDaysRequired}</div>
-          <div class="stat-label">Days in Your Plan</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${attendance.totals.totalHoursLogged}</div>
-          <div class="stat-label">Hours Logged</div>
-        </div>
+        ${entry.description ? `<p class="entry-desc">${esc(entry.description)}</p>` : ''}
+        ${tags ? `<div class="entry-tags">${tags}</div>` : ''}`;
+      if (entry.signedPhotos.length > 0) {
+        body += `<div class="photo-gallery">`;
+        for (const url of entry.signedPhotos) {
+          body += `<img src="${esc(url)}" alt="${esc(entry.title)} - photo evidence" loading="lazy" />`;
+        }
+        body += `</div>`;
+      } else {
+        body += `<p class="no-photo-note">No photo attached to this entry.</p>`;
+      }
+      body += `
+      </div>`;
+    }
+  } else {
+    body += `<p style="color: var(--clay);">No portfolio entries recorded for this period yet. As the family adds pieces of work, with photos, they will appear here as evidence.</p>`;
+  }
+  body += `
+    </div>`;
+
+  // ── Footer disclaimer ───────────────────────────────────
+  body += `
+    <div class="section page-break">
+      <div class="disclaimer-panel">
+        <p style="margin-bottom:10px;"><strong>About this pack.</strong> It was assembled by the family using The Hedge from the learning they recorded over the year. <strong>The Hedge is not affiliated with Tusla</strong> and this is not an official Tusla document.</p>
+        <p style="margin-bottom:10px;">In Ireland, a parent <strong>applies to Tusla via AEARS</strong> (the Alternative Education Assessment and Registration Service) to register a child on the Section 14 Register under the Education (Welfare) Act 2000. An <strong>authorised person</strong> carries out the assessment. The standard is whether the child is receiving <strong>a certain minimum education</strong> suitable to their age, ability and aptitude. There is <strong>no required curriculum, no minimum hours, and no attendance requirement</strong>. Registration is subject to <strong>periodic review</strong>.</p>
+        <p>Please use Tusla&rsquo;s official application (currently the R1 form) and current guidance when you apply. Nothing here is legal advice.</p>
+      </div>
+      <div class="report-footer" style="margin-top:24px;">
+        <div class="generated">Prepared ${genDate} with The Hedge &middot; thehedge.ie</div>
       </div>
     </div>`;
 
-  if (attendance.monthlyBreakdown.length > 0) {
-    body += `
-    <div class="section">
-      <h3 class="section-title">Monthly Learning Record</h3>
-      <table>
-        <thead><tr><th>Month</th><th>Days (of your plan)</th><th>Hours Logged</th><th>Of Your Own Plan</th></tr></thead>
-        <tbody>`;
-    for (const month of attendance.monthlyBreakdown) {
-      body += `<tr>
-        <td>${month.month}</td>
-        <td>${month.daysAttended} / ${month.daysPlanned}</td>
-        <td>${month.hoursLogged}</td>
-        <td>${month.completionRate}%</td>
-      </tr>`;
-    }
-    body += `</tbody></table></div>`;
-  }
-
-  // Section: Portfolio
-  body += `
-    <div class="annual-divider">
-      <hr class="divider-line" />
-      <h2>Part 3: Portfolio of Learning</h2>
-    </div>`;
-
-  body += `
-    <div class="section">
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-value">${portfolio.totalEntries}</div>
-          <div class="stat-label">Portfolio Entries</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${Object.keys(portfolio.curriculumCoverageSummary).length}</div>
-          <div class="stat-label">Curriculum Areas</div>
-        </div>
-      </div>
-    </div>`;
-
-  if (portfolio.entries.length > 0) {
-    body += `
-    <div class="section">
-      <h3 class="section-title">Portfolio Entries</h3>
-      <table>
-        <thead><tr><th>Date</th><th>Title</th><th>Curriculum Areas</th></tr></thead>
-        <tbody>`;
-    for (const entry of portfolio.entries) {
-      const areas = entry.curriculumAreas.map((a) => `<span class="tag">${formatCategory(a)}</span>`).join('');
-      body += `<tr>
-        <td>${formatDateDisplay(entry.date)}</td>
-        <td><strong>${entry.title}</strong>${entry.description ? `<br><span style="font-size: 12px; color: var(--umber);">${entry.description}</span>` : ''}</td>
-        <td>${areas || '&mdash;'}</td>
-      </tr>`;
-    }
-    body += `</tbody></table></div>`;
-  }
-
-  return htmlShell(
-    'Annual Education Report',
-    child.name,
-    formatDateRange(dateRange.start, dateRange.end),
-    generatedAt,
-    body
-  );
+  return aearsShell(child.name, body);
 }

@@ -11,6 +11,7 @@ import {
   type KTAnswers,
   type KTFramework,
 } from '@/lib/kitchen-table';
+import { seedStarterWeek } from '@/lib/starter-plan';
 
 // POST /api/kitchen-table
 // Takes the kitchen-table answers, writes the Family Framework (one invisible
@@ -141,6 +142,12 @@ export async function POST(request: NextRequest) {
     profile: { ...profile, framework },
     rendered_markdown: frameworkToMarkdown(framework),
   });
+
+  // Seed a gentle, personalised starter week so the Plan tab (and the week) feel
+  // alive from minute one rather than landing empty. Best-effort and idempotent:
+  // it only seeds when the family has no daily_plans yet, and any failure is
+  // swallowed so onboarding is never blocked.
+  await seedStarterWeek(supabase, familyId, profile.approach);
 
   return NextResponse.json({ framework, profile });
 }
