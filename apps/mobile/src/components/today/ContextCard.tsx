@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Sun, Cloud, CloudRain, Sparkles, ChevronRight } from 'lucide-react-native';
+import { Sun, Cloud, CloudRain, Leaf, ChevronRight } from 'lucide-react-native';
 import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
@@ -53,8 +53,8 @@ export function ContextCard({ weather, childNames, onAskAI }: ContextCardProps) 
 
       {onAskAI && (
         <TouchableOpacity onPress={onAskAI} style={styles.aiButton}>
-          <Sparkles size={16} color="#FFFFFF" />
-          <Text style={styles.aiText}>Ask AI for ideas</Text>
+          <Leaf size={16} color="#FFFFFF" />
+          <Text style={styles.aiText}>Want an idea?</Text>
           <ChevronRight size={16} color="#FFFFFF" />
         </TouchableOpacity>
       )}

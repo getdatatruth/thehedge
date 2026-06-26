@@ -1,11 +1,16 @@
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
+import { buildFamilyContext } from '@/lib/family-context';
 
 export async function OPTIONS() {
   return apiOptions();
 }
+
+const PRIVACY_NOTE =
+  'Use only THIS family\'s own information to help them. Their details are private to them and are never used to help any other family.';
 
 const SYSTEM_PROMPTS: Record<string, string> = {
   today: `You're a warm, knowledgeable Irish parenting coach for The Hedge family learning app. Give a 2-3 sentence morning briefing. Reference the weather, what's planned today, and which children benefit from today's activities. Be encouraging, specific, and natural - not cheesy. Never mention points, scores, streaks or leaderboards. Use Irish English. Never use em dashes.`,
@@ -23,8 +28,16 @@ const SYSTEM_PROMPTS: Record<string, string> = {
  * Cached client-side for 1 hour to minimise API calls.
  */
 export async function POST(request: NextRequest) {
-  const { user, error } = await createApiClient(request);
+  const { supabase, user, error } = await createApiClient(request);
   if (!user) return apiError(error || 'Unauthorized', 401);
+
+  // Resolve this family so we can shape the insight around their real data.
+  const { data: profile } = await supabase
+    .from('users')
+    .select('family_id')
+    .eq('id', user.id)
+    .single();
+  const familyId = profile?.family_id as string | undefined;
 
   const body = await request.json();
   const { type, context } = body;
@@ -93,10 +106,17 @@ Provide a personalised progress narrative with actionable next steps.`;
         break;
     }
 
+    // Fold in everything we know about THIS family so the insight is genuinely
+    // theirs, not a generic one. Degrades gracefully if the context is empty.
+    const { text: familyContextText } = await buildFamilyContext(supabase, familyId);
+    const system = familyContextText
+      ? `${SYSTEM_PROMPTS[type]} ${PRIVACY_NOTE}\n\nWhat you know about this family (use it naturally, do not list it back):\n${familyContextText}`
+      : `${SYSTEM_PROMPTS[type]} ${PRIVACY_NOTE}`;
+
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 200,
-      system: SYSTEM_PROMPTS[type],
+      system,
       messages: [{ role: 'user', content: userPrompt }],
     });
 

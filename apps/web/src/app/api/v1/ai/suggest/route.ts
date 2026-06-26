@@ -1,7 +1,9 @@
 import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
+import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -27,7 +29,9 @@ When suggesting activities, respond with a JSON array of 3-5 suggestions. Each s
   "why_today": "Why this is a good idea right now"
 }
 
-Consider the family's context: children's ages, interests, the weather, time of year, and what they've done recently. Suggest household-only materials - nothing they'd need to buy.`;
+Consider the family's context: children's ages, interests, the weather, time of year, and what they've done recently. Suggest household-only materials - nothing they'd need to buy.
+
+Privacy: you only ever use THIS family's own information to help them. Their details are private to them and are never used to help any other family.`;
 
 const RATE_LIMITS: Record<string, number> = {
   free: 5,
@@ -59,6 +63,29 @@ export async function POST(request: NextRequest) {
 
     const tier = family?.subscription_tier || 'free';
     const weeklyLimit = RATE_LIMITS[tier] || 5;
+    const familyId = profile?.family_id;
+
+    // Enforce the weekly limit server-side against the real ai_usage ledger.
+    // (Monday-start week, matching the rest of the app.)
+    const now = new Date();
+    const day = now.getDay();
+    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - day + (day === 0 ? -6 : 1));
+    let used = 0;
+    if (familyId) {
+      const { count } = await supabase
+        .from('ai_usage')
+        .select('*', { count: 'exact', head: true })
+        .eq('family_id', familyId)
+        .eq('feature', 'ai_suggestions')
+        .gte('created_at', weekStart.toISOString());
+      used = count || 0;
+    }
+    if (used >= weeklyLimit) {
+      return apiError(
+        `You've used all ${weeklyLimit} of this week's idea requests on the ${tier} plan. Upgrade to ask for more.`,
+        402
+      );
+    }
 
     const body = await request.json();
     const { prompt, context } = body;
@@ -67,12 +94,18 @@ export async function POST(request: NextRequest) {
       return apiError('Missing prompt', 400);
     }
 
-    const userMessage = context
-      ? `Family context: ${JSON.stringify(context)}\n\nUser request: ${prompt}`
-      : prompt;
+    // Build a rich picture of THIS family from their own real data so the ideas
+    // are genuinely theirs, then layer any live context the client passed.
+    const { text: familyContextText } = await buildFamilyContext(supabase, familyId);
+
+    const contextParts: string[] = [];
+    if (familyContextText) contextParts.push(`What you know about this family:\n${familyContextText}`);
+    if (context) contextParts.push(`Right now: ${JSON.stringify(context)}`);
+    contextParts.push(`User request: ${prompt}`);
+    const userMessage = contextParts.join('\n\n');
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 2048,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userMessage }],
@@ -92,11 +125,19 @@ export async function POST(request: NextRequest) {
       // If JSON parsing fails, return the text response
     }
 
+    // Record the spend so the limit means something.
+    if (familyId) {
+      await supabase.from('ai_usage').insert({ family_id: familyId, feature: 'ai_suggestions' });
+      // Learn this family a little more from what they asked for ideas about.
+      void recordAiMemory(familyId, `Looked for ideas: ${prompt}`);
+    }
+
     return apiSuccess({
       suggestions,
       text: responseText,
       tier,
       weeklyLimit,
+      used: used + 1,
     });
   } catch (err) {
     console.error('AI suggestion error:', err);

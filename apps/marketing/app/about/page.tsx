@@ -16,7 +16,7 @@ const values = [
   { id:'book', title:'Learning is everywhere', body:"The hedge school tradition understood that learning doesn't need four walls and a bell. It happens in kitchens, gardens, fields, and beaches. We help families find it everywhere." },
   { id:'shield', title:'Privacy first', body:"We will never sell your family's data, serve you ads, or use your children's information to train AI models. EU data storage, GDPR compliant, always." },
   { id:'users', title:'For every family', body:"Whether you homeschool, use mainstream school, live in a city apartment, or on a farm in Connaught - The Hedge works for you. Irish family life is diverse, and we reflect that." },
-  { id:'spark', title:'Honest about what we are', body:"We're a small team building something we genuinely believe in. We're not venture-backed, not chasing virality, and not optimising for engagement. We're optimising for families having better days." },
+  { id:'spark', title:'Honest about what we are', body:"The Hedge is built by one person who genuinely believes in it. Not venture-backed, not chasing virality, not optimising for engagement. Just optimising for families having better days." },
 ];
 
 export default function About() {
@@ -29,7 +29,8 @@ export default function About() {
     mainEntity: {
       '@type': 'Organization',
       name: 'The Hedge',
-      foundingLocation: { '@type': 'Place', name: 'West Cork, Ireland' },
+      foundingLocation: { '@type': 'Place', name: 'Ireland' },
+      founder: { '@type': 'Person', name: "Adam O'Flynn" },
       description: "Family learning platform for Irish families.",
       url: 'https://thehedge.ie',
     },
@@ -58,7 +59,7 @@ export default function About() {
                 "In 18th-century Ireland, when formal education was suppressed under the Penal Laws, Irish communities created their own - holding lessons outdoors, beneath hedgerows and in ditches, with whatever teacher was available and whatever materials they had to hand. Education, stubbornly happening despite everything.",
                 "These hedge schools weren't perfect. But they were real. They were community-driven, they worked with the landscape, and they understood that learning happens wherever you decide it does.",
                 "That spirit is what The Hedge is built on. Not the idea that children need a building, a curriculum, or a screen to learn - but that curiosity, guided gently, flowers in the most ordinary places. A kitchen. A garden. A walk along a lane in Kerry in November.",
-                "We built The Hedge in West Cork because that's where we live, and because West Cork felt like the right kind of place to build something like this - somewhere with a long memory of learning the hard way, in the real world, outside.",
+                "I built The Hedge in Ireland because that is where I live, and because it felt like the right kind of place to build something like this - somewhere with a long memory of learning the hard way, in the real world, outside.",
               ].map((para, i) => (
                 <p key={i} style={{fontFamily:'var(--font-serif)',fontSize:'clamp(16px,2.5vw,19px)',color:'var(--clay)',lineHeight:1.75}}>{para}</p>
               ))}
@@ -85,17 +86,43 @@ export default function About() {
           </div>
         </section>
 
+        {/* FOUNDER */}
+        <section className="section" aria-labelledby="founder-title">
+          <div className="container" style={{maxWidth:760}}>
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Who is behind it</span></div>
+            <h2 className="section-title" id="founder-title">A note from the <em>founder</em></h2>
+            <div style={{display:'flex',flexDirection:'column',gap:20}}>
+              {[
+                "Hello. I'm Adam O'Flynn, and I build The Hedge. It is a solo project, made in Ireland, for Irish families. There is no big team behind the curtain, no investors to please, and no growth target driving the decisions. There is one person trying to make something genuinely useful and honest.",
+                "The idea grew out of a simple frustration: every family app I tried felt like it was built for somewhere else. It did not know Irish weather, Irish seasons, the Aistear and NCCA frameworks our children actually learn under, or the AEARS process home-educating families have to navigate. So I started building the one I wished existed.",
+                "Building solo keeps me honest. I will not claim features The Hedge does not have, invent testimonials, or pretend to be something I'm not. The app is early, the mobile version is still coming, and I would far rather under-promise and let the product speak. If you spot something that feels off, or you want something it does not do yet, write to me. I read every email.",
+              ].map((para, i) => (
+                <p key={i} style={{fontFamily:'var(--font-serif)',fontSize:'clamp(16px,2.5vw,19px)',color:'var(--clay)',lineHeight:1.75}}>{para}</p>
+              ))}
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:14,marginTop:24,padding:'16px 20px',background:'var(--linen)',borderRadius:12,border:'1px solid var(--stone)'}}>
+              <div style={{width:36,height:36,borderRadius:8,background:'rgba(61,97,66,0.08)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <Icon id="msg" size={16} color="var(--moss)" />
+              </div>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'var(--clay)',marginBottom:2}}>Reach Adam directly</div>
+                <a href="mailto:adam@ofmm.ie" style={{fontSize:15,fontWeight:600,color:'var(--forest)'}}>adam@ofmm.ie</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* BUILT IN IRELAND */}
         <section className="section section-forest" aria-labelledby="made-title">
           <div className="container" style={{maxWidth:700,textAlign:'center'}}>
             <div className="eyebrow eyebrow-sage" style={{justifyContent:'center'}}><div className="eyebrow-line" /><span className="eyebrow-text">Made in Ireland</span></div>
             <h2 className="section-title section-title-light" id="made-title">West Cork to <em>all 32 counties</em></h2>
-            <p style={{fontFamily:'var(--font-serif)',fontSize:'clamp(15px,2.5vw,18px)',color:'rgba(189,212,176,0.8)',lineHeight:1.75,marginBottom:32}}>The Hedge is built, hosted, and supported entirely within the EU. Our data never leaves Frankfurt. Our team is based in West Cork. And our test families live in Donegal, Tipperary, Galway, and everywhere in between.</p>
+            <p style={{fontFamily:'var(--font-serif)',fontSize:'clamp(15px,2.5vw,18px)',color:'rgba(189,212,176,0.8)',lineHeight:1.75,marginBottom:32}}>The Hedge is built, hosted, and supported entirely within the EU. Your data never leaves Frankfurt, and the weather works for every one of the 32 counties. This is a one-person operation in Ireland, building for families the length and breadth of the island.</p>
             <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:14,maxWidth:440,margin:'0 auto'}}>
               {[
                 { n:'West Cork', l:'Where we build' },
                 { n:'Frankfurt', l:'Where data lives (EU)' },
-                { n:'32', l:'Counties covered' },
+                { n:'32', l:'Counties of live weather' },
                 { n:'2026', l:'Founded' },
               ].map(s => (
                 <div key={s.l} className="stat stat-dark">
@@ -112,7 +139,7 @@ export default function About() {
           <div className="container" style={{maxWidth:640}}>
             <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">Get in touch</span></div>
             <h2 className="section-title" id="contact-title">We love hearing <em>from families</em></h2>
-            <p className="section-body">Questions, feedback, stories about what your children made last Tuesday - we want to hear it all. We&apos;re a small team and we read every email.</p>
+            <p className="section-body">Questions, feedback, stories about what your children made last Tuesday - I want to hear it all. It is just me here, and I read every email.</p>
             <div style={{display:'flex',flexDirection:'column',gap:12}}>
               {[
                 { id:'msg', label:'General enquiries', email:'hello@thehedge.ie' },

@@ -57,30 +57,6 @@ export async function scheduleDailyReminder(time: {
 }
 
 /**
- * Schedules a streak reminder notification for 6pm daily.
- * Content: "Your streak is at risk! Log an activity to keep it going."
- * Triggers every day at 18:00.
- */
-export async function scheduleStreakReminder(): Promise<string> {
-  const id = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Streak Alert',
-      body: 'Your streak is at risk! Log an activity to keep it going.',
-      sound: 'default',
-      data: { type: 'reminder' },
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: 18,
-      minute: 0,
-      channelId: CHANNEL_ID,
-    },
-  });
-
-  return id;
-}
-
-/**
  * Schedules a weekly review notification for Sunday at 18:00.
  * Content: "Your week in review is ready. See how your family did!"
  * Repeats every Sunday.

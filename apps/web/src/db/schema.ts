@@ -10,6 +10,7 @@ import {
   jsonb,
   pgEnum,
   uniqueIndex,
+  index,
 } from 'drizzle-orm/pg-core';
 
 // ─── Enums ───────────────────────────────────────────────
@@ -87,6 +88,11 @@ export const families = pgTable('families', {
   latitude: real('latitude'),
   longitude: real('longitude'),
   familyStyle: familyStyleEnum('family_style').default('balanced'),
+  // The living Framework seed: the family's learning approach (from The Kitchen
+  // Table) and which doorway they came in through. Nullable for families with no
+  // plan yet (e.g. mainstream do-more parents).
+  approach: educationApproachEnum('approach'),
+  doorway: text('doorway'), // 'do_more' | 'considering' | 'early_window' | 'homeschool'
   timezone: text('timezone').notNull().default('Europe/Dublin'),
   stripeCustomerId: text('stripe_customer_id'),
   stripeSubscriptionId: text('stripe_subscription_id'),
@@ -97,6 +103,93 @@ export const families = pgTable('families', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
+
+// The living "Family Framework" produced by The Kitchen Table consultative
+// onboarding: the raw conversation, the extracted structured profile (value,
+// worry, rhythm, the two dials), and the rendered one-page framework the parent
+// recognises as their own beliefs. Every downstream surface is a projection of it.
+export const familyFrameworks = pgTable('family_frameworks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  transcript: jsonb('transcript').$type<{ role: string; text: string }[]>().notNull().default([]),
+  profile: jsonb('profile').$type<Record<string, unknown>>().notNull().default({}),
+  renderedMarkdown: text('rendered_markdown'),
+  version: integer('version').notNull().default(1),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('family_frameworks_family_id_idx').on(table.familyId),
+]);
+
+// Previously created at runtime via an exec_sql hack; now real + migrated
+// (migrations 0003_tusla_registrations.sql). Notifications and
+// activity_favourites already existed in the DB; declared here so the schema
+// is the single source of truth.
+export const tuslaRegistrations = pgTable('tusla_registrations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  childId: uuid('child_id').notNull().references(() => children.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('not_started'),
+  notificationForm: jsonb('notification_form').$type<Record<string, unknown>>().notNull().default({}),
+  documents: jsonb('documents').$type<unknown[]>().notNull().default([]),
+  deadlines: jsonb('deadlines').$type<unknown[]>().notNull().default([]),
+  assessmentChecklist: jsonb('assessment_checklist').$type<unknown[]>().notNull().default([]),
+  notes: text('notes'),
+  submittedAt: timestamp('submitted_at', { withTimezone: true }),
+  approvedAt: timestamp('approved_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('tusla_registrations_family_child_idx').on(table.familyId, table.childId),
+  index('tusla_registrations_family_idx').on(table.familyId),
+]);
+
+export const notifications = pgTable('notifications', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  type: text('type').notNull().default('info'),
+  title: text('title').notNull(),
+  body: text('body'),
+  read: boolean('read').notNull().default(false),
+  actionUrl: text('action_url'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('notifications_family_id_idx').on(table.familyId),
+]);
+
+export const activityFavourites = pgTable('activity_favourites', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  activityId: uuid('activity_id').notNull().references(() => activities.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('activity_favourites_family_activity_idx').on(table.familyId, table.activityId),
+]);
+
+// Per-family AI usage ledger for server-side tier enforcement
+// (migrations/0004_ai_usage.sql).
+export const aiUsage = pgTable('ai_usage', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  feature: text('feature').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('ai_usage_family_feature_idx').on(table.familyId, table.feature, table.createdAt),
+]);
+
+// A lightweight, per-family memory the AI accumulates over time so every reply
+// is shaped by what we have learned about THIS family and no other
+// (migrations/0005_family_ai_memory.sql). `notes` is a capped list of short
+// gist-of-the-ask jottings; `summary` is an optional rolled-up digest.
+export const familyAiMemory = pgTable('family_ai_memory', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  familyId: uuid('family_id').notNull().references(() => families.id, { onDelete: 'cascade' }),
+  notes: jsonb('notes').$type<{ at: string; note: string }[]>().notNull().default([]),
+  summary: text('summary'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  uniqueIndex('family_ai_memory_family_id_idx').on(table.familyId),
+]);
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(), // references auth.users

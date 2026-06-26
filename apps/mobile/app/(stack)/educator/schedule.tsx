@@ -25,7 +25,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { TierGate } from '@/components/shared/TierGate';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface ScheduleBlock {
@@ -111,7 +111,7 @@ export default function ScheduleScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Schedule</Text>
       </View>
@@ -151,7 +151,7 @@ export default function ScheduleScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.primary}
           />
         }
       >
@@ -173,9 +173,9 @@ export default function ScheduleScreen() {
                 <View style={styles.blockRow}>
                   <View style={styles.blockCheck}>
                     {block.completed ? (
-                      <CheckSquare size={22} color={colors.moss} />
+                      <CheckSquare size={22} color={lightTheme.primary} />
                     ) : (
-                      <Square size={22} color={colors.stone} />
+                      <Square size={22} color={lightTheme.border} />
                     )}
                   </View>
                   <View style={styles.blockContent}>
@@ -187,7 +187,7 @@ export default function ScheduleScreen() {
                         {block.subject}
                       </Badge>
                       <View style={styles.blockTime}>
-                        <Clock size={11} color={colors.clay} />
+                        <Clock size={11} color={lightTheme.textSecondary} />
                         <Text style={styles.blockTimeText}>{block.time}</Text>
                       </View>
                     </View>
@@ -217,9 +217,9 @@ export default function ScheduleScreen() {
             activeOpacity={0.8}
           >
             {isAttending ? (
-              <UserCheck size={18} color={colors.moss} />
+              <UserCheck size={18} color={lightTheme.primary} />
             ) : (
-              <UserX size={18} color={colors.terracotta} />
+              <UserX size={18} color={lightTheme.error} />
             )}
             <Text style={styles.attendanceText}>
               {isAttending ? 'Attending' : 'Not attending'}
@@ -229,8 +229,8 @@ export default function ScheduleScreen() {
                 styles.attendanceDot,
                 {
                   backgroundColor: isAttending
-                    ? colors.moss
-                    : colors.terracotta,
+                    ? lightTheme.primary
+                    : lightTheme.error,
                 },
               ]}
             />
@@ -243,7 +243,7 @@ export default function ScheduleScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  headerTitle: { fontSize: 20, fontWeight: '300', color: lightTheme.text },
   dayTabs: {
     paddingHorizontal: spacing.xl,
     gap: spacing.sm,
@@ -269,22 +269,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: radius.sm,
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     marginRight: spacing.sm,
   },
   dayTabActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
+    borderColor: lightTheme.primary,
   },
   dayTabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   dayTabTextActive: {
-    color: colors.parchment,
+    color: lightTheme.background,
   },
   scroll: {
     paddingHorizontal: spacing.xl,
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   emptyDay: {
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     borderStyle: 'dashed',
     borderRadius: radius.lg,
     padding: spacing['3xl'],
@@ -303,11 +303,11 @@ const styles = StyleSheet.create({
   emptyDayTitle: {
     fontSize: 16,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   emptyDayText: {
     fontSize: 13,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
   },
   blockRow: {
@@ -333,41 +333,41 @@ const styles = StyleSheet.create({
   },
   blockTimeText: {
     fontSize: 11,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   blockTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   blockTitleCompleted: {
     textDecorationLine: 'line-through',
-    color: `${colors.clay}80`,
+    color: `${lightTheme.textSecondary}80`,
   },
   blockDuration: {
     fontSize: 12,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   attendanceSection: {
     marginTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: `${colors.stone}60`,
+    borderTopColor: `${lightTheme.border}60`,
     paddingTop: spacing.xl,
   },
   attendanceToggle: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     borderRadius: radius.lg,
     padding: spacing.lg,
   },
   attendanceText: {
     fontSize: 14,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
     flex: 1,
   },
   attendanceDot: {

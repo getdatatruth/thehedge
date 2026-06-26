@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -12,13 +13,11 @@ import {
   ChevronRight,
   Settings,
   Bell,
-  Heart,
   Users,
-  Clock,
-  FolderOpen,
   GraduationCap,
   CreditCard,
   HelpCircle,
+  Download,
   LogOut,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
@@ -44,22 +43,28 @@ export default function ProfileScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile header */}
+        {/* Our Hedge header - the family hearth */}
         <View style={styles.profileHeader}>
+          <Text style={styles.eyebrow}>OUR HEDGE</Text>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>
-              {(profile?.name || 'U').charAt(0).toUpperCase()}
+              {(family?.name || profile?.name || 'H').charAt(0).toUpperCase()}
             </Text>
           </View>
-          <Text style={styles.userName}>{profile?.name || 'User'}</Text>
+          <Text style={styles.userName}>
+            {family?.name ? `The ${family.name} Hedge` : 'Our Hedge'}
+          </Text>
           <Text style={styles.familyLabel}>
-            {family?.name || 'Family'}
+            {profile?.name ? `Kept by ${profile.name}` : 'Your family hearth'}
+          </Text>
+          <Text style={styles.familyTagline}>
+            Learning that feels like a breath, not a battle.
           </Text>
           <TouchableOpacity
             onPress={() => router.push('/(stack)/settings/profile' as any)}
             style={styles.editButton}
           >
-            <Text style={styles.editText}>EDIT PROFILE</Text>
+            <Text style={styles.editText}>TEND TO OUR HEDGE</Text>
           </TouchableOpacity>
         </View>
 
@@ -93,29 +98,15 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* Main menu */}
+        {/* Family menu */}
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>MY STUFF</Text>
+          <Text style={styles.sectionLabel}>FAMILY</Text>
           <View style={styles.card}>
             <MenuItem
-              icon={<Heart size={20} color="#E8735A" />}
-              label="Favourites"
-              onPress={() => router.push('/(stack)/favourites' as any)}
-            />
-            <MenuItem
-              icon={<Clock size={20} color="#9B7BD4" />}
-              label="Timeline"
-              onPress={() => router.push('/(stack)/timeline' as any)}
-            />
-            <MenuItem
-              icon={<FolderOpen size={20} color={lightTheme.accent} />}
-              label="Collections"
-              onPress={() => router.push('/(stack)/collections' as any)}
-            />
-            <MenuItem
               icon={<Users size={20} color="#5B8DEF" />}
-              label="Community"
-              onPress={() => router.push('/(stack)/community' as any)}
+              label="Children"
+              subtitle="Add or tend to the ones at the heart of it"
+              onPress={() => router.push('/(stack)/settings/children' as any)}
               last
             />
           </View>
@@ -155,9 +146,19 @@ export default function ProfileScreen() {
               />
             )}
             <MenuItem
+              icon={<Download size={20} color={lightTheme.textSecondary} />}
+              label="Export Your Data"
+              onPress={() => router.push('/(stack)/settings/data' as any)}
+            />
+            <MenuItem
               icon={<HelpCircle size={20} color={lightTheme.textSecondary} />}
               label="Help & Support"
-              onPress={() => {}}
+              subtitle="Anything at all, we're glad to hear from you"
+              onPress={() => {
+                Linking.openURL(
+                  'mailto:adam@ofmm.ie?subject=The%20Hedge%20support'
+                ).catch(() => {});
+              }}
               last
             />
           </View>
@@ -219,6 +220,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing['2xl'],
     paddingHorizontal: spacing.xl,
   },
+  eyebrow: {
+    ...typography.eyebrow,
+    color: lightTheme.accent,
+    marginBottom: spacing.md,
+  },
   avatar: {
     width: 80,
     height: 80,
@@ -241,6 +247,14 @@ const styles = StyleSheet.create({
     ...typography.uiSmall,
     color: lightTheme.textMuted,
     marginTop: 2,
+  },
+  familyTagline: {
+    ...typography.uiSmall,
+    color: lightTheme.textSecondary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.lg,
   },
   editButton: {
     marginTop: spacing.lg,

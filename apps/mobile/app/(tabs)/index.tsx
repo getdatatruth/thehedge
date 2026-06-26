@@ -11,19 +11,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
   Bell,
-  Sparkles,
-  Plus,
-  Activity,
   Sun,
   Cloud,
   CloudRain,
-  ChevronRight,
   Shuffle,
   Clock,
-  MapPin,
   Zap,
   Calendar,
   ArrowRight,
+  Leaf,
+  Feather,
+  Sprout,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
@@ -55,6 +53,7 @@ interface DashboardData {
     duration_minutes: number;
     description?: string;
     location?: string;
+    energy_level?: string;
     age_min?: number;
     age_max?: number;
   }>;
@@ -124,6 +123,27 @@ function getCategoryColor(category: string): string {
   return (categoryColors as Record<string, string>)[category] || lightTheme.accent;
 }
 
+// Reframe chips re-pick the single hero, they do not open a list.
+// Each one quietly filters the candidate pool and the hero re-picks.
+const REFRAMES = [
+  { id: 'calm', label: 'Something calmer', Icon: Feather },
+  { id: 'quick', label: "We've ten minutes", Icon: Clock },
+  { id: 'outdoor', label: 'Out of doors', Icon: Sprout },
+  { id: 'rain', label: "It's lashing", Icon: CloudRain },
+] as const;
+
+type ReframeId = (typeof REFRAMES)[number]['id'];
+
+// How many leaves we show before spilling into a "+N" tail.
+const SEASON_LEAF_SLOTS = 12;
+
+function seasonForMonth(month: number): string {
+  if (month <= 1 || month === 11) return 'winter';
+  if (month <= 4) return 'spring';
+  if (month <= 7) return 'summer';
+  return 'autumn';
+}
+
 // ---- Component ----
 
 export default function TodayScreen() {
@@ -141,6 +161,7 @@ export default function TodayScreen() {
   const [selectedDay, setSelectedDay] = useState<number>(todayDow);
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
   const [heroShuffle, setHeroShuffle] = useState(0);
+  const [reframe, setReframe] = useState<ReframeId | null>(null);
 
   // Dashboard data
   const {
@@ -222,8 +243,20 @@ export default function TodayScreen() {
   const familyInterests = children.flatMap(c => c.interests || []);
   const preferredCategories = new Set(familyInterests.flatMap(i => interestCategoryMap[i] || []));
 
-  // Weather + interest-aware hero activity
-  const heroActivity = useMemo(() => {
+  // ─── The Thread: one context-aware hero, re-pickable by reframe chips ───
+  // Each chip filters the candidate pool; the hero re-picks from what is left.
+  const reframeMatches = (a: { duration_minutes?: number; location?: string; energy_level?: string; category?: string }): boolean => {
+    if (!reframe) return true;
+    const location = a.location || 'anywhere';
+    if (reframe === 'calm') return a.energy_level === 'calm' || a.category === 'calm';
+    if (reframe === 'quick') return (a.duration_minutes ?? 99) <= 15;
+    if (reframe === 'outdoor') return ['outdoor', 'both', 'anywhere'].includes(location);
+    if (reframe === 'rain') return ['indoor', 'both', 'anywhere'].includes(location);
+    return true;
+  };
+
+  // Weather + interest-aware hero activity, picked from the reframed pool.
+  const { heroActivity, reframeEmpty } = useMemo(() => {
     const isRaining = dashboard?.weather?.isRaining || false;
 
     function scoreActivity(a: { category?: string; location?: string }): number {
@@ -236,26 +269,36 @@ export default function TodayScreen() {
       return score;
     }
 
-    const todayActivities = selectedDayActivities.filter(a => !a.completed);
-    if (todayActivities.length > 0) {
-      // Sort by interest/weather score, then pick based on shuffle
-      const scored = [...todayActivities].sort((a, b) => scoreActivity(b as any) - scoreActivity(a as any));
-      const idx = heroShuffle % scored.length;
-      return scored[idx];
-    }
-    // Fall back to dashboard today activities
-    if (dashboard?.todayActivities?.length) {
-      const scored = [...dashboard.todayActivities].sort((a, b) => scoreActivity(b as any) - scoreActivity(a as any));
-      const idx = heroShuffle % scored.length;
-      return { ...scored[idx], completed: false, child_name: '', time: '' };
-    }
-    return null;
-  }, [selectedDayActivities, dashboard?.todayActivities, dashboard?.weather, heroShuffle, preferredCategories]);
+    // Build the base pool: today's plan if there is one, otherwise the
+    // dashboard suggestions (normalised to the same shape).
+    const planPool = selectedDayActivities.filter(a => !a.completed);
+    const base = planPool.length > 0
+      ? planPool
+      : (dashboard?.todayActivities || []).map(a => ({ ...a, completed: false, child_name: '', time: '' }));
+
+    if (base.length === 0) return { heroActivity: null, reframeEmpty: false };
+
+    // Apply the reframe filter. If nothing matches, gently fall back to the
+    // whole pool so the hero never vanishes, but flag it for a soft note.
+    const filtered = base.filter(reframeMatches);
+    const empty = !!reframe && filtered.length === 0;
+    const pool = filtered.length > 0 ? filtered : base;
+
+    const scored = [...pool].sort((a, b) => scoreActivity(b as any) - scoreActivity(a as any));
+    const idx = heroShuffle % scored.length;
+    return { heroActivity: scored[idx], reframeEmpty: empty };
+  }, [selectedDayActivities, dashboard?.todayActivities, dashboard?.weather, heroShuffle, preferredCategories, reframe]);
 
   const hasMultipleChildren = children.length > 1;
   const isSelectedToday = selectedDay === todayDow;
   const hasPlan = selectedDayActivities.length > 0;
   const isFirstTime = (dashboard?.activitiesThisWeek || 0) === 0 && (dashboard?.daysOfLearning || 0) === 0;
+
+  // ─── Your season so far: accumulating leaves, not a score ───
+  const season = seasonForMonth(now.getMonth());
+  const seasonLabel = season.charAt(0).toUpperCase() + season.slice(1);
+  const moments = dashboard?.daysOfLearning || 0;
+  const leavesFilled = Math.min(moments, SEASON_LEAF_SLOTS);
 
   // Day header
   const selectedDate = getDateForDayIndex(monday, selectedDay);
@@ -309,6 +352,34 @@ export default function TodayScreen() {
           <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} tintColor={lightTheme.accent} />
         }
       >
+        {/* ─── REFRAME CHIPS: re-pick the one hero, not open a list ─── */}
+        {isSelectedToday && heroActivity && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.reframeRow}
+            style={{ flexGrow: 0 }}
+          >
+            {REFRAMES.map(({ id, label, Icon }) => {
+              const active = reframe === id;
+              return (
+                <TouchableOpacity
+                  key={id}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setReframe(active ? null : id);
+                    setHeroShuffle(0);
+                  }}
+                  style={[styles.reframeChip, active && styles.reframeChipActive]}
+                >
+                  <Icon size={13} color={active ? '#FFFFFF' : lightTheme.textSecondary} />
+                  <Text style={[styles.reframeChipText, active && styles.reframeChipTextActive]}>{label}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        )}
+
         {/* ─── HERO RECOMMENDATION ─── */}
         {isSelectedToday && heroActivity && (
           <AnimatedCard delay={0}>
@@ -322,9 +393,13 @@ export default function TodayScreen() {
             >
               <View style={styles.heroHeader}>
                 <View style={styles.heroLabelRow}>
-                  <Sparkles size={14} color={lightTheme.accent} />
+                  <Leaf size={14} color={lightTheme.accent} />
                   <Text style={styles.heroLabel}>
-                    {isFirstTime ? 'Start here'
+                    {reframe === 'calm' ? 'Something gentler'
+                      : reframe === 'quick' ? 'A quick one'
+                      : reframe === 'outdoor' ? 'Out in the fresh air'
+                      : reframe === 'rain' ? 'Cosy and indoors'
+                      : isFirstTime ? 'Start here'
                       : hasPlan ? (educationApproach === 'structured' ? "Today's schedule" : 'Up next')
                       : dashboard?.weather?.isRaining ? 'Perfect for a rainy day'
                       : educationApproach === 'child_led' ? 'Inspiration for today'
@@ -333,16 +408,6 @@ export default function TodayScreen() {
                       : 'Try this today'}
                   </Text>
                 </View>
-                <TouchableOpacity
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    setHeroShuffle(s => s + 1);
-                  }}
-                  style={styles.shuffleButton}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <Shuffle size={14} color={lightTheme.textMuted} />
-                </TouchableOpacity>
               </View>
 
               <Text style={styles.heroTitle}>{heroActivity.title}</Text>
@@ -365,10 +430,28 @@ export default function TodayScreen() {
                 )}
               </View>
 
+              {reframeEmpty && (
+                <Text style={styles.reframeNote}>
+                  Nothing matched that just now, so here is another gentle idea.
+                </Text>
+              )}
+
               <View style={styles.heroCta}>
                 <Text style={styles.heroCtaText}>Let's do this</Text>
                 <ArrowRight size={16} color="#FFFFFF" />
               </View>
+
+              <TouchableOpacity
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setHeroShuffle(s => s + 1);
+                }}
+                style={styles.heroAnother}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Shuffle size={13} color={lightTheme.textMuted} />
+                <Text style={styles.heroAnotherText}>Show me another</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           </AnimatedCard>
         )}
@@ -537,23 +620,41 @@ export default function TodayScreen() {
           />
         ))}
 
-        {/* Compact stats row */}
+        {/* ─── YOUR SEASON SO FAR: accumulating leaves, not a score ─── */}
         <TouchableOpacity
-          style={styles.statsRow}
-          activeOpacity={0.8}
+          style={styles.seasonCard}
+          activeOpacity={0.85}
           onPress={() => router.push('/(tabs)/progress' as any)}
         >
-          <View style={styles.statItem}>
-            <Calendar size={14} color="#9B7BD4" />
-            <Text style={styles.statValue}>{dashboard?.daysOfLearning || 0}</Text>
-            <Text style={styles.statLabel}>days of learning</Text>
+          <Text style={styles.seasonLabel}>Your {seasonLabel.toLowerCase()} so far</Text>
+          <View style={styles.seasonLeaves}>
+            {Array.from({ length: SEASON_LEAF_SLOTS }).map((_, i) => (
+              <Leaf
+                key={i}
+                size={18}
+                color={i < leavesFilled ? lightTheme.accent : lightTheme.border}
+                fill={i < leavesFilled ? lightTheme.accent : 'none'}
+              />
+            ))}
+            {moments > SEASON_LEAF_SLOTS && (
+              <Text style={styles.seasonOverflow}>+{moments - SEASON_LEAF_SLOTS}</Text>
+            )}
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Activity size={14} color={lightTheme.accent} />
-            <Text style={styles.statValue}>{dashboard?.activitiesThisWeek || 0}</Text>
-            <Text style={styles.statLabel}>this week</Text>
-          </View>
+          <Text style={styles.seasonNote}>
+            {moments === 0
+              ? 'Nothing kept yet this season. Your first one is waiting just above.'
+              : `You have kept ${moments} ${moments === 1 ? 'moment' : 'moments'} together this ${seasonLabel.toLowerCase()}. Lovely.`}
+          </Text>
+        </TouchableOpacity>
+
+        {/* ─── Browse all ideas (gentle) ─── */}
+        <TouchableOpacity
+          style={styles.browseLink}
+          activeOpacity={0.7}
+          onPress={() => router.push('/(tabs)/browse')}
+        >
+          <Text style={styles.browseLinkText}>Browse all ideas</Text>
+          <ArrowRight size={15} color={lightTheme.textSecondary} />
         </TouchableOpacity>
 
       </ScrollView>
@@ -603,21 +704,36 @@ const styles = StyleSheet.create({
     fontSize: 12, fontWeight: '700', color: lightTheme.accent,
     textTransform: 'uppercase', letterSpacing: 0.5,
   },
-  shuffleButton: {
-    width: 32, height: 32, borderRadius: 16,
-    backgroundColor: lightTheme.background, alignItems: 'center', justifyContent: 'center',
-  },
   heroTitle: { fontSize: 22, fontWeight: '700', color: lightTheme.text, lineHeight: 28, marginBottom: spacing.md },
   heroMeta: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.lg, flexWrap: 'wrap' },
   heroCategoryBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   heroCategoryText: { fontSize: 12, fontWeight: '600', textTransform: 'capitalize' },
   heroMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   heroMetaText: { fontSize: 12, color: lightTheme.textMuted },
+  reframeNote: {
+    fontSize: 13, color: lightTheme.textSecondary, lineHeight: 19,
+    fontStyle: 'italic', marginBottom: spacing.md,
+  },
   heroCta: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     backgroundColor: lightTheme.accent, borderRadius: radius.lg, paddingVertical: 12,
   },
   heroCtaText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
+  heroAnother: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    paddingTop: spacing.md,
+  },
+  heroAnotherText: { fontSize: 13, fontWeight: '500', color: lightTheme.textMuted },
+  // Reframe chips
+  reframeRow: { gap: 8, paddingVertical: 2 },
+  reframeChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    height: 34, paddingHorizontal: 14, borderRadius: 17,
+    backgroundColor: lightTheme.surface,
+  },
+  reframeChipActive: { backgroundColor: lightTheme.primary },
+  reframeChipText: { fontSize: 13, fontWeight: '500', color: lightTheme.textSecondary },
+  reframeChipTextActive: { color: '#FFFFFF' },
   // First time guidance
   guidanceCard: {
     backgroundColor: `${lightTheme.accent}08`, borderRadius: 16,
@@ -670,14 +786,22 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: lightTheme.border,
   },
   emptySecondaryText: { fontSize: 14, fontWeight: '600', color: lightTheme.textSecondary },
-  // Compact stats
-  statsRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+  // Your season so far (accumulating leaves)
+  seasonCard: {
     backgroundColor: lightTheme.surface, borderRadius: 16,
-    paddingVertical: spacing.lg, paddingHorizontal: spacing.xl,
+    padding: spacing.xl,
   },
-  statItem: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
-  statValue: { fontSize: 16, fontWeight: '700', color: lightTheme.text },
-  statLabel: { fontSize: 11, color: lightTheme.textMuted },
-  statDivider: { width: 1, height: 20, backgroundColor: lightTheme.borderLight },
+  seasonLabel: {
+    fontSize: 12, fontWeight: '700', color: lightTheme.accent,
+    textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: spacing.md,
+  },
+  seasonLeaves: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 4, marginBottom: spacing.md },
+  seasonOverflow: { fontSize: 13, fontWeight: '600', color: lightTheme.accent, marginLeft: 4 },
+  seasonNote: { fontSize: 14, color: lightTheme.textSecondary, lineHeight: 21 },
+  // Browse all ideas
+  browseLink: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    paddingVertical: spacing.sm,
+  },
+  browseLinkText: { fontSize: 14, fontWeight: '500', color: lightTheme.textSecondary },
 });

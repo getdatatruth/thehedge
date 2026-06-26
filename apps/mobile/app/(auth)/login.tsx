@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     borderColor: darkTheme.accent,
   },
   logoText: {
-    fontFamily: 'CormorantGaramond-Light',
     fontSize: 32,
     color: darkTheme.text,
     letterSpacing: -0.5,

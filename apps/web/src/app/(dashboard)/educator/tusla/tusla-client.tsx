@@ -1,7 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import {
+  buildAearsTimeline,
+  nextAearsMilestone,
+  describeDaysAway,
+  assessmentReadiness,
+  type AearsMilestone,
+} from '@/lib/aears';
 import {
   ArrowLeft,
   Shield,
@@ -30,6 +37,7 @@ import {
   Trash2,
   CalendarDays,
   Bell,
+  Printer,
 } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────
@@ -154,17 +162,17 @@ const STATUS_STEPS: { key: RegistrationStatus; label: string }[] = [
 
 const DEFAULT_DOCUMENTS: TuslaDocument[] = [
   {
-    id: 'notification-of-intent',
-    name: 'Notification of Intent to Educate at Home',
-    description: 'Section 14 notification form sent to Tusla Education and Welfare Service informing them of your decision to home educate.',
+    id: 'application-for-registration',
+    name: 'Application for Registration (Section 14)',
+    description: 'Tusla\'s official application form (currently the R1 form), submitted via AEARS, to register your child under Section 14 of the Education (Welfare) Act 2000.',
     required: true,
     completed: false,
     category: 'registration',
   },
   {
-    id: 'preliminary-assessment-form',
-    name: 'Preliminary Assessment Statement',
-    description: 'Initial outline of your educational provision including approach, curriculum areas, and daily schedule.',
+    id: 'birth-cert-or-passport',
+    name: 'Certified copy of birth certificate or passport',
+    description: 'A certified copy of the child\'s birth certificate or passport, submitted with your application for registration.',
     required: true,
     completed: false,
     category: 'registration',
@@ -172,56 +180,48 @@ const DEFAULT_DOCUMENTS: TuslaDocument[] = [
   {
     id: 'education-plan',
     name: 'Education Plan / Philosophy Statement',
-    description: 'Detailed description of your educational philosophy, methodology, and how you plan to cover all curriculum areas.',
-    required: true,
+    description: 'A description of your educational approach and how you provide a certain minimum education suitable to the child\'s age, ability and aptitude. Helpful to have, not a fixed Tusla form.',
+    required: false,
     completed: false,
     category: 'registration',
   },
   {
     id: 'sample-timetable',
-    name: 'Sample Weekly Timetable',
-    description: 'A typical week showing how education time is structured across subjects and activities.',
-    required: true,
+    name: 'Sample Weekly Timetable (optional)',
+    description: 'A typical week, if you keep one. Optional, since there is no attendance or hours requirement and many child-led families have no set timetable.',
+    required: false,
     completed: false,
     category: 'registration',
   },
   {
-    id: 'child-birth-cert',
-    name: 'Child\'s Birth Certificate (copy)',
-    description: 'Copy of the child\'s birth certificate for identification purposes.',
-    required: true,
-    completed: false,
-    category: 'registration',
-  },
-  {
-    id: 'annual-assessment-report',
-    name: 'Annual Assessment Report',
-    description: 'Yearly report documenting educational progress, portfolio evidence, and curriculum coverage for Tusla review.',
-    required: true,
+    id: 'preliminary-assessment-notes',
+    name: 'Preliminary Assessment Notes',
+    description: 'Notes for the preliminary assessment, which is a questionnaire and a meeting with the parent or guardian. A space to gather your thoughts, not an official form.',
+    required: false,
     completed: false,
     category: 'assessment',
   },
   {
     id: 'portfolio-evidence',
     name: 'Portfolio of Child\'s Work',
-    description: 'Collection of work samples, projects, photographs, and evidence of learning across all curriculum areas.',
-    required: true,
+    description: 'A collection of work samples, projects, photographs, and evidence of learning. Useful for the comprehensive assessment home visit, not a fixed Tusla requirement.',
+    required: false,
     completed: false,
     category: 'assessment',
   },
   {
-    id: 'attendance-record',
-    name: 'Attendance Records',
-    description: 'Daily attendance log showing education days, including any absences and reasons.',
-    required: true,
+    id: 'learning-record',
+    name: 'Record of Learning (optional)',
+    description: 'A note of days you did learning together, if you like to keep one. Optional, since there is no attendance requirement in Ireland.',
+    required: false,
     completed: false,
     category: 'ongoing',
   },
   {
     id: 'curriculum-records',
-    name: 'Curriculum Coverage Records',
-    description: 'Ongoing records showing coverage across all required curriculum areas: Language, Maths, SESE, SPHE, Arts, PE.',
-    required: true,
+    name: 'Curriculum Coverage Notes (optional)',
+    description: 'Notes on the areas you cover. The NCCA areas (Language, Maths, SESE, SPHE, Arts, PE) are a helpful map, not a required curriculum. You do not have to follow the national curriculum.',
+    required: false,
     completed: false,
     category: 'ongoing',
   },
@@ -236,10 +236,10 @@ const DEFAULT_DOCUMENTS: TuslaDocument[] = [
 ];
 
 const DEFAULT_ASSESSMENT_CHECKLIST: AssessmentItem[] = [
-  { id: 'ac-1', text: 'Review and update education plan for current year', completed: false, category: 'preparation' },
-  { id: 'ac-2', text: 'Ensure attendance records are complete and up to date', completed: false, category: 'preparation' },
-  { id: 'ac-3', text: 'Review curriculum coverage across all areas', completed: false, category: 'preparation' },
-  { id: 'ac-4', text: 'Identify any curriculum gaps and plan to address them', completed: false, category: 'preparation' },
+  { id: 'ac-1', text: 'Review and update your education plan for the current year', completed: false, category: 'preparation' },
+  { id: 'ac-2', text: 'Gather any learning records you keep (optional - there is no attendance requirement)', completed: false, category: 'preparation' },
+  { id: 'ac-3', text: 'Reflect on the areas you have been covering (the NCCA areas are a helpful map, not required)', completed: false, category: 'preparation' },
+  { id: 'ac-4', text: 'Note any areas you would like to grow into next', completed: false, category: 'preparation' },
   { id: 'ac-5', text: 'Compile portfolio samples for each curriculum area', completed: false, category: 'portfolio' },
   { id: 'ac-6', text: 'Include dated work samples showing progression', completed: false, category: 'portfolio' },
   { id: 'ac-7', text: 'Add photographs of projects, field trips, and practical work', completed: false, category: 'portfolio' },
@@ -247,35 +247,43 @@ const DEFAULT_ASSESSMENT_CHECKLIST: AssessmentItem[] = [
   { id: 'ac-9', text: 'Write narrative summary of child\'s progress', completed: false, category: 'documentation' },
   { id: 'ac-10', text: 'Document any standardised test results (if applicable)', completed: false, category: 'documentation' },
   { id: 'ac-11', text: 'Prepare list of resources and materials used', completed: false, category: 'documentation' },
-  { id: 'ac-12', text: 'Document socialisation activities and group involvement', completed: false, category: 'documentation' },
-  { id: 'ac-13', text: 'Prepare child for potential interview/conversation with assessor', completed: false, category: 'review' },
-  { id: 'ac-14', text: 'Prepare the home education space for visit (if applicable)', completed: false, category: 'review' },
-  { id: 'ac-15', text: 'Review previous assessment feedback and address any concerns', completed: false, category: 'review' },
+  { id: 'ac-12', text: 'Note any social activities and group involvement', completed: false, category: 'documentation' },
+  { id: 'ac-13', text: 'Prepare your child for a gentle conversation with the assessor (an authorised person appointed by Tusla)', completed: false, category: 'review' },
+  { id: 'ac-14', text: 'Prepare the home education space for the comprehensive assessment home visit (if applicable)', completed: false, category: 'review' },
+  { id: 'ac-15', text: 'Review any previous review feedback and address any points raised', completed: false, category: 'review' },
   { id: 'ac-16', text: 'Have education plan and goals ready for discussion', completed: false, category: 'review' },
 ];
 
 const DEFAULT_DEADLINES: TuslaDeadline[] = [
   {
     id: 'dl-1',
-    title: 'Submit Notification of Intent',
+    title: 'Submit Application for Registration (Section 14)',
     date: '',
-    description: 'Notify Tusla of your intention to home educate under Section 14 of the Education (Welfare) Act 2000.',
+    description: 'Apply to Tusla, via AEARS, to register your child under Section 14 of the Education (Welfare) Act 2000.',
     completed: false,
     type: 'registration',
   },
   {
     id: 'dl-2',
-    title: 'Preliminary Assessment Visit',
+    title: 'Preliminary Assessment',
     date: '',
-    description: 'First assessment visit from Tusla Education Welfare Officer to review your educational provision.',
+    description: 'A questionnaire and a meeting with you (the parent or guardian) about your educational provision.',
     completed: false,
     type: 'assessment',
   },
   {
     id: 'dl-3',
-    title: 'Annual Assessment Due',
+    title: 'Comprehensive Assessment (home visit)',
     date: '',
-    description: 'Annual review of home education provision. Prepare portfolio, attendance records, and progress report.',
+    description: 'A home visit by an assessor (an authorised person appointed by Tusla) to look over your provision.',
+    completed: false,
+    type: 'assessment',
+  },
+  {
+    id: 'dl-4',
+    title: 'Periodic Review',
+    date: '',
+    description: 'Registration is subject to periodic review, with the timing set by Tusla. Gather any evidence you like to have to hand.',
     completed: false,
     type: 'review',
   },
@@ -363,6 +371,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     existingReg?.deadlines?.length ? existingReg.deadlines : DEFAULT_DEADLINES
   );
   const [notes, setNotes] = useState(existingReg?.notes || '');
+  const [submittedAt, setSubmittedAt] = useState<string | null>(existingReg?.submitted_at || null);
+  const [approvedAt, setApprovedAt] = useState<string | null>(existingReg?.approved_at || null);
 
   // Expanded sections
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -434,6 +444,25 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     .filter((d) => d.date && !d.completed)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  // ─── Computed AEARS timeline (guidance, not legal advice) ──────────────
+  // Anchored to the family's own start date and the registration record's
+  // submitted/approved dates, so the dates shown are real and move with the
+  // calendar - never hardcoded blanks.
+  const aearsTimeline = useMemo(
+    () =>
+      buildAearsTimeline({
+        status: registrationStatus,
+        educationStartDate: notificationForm.educationStartDate || null,
+        submittedAt,
+        approvedAt,
+      }),
+    [registrationStatus, notificationForm.educationStartDate, submittedAt, approvedAt]
+  );
+  const nextMilestone = useMemo(() => nextAearsMilestone(aearsTimeline), [aearsTimeline]);
+
+  // Assessment readiness summary
+  const readiness = useMemo(() => assessmentReadiness(assessmentChecklist), [assessmentChecklist]);
+
   // ─── Save handler ─────────────────────────────────────
 
   const handleSave = useCallback(async () => {
@@ -457,6 +486,17 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
       });
 
       if (res.ok) {
+        // Pick up server-set submitted_at / approved_at so the timeline
+        // reflects the new status without a page reload.
+        try {
+          const saved = await res.json();
+          if (saved?.data) {
+            setSubmittedAt(saved.data.submitted_at ?? null);
+            setApprovedAt(saved.data.approved_at ?? null);
+          }
+        } catch {
+          // Non-fatal: timeline simply waits for next load.
+        }
         setSaveMessage('Saved successfully');
         setTimeout(() => setSaveMessage(''), 3000);
       } else {
@@ -518,24 +558,135 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     setNotificationForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // ─── Application for Registration: printable summary ───
+  // Opens a clean, print-ready SUMMARY of the saved details to help you
+  // complete Tusla's official application (R1) form. This is not the official
+  // form itself. Falls back gracefully if the browser blocks popups.
+
+  const handlePrintNotification = useCallback(() => {
+    const f = notificationForm;
+    const childName = f.childName || selectedChild?.name || '';
+    const childDob = f.childDob || selectedChild?.date_of_birth || '';
+    const approach = f.educationApproach || selectedPlan?.approach || '';
+    const hoursPerDay = f.hoursPerDay || String(selectedPlan?.hours_per_day || '');
+    const daysPerWeek = f.daysPerWeek || String(selectedPlan?.days_per_week || '');
+
+    const esc = (s: string) =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    const fmtDate = (d: string) => {
+      if (!d) return '';
+      const parsed = new Date(d.split('T')[0] + 'T12:00:00');
+      return Number.isNaN(parsed.getTime())
+        ? d
+        : parsed.toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
+    };
+
+    const row = (label: string, value: string) =>
+      value
+        ? `<tr><th>${esc(label)}</th><td>${esc(value)}</td></tr>`
+        : `<tr><th>${esc(label)}</th><td class="empty">Not provided</td></tr>`;
+
+    const block = (label: string, value: string) =>
+      `<div class="block"><h3>${esc(label)}</h3><p>${value ? esc(value).replace(/\n/g, '<br/>') : '<span class="empty">Not provided</span>'}</p></div>`;
+
+    const printedOn = new Date().toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+      <title>Application for Registration (Section 14) - Summary${childName ? ' - ' + esc(childName) : ''}</title>
+      <style>
+        * { box-sizing: border-box; }
+        body { font-family: Georgia, 'Times New Roman', serif; color: #1f2a24; line-height: 1.6; max-width: 720px; margin: 40px auto; padding: 0 24px; }
+        h1 { font-size: 22px; font-weight: normal; margin-bottom: 4px; }
+        .sub { color: #5a6b60; font-size: 13px; margin-bottom: 4px; }
+        .law { color: #5a6b60; font-size: 12px; margin-bottom: 28px; }
+        h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #2f7d52; border-bottom: 1px solid #d8e0d8; padding-bottom: 6px; margin: 28px 0 12px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+        th { text-align: left; width: 38%; vertical-align: top; padding: 6px 12px 6px 0; font-weight: bold; font-size: 13px; }
+        td { padding: 6px 0; font-size: 13px; }
+        .empty { color: #9aa69d; font-style: italic; }
+        .block { margin-bottom: 14px; }
+        .block h3 { font-size: 13px; margin: 0 0 2px; }
+        .block p { margin: 0; font-size: 13px; }
+        .disclaimer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #d8e0d8; color: #7a857d; font-size: 11px; font-style: italic; }
+        .sign { margin-top: 32px; font-size: 13px; }
+        .sign-line { display: inline-block; border-bottom: 1px solid #1f2a24; min-width: 240px; margin-left: 8px; }
+        @media print { body { margin: 0; } }
+      </style></head><body>
+      <h1>Application for Registration (Section 14) - Summary</h1>
+      <p class="sub">Prepared with The Hedge - printed ${esc(printedOn)}</p>
+      <p class="law">To register your child under Section 14 of the Education (Welfare) Act 2000, applied for to Tusla via AEARS. This is a summary to help you, not the official form.</p>
+
+      <h2>Parent / Guardian</h2>
+      <table>
+        ${row('Full name', f.parentName)}
+        ${row('Address', f.parentAddress)}
+        ${row('Phone', f.parentPhone)}
+        ${row('Email', f.parentEmail)}
+      </table>
+
+      <h2>Child</h2>
+      <table>
+        ${row('Full name', childName)}
+        ${row('Date of birth', fmtDate(childDob))}
+        ${row('PPS number', f.childPps)}
+        ${row('Previous school', f.previousSchool)}
+      </table>
+
+      <h2>Education Provision</h2>
+      <table>
+        ${row('Intended start date', fmtDate(f.educationStartDate))}
+        ${row('Approach', approach)}
+        ${row('Hours per day', hoursPerDay)}
+        ${row('Days per week', daysPerWeek)}
+      </table>
+      ${block('Curriculum description', f.curriculumDescription)}
+      ${block('Special educational needs', f.specialNeeds)}
+      ${block('Assessment methods', f.assessmentMethod)}
+      ${block('Additional information', f.additionalInfo)}
+
+      <div class="sign">
+        <p>Signed: <span class="sign-line"></span></p>
+        <p>Date: <span class="sign-line"></span></p>
+      </div>
+
+      <p class="disclaimer">
+        This summary was prepared using The Hedge to help you complete Tusla's official application for
+        registration (currently the R1 form). The Hedge is not affiliated with Tusla and this is not an
+        official Tusla form, and nothing here is legal advice. Please submit Tusla's official application form,
+        along with a certified copy of your child's birth certificate or passport, and check the current
+        requirements and guidance with Tusla (AEARS) before submitting.
+      </p>
+      </body></html>`;
+
+    const win = window.open('', '_blank');
+    if (!win) {
+      setSaveMessage('Error: Allow pop-ups to print the summary');
+      setTimeout(() => setSaveMessage(''), 4000);
+      return;
+    }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    // Give the new document a moment to lay out before invoking print.
+    setTimeout(() => win.print(), 250);
+  }, [notificationForm, selectedChild, selectedPlan]);
+
   // ─── Tab navigation items ─────────────────────────────
 
   const tabs = [
     { key: 'overview', label: 'Overview', icon: Shield },
     { key: 'registration', label: 'Registration', icon: ClipboardCheck },
     { key: 'documents', label: 'Documents', icon: FileText },
-    { key: 'notification', label: 'Notification Form', icon: BookOpen },
+    { key: 'notification', label: 'Application Form', icon: BookOpen },
     { key: 'assessment', label: 'Assessment Prep', icon: CheckCircle },
     { key: 'deadlines', label: 'Deadlines', icon: CalendarDays },
     { key: 'resources', label: 'Resources', icon: ExternalLink },
   ] as const;
-
-  // ─── Days until next deadline ─────────────────────────
-
-  const nextDeadline = upcomingDeadlines[0];
-  const daysUntilDeadline = nextDeadline
-    ? Math.ceil((new Date(nextDeadline.date).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    : null;
 
   // ─── Render ────────────────────────────────────────────
 
@@ -543,9 +694,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     <div className="space-y-8 animate-fade-up">
       {/* Header */}
       <div>
-        <Link href="/educator" className="inline-flex items-center gap-1.5 text-sm text-moss hover:text-forest transition-colors mb-4">
+        <Link href="/keep" className="inline-flex items-center gap-1.5 text-sm text-moss hover:text-forest transition-colors mb-4">
           <ArrowLeft className="h-4 w-4" />
-          Back to educator
+          Back to Keep
         </Link>
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
@@ -573,6 +724,16 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
         </div>
       </div>
 
+      {/* Honest framing - this is a helper, not an official Tusla product */}
+      <div className="flex items-start gap-3 rounded-2xl bg-linen border border-stone/60 px-5 py-3.5 print:hidden">
+        <Info className="h-4 w-4 shrink-0 text-clay/50 mt-0.5" />
+        <p className="text-xs text-clay/70 leading-relaxed">
+          The Hedge is not affiliated with Tusla and this is not an official Tusla product. It helps you
+          organise the evidence and dates an AEARS assessment tends to look for. The timings shown are
+          general guidance, not legal advice, and you can override any date with your own.
+        </p>
+      </div>
+
       {/* Child selector (if multiple children) */}
       {childrenProp.length > 1 && (
         <div className="flex gap-2 flex-wrap">
@@ -592,6 +753,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 setAssessmentChecklist(reg?.assessment_checklist?.length ? reg.assessment_checklist : DEFAULT_ASSESSMENT_CHECKLIST);
                 setDeadlines(reg?.deadlines?.length ? reg.deadlines : DEFAULT_DEADLINES);
                 setNotes(reg?.notes || '');
+                setSubmittedAt(reg?.submitted_at || null);
+                setApprovedAt(reg?.approved_at || null);
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-[10px] text-sm font-medium transition-all ${
                 selectedChildId === child.id
@@ -758,32 +921,36 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
 
           {/* Upcoming deadlines + Curriculum coverage row */}
           <div className="grid gap-4 sm:grid-cols-2">
-            {/* Next deadline card */}
+            {/* Next milestone card (computed from your AEARS timeline) */}
             <div className="card-elevated p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Bell className="h-4 w-4 text-terracotta" />
-                <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Next Deadline</h3>
+                <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/60">Next Up</h3>
               </div>
-              {nextDeadline ? (
+              {nextMilestone ? (
                 <div>
-                  <p className="text-sm font-medium text-ink">{nextDeadline.title}</p>
-                  <p className="text-xs text-clay/60 mt-1">{nextDeadline.description}</p>
-                  <div className="flex items-center gap-2 mt-3">
+                  <p className="text-sm font-medium text-ink">{nextMilestone.title}</p>
+                  <p className="text-xs text-clay/60 mt-1">{nextMilestone.guidance}</p>
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
                     <CalendarDays className="h-3.5 w-3.5 text-clay/40" />
                     <span className="text-xs font-medium text-umber">
-                      {new Date(nextDeadline.date).toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {nextMilestone.date
+                        ? new Date(nextMilestone.date + 'T12:00:00').toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })
+                        : 'Date fills in once you add your details'}
                     </span>
-                    {daysUntilDeadline !== null && (
-                      <span className={`tag ${
-                        daysUntilDeadline <= 7 ? 'tag-terra' : daysUntilDeadline <= 30 ? 'tag-amber' : 'tag-sage'
-                      }`}>
-                        {daysUntilDeadline > 0 ? `${daysUntilDeadline} days` : daysUntilDeadline === 0 ? 'Today' : 'Overdue'}
-                      </span>
-                    )}
+                    <span className={`tag ${
+                      nextMilestone.tone === 'overdue' ? 'tag-terra' : nextMilestone.tone === 'soon' ? 'tag-amber' : 'tag-sage'
+                    }`}>
+                      {describeDaysAway(nextMilestone.daysAway)}
+                    </span>
                   </div>
+                  <button onClick={() => setActiveTab('deadlines')} className="text-[11px] text-moss hover:text-forest font-medium mt-3 inline-flex items-center gap-1">
+                    See your full timeline
+                    <ChevronRight className="h-3 w-3" />
+                  </button>
                 </div>
               ) : (
-                <p className="text-sm text-clay/40">No upcoming deadlines. Add dates in the Deadlines tab.</p>
+                <p className="text-sm text-clay/40">Add your details in the Notification Form and your timeline will fill itself in.</p>
               )}
             </div>
 
@@ -837,19 +1004,64 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </div>
           )}
 
-          {/* Reports */}
+          {/* AEARS pack - the flagship assessment-ready document */}
+          <div className="card-elevated overflow-hidden">
+            <div className="bg-forest p-6 sm:p-7">
+              <div className="flex items-start gap-4 flex-wrap">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-parchment/10">
+                  <ClipboardCheck className="h-6 w-6 text-parchment" />
+                </div>
+                <div className="flex-1 min-w-[220px]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-parchment/60 mb-1.5">Your Assessment Pack</p>
+                  <h2 className="font-display text-2xl font-light text-parchment leading-tight">
+                    Generate your <em className="italic">AEARS pack</em>
+                  </h2>
+                  <p className="text-sm text-parchment/75 mt-2 leading-relaxed max-w-prose">
+                    {selectedChild
+                      ? `One calm, assessor-ready document for ${selectedChild.name}, assembled from everything you have logged. It gathers a warm summary of the year, curriculum coverage mapped to the NCCA areas, your record of learning, and the full portfolio with its photo evidence embedded. Print it or save it as a PDF to bring to an AEARS assessment or review.`
+                      : 'Add a child to assemble their assessor-ready AEARS pack.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 mt-5 flex-wrap">
+                <a
+                  href={`/api/educator/reports?type=annual&childId=${selectedChildId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-2 rounded-[12px] bg-parchment px-5 py-2.5 text-sm font-bold text-forest transition-all hover:bg-white ${!selectedChildId ? 'pointer-events-none opacity-40' : ''}`}
+                  aria-disabled={!selectedChildId}
+                >
+                  <FileText className="h-4 w-4" />
+                  Generate AEARS pack
+                </a>
+                <a
+                  href={`/api/educator/reports?type=annual&childId=${selectedChildId}&format=csv`}
+                  className={`inline-flex items-center gap-2 rounded-[12px] border border-parchment/30 px-4 py-2.5 text-sm font-medium text-parchment/90 transition-all hover:bg-parchment/10 ${!selectedChildId ? 'pointer-events-none opacity-40' : ''}`}
+                  aria-disabled={!selectedChildId}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Data (CSV)
+                </a>
+              </div>
+              <p className="text-[11px] text-parchment/50 mt-4 leading-relaxed">
+                Prepared by your family using The Hedge. Not affiliated with Tusla. There is no required curriculum, no minimum hours, and no attendance requirement; the pack simply shows the breadth of your child{"'"}s learning.
+              </p>
+            </div>
+          </div>
+
+          {/* Other reports */}
           <div className="card-elevated p-6">
             <h2 className="font-display text-lg font-light text-ink mb-5">
-              Available <em className="text-moss italic">Reports</em>
+              Other <em className="text-moss italic">Reports</em>
             </h2>
             <div className="space-y-2">
               {([
-                { title: 'Annual Assessment Report', description: 'Full compliance report for Tusla assessment', type: 'PDF' as const, reportType: 'annual' },
-                { title: 'Term Summary', description: 'Attendance, curriculum coverage, and portfolio summary', type: 'PDF' as const, reportType: 'assessment' },
-                { title: 'Attendance Record', description: 'Day-by-day attendance log', type: 'CSV' as const, reportType: 'attendance' },
-                { title: 'Curriculum Coverage', description: 'Detailed breakdown by subject area and strand', type: 'PDF' as const, reportType: 'portfolio' },
+                { title: 'Term Summary', description: 'Learning days, curriculum coverage, and portfolio summary', reportType: 'assessment' },
+                { title: 'Record of Learning Days', description: 'Day-by-day record of learning (optional, no attendance requirement)', reportType: 'attendance' },
+                { title: 'Curriculum Coverage', description: 'Breakdown by area and strand (the NCCA areas are a helpful map, not required)', reportType: 'portfolio' },
               ] as const).map((report) => {
                 const reportUrl = `/api/educator/reports?type=${report.reportType}&childId=${selectedChildId}`;
+                const disabled = !selectedChildId;
                 return (
                   <div key={report.title} className="flex items-center gap-3 rounded-2xl p-3.5 hover:bg-parchment/50 transition-colors">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-moss/8">
@@ -860,16 +1072,22 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                       <p className="text-xs text-clay/50">{report.description}</p>
                     </div>
                     <a
+                      href={`${reportUrl}&format=csv`}
+                      className={`btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+                      aria-disabled={disabled}
+                    >
+                      <Download className="h-3 w-3" />
+                      CSV
+                    </a>
+                    <a
                       href={reportUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 ${
-                        !selectedChildId ? 'pointer-events-none opacity-40' : ''
-                      }`}
-                      aria-disabled={!selectedChildId}
+                      className={`btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5 ${disabled ? 'pointer-events-none opacity-40' : ''}`}
+                      aria-disabled={disabled}
                     >
-                      <Download className="h-3 w-3" />
-                      {report.type}
+                      <FileText className="h-3 w-3" />
+                      View
                     </a>
                   </div>
                 );
@@ -941,13 +1159,14 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Getting Started</h3>
                       <p className="text-sm text-clay">
-                        Under Section 14 of the Education (Welfare) Act 2000, parents who wish to educate their children at home
-                        must notify Tusla. Begin by completing the Notification of Intent form and gathering the required documents.
-                        Tusla will then arrange a preliminary assessment of your educational provision.
+                        Under Section 14 of the Education (Welfare) Act 2000, parents who educate their children at home
+                        apply to Tusla, via AEARS, to register their child. Begin by gathering your details and a certified copy
+                        of the child{"'"}s birth certificate or passport for Tusla{"'"}s official application form. Once your application
+                        is acknowledged as valid, you may begin or continue home educating while the assessment proceeds.
                       </p>
                       <div className="mt-3 flex gap-2">
                         <button onClick={() => setActiveTab('notification')} className="btn-primary text-xs py-2 px-3">
-                          Fill Notification Form
+                          Fill Application Form
                         </button>
                         <button onClick={() => setActiveTab('documents')} className="btn-secondary text-xs py-2 px-3">
                           View Document Checklist
@@ -959,9 +1178,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Application In Progress</h3>
                       <p className="text-sm text-clay">
-                        You have begun the registration process. Ensure all required documents are prepared and your notification
-                        form is complete. When ready, submit your notification to Tusla Education and Welfare Service (TESS)
-                        at your regional office.
+                        You have begun the registration process. Have your details and the certified copy of the birth certificate
+                        or passport ready, and complete Tusla{"'"}s official application form. When ready, submit your application
+                        to Tusla (AEARS), part of the Tusla Education Support Service (TESS).
                       </p>
                       <div className="mt-3 flex gap-2 flex-wrap">
                         <button onClick={() => setActiveTab('documents')} className="btn-secondary text-xs py-2 px-3">
@@ -977,9 +1196,10 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Application Submitted</h3>
                       <p className="text-sm text-clay">
-                        Your notification has been submitted to Tusla. They will review your application and arrange a preliminary
-                        assessment visit. This typically takes 4-8 weeks. In the meantime, continue documenting your educational
-                        provision and keep attendance records.
+                        Your application has been submitted to Tusla (AEARS). Once it is acknowledged as valid, you may begin or
+                        continue home educating while the assessment proceeds. The assessment has two stages: a preliminary
+                        assessment (a questionnaire and a meeting with you), and a comprehensive assessment (a home visit by an
+                        assessor). In the meantime, keep noting your educational provision in whatever way suits you.
                       </p>
                       <div className="mt-3">
                         <button onClick={() => setActiveTab('assessment')} className="btn-secondary text-xs py-2 px-3">
@@ -992,13 +1212,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Registration Approved</h3>
                       <p className="text-sm text-clay">
-                        Congratulations! Your home education provision has been approved by Tusla. You are now on the register
-                        maintained under Section 14. Annual assessments will be conducted to review your educational provision.
-                        Keep documenting learning, maintaining attendance records, and building portfolios.
+                        Your child is now on the Section 14 register maintained by Tusla. Registration is subject to periodic
+                        review, with the timing set by Tusla. Keep noting learning and gathering any evidence you like to have
+                        to hand, in whatever way suits your family.
                       </p>
                       <div className="mt-3 flex gap-2">
                         <button onClick={() => setActiveTab('assessment')} className="btn-secondary text-xs py-2 px-3">
-                          Annual Assessment Prep
+                          Review Prep
                         </button>
                         <button onClick={() => setActiveTab('deadlines')} className="btn-secondary text-xs py-2 px-3">
                           View Deadlines
@@ -1136,11 +1356,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
         <div className="space-y-6">
           <div className="card-elevated p-6">
             <h2 className="font-display text-xl font-light text-ink mb-2">
-              Notification of Intent to <em className="text-moss italic">Educate at Home</em>
+              Application for <em className="text-moss italic">Registration (Section 14)</em>
             </h2>
             <p className="text-sm text-clay mb-2">
-              Complete this form to prepare your Section 14 notification to Tusla. You can save your progress
-              and return later. When complete, print or download to submit to your regional Tusla office.
+              Use this to gather the details for your application to Tusla (AEARS) to register your child under
+              Section 14. You can save your progress and return later. When complete, print a summary to help you
+              fill in Tusla{"'"}s official application form (currently the R1 form), which you submit with a certified
+              copy of the child{"'"}s birth certificate or passport. This is a helper, not the official form.
             </p>
             <div className="flex items-center gap-2 mb-6">
               <Info className="h-3.5 w-3.5 text-clay/40" />
@@ -1258,7 +1480,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                       label="Curriculum Description"
                       value={notificationForm.curriculumDescription}
                       onChange={(v) => updateNotificationField('curriculumDescription', v)}
-                      placeholder="Describe how you will cover the main curriculum areas: Language (English/Irish), Mathematics, SESE (Science, History, Geography), Arts (Visual Arts, Music, Drama), PE, and SPHE."
+                      placeholder="Describe your approach to providing a certain minimum education. You do not have to follow the national curriculum. If it helps, the NCCA areas are a useful map: Language (English/Irish), Mathematics, SESE (Science, History, Geography), Arts (Visual Arts, Music, Drama), PE, and SPHE."
                       multiline
                       rows={4}
                     />
@@ -1288,7 +1510,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                       label="Additional Information"
                       value={notificationForm.additionalInfo}
                       onChange={(v) => updateNotificationField('additionalInfo', v)}
-                      placeholder="Any additional information you wish to provide to the Education Welfare Officer."
+                      placeholder="Any additional information you wish to provide to Tusla (AEARS) or to the assessor."
                       multiline
                       rows={3}
                     />
@@ -1299,9 +1521,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
 
             <div className="mt-6 pt-6 border-t border-stone/30 flex items-center justify-between">
               <p className="text-xs text-clay/40">
-                Save your progress and return anytime. When ready, print this form for submission.
+                Save your progress and return anytime. When ready, print a summary to help you complete Tusla{"'"}s official form.
               </p>
               <div className="flex gap-3">
+                <button onClick={handlePrintNotification} className="btn-secondary text-sm flex items-center gap-2">
+                  <Printer className="h-3.5 w-3.5" />
+                  Print / Save PDF
+                </button>
                 <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2">
                   {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
                   Save Form
@@ -1321,18 +1547,33 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h2 className="font-display text-xl font-light text-ink mb-2">
-                  Annual Assessment <em className="text-moss italic">Preparation</em>
+                  Assessment <em className="text-moss italic">Preparation</em>
                 </h2>
                 <p className="text-sm text-clay">
-                  Use this checklist to prepare for your annual Tusla assessment. The assessor will review your
-                  educational provision, meet your child, and examine portfolio evidence.
+                  This helps you organise the evidence an AEARS assessment tends to look for. The assessment has two
+                  stages: a preliminary assessment (a questionnaire and a meeting with you), and a comprehensive
+                  assessment (a home visit by an assessor, an authorised person appointed by Tusla). It is a calm
+                  conversation about how learning is going. Tick things off as you go.
                 </p>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <p className="text-2xl font-light text-ink">
-                  {completedAssessmentItems}/{totalAssessmentItems}
+                  {readiness.ready}<span className="text-sm font-normal text-clay/40"> / {readiness.total}</span>
                 </p>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Complete</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Ready</p>
+              </div>
+            </div>
+
+            {/* Readiness indicator */}
+            <div className="rounded-2xl bg-parchment p-4 border border-stone/40 mb-6 flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-sage/15">
+                <span className="text-sm font-bold text-forest">{readiness.percent}%</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-ink">{readiness.label}</p>
+                <p className="text-xs text-clay/60 mt-0.5">
+                  {readiness.ready} of {readiness.total} items ready. Save your progress and it will be here when you return.
+                </p>
               </div>
             </div>
 
@@ -1340,7 +1581,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="h-2 rounded-full bg-stone/20 mb-8">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-moss to-sage transition-all"
-                style={{ width: `${totalAssessmentItems > 0 ? (completedAssessmentItems / totalAssessmentItems) * 100 : 0}%` }}
+                style={{ width: `${readiness.percent}%` }}
               />
             </div>
 
@@ -1356,9 +1597,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               };
               const categoryDescriptions = {
                 preparation: 'Foundational tasks to get ready for your assessment.',
-                portfolio: 'Evidence of learning across all curriculum areas.',
-                documentation: 'Written records and reports to present.',
-                review: 'Preparation for the assessment visit itself.',
+                portfolio: 'Evidence of learning, gathered in whatever way suits your family.',
+                documentation: 'Any written notes and records you would like to present.',
+                review: 'Preparation for the comprehensive assessment home visit itself.',
               };
 
               return (
@@ -1410,6 +1651,16 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                 </div>
               );
             })}
+
+            <div className="mt-2 pt-6 border-t border-stone/30 flex items-center justify-between gap-4 flex-wrap">
+              <p className="text-xs text-clay/50">
+                There is no pass mark here. Ticking these simply helps you feel ready and gather what tends to be useful on the day.
+              </p>
+              <button onClick={handleSave} disabled={saving} className="btn-primary text-sm flex items-center gap-2 shrink-0">
+                {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+                Save Progress
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1419,14 +1670,44 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
          ═══════════════════════════════════════════════════ */}
       {activeTab === 'deadlines' && (
         <div className="space-y-6">
+          {/* Computed AEARS timeline */}
+          <div className="card-elevated p-6">
+            <div className="mb-2">
+              <h2 className="font-display text-xl font-light text-ink mb-2">
+                Your AEARS <em className="text-moss italic">Timeline</em>
+              </h2>
+              <p className="text-sm text-clay">
+                Worked out from where you are in the process and the dates you have entered. These are gentle
+                guidance dates, not legal deadlines, and you can always set your own below.
+              </p>
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {aearsTimeline.map((m) => (
+                <AearsMilestoneRow key={m.id} milestone={m} />
+              ))}
+            </div>
+
+            {aearsTimeline.every((m) => m.date === null) && (
+              <div className="mt-4 rounded-2xl bg-parchment p-4 border border-stone/40 flex items-start gap-3">
+                <Info className="h-4 w-4 text-moss shrink-0 mt-0.5" />
+                <p className="text-xs text-clay/70">
+                  Add your intended start date in the Notification Form, then save. Your dates will fill
+                  themselves in here.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Your own dates */}
           <div className="card-elevated p-6">
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h2 className="font-display text-xl font-light text-ink mb-2">
-                  Important <em className="text-moss italic">Dates {'&'} Deadlines</em>
+                  Your Own <em className="text-moss italic">Dates</em>
                 </h2>
                 <p className="text-sm text-clay">
-                  Track registration deadlines, assessment dates, and review periods.
+                  Add anything specific to your family - a confirmed assessment date, a regional office reminder.
                 </p>
               </div>
               <button onClick={addDeadline} className="btn-secondary text-xs py-2 px-3 flex items-center gap-1.5">
@@ -1545,16 +1826,17 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               Typical <em className="text-moss italic">Academic Year</em> Key Dates
             </h2>
             <p className="text-xs text-clay/50 mb-4">
-              These are general guideline dates. Your actual Tusla assessment schedule may vary.
+              These are general guideline dates, not Tusla requirements. There is no fixed yearly schedule; registration is
+              subject to periodic review, with the timing set by Tusla. Your own rhythm may look quite different.
             </p>
             <div className="space-y-3">
               {[
-                { month: 'September', event: 'Academic year begins. Update education plan for the new year.', icon: BookOpen },
-                { month: 'October', event: 'Submit updated education plan to Tusla if requested. Begin attendance logging.', icon: FileText },
-                { month: 'December', event: 'End of Term 1. Review curriculum coverage and portfolio progress.', icon: TrendingUp },
-                { month: 'January-March', event: 'Typical window for annual Tusla assessment visits.', icon: Shield },
-                { month: 'March', event: 'Mid-year review. Ensure all curriculum areas are being covered.', icon: ClipboardCheck },
-                { month: 'June', event: 'End of academic year. Compile annual portfolio and assessment report.', icon: CheckCircle },
+                { month: 'September', event: 'A natural point to refresh your education plan for the year ahead, if you keep one.', icon: BookOpen },
+                { month: 'October', event: 'Settle into your rhythm. Note learning in whatever way suits you (no attendance requirement).', icon: FileText },
+                { month: 'December', event: 'A gentle moment to look back over the term and tidy any portfolio you keep.', icon: TrendingUp },
+                { month: 'January-March', event: 'A common window for Tusla assessments or reviews, though timing varies and is set by Tusla.', icon: Shield },
+                { month: 'March', event: 'A mid-year pause to reflect on the areas you have been exploring.', icon: ClipboardCheck },
+                { month: 'June', event: 'A natural point to gather any portfolio and reflections from the year.', icon: CheckCircle },
               ].map((item) => {
                 const Icon = item.icon;
                 return (
@@ -1618,7 +1900,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               Irish Primary <em className="text-moss italic">Curriculum Areas</em>
             </h2>
             <p className="text-xs text-clay/50 mb-4">
-              Tusla assessors will look for evidence of education across these curriculum areas as defined by the NCCA.
+              You do not have to follow the national curriculum. These NCCA areas are an optional, helpful map for thinking
+              about a rounded education, never a Tusla requirement.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {[
@@ -1670,28 +1953,32 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="space-y-4">
               {[
                 {
-                  q: 'Do I legally have to register with Tusla?',
-                  a: 'Yes. Under the Education (Welfare) Act 2000, Section 14, parents who educate their children in a place other than a recognised school must apply to have the child registered with Tusla.',
+                  q: 'Do I have to register with Tusla?',
+                  a: 'Yes. Under Section 14 of the Education (Welfare) Act 2000, and grounded in Article 42 of the Constitution, parents who educate their children in a place other than a recognised school apply to Tusla, via AEARS, to have the child placed on the Section 14 register. This is not legal advice; always use Tusla\'s official forms and guidance.',
+                },
+                {
+                  q: 'How do I apply to register?',
+                  a: 'You make an application for registration using Tusla\'s official application form (currently the R1 form), submitted via AEARS, along with a certified copy of the child\'s birth certificate or passport. There is no "notification of intent" in Ireland; you apply to be registered. Once your application is acknowledged as valid, you may begin or continue home educating while the assessment proceeds.',
                 },
                 {
                   q: 'What happens during a Tusla assessment?',
-                  a: 'An Education Welfare Officer will visit your home (or arrange a meeting), review your education provision, examine portfolio evidence, and may speak with your child. They assess whether a minimum education is being provided.',
+                  a: 'There are two stages. A preliminary assessment is a questionnaire and a meeting with the parent or guardian. A comprehensive assessment is a home visit by an assessor (an authorised person appointed by Tusla), who looks over your provision and may have a gentle conversation with your child. They assess whether a certain minimum education is being provided.',
                 },
                 {
-                  q: 'What is considered a "minimum education"?',
-                  a: 'There is no strict definition, but Tusla looks for evidence that the child is receiving education in the core curriculum areas appropriate to their age and ability. The education should support the child\'s intellectual, social, and personal development.',
+                  q: 'What is considered a "certain minimum education"?',
+                  a: 'There is no strict definition. The standard is that the child receives a certain minimum education suitable to their age, ability and aptitude. There is no minimum number of hours and no attendance requirement, and you do not have to follow the national curriculum.',
                 },
                 {
                   q: 'How often are assessments carried out?',
-                  a: 'Typically annually, though newly registered families may have an initial preliminary assessment followed by a comprehensive assessment within the first year.',
+                  a: 'Registration is subject to periodic review, with the timing set by Tusla. There is no fixed mandatory annual assessment. Newly registered families typically have the preliminary assessment followed by the comprehensive assessment.',
                 },
                 {
                   q: 'Can my application be refused?',
-                  a: 'If Tusla determines that a minimum education is not being provided, they can refuse registration. You would then be required to send your child to a recognised school or address the concerns raised.',
+                  a: 'If Tusla determines that a certain minimum education is not being provided, registration can be refused. You would then be asked to address the points raised or send your child to a recognised school. This is not legal advice; check Tusla\'s guidance.',
                 },
                 {
-                  q: 'Do I need to follow the national curriculum exactly?',
-                  a: 'No. You are not required to follow the NCCA curriculum exactly, but Tusla will look for evidence that you are covering equivalent curriculum areas at an appropriate level for your child.',
+                  q: 'Do I need to follow the national curriculum?',
+                  a: 'No. You are not required to follow the NCCA national curriculum. The NCCA areas can be a helpful map if you find them useful, but Tusla assesses whether a certain minimum education is being provided, not whether you follow a particular curriculum.',
                 },
               ].map((faq, idx) => (
                 <div key={idx} className="rounded-[10px] p-4 bg-parchment/50 border border-stone/20">
@@ -1749,6 +2036,59 @@ function FormField({
           placeholder={placeholder}
         />
       )}
+    </div>
+  );
+}
+
+// ─── AEARS Milestone Row ─────────────────────────────────
+
+function AearsMilestoneRow({ milestone }: { milestone: AearsMilestone }) {
+  const toneClasses: Record<AearsMilestone['tone'], string> = {
+    overdue: 'bg-terracotta/5 border-terracotta/20',
+    soon: 'bg-amber/8 border-amber/20',
+    upcoming: 'bg-linen border-stone',
+    done: 'bg-sage/5 border-sage/20',
+    guidance: 'bg-parchment border-stone/40',
+  };
+  const tagClass =
+    milestone.tone === 'overdue'
+      ? 'tag-terra'
+      : milestone.tone === 'soon'
+      ? 'tag-amber'
+      : 'tag-sage';
+
+  const Icon = milestone.done ? CheckCircle2 : milestone.kind === 'evidence' ? FileText : milestone.kind === 'notification' ? BookOpen : CalendarDays;
+
+  return (
+    <div className={`rounded-2xl border p-5 transition-all ${toneClasses[milestone.tone]}`}>
+      <div className="flex items-start gap-4">
+        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+          milestone.done ? 'bg-moss/10 text-moss' : 'bg-moss/8 text-moss'
+        }`}>
+          <Icon className="h-4.5 w-4.5" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className={`text-sm font-medium ${milestone.done ? 'text-moss' : 'text-ink'}`}>
+              {milestone.title}
+            </p>
+            {!milestone.done && (
+              <span className={`tag ${tagClass}`}>{describeDaysAway(milestone.daysAway)}</span>
+            )}
+            {milestone.done && <span className="tag tag-sage">Done</span>}
+          </div>
+          <p className="text-xs text-clay/60 mt-1">{milestone.description}</p>
+          <div className="flex items-center gap-2 mt-2.5">
+            <CalendarDays className="h-3.5 w-3.5 text-clay/40" />
+            <span className="text-xs font-medium text-umber">
+              {milestone.date
+                ? new Date(milestone.date + 'T12:00:00').toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' })
+                : 'Date not set yet'}
+            </span>
+          </div>
+          <p className="text-[11px] text-clay/50 mt-2 italic">{milestone.guidance}</p>
+        </div>
+      </div>
     </div>
   );
 }

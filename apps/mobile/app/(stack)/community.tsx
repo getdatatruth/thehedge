@@ -30,7 +30,7 @@ import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { SimpleBottomSheet, SimpleBottomSheetRef } from '@/components/ui/SimpleBottomSheet';
 import { hapticLight, hapticSuccess } from '@/lib/haptics';
-import { lightTheme, colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 

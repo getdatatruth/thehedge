@@ -3,41 +3,26 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ActivityCard, CATEGORY_CONFIG } from '@/components/shared/activity-card';
-import { FilterChips } from '@/components/shared/filter-chips';
 import { InsightCard } from '@/components/shared/insight-card';
-import { MilestoneCard } from '@/components/shared/milestone-card';
 import { NewThisWeek } from '@/components/shared/new-this-week';
 import { type MockActivity } from '@/lib/mock-data';
+import { structureFromApproach } from '@/lib/personalisation';
 import {
-  ChevronRight,
-  Sparkles,
   ArrowRight,
-  Zap,
-  Target,
-  CloudRain,
-  Sun,
-  Cloud,
-  Crown,
-  Heart,
-  CalendarDays,
   Shuffle,
   Clock,
-  Calendar,
+  Leaf,
+  Sun,
+  Cloud,
+  CloudRain,
+  Feather,
+  Sprout,
+  ChevronRight,
+  Heart,
+  Crown,
+  CalendarDays,
+  Sparkles,
 } from 'lucide-react';
-
-const FILTERS = [
-  { label: '15 min', value: 'dur:15' },
-  { label: '30 min', value: 'dur:30' },
-  { label: '1 hour', value: 'dur:60' },
-  { label: 'Indoor', value: 'loc:indoor' },
-  { label: 'Outdoor', value: 'loc:outdoor' },
-  { label: 'Calm', value: 'energy:calm' },
-  { label: 'Active', value: 'energy:active' },
-  { label: 'No mess', value: 'mess:none' },
-  { label: 'Screen-free', value: 'screen:true' },
-];
-
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 interface PlanActivity {
   day: string;
@@ -68,23 +53,33 @@ interface TodayClientProps {
   isFreeUser?: boolean;
   learningPath?: string | null;
   activitiesLogged?: number;
+  approach?: string | null;
 }
+
+// Reframe chips re-pick the single hero, they do not open a list.
+const REFRAMES = [
+  { id: 'calm', label: 'Something calmer', Icon: Feather },
+  { id: 'quick', label: "We've ten minutes", Icon: Clock },
+  { id: 'outdoor', label: 'Out of doors', Icon: Sprout },
+  { id: 'rain', label: "It's lashing", Icon: CloudRain },
+] as const;
 
 const UPGRADE_PROMPTS = [
   { icon: CalendarDays, text: 'Unlock the weekly planner', description: 'Plan your week with drag-and-drop scheduling.' },
   { icon: Heart, text: 'Save your favourites', description: 'Build a library of activities your family loves.' },
-  { icon: Sparkles, text: 'Unlimited AI suggestions', description: 'Ask HedgeAI as many times as you like.' },
-  { icon: Crown, text: 'Access all 700+ activities', description: 'Including premium content across every category.' },
+  { icon: Sparkles, text: 'Unlimited suggestions', description: 'Ask The Hedge as many times as you like.' },
+  { icon: Crown, text: 'The full library', description: 'Every activity across every category.' },
 ];
+
+const SEASON_LEAF_SLOTS = 12;
 
 export function TodayClient({
   activities,
   season,
   greeting,
   firstName,
-  familyName,
-  county,
   childNames,
+  county,
   isRaining,
   temperature,
   weatherDescription,
@@ -93,559 +88,344 @@ export function TodayClient({
   isFreeUser = false,
   learningPath,
   activitiesLogged = 0,
+  approach,
 }: TodayClientProps) {
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [selectedChild, setSelectedChild] = useState<string | null>(null);
-  const [heroShuffleIndex, setHeroShuffleIndex] = useState(0);
+  const [reframe, setReframe] = useState<string | null>(null);
+  const [shuffle, setShuffle] = useState(0);
+  const [loggedId, setLoggedId] = useState<string | null>(null);
+  const [logging, setLogging] = useState(false);
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayAbbrevs = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const currentDayIndex = new Date().getDay();
-  const today = dayNames[currentDayIndex];
-
-  // Use real plan data if available, otherwise empty
-  const hasRealPlan = planActivities.length > 0;
-  const todayPlanActivities = planActivities.filter((a) => a.day === today);
-  const completedToday = todayPlanActivities.filter((a) => a.completed).length;
-
-  // "New this week" activities and featured collections are not yet wired from
-  // the server, so we show nothing rather than fabricated content. The
-  // NewThisWeek component below fetches real new activities from the API.
-  const newActivities: MockActivity[] = [];
-  const featuredCollections: { id: string; slug: string; emoji: string; title: string; activity_ids: string[] }[] = [];
-
-  // Hero recommendation: pick from plan or activities pool
-  const heroPool = useMemo(() => {
-    if (isRaining && todayPlanActivities.length > 0) {
-      // When raining, prioritise indoor plan activities
-      const indoor = todayPlanActivities.filter((a) => {
-        const match = activities.find((act) => act.id === a.activity_id || act.slug === a.slug);
-        return !match || match.location === 'indoor' || match.location === 'both' || match.location === 'anywhere';
-      });
-      if (indoor.length > 0) return indoor;
-    }
-    if (todayPlanActivities.length > 0) {
-      return todayPlanActivities.filter((a) => !a.completed);
-    }
-    return activities.slice(0, 10);
-  }, [isRaining, todayPlanActivities, activities]);
-
-  const heroActivity = heroPool.length > 0
-    ? heroPool[heroShuffleIndex % heroPool.length]
-    : null;
-
-  const heroLabel = activitiesLogged === 0
-    ? 'Start here'
-    : isRaining
-      ? 'Perfect for a rainy day'
-      : hasRealPlan
-        ? 'Up next'
-        : 'Try this today';
-
-  // Resolve hero details - could be PlanActivity or MockActivity
-  const heroIsPlan = heroActivity && 'time_slot' in heroActivity;
-  const heroTitle = heroActivity
-    ? heroIsPlan
-      ? (heroActivity as PlanActivity).title
-      : (heroActivity as MockActivity).title
-    : null;
-  const heroCategory = heroActivity
-    ? heroIsPlan
-      ? (heroActivity as PlanActivity).category
-      : (heroActivity as MockActivity).category
-    : 'nature';
-  const heroDuration = heroActivity
-    ? heroIsPlan
-      ? (heroActivity as PlanActivity).duration_minutes
-      : (heroActivity as MockActivity).duration_minutes
-    : 30;
-  const heroSlug = heroActivity
-    ? heroIsPlan
-      ? (heroActivity as PlanActivity).slug
-      : (heroActivity as MockActivity).slug
-    : '';
-  const heroCatConfig = CATEGORY_CONFIG[heroCategory] || CATEGORY_CONFIG.nature;
-
-  const filtered = useMemo(() => {
-    let result = [...activities];
-    result.sort((a, b) => {
-      const aMatch = a.season?.includes(season) ? 0 : 1;
-      const bMatch = b.season?.includes(season) ? 0 : 1;
-      return aMatch - bMatch;
-    });
-    for (const filter of activeFilters) {
-      const [type, value] = filter.split(':');
-      switch (type) {
-        case 'dur':
-          result = result.filter((a) => a.duration_minutes <= parseInt(value));
-          break;
-        case 'loc':
-          result = result.filter(
-            (a) => a.location === value || a.location === 'both' || a.location === 'anywhere'
-          );
-          break;
-        case 'energy':
-          result = result.filter((a) => a.energy_level === value);
-          break;
-        case 'mess':
-          result = result.filter((a) => a.mess_level === value);
-          break;
-        case 'screen':
-          result = result.filter((a) => a.screen_free === true);
-          break;
-      }
-    }
-    return result;
-  }, [activities, activeFilters, season]);
-
+  const today = dayNames[new Date().getDay()];
   const dayOfWeek = new Date().toLocaleDateString('en-IE', { weekday: 'long' });
-  const dateStr = new Date().toLocaleDateString('en-IE', { day: 'numeric', month: 'long' });
+
+  const hasRealPlan = planActivities.length > 0;
+  const todayPlanActivities = planActivities.filter((a) => a.day === today && !a.completed);
+
+  // ─── The Thread: one context-aware hero, re-pickable by reframe chips ───
+  const pool = useMemo(() => {
+    let base = activities;
+    if (reframe === 'calm') base = activities.filter((a) => a.energy_level === 'calm');
+    else if (reframe === 'quick') base = activities.filter((a) => a.duration_minutes <= 15);
+    else if (reframe === 'outdoor') base = activities.filter((a) => ['outdoor', 'both', 'anywhere'].includes(a.location));
+    else if (reframe === 'rain') base = activities.filter((a) => ['indoor', 'both', 'anywhere'].includes(a.location));
+    else if (isRaining) base = activities.filter((a) => ['indoor', 'both', 'anywhere'].includes(a.location));
+
+    // Lead with activities in season
+    return [...base].sort((a, b) => {
+      const am = a.season?.includes(season) ? 0 : 1;
+      const bm = b.season?.includes(season) ? 0 : 1;
+      return am - bm;
+    });
+  }, [activities, reframe, isRaining, season]);
+
+  const hero = pool.length > 0 ? pool[shuffle % pool.length] : null;
+  const heroCat = hero ? CATEGORY_CONFIG[hero.category] || CATEGORY_CONFIG.nature : CATEGORY_CONFIG.nature;
+  const HeroCatIcon = heroCat.icon;
+
+  // The hero is two-faced: planned families hear "today's plan"; emergent
+  // families (child-led / relaxed / nature-led) hear an observational thread.
+  const emergent = structureFromApproach(approach) < 0.4;
+  const firstChild = childNames[0];
+  const heroLabel = (() => {
+    if (reframe === 'calm') return 'Something gentler';
+    if (reframe === 'quick') return 'A quick one';
+    if (reframe === 'outdoor') return 'Out in the fresh air';
+    if (reframe === 'rain') return emergent ? 'A cosy thread for a wet day' : 'Good for a wet day';
+    if (activitiesLogged === 0) return 'A lovely place to start';
+    if (emergent) return firstChild ? `A thread ${firstChild} might love` : 'A thread worth pulling';
+    if (hasRealPlan) return 'Up next';
+    if (greeting === 'Good morning') return 'To start the day';
+    if (greeting === 'Good afternoon') return 'For this afternoon';
+    return 'A gentle one for this evening';
+  })();
+
+  const seasonLabel = season.charAt(0).toUpperCase() + season.slice(1);
+  const moments = activitiesLogged;
+  const leavesFilled = Math.min(moments, SEASON_LEAF_SLOTS);
+
+  const showOpenDoor = learningPath === 'considering' || learningPath === 'homeschool';
+
+  const heroId = hero ? (hero as { id?: string }).id ?? null : null;
+  const heroLogged = loggedId !== null && loggedId === heroId;
+
+  // One-tap "we did this": no form, just a warm note that quietly keeps the record.
+  async function quickLog() {
+    if (!hero || logging) return;
+    setLogging(true);
+    try {
+      await fetch('/api/activity-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          activity_id: heroId,
+          date: new Date().toISOString().split('T')[0],
+          child_ids: [],
+          duration_minutes: hero.duration_minutes,
+        }),
+      });
+      setLoggedId(heroId);
+    } catch {
+      // quietly ignore; the friend never scolds
+    }
+    setLogging(false);
+  }
 
   return (
-    <div className="space-y-10 animate-fade-up">
+    <div className="space-y-8 animate-fade-up max-w-2xl mx-auto">
 
-      {/* ─── Morning Brief Card ─── */}
-      <div className="rounded-2xl bg-forest overflow-hidden">
-        {/* Header */}
-        <div className="px-6 pt-6 pb-4 border-b border-parchment/8">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-1.5 rounded bg-fern/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-mist">
-              <Sun className="h-3 w-3" />
-              {greeting}
-            </span>
+      {/* ─── Greeting + weather ─── */}
+      <header className="pt-2">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-moss/80">
+          {isRaining ? <CloudRain className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
+          {greeting}
+        </span>
+        <h1 className="font-display text-3xl sm:text-4xl font-light text-ink mt-2 tracking-tight">
+          Today with <em className="text-moss italic">{firstName}&apos;s family</em>
+        </h1>
+        <p className="text-[13px] text-clay mt-2 flex items-center gap-1.5">
+          {isRaining ? <CloudRain className="h-3.5 w-3.5 text-sky" /> : <Cloud className="h-3.5 w-3.5 text-sage" />}
+          {county} · {dayOfWeek} · {temperature ? `${temperature}°C` : '14°C'}
+          {weatherDescription ? `, ${weatherDescription.toLowerCase()}` : isRaining ? ', rain' : ', mixed'}
+        </p>
+        {activitiesLogged === 0 && (
+          <p className="text-[13px] text-moss/90 mt-3 italic leading-relaxed">
+            Learning that feels like a breath, not a battle. One gentle idea below, whenever you are ready.
+          </p>
+        )}
+      </header>
+
+      {/* ─── The Thread: one breathing hero ─── */}
+      {hero ? (
+        <section>
+          {/* Reframe chips */}
+          <div className="flex gap-2 flex-wrap mb-4">
+            {REFRAMES.map(({ id, label, Icon }) => {
+              const active = reframe === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => { setReframe(active ? null : id); setShuffle(0); }}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-medium transition-all ${
+                    active
+                      ? 'bg-forest text-parchment border border-forest shadow-sm'
+                      : 'bg-white border border-stone/40 text-clay hover:border-moss/50'
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </button>
+              );
+            })}
           </div>
-          <h1 className="font-display text-2xl sm:text-3xl font-light text-parchment tracking-tight">
-            Today for <em className="text-sage italic">{firstName}&apos;s family</em>
-          </h1>
-        </div>
 
-        {/* Weather bar */}
-        <div className="flex items-center justify-between px-6 py-3 bg-forest/60 border-b border-parchment/6">
-          <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-sage/70">{county} · {dayOfWeek}</span>
-          <span className="font-display text-base font-light text-parchment flex items-center gap-2">
-            {isRaining ? <CloudRain className="h-4 w-4 text-sky" /> : <Cloud className="h-4 w-4 text-sage" />}
-            {temperature ? `${temperature}°C` : '14°C'} · {weatherDescription || (isRaining ? 'Rain' : 'Mixed')}
-          </span>
-        </div>
+          {/* Hero card with a colourful category header band */}
+          <div className="rounded-3xl bg-white shadow-sm overflow-hidden border border-stone/40">
+            <div className={`relative h-32 sm:h-36 bg-gradient-to-br ${heroCat.gradient} overflow-hidden`}>
+              <HeroCatIcon className={`absolute -right-3 -bottom-3 h-32 w-32 ${heroCat.color} opacity-20`} strokeWidth={1.4} />
+              <span className={`absolute top-5 left-7 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] ${heroCat.color}`}>
+                <Leaf className="h-3.5 w-3.5" />
+                {heroLabel}
+              </span>
+            </div>
+            <div className="p-7 sm:p-8 pt-6">
+              <h2 className="font-display text-3xl sm:text-[2.4rem] leading-tight font-semibold text-ink">
+                {hero.title}
+              </h2>
+              <div className="flex items-center gap-3 mt-4 text-[12px] text-clay">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-moss/10 px-2.5 py-1 font-semibold text-moss">
+                  {heroCat.label}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" />
+                  {hero.duration_minutes} min
+                </span>
+                {hero.screen_free && <span className="text-sage">screen-free</span>}
+              </div>
 
-        {/* Today's planned activities */}
-        <div className="px-6 py-4 space-y-2">
-          {todayPlanActivities.length > 0 ? (
-            todayPlanActivities.slice(0, 3).map((planItem) => {
-              const cat = CATEGORY_CONFIG[planItem.category] || CATEGORY_CONFIG.nature;
+              {heroLogged ? (
+                <div className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-moss/10 px-5 py-3 text-[14px] text-moss font-medium">
+                  <Leaf className="h-4 w-4" fill="currentColor" />
+                  Lovely, that&apos;s one for the book.
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 mt-7 flex-wrap">
+                  <Link
+                    href={hero.slug ? `/activity/${hero.slug}` : '/browse'}
+                    className="inline-flex items-center gap-2 bg-forest text-parchment font-semibold text-sm rounded-2xl px-6 py-3 hover:bg-forest/90 transition-colors"
+                  >
+                    Let&apos;s do this
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <button
+                    onClick={quickLog}
+                    disabled={logging}
+                    className="inline-flex items-center gap-1.5 rounded-2xl border border-moss/30 px-4 py-3 text-[13px] font-medium text-moss hover:bg-moss/5 transition-colors disabled:opacity-50"
+                  >
+                    <Leaf className="h-3.5 w-3.5" />
+                    We did this
+                  </button>
+                  <button
+                    onClick={() => setShuffle((s) => s + 1)}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-medium text-clay hover:text-ink transition-colors"
+                  >
+                    <Shuffle className="h-3.5 w-3.5" />
+                    Show me another
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="rounded-3xl border border-dashed border-stone bg-linen/50 p-10 text-center">
+          <p className="font-medium text-umber">Nothing pressing just now</p>
+          <p className="text-[13px] text-clay mt-1 italic">
+            {reframe
+              ? 'Nothing matches that this minute. Try another, or clear it and have a wander.'
+              : 'Take the breath. We are gathering a few more ideas, and they will be here when you are.'}
+          </p>
+          {reframe && (
+            <button onClick={() => setReframe(null)} className="btn-secondary mt-4 text-[13px]">
+              Show me anything
+            </button>
+          )}
+        </section>
+      )}
+
+      {/* ─── Today's plan (homeschool families with a plan) ─── */}
+      {hasRealPlan && todayPlanActivities.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <span className="eyebrow">Also on today</span>
+            <Link href="/planner" className="btn-ghost text-[12px]">
+              Full plan <ArrowRight className="h-3 w-3 inline" />
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {todayPlanActivities.slice(0, 3).map((p) => {
+              const cat = CATEGORY_CONFIG[p.category] || CATEGORY_CONFIG.nature;
               const CatIcon = cat.icon;
-              const rowColor = planItem.category === 'nature' || planItem.category === 'movement'
-                ? 'bg-sage/8 border-sage/12'
-                : planItem.category === 'science' || planItem.category === 'kitchen'
-                  ? 'bg-terracotta/8 border-terracotta/12'
-                  : 'bg-parchment/5 border-parchment/8';
-
-              const href = planItem.slug
-                ? `/activity/${planItem.slug}`
-                : '/planner';
-
               return (
                 <Link
-                  key={`${planItem.activity_id}-${planItem.time_slot}`}
-                  href={href}
-                  className={`flex items-center gap-3 rounded-lg border px-4 py-3 transition-all hover:translate-x-1 ${rowColor} ${planItem.completed ? 'opacity-50' : ''}`}
+                  key={`${p.activity_id}-${p.time_slot}`}
+                  href={p.slug ? `/activity/${p.slug}` : '/planner'}
+                  className="flex items-center gap-3 rounded-xl bg-white border border-stone/40 px-4 py-3 transition-all hover:translate-x-0.5"
                 >
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                    planItem.category === 'nature' || planItem.category === 'movement'
-                      ? 'bg-sage/20'
-                      : planItem.category === 'science' || planItem.category === 'kitchen'
-                        ? 'bg-terracotta/20'
-                        : 'bg-parchment/10'
-                  }`}>
-                    <CatIcon className="h-4 w-4 text-parchment/80" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-moss/10">
+                    <CatIcon className="h-4 w-4 text-moss" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-[13px] font-medium text-parchment ${planItem.completed ? 'line-through' : ''}`}>
-                      {planItem.title}
-                    </p>
-                    <div className="flex gap-1.5 mt-1">
-                      <span className="tag bg-parchment/8 text-sage text-[8px]">{cat.label}</span>
-                      <span className="tag bg-parchment/8 text-sage text-[8px]">{planItem.duration_minutes}m</span>
-                      <span className="tag bg-parchment/8 text-sage text-[8px]">{planItem.time_slot}</span>
-                    </div>
+                    <p className="text-[13px] font-medium text-ink truncate">{p.title}</p>
+                    <p className="text-[11px] text-clay">{cat.label} · {p.duration_minutes} min · {p.time_slot}</p>
                   </div>
-                  {planItem.completed && (
-                    <span className="text-sage text-[10px] font-bold uppercase tracking-wider">Done</span>
-                  )}
-                  <ChevronRight className="h-4 w-4 text-parchment/20 shrink-0" />
+                  <ChevronRight className="h-4 w-4 text-stone shrink-0" />
                 </Link>
               );
-            })
-          ) : (
-            <div className="text-center py-4">
-              <p className="text-sage/60 text-sm italic">No plan for today yet.</p>
-              <Link href="/planner" className="btn-light text-[12px] mt-3 py-2 px-4">
-                Generate a plan <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Footer CTA */}
-        <div className="px-6 py-3 border-t border-parchment/8 flex items-center justify-between">
-          <span className="text-[11px] text-sage/50 font-medium">
-            {completedToday}/{todayPlanActivities.length} done today
-          </span>
-          <Link href="/planner" className="btn-terra text-[11px] py-1.5 px-3">
-            View full plan <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
-      </div>
-
-      {/* ─── Hero Recommendation Card ─── */}
-      {heroActivity && (
-        <div className="bg-white rounded-2xl shadow-sm p-6 border-l-4 border-l-cat-nature">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[12px] font-bold uppercase tracking-[0.1em] text-cat-nature">
-              <Sparkles className="h-3 w-3 inline mr-1" />
-              {heroLabel}
-            </span>
-            <button
-              onClick={() => setHeroShuffleIndex((i) => i + 1)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-parchment hover:bg-stone/20 transition-colors"
-              aria-label="Shuffle recommendation"
-            >
-              <Shuffle className="h-4 w-4 text-clay" />
-            </button>
+            })}
           </div>
-          <h2 className="text-2xl font-bold text-umber mb-2">{heroTitle}</h2>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1 rounded-lg bg-cat-nature/10 px-2 py-1 text-[11px] font-semibold text-cat-nature">
-              {heroCatConfig.label}
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] text-clay">
-              <Clock className="h-3 w-3" />
-              {heroDuration} min
-            </span>
-          </div>
-          <Link
-            href={heroSlug ? `/activity/${heroSlug}` : '/browse'}
-            className="inline-flex items-center gap-2 bg-cat-nature text-white font-semibold text-sm rounded-2xl px-5 py-2.5 hover:bg-cat-nature/90 transition-colors"
-          >
-            Let&apos;s do this
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        </section>
       )}
 
-      {/* ─── Guided Pathway (new users) ─── */}
-      {activitiesLogged === 0 && (
-        <div className="bg-cat-nature/5 border border-cat-nature/20 rounded-2xl p-5">
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cat-nature/15 mt-0.5">
-              <Zap className="h-4 w-4 text-cat-nature" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-umber mb-1">
-                {learningPath === 'homeschool'
-                  ? 'Ready to plan your first week?'
-                  : learningPath === 'considering'
-                    ? 'Exploring homeschooling?'
-                    : 'Welcome to The Hedge!'}
-              </p>
-              <p className="text-[13px] text-clay leading-relaxed mb-3">
-                {learningPath === 'homeschool'
-                  ? 'Generate your first weekly plan and get a structured, curriculum-aligned schedule for your family.'
-                  : learningPath === 'considering'
-                    ? 'Try a few activities this week to see how homeschooling feels. No commitment needed.'
-                    : 'Pick an activity above and try it with your kids. It only takes 15 minutes to get started.'}
-              </p>
-              <Link
-                href={learningPath === 'homeschool' ? '/planner' : '/browse'}
-                className="inline-flex items-center gap-2 text-sm font-semibold text-cat-nature hover:text-cat-nature/80 transition-colors"
-              >
-                {learningPath === 'homeschool' ? (
-                  <>
-                    <Calendar className="h-4 w-4" />
-                    Generate your first weekly plan
-                  </>
-                ) : (
-                  <>
-                    <ArrowRight className="h-4 w-4" />
-                    Browse activities
-                  </>
-                )}
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* ─── A warm note ─── */}
       <InsightCard
         type="today"
         context={{
-          children: childNames.map(name => ({ name })),
+          children: childNames.map((name) => ({ name })),
           weather: { temperature, isRaining, description: weatherDescription },
           activitiesThisWeek,
-          todayActivities: todayPlanActivities.map(a => ({ title: a.title, category: a.category })),
-          categoryBreakdown: todayPlanActivities.reduce((acc, a) => { acc[a.category] = (acc[a.category] || 0) + 1; return acc; }, {} as Record<string, number>),
+          todayActivities: todayPlanActivities.map((a) => ({ title: a.title, category: a.category })),
         }}
       />
 
-      {/* TODO: Wire MilestoneCard here once milestone API data is available */}
-      {/* <MilestoneCard milestone={milestone} onClick={() => {}} /> */}
-
-      {/* ─── Child Selector ─── */}
-      {childNames.length > 1 && (
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={() => setSelectedChild(null)}
-            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-all ${
-              !selectedChild
-                ? 'bg-forest text-parchment shadow-sm'
-                : 'bg-linen text-clay hover:bg-stone/30'
-            }`}
-          >
-            All
-          </button>
-          {childNames.map((name) => (
-            <button
-              key={name}
-              onClick={() => setSelectedChild(name)}
-              className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-all ${
-                selectedChild === name
-                  ? 'bg-forest text-parchment shadow-sm'
-                  : 'bg-linen text-clay hover:bg-stone/30'
-              }`}
-            >
-              {name}
-            </button>
+      {/* ─── Your season so far: accumulating leaves (not a score) ─── */}
+      <Link href="/progress" className="block rounded-2xl bg-white border border-stone/40 p-5 shadow-sm transition-all hover:border-moss/40">
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80 mb-2">Your {seasonLabel.toLowerCase()} so far</p>
+        <div className="flex items-center gap-1 mb-3">
+          {Array.from({ length: SEASON_LEAF_SLOTS }).map((_, i) => (
+            <Leaf
+              key={i}
+              className={`h-4 w-4 ${i < leavesFilled ? 'text-moss' : 'text-sage/25'}`}
+              fill={i < leavesFilled ? 'currentColor' : 'none'}
+            />
           ))}
+          {moments > SEASON_LEAF_SLOTS && (
+            <span className="text-[12px] text-moss font-medium ml-1.5">+{moments - SEASON_LEAF_SLOTS}</span>
+          )}
         </div>
+        <p className="text-[14px] text-umber leading-relaxed">
+          {moments === 0
+            ? 'Nothing kept yet this season. Your first one is waiting just above.'
+            : `You have kept ${moments} ${moments === 1 ? 'moment' : 'moments'} together this ${seasonLabel.toLowerCase()}. Lovely.`}
+        </p>
+      </Link>
+
+      {/* ─── A few more for today ─── */}
+      {activities.length > 1 && (
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display text-lg font-semibold text-ink">A few more for today</h3>
+            <Link href="/browse" className="btn-ghost text-[12px]">
+              Browse all <ArrowRight className="h-3 w-3 inline" />
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {activities.filter((a) => a.id !== heroId).slice(0, 6).map((a) => (
+              <ActivityCard key={a.id} activity={a} />
+            ))}
+          </div>
+        </section>
       )}
 
-      {/* ─── Stats Row ─── */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="stat text-center">
-          <p className="font-display text-3xl font-light text-ink">{activitiesThisWeek}</p>
-          <p className="text-[11px] text-clay font-medium mt-1">this week</p>
-        </div>
-        <Link href="/progress" className="stat text-center hover:border-moss/30 transition-all cursor-pointer">
-          <p className="font-display text-3xl font-light text-ink">{activitiesLogged}</p>
-          <p className="text-[11px] text-clay font-medium mt-1">activities together</p>
+      {/* ─── The open door (considering / homeschool) ─── */}
+      {showOpenDoor && (
+        <Link
+          href={learningPath === 'homeschool' ? '/planner' : '/educator'}
+          className="block rounded-2xl border border-moss/20 bg-moss/5 p-5 transition-colors hover:bg-moss/10"
+        >
+          <p className="text-sm font-semibold text-ink mb-1">
+            {learningPath === 'homeschool' ? 'Plan a gentle week' : 'Curious about home education?'}
+          </p>
+          <p className="text-[13px] text-clay leading-relaxed">
+            {learningPath === 'homeschool'
+              ? 'Build a calm, curriculum-aligned rhythm for your family, your way.'
+              : 'No decision today. Just see what it could look like, at your own pace.'}
+          </p>
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-moss mt-3">
+            {learningPath === 'homeschool' ? 'Open the planner' : 'Have a look'}
+            <ArrowRight className="h-4 w-4" />
+          </span>
         </Link>
-      </div>
+      )}
 
-      {/* ─── Upgrade card (free users) ─── */}
+      {/* ─── Upgrade (free users, quiet) ─── */}
       {isFreeUser && (() => {
-        // Rotate through prompts based on day of week
         const prompt = UPGRADE_PROMPTS[new Date().getDay() % UPGRADE_PROMPTS.length];
         const PromptIcon = prompt.icon;
         return (
           <Link
             href="/settings/billing"
-            className="card-elevated flex items-center gap-4 p-5 border-l-4 border-l-amber/40 hover:border-l-amber transition-all group"
+            className="flex items-center gap-4 rounded-2xl border border-stone/50 bg-white p-4 hover:border-amber/40 transition-all group"
           >
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber/10">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber/10">
               <PromptIcon className="h-5 w-5 text-amber" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-ink">{prompt.text}</p>
-              <p className="text-[12px] text-clay/60 mt-0.5">{prompt.description}</p>
+              <p className="text-[13px] font-medium text-ink">{prompt.text}</p>
+              <p className="text-[12px] text-clay/70 mt-0.5">{prompt.description}</p>
             </div>
-            <span className="text-[11px] font-bold text-amber shrink-0 group-hover:underline">
-              See plans
-            </span>
+            <span className="text-[11px] font-bold text-amber shrink-0 group-hover:underline">See plans</span>
           </Link>
         );
       })()}
 
-      {/* ─── Week Preview ─── */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="eyebrow">This week</div>
-          <Link href="/planner" className="btn-ghost text-[12px]">
-            Full planner <ArrowRight className="h-3 w-3 inline" />
-          </Link>
-        </div>
-        <div className="card-elevated p-5">
-          <div className="grid grid-cols-7 gap-2">
-            {DAYS.map((day, i) => {
-              // Map DAYS (Mon=0, Tue=1, ...) to dayNames index for lookup
-              const fullDayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-              const dayFullName = fullDayNames[i];
-              const isCurrentDay = day === dayAbbrevs[currentDayIndex];
-              const dayActivities = planActivities.filter(
-                (a) => a.day === dayFullName
-              );
-              const completed = dayActivities.filter((a) => a.completed).length;
-
-              return (
-                <div key={day} className="text-center">
-                  <p className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${
-                    isCurrentDay ? 'text-terracotta' : 'text-clay/50'
-                  }`}>
-                    {day}
-                  </p>
-                  <div className={`rounded-lg p-2 min-h-[60px] flex flex-col items-center justify-center gap-1 ${
-                    isCurrentDay
-                      ? 'bg-forest text-parchment'
-                      : dayActivities.length > 0 && completed === dayActivities.length
-                        ? 'bg-sage/15'
-                        : 'bg-linen/50'
-                  }`}>
-                    <p className={`font-display text-lg font-light ${isCurrentDay ? 'text-parchment' : 'text-ink'}`}>
-                      {dayActivities.length}
-                    </p>
-                    {dayActivities.length > 0 && (
-                      <div className="flex gap-0.5">
-                        {dayActivities.slice(0, 3).map((a, j) => (
-                          <div
-                            key={j}
-                            className={`h-1 w-1 rounded-full ${
-                              a.completed
-                                ? isCurrentDay ? 'bg-sage' : 'bg-moss'
-                                : isCurrentDay ? 'bg-parchment/30' : 'bg-stone'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Summary below week grid */}
-          {hasRealPlan && (
-            <div className="mt-4 pt-3 border-t border-stone/20 flex items-center justify-between">
-              <span className="text-[11px] text-clay/60">
-                {planActivities.filter((a) => a.completed).length} of{' '}
-                {planActivities.length} activities completed this week
-              </span>
-              <span className="text-[12px] font-bold text-moss">
-                {planActivities.length > 0
-                  ? Math.round(
-                      (planActivities.filter((a) => a.completed).length /
-                        planActivities.length) *
-                        100
-                    )
-                  : 0}
-                %
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ─── Quick Actions ─── */}
-      <div className="flex gap-3">
-        <Link href="/browse?dur=15" className="btn-terra flex-1 justify-center py-3">
-          <Zap className="h-4 w-4" />
-          Quick activity
-        </Link>
-        <Link href="/chat" className="btn-primary flex-1 justify-center py-3">
-          <Sparkles className="h-4 w-4" />
-          Ask AI
-        </Link>
-        <Link href="/planner" className="btn-secondary flex-1 justify-center py-3">
-          <Target className="h-4 w-4" />
-          View plan
-        </Link>
-      </div>
-
-      {/* ─── New This Week ─── */}
-      {newActivities.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-5">
-            <div className="eyebrow">New this week</div>
-            <span className="tag tag-terra">{newActivities.length} added</span>
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 -mx-5 px-5 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:overflow-visible scrollbar-none">
-            {newActivities.slice(0, 3).map((activity) => (
-              <div key={activity.id} className="min-w-[280px] sm:min-w-0">
-                <ActivityCard activity={activity} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─── Collections ─── */}
-      {featuredCollections.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-5">
-            <div className="eyebrow">Collections for you</div>
-            <Link href="/browse?tab=collections" className="btn-ghost text-[12px]">
-              View all <ArrowRight className="h-3 w-3 inline" />
-            </Link>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {featuredCollections.map((collection) => (
-              <Link
-                key={collection.id}
-                href={`/browse?collection=${collection.slug}`}
-                className="card-interactive p-5 flex items-center gap-4 group"
-              >
-                <span className="text-3xl transition-transform group-hover:scale-110">{collection.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-medium text-ink">{collection.title}</p>
-                  <p className="text-[12px] text-clay">{collection.activity_ids.length} activities</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-stone transition-all group-hover:text-terracotta group-hover:translate-x-1" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ─── New This Week (from API) ─── */}
+      {/* ─── A few more ideas (real, gentle) ─── */}
       <NewThisWeek />
 
-      {/* ─── Explore Section ─── */}
-      <div>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-2xl font-bold text-ink">
-            Today&apos;s <em className="text-moss italic">ideas</em>
-          </h2>
-          <span className="text-[11px] font-bold text-clay/50 uppercase tracking-wider">
-            {filtered.length} activities
-          </span>
-        </div>
-
-        <FilterChips filters={FILTERS} active={activeFilters} onChange={setActiveFilters} />
-
-        <div className="mt-5">
-          {filtered.length === 0 ? (
-            <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
-              <div className="text-center">
-                {activities.length === 0 ? (
-                  <>
-                    <p className="font-medium text-umber">No activities here just yet</p>
-                    <p className="text-[13px] text-clay mt-1 italic">We are adding more all the time. Check back soon.</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="font-medium text-umber">No activities match your filters</p>
-                    <p className="text-[13px] text-clay mt-1 italic">Try removing some filters to see more ideas.</p>
-                  </>
-                )}
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
-                {filtered.slice(0, 6).map((activity) => (
-                  <ActivityCard key={activity.id} activity={activity} />
-                ))}
-              </div>
-              {filtered.length > 6 && (
-                <div className="text-center mt-6">
-                  <Link href="/browse" className="btn-secondary">
-                    Browse all {filtered.length} activities
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+      <div className="text-center pt-2">
+        <Link href="/browse" className="btn-ghost text-[13px]">
+          Browse all ideas <ArrowRight className="h-3.5 w-3.5 inline" />
+        </Link>
       </div>
     </div>
   );

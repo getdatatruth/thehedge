@@ -82,7 +82,7 @@ export default async function DashboardLayout({
         isTrialing={isTrialing}
         trialDaysLeft={trialDaysLeft}
       />
-      <main className="flex-1 pt-13 lg:pt-0 pb-24 lg:pb-0">
+      <main className="min-w-0 flex-1 pt-13 lg:pt-0 pb-24 lg:pb-0">
         <div className="mx-auto max-w-[960px] px-5 py-6 sm:px-6 lg:px-10 lg:py-8">
           {children}
         </div>

@@ -15,14 +15,14 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { colors, lightTheme } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
 
 const COLLECTION_ICON_MAP: Record<string, { icon: any; color: string }> = {
-  nature: { icon: TreePine, color: colors.sage },
-  outdoor: { icon: TreePine, color: colors.sage },
-  science: { icon: FlaskConical, color: colors.moss },
+  nature: { icon: TreePine, color: lightTheme.accent },
+  outdoor: { icon: TreePine, color: lightTheme.accent },
+  science: { icon: FlaskConical, color: lightTheme.primary },
   art: { icon: Palette, color: '#E8735A' },
   craft: { icon: Palette, color: '#E8735A' },
   math: { icon: Calculator, color: lightTheme.textSecondary },
@@ -31,11 +31,11 @@ const COLLECTION_ICON_MAP: Record<string, { icon: any; color: string }> = {
   music: { icon: Music, color: lightTheme.textSecondary },
   cook: { icon: UtensilsCrossed, color: '#E8735A' },
   bak: { icon: UtensilsCrossed, color: '#E8735A' },
-  physical: { icon: Footprints, color: colors.moss },
-  movement: { icon: Footprints, color: colors.moss },
+  physical: { icon: Footprints, color: lightTheme.primary },
+  movement: { icon: Footprints, color: lightTheme.primary },
   irish: { icon: Globe, color: lightTheme.primary },
-  sensory: { icon: Shapes, color: colors.sage },
-  play: { icon: Shapes, color: colors.sage },
+  sensory: { icon: Shapes, color: lightTheme.accent },
+  play: { icon: Shapes, color: lightTheme.accent },
 };
 
 function getCollectionIcon(title: string) {
@@ -43,7 +43,7 @@ function getCollectionIcon(title: string) {
   for (const [keyword, config] of Object.entries(COLLECTION_ICON_MAP)) {
     if (lower.includes(keyword)) return config;
   }
-  return { icon: Leaf, color: colors.moss };
+  return { icon: Leaf, color: lightTheme.primary };
 }
 
 interface Collection {

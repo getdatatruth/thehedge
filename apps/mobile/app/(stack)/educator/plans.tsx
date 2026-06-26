@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TierGate } from '@/components/shared/TierGate';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface EducationPlan {
@@ -127,7 +127,7 @@ export default function PlansScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Education Plans</Text>
       </View>
@@ -140,13 +140,13 @@ export default function PlansScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.primary}
           />
         }
       >
         {plansList.length === 0 ? (
           <EmptyState
-            icon={<FileText size={32} color={`${colors.clay}40`} />}
+            icon={<FileText size={32} color={`${lightTheme.textSecondary}40`} />}
             title="No education plans"
             message="Create an education plan for each child to track their learning approach and hours."
             actionLabel="Add plan"
@@ -195,7 +195,7 @@ export default function PlansScreen() {
           onPress={() => bottomSheetRef.current?.expand()}
           activeOpacity={0.8}
         >
-          <Plus size={22} color={colors.parchment} />
+          <Plus size={22} color={lightTheme.background} />
         </TouchableOpacity>
       </View>
 
@@ -232,7 +232,7 @@ export default function PlansScreen() {
             value={academicYear}
             onChangeText={setAcademicYear}
             placeholder="e.g. 2025-2026"
-            placeholderTextColor={`${colors.clay}60`}
+            placeholderTextColor={`${lightTheme.textSecondary}60`}
           />
 
           <Text style={styles.fieldLabel}>Approach</Text>
@@ -264,14 +264,14 @@ export default function PlansScreen() {
               style={styles.stepperBtn}
               onPress={() => setHoursPerDay(Math.max(1, hoursPerDay - 1))}
             >
-              <Minus size={16} color={colors.ink} />
+              <Minus size={16} color={lightTheme.text} />
             </TouchableOpacity>
             <Text style={styles.stepperValue}>{hoursPerDay}</Text>
             <TouchableOpacity
               style={styles.stepperBtn}
               onPress={() => setHoursPerDay(Math.min(10, hoursPerDay + 1))}
             >
-              <Plus size={16} color={colors.ink} />
+              <Plus size={16} color={lightTheme.text} />
             </TouchableOpacity>
           </View>
 
@@ -281,14 +281,14 @@ export default function PlansScreen() {
               style={styles.stepperBtn}
               onPress={() => setDaysPerWeek(Math.max(1, daysPerWeek - 1))}
             >
-              <Minus size={16} color={colors.ink} />
+              <Minus size={16} color={lightTheme.text} />
             </TouchableOpacity>
             <Text style={styles.stepperValue}>{daysPerWeek}</Text>
             <TouchableOpacity
               style={styles.stepperBtn}
               onPress={() => setDaysPerWeek(Math.min(7, daysPerWeek + 1))}
             >
-              <Plus size={16} color={colors.ink} />
+              <Plus size={16} color={lightTheme.text} />
             </TouchableOpacity>
           </View>
 
@@ -309,7 +309,7 @@ export default function PlansScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  headerTitle: { fontSize: 20, fontWeight: '300', color: lightTheme.text },
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['6xl'],
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   childGroupTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   planHeader: {
     flexDirection: 'row',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   planYear: {
     fontSize: 15,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   planMeta: {
     flexDirection: 'row',
@@ -358,11 +358,11 @@ const styles = StyleSheet.create({
   },
   planMetaText: {
     fontSize: 13,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   planMetaDot: {
     fontSize: 13,
-    color: `${colors.clay}60`,
+    color: `${lightTheme.textSecondary}60`,
   },
   areaBadges: {
     flexDirection: 'row',
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.forest,
+    backgroundColor: lightTheme.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -390,13 +390,13 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
     marginBottom: spacing.sm,
   },
   fieldLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: `${colors.clay}80`,
+    color: `${lightTheme.textSecondary}80`,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -409,31 +409,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: radius.sm,
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
   },
   chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
+    borderColor: lightTheme.primary,
   },
   chipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: lightTheme.background,
   },
   textInput: {
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: 15,
-    color: colors.ink,
+    color: lightTheme.text,
   },
   stepperRow: {
     flexDirection: 'row',
@@ -444,16 +444,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radius.md,
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepperValue: {
     fontSize: 22,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
     minWidth: 30,
     textAlign: 'center',
   },

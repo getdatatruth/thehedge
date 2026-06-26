@@ -12,8 +12,36 @@ import {
   renderPortfolioHtml,
   renderAnnualHtml,
 } from '@/lib/reports';
+import {
+  assessmentToCsv,
+  attendanceToCsv,
+  portfolioToCsv,
+  annualToCsv,
+  csvFilename,
+  csvToPdf,
+  pdfFilename,
+} from '@/lib/export';
 
 const VALID_TYPES: ReportType[] = ['assessment', 'attendance', 'portfolio', 'annual'];
+
+function csvResponse(reportType: string, childName: string, startDate: string, endDate: string, body: string) {
+  return new NextResponse(body, {
+    headers: {
+      'Content-Type': 'text/csv; charset=utf-8',
+      'Content-Disposition': `attachment; filename="${csvFilename(reportType, childName, startDate, endDate)}"`,
+    },
+  });
+}
+
+async function pdfResponse(reportType: string, label: string, childName: string, startDate: string, endDate: string, csv: string) {
+  const bytes = await csvToPdf(csv, label);
+  return new NextResponse(Buffer.from(bytes), {
+    headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${pdfFilename(reportType, childName, startDate, endDate)}"`,
+    },
+  });
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -42,7 +70,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') as ReportType | null;
     const childId = searchParams.get('childId');
-    const format = searchParams.get('format') || 'html'; // 'html' or 'json'
+    const format = searchParams.get('format') || 'html'; // 'html' | 'csv' | 'json'
 
     if (!type || !VALID_TYPES.includes(type)) {
       return NextResponse.json(
@@ -99,6 +127,12 @@ export async function GET(request: NextRequest) {
         if (format === 'json') {
           return NextResponse.json(data);
         }
+        if (format === 'csv') {
+          return csvResponse('term-summary', data.child.name, startDate, endDate, assessmentToCsv(data));
+        }
+        if (format === 'pdf') {
+          return pdfResponse('term-summary', 'Term Summary', data.child.name, startDate, endDate, assessmentToCsv(data));
+        }
         return new NextResponse(renderAssessmentHtml(data), {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
@@ -111,6 +145,12 @@ export async function GET(request: NextRequest) {
         const data = await buildAttendanceReport(params);
         if (format === 'json') {
           return NextResponse.json(data);
+        }
+        if (format === 'csv') {
+          return csvResponse('attendance-record', data.child.name, startDate, endDate, attendanceToCsv(data));
+        }
+        if (format === 'pdf') {
+          return pdfResponse('attendance-record', 'Attendance Record', data.child.name, startDate, endDate, attendanceToCsv(data));
         }
         return new NextResponse(renderAttendanceHtml(data), {
           headers: {
@@ -125,6 +165,12 @@ export async function GET(request: NextRequest) {
         if (format === 'json') {
           return NextResponse.json(data);
         }
+        if (format === 'csv') {
+          return csvResponse('portfolio-entries', data.child.name, startDate, endDate, portfolioToCsv(data));
+        }
+        if (format === 'pdf') {
+          return pdfResponse('portfolio-entries', 'Portfolio Entries', data.child.name, startDate, endDate, portfolioToCsv(data));
+        }
         return new NextResponse(renderPortfolioHtml(data), {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
@@ -137,6 +183,12 @@ export async function GET(request: NextRequest) {
         const data = await buildAnnualReport(params);
         if (format === 'json') {
           return NextResponse.json(data);
+        }
+        if (format === 'csv') {
+          return csvResponse('annual-summary', data.assessment.child.name, startDate, endDate, annualToCsv(data));
+        }
+        if (format === 'pdf') {
+          return pdfResponse('annual-summary', 'Annual Activity Summary', data.assessment.child.name, startDate, endDate, annualToCsv(data));
         }
         return new NextResponse(renderAnnualHtml(data), {
           headers: {

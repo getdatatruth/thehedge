@@ -20,6 +20,7 @@ import {
   Crown,
   Lock,
   Shield,
+  Leaf,
 } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
@@ -67,6 +68,17 @@ export default function SettingsScreen() {
           label: 'Notifications',
           detail: '',
           onPress: () => router.push('/(stack)/settings/notifications' as any),
+        },
+      ],
+    },
+    {
+      title: 'Your family',
+      items: [
+        {
+          icon: Leaf,
+          label: 'Your Family Framework',
+          detail: '',
+          onPress: () => router.push('/(stack)/framework' as any),
         },
       ],
     },

@@ -13,7 +13,7 @@ import {
   Clock,
   BookOpen,
   Users,
-  Flame,
+  CalendarCheck,
   FileText,
   FolderOpen,
   Calendar,
@@ -24,15 +24,15 @@ import { useApiQuery } from '@/hooks/use-api';
 import { Card } from '@/components/ui/Card';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { TierGate } from '@/components/shared/TierGate';
-import { lightTheme, colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing, radius } from '@/theme/spacing';
 
 interface DashboardData {
   hours_this_week: number;
-  areas_covered: number;
+  curriculum_areas_covered: number;
   children_count: number;
-  streak: number;
+  active_days: number;
   aistear_coverage: Record<string, number>;
 }
 
@@ -42,7 +42,7 @@ const QUICK_LINKS = [
     label: 'Plans',
     description: 'Education plans',
     icon: FileText,
-    color: colors.moss,
+    color: lightTheme.primary,
     route: '/(stack)/educator/plans',
   },
   {
@@ -50,7 +50,7 @@ const QUICK_LINKS = [
     label: 'Portfolio',
     description: 'Learning records',
     icon: FolderOpen,
-    color: colors.terracotta,
+    color: lightTheme.error,
     route: '/(stack)/educator/portfolio',
   },
   {
@@ -58,7 +58,7 @@ const QUICK_LINKS = [
     label: 'Schedule',
     description: 'Weekly timetable',
     icon: Calendar,
-    color: colors.amber,
+    color: lightTheme.warning,
     route: '/(stack)/educator/schedule',
   },
   {
@@ -66,7 +66,7 @@ const QUICK_LINKS = [
     label: 'Tusla',
     description: 'Compliance',
     icon: ShieldCheck,
-    color: colors.sage,
+    color: lightTheme.accent,
     route: '/(stack)/educator/tusla',
   },
 ] as const;
@@ -103,39 +103,39 @@ function EducatorDashboardContent() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.primary}
           />
         }
       >
         {/* Stats Row */}
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <Clock size={18} color={colors.moss} />
+            <Clock size={18} color={lightTheme.primary} />
             <Text style={styles.statNumber}>
               {dashboard?.hours_this_week ?? 0}
             </Text>
             <Text style={styles.statLabel}>Hours</Text>
           </View>
           <View style={styles.statCard}>
-            <BookOpen size={18} color={colors.terracotta} />
+            <BookOpen size={18} color={lightTheme.error} />
             <Text style={styles.statNumber}>
-              {dashboard?.areas_covered ?? 0}
+              {dashboard?.curriculum_areas_covered ?? 0}
             </Text>
             <Text style={styles.statLabel}>Areas</Text>
           </View>
           <View style={styles.statCard}>
-            <Users size={18} color={colors.amber} />
+            <Users size={18} color={lightTheme.warning} />
             <Text style={styles.statNumber}>
               {dashboard?.children_count ?? 0}
             </Text>
             <Text style={styles.statLabel}>Children</Text>
           </View>
           <View style={styles.statCard}>
-            <Flame size={18} color={colors.sage} />
+            <CalendarCheck size={18} color={lightTheme.accent} />
             <Text style={styles.statNumber}>
-              {dashboard?.streak ?? 0}
+              {dashboard?.active_days ?? 0}
             </Text>
-            <Text style={styles.statLabel}>Streak</Text>
+            <Text style={styles.statLabel}>Active days</Text>
           </View>
         </View>
 
@@ -193,7 +193,7 @@ function EducatorDashboardContent() {
                   <Text style={styles.quickLinkDesc}>{link.description}</Text>
                   <ChevronRight
                     size={14}
-                    color={colors.stone}
+                    color={lightTheme.border}
                     style={styles.quickLinkArrow}
                   />
                 </TouchableOpacity>
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: `${colors.stone}40`,
+    borderBottomColor: `${lightTheme.border}40`,
   },
   breakdownLabel: {
     flexDirection: 'row',
@@ -284,13 +284,13 @@ const styles = StyleSheet.create({
   },
   breakdownBar: {
     height: 6,
-    backgroundColor: `${colors.stone}30`,
+    backgroundColor: `${lightTheme.border}30`,
     borderRadius: 3,
     overflow: 'hidden',
   },
   breakdownFill: {
     height: '100%',
-    backgroundColor: colors.moss,
+    backgroundColor: lightTheme.primary,
     borderRadius: 3,
   },
   quickLinksGrid: {

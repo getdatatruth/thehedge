@@ -424,9 +424,9 @@ export function ScheduleClient({
   return (
     <div className="space-y-10 animate-fade-up">
       <div>
-        <Link href="/educator" className="inline-flex items-center gap-1.5 text-sm text-moss hover:text-forest transition-colors mb-4">
+        <Link href="/planner" className="inline-flex items-center gap-1.5 text-sm text-moss hover:text-forest transition-colors mb-4">
           <ArrowLeft className="h-4 w-4" />
-          Back to educator
+          Back to Plan
         </Link>
         <div className="flex items-start justify-between">
           <div>

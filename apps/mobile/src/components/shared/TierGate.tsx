@@ -4,7 +4,7 @@ import { Crown } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/Button';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface TierGateProps {
@@ -26,20 +26,21 @@ export function TierGate({ requiredTier, children, featureName }: TierGateProps)
   return (
     <View style={styles.container}>
       <View style={styles.iconWrap}>
-        <Crown size={28} color={colors.amber} />
+        <Crown size={28} color={lightTheme.warning} />
       </View>
       <Text style={styles.title}>
-        {featureName || 'This feature'} requires the {requiredTier} plan
+        {featureName || 'This part of the hedge'} opens with the {requiredTier} plan
       </Text>
       <Text style={styles.body}>
-        Upgrade to unlock {featureName?.toLowerCase() || 'this feature'} and more.
+        It's here whenever you're ready. Have a look at the plans and see what
+        suits your family.
       </Text>
       <Button
         variant="primary"
         size="md"
         onPress={() => router.push('/(stack)/settings/billing' as any)}
       >
-        View plans
+        Have a look at the plans
       </Button>
     </View>
   );
@@ -57,19 +58,19 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: `${colors.amber}15`,
+    backgroundColor: `${lightTheme.warning}15`,
     alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
     fontSize: 18,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
     textAlign: 'center',
   },
   body: {
     fontSize: 14,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },

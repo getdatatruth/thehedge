@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: NextRequest) {
   try {
@@ -108,8 +109,12 @@ export async function POST(request: NextRequest) {
       // Remove existing children so we can re-insert fresh
       await supabase.from('children').delete().eq('family_id', familyId);
     } else {
-      // Create new family
-      const { data: family, error: familyError } = await supabase
+      // Create new family. This bootstrap runs before the user is linked to a
+      // family, so it must use the service-role client: under RLS the
+      // user-scoped client cannot read back (RETURNING) a family it does not
+      // yet belong to.
+      const admin = createAdminClient();
+      const { data: family, error: familyError } = await admin
         .from('families')
         .insert({
           name: familyName.trim(),

@@ -7,7 +7,7 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import { colors, darkTheme } from '@/theme/colors';
+import { lightTheme, darkTheme } from '@/theme/colors';
 import { radius, spacing } from '@/theme/spacing';
 
 interface InputProps extends TextInputProps {
@@ -42,7 +42,7 @@ export function Input({
           error && styles.inputError,
           style,
         ]}
-        placeholderTextColor={isDark ? darkTheme.textMuted : `${colors.clay}80`}
+        placeholderTextColor={isDark ? darkTheme.textMuted : `${lightTheme.textSecondary}80`}
         onFocus={(e) => {
           setIsFocused(true);
           props.onFocus?.(e);
@@ -70,11 +70,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   inputError: {
-    borderColor: '#E57373',
+    borderColor: lightTheme.error,
   },
   error: {
     fontSize: 12,
-    color: '#E57373',
+    color: lightTheme.error,
   },
 });
 
@@ -82,15 +82,15 @@ const lightStyles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   input: {
-    borderColor: colors.stone,
-    backgroundColor: colors.linen,
-    color: colors.ink,
+    borderColor: lightTheme.border,
+    backgroundColor: lightTheme.surface,
+    color: lightTheme.text,
   },
   inputFocused: {
-    borderColor: colors.accent,
+    borderColor: lightTheme.accent,
   },
 });
 

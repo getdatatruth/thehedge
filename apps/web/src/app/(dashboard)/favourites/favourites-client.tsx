@@ -171,7 +171,7 @@ export function FavouritesClient() {
                 placeholder="Search favourites..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="h-10 pl-10 rounded-[4px] border-stone bg-linen shadow-sm"
+                className="h-10 pl-10 rounded-xl border border-stone/40 bg-white shadow-sm focus-visible:border-moss/40 transition-all"
               />
             </div>
 
@@ -180,7 +180,7 @@ export function FavouritesClient() {
               <div className="relative">
                 <button
                   onClick={() => setShowSortMenu(!showSortMenu)}
-                  className="flex h-10 items-center gap-2 rounded-[4px] border border-stone px-3 text-[12px] font-bold text-clay hover:border-moss/30 transition-all"
+                  className="flex h-10 items-center gap-2 rounded-xl border border-stone/40 bg-white px-3 text-[12px] font-bold text-clay hover:border-moss/40 transition-all"
                 >
                   <ArrowUpDown className="h-3.5 w-3.5" />
                   {sortOptions.find((o) => o.value === sortBy)?.label}
@@ -188,7 +188,7 @@ export function FavouritesClient() {
                 {showSortMenu && (
                   <>
                     <div className="fixed inset-0 z-10" onClick={() => setShowSortMenu(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-20 w-44 rounded-[8px] border border-stone bg-linen shadow-lg py-1">
+                    <div className="absolute right-0 top-full mt-1 z-20 w-44 rounded-2xl border border-stone/40 bg-white shadow-sm py-1">
                       {sortOptions.map((option) => (
                         <button
                           key={option.value}
@@ -196,7 +196,7 @@ export function FavouritesClient() {
                           className={`w-full text-left px-3 py-2 text-[12px] transition-colors ${
                             sortBy === option.value
                               ? 'text-forest font-bold bg-forest/5'
-                              : 'text-clay hover:bg-parchment/50'
+                              : 'text-clay hover:bg-stone/10'
                           }`}
                         >
                           {option.label}
@@ -208,11 +208,11 @@ export function FavouritesClient() {
               </div>
 
               {/* View mode toggle */}
-              <div className="flex rounded-[4px] border border-stone overflow-hidden">
+              <div className="flex rounded-xl border border-stone/40 bg-white overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`h-10 w-10 flex items-center justify-center transition-colors ${
-                    viewMode === 'grid' ? 'bg-forest text-parchment' : 'text-clay hover:bg-linen'
+                    viewMode === 'grid' ? 'bg-forest text-parchment' : 'text-clay hover:bg-stone/10'
                   }`}
                 >
                   <Grid3X3 className="h-4 w-4" />
@@ -220,7 +220,7 @@ export function FavouritesClient() {
                 <button
                   onClick={() => setViewMode('list')}
                   className={`h-10 w-10 flex items-center justify-center transition-colors ${
-                    viewMode === 'list' ? 'bg-forest text-parchment' : 'text-clay hover:bg-linen'
+                    viewMode === 'list' ? 'bg-forest text-parchment' : 'text-clay hover:bg-stone/10'
                   }`}
                 >
                   <List className="h-4 w-4" />
@@ -233,10 +233,10 @@ export function FavouritesClient() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`rounded-[3px] px-3.5 py-1.5 text-[12px] font-semibold transition-all ${
+              className={`rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all ${
                 !selectedCategory
                   ? 'bg-forest text-parchment'
-                  : 'bg-linen text-clay/60 border border-stone hover:border-umber/20'
+                  : 'bg-white text-clay/70 border border-stone/40 hover:border-moss/40'
               }`}
             >
               All ({favourites.length})
@@ -247,10 +247,10 @@ export function FavouritesClient() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                  className={`rounded-[3px] px-3.5 py-1.5 text-[12px] font-semibold transition-all ${
+                  className={`rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all ${
                     selectedCategory === cat
                       ? 'bg-forest text-parchment'
-                      : 'bg-linen text-clay/60 border border-stone hover:border-umber/20'
+                      : 'bg-white text-clay/70 border border-stone/40 hover:border-moss/40'
                   }`}
                 >
                   {config?.label || cat} ({categoryCounts[cat] || 0})
@@ -281,7 +281,7 @@ export function FavouritesClient() {
       {/* Content */}
       {favourites.length === 0 ? (
         /* Empty state - no favourites at all */
-        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[400px] items-center justify-center rounded-2xl border border-dashed border-stone/50 bg-white">
           <div className="text-center px-6 max-w-sm">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-terracotta/8 mx-auto mb-5">
               <Heart className="h-8 w-8 text-terracotta/40" />
@@ -304,7 +304,7 @@ export function FavouritesClient() {
         </div>
       ) : filtered.length === 0 ? (
         /* No results from search/filter */
-        <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-dashed border-stone bg-linen/50">
+        <div className="flex min-h-[240px] items-center justify-center rounded-2xl border border-dashed border-stone/50 bg-white">
           <div className="text-center px-4">
             <Search className="mx-auto mb-3 h-8 w-8 text-stone" />
             <p className="font-medium text-umber">No matches found</p>

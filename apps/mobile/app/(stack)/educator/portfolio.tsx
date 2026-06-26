@@ -28,7 +28,7 @@ import { Button } from '@/components/ui/Button';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { TierGate } from '@/components/shared/TierGate';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing, radius } from '@/theme/spacing';
 
 interface PortfolioEntry {
@@ -146,7 +146,7 @@ export default function PortfolioScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ChevronLeft size={20} color={colors.ink} />
+          <ChevronLeft size={20} color={lightTheme.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Portfolio</Text>
       </View>
@@ -187,13 +187,13 @@ export default function PortfolioScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={refetch}
-            tintColor={colors.moss}
+            tintColor={lightTheme.primary}
           />
         }
       >
         {entries.length === 0 ? (
           <EmptyState
-            icon={<FolderOpen size={32} color={`${colors.clay}40`} />}
+            icon={<FolderOpen size={32} color={`${lightTheme.textSecondary}40`} />}
             title="No portfolio entries"
             message="Add learning observations, work samples, and milestones to build a portfolio."
             actionLabel="Add entry"
@@ -205,7 +205,7 @@ export default function PortfolioScreen() {
               <View style={styles.entryHeader}>
                 <Text style={styles.entryTitle}>{entry.title}</Text>
                 <View style={styles.entryDate}>
-                  <Calendar size={12} color={colors.clay} />
+                  <Calendar size={12} color={lightTheme.textSecondary} />
                   <Text style={styles.entryDateText}>
                     {new Date(entry.date).toLocaleDateString('en-IE', {
                       day: 'numeric',
@@ -231,7 +231,7 @@ export default function PortfolioScreen() {
                 )}
                 {entry.photo_count > 0 && (
                   <View style={styles.photoIndicator}>
-                    <Image size={12} color={colors.clay} />
+                    <Image size={12} color={lightTheme.textSecondary} />
                     <Text style={styles.photoCount}>
                       {entry.photo_count} photo{entry.photo_count !== 1 ? 's' : ''}
                     </Text>
@@ -249,7 +249,7 @@ export default function PortfolioScreen() {
           onPress={() => bottomSheetRef.current?.expand()}
           activeOpacity={0.8}
         >
-          <Plus size={22} color={colors.parchment} />
+          <Plus size={22} color={lightTheme.background} />
         </TouchableOpacity>
       </View>
 
@@ -263,7 +263,7 @@ export default function PortfolioScreen() {
             value={title}
             onChangeText={setTitle}
             placeholder="e.g. Nature walk observations"
-            placeholderTextColor={`${colors.clay}60`}
+            placeholderTextColor={`${lightTheme.textSecondary}60`}
           />
 
           <Text style={styles.fieldLabel}>Description</Text>
@@ -272,7 +272,7 @@ export default function PortfolioScreen() {
             value={description}
             onChangeText={setDescription}
             placeholder="What happened? What did the child learn?"
-            placeholderTextColor={`${colors.clay}60`}
+            placeholderTextColor={`${lightTheme.textSecondary}60`}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -284,7 +284,7 @@ export default function PortfolioScreen() {
             value={entryDate}
             onChangeText={setEntryDate}
             placeholder="YYYY-MM-DD"
-            placeholderTextColor={`${colors.clay}60`}
+            placeholderTextColor={`${lightTheme.textSecondary}60`}
           />
 
           <Text style={styles.fieldLabel}>Curriculum areas</Text>
@@ -312,7 +312,7 @@ export default function PortfolioScreen() {
 
           <Text style={styles.fieldLabel}>Photos</Text>
           <View style={styles.photoPlaceholder}>
-            <Image size={20} color={`${colors.clay}60`} />
+            <Image size={20} color={`${lightTheme.textSecondary}60`} />
             <Text style={styles.photoPlaceholderText}>
               Photo uploads coming soon
             </Text>
@@ -335,7 +335,7 @@ export default function PortfolioScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.parchment },
+  safe: { flex: 1, backgroundColor: lightTheme.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: { fontSize: 20, fontWeight: '300', color: colors.ink },
+  headerTitle: { fontSize: 20, fontWeight: '300', color: lightTheme.text },
   childSelector: {
     paddingHorizontal: spacing.xl,
     gap: spacing.sm,
@@ -361,21 +361,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: radius.sm,
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
   },
   childChipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
+    borderColor: lightTheme.primary,
   },
   childChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   childChipTextActive: {
-    color: colors.parchment,
+    color: lightTheme.background,
   },
   scroll: {
     paddingHorizontal: spacing.xl,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   entryTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: colors.ink,
+    color: lightTheme.text,
     flex: 1,
     marginRight: spacing.sm,
   },
@@ -402,11 +402,11 @@ const styles = StyleSheet.create({
   },
   entryDateText: {
     fontSize: 11,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   entryDescription: {
     fontSize: 13,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     lineHeight: 18,
     marginBottom: spacing.sm,
   },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   },
   photoCount: {
     fontSize: 11,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   fabContainer: {
     position: 'absolute',
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.forest,
+    backgroundColor: lightTheme.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -448,25 +448,25 @@ const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 22,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
     marginBottom: spacing.sm,
   },
   fieldLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: `${colors.clay}80`,
+    color: `${lightTheme.textSecondary}80`,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   textInput: {
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     borderRadius: radius.sm,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     fontSize: 15,
-    color: colors.ink,
+    color: lightTheme.text,
   },
   textArea: {
     minHeight: 100,
@@ -481,25 +481,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: radius.sm,
-    backgroundColor: colors.linen,
+    backgroundColor: lightTheme.surface,
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
   },
   chipActive: {
-    backgroundColor: colors.forest,
-    borderColor: colors.forest,
+    backgroundColor: lightTheme.primary,
+    borderColor: lightTheme.primary,
   },
   chipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.clay,
+    color: lightTheme.textSecondary,
   },
   chipTextActive: {
-    color: colors.parchment,
+    color: lightTheme.background,
   },
   photoPlaceholder: {
     borderWidth: 1,
-    borderColor: colors.stone,
+    borderColor: lightTheme.border,
     borderStyle: 'dashed',
     borderRadius: radius.md,
     padding: spacing.xl,
@@ -509,6 +509,6 @@ const styles = StyleSheet.create({
   },
   photoPlaceholderText: {
     fontSize: 13,
-    color: `${colors.clay}60`,
+    color: `${lightTheme.textSecondary}60`,
   },
 });

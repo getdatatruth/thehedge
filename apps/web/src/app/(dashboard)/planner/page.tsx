@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { PlannerClient } from './planner-client';
+import { PlanTabs } from '@/components/dashboard/plan-tabs';
 import { getWeather } from '@/lib/weather';
 
 export const metadata = {
@@ -46,7 +47,7 @@ export default async function PlannerPage({
 
   const { data: profile } = await supabase
     .from('users')
-    .select('family_id, families(name, family_style, latitude, longitude)')
+    .select('family_id, families(name, family_style, approach, latitude, longitude)')
     .eq('id', user.id)
     .single();
 
@@ -59,6 +60,7 @@ export default async function PlannerPage({
   const familyData = family as {
     name?: string;
     family_style?: string;
+    approach?: string | null;
     latitude?: number | null;
     longitude?: number | null;
   } | null;
@@ -133,6 +135,8 @@ export default async function PlannerPage({
   }
 
   return (
+    <>
+    <PlanTabs active="week" />
     <PlannerClient
       children={children || []}
       weeklyPlans={familyPlans}
@@ -145,6 +149,8 @@ export default async function PlannerPage({
       }
       weatherCondition={weatherCondition}
       temperature={weather?.temperature}
+      approach={familyData?.approach ?? null}
     />
+    </>
   );
 }

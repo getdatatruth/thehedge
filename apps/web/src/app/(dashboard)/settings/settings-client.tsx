@@ -125,10 +125,10 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className={`relative h-6 w-11 rounded-full transition-colors ${checked ? 'bg-moss' : 'bg-linen'}`}
+      className={`relative h-6 w-11 rounded-full transition-colors ${checked ? 'bg-forest' : 'bg-stone/50'}`}
     >
       <div
-        className={`absolute top-0.5 h-5 w-5 rounded-full bg-parchment shadow-sm transition-transform ${
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
           checked ? 'translate-x-5.5' : 'translate-x-0.5'
         }`}
       />
@@ -197,12 +197,12 @@ function ChildForm({
   };
 
   return (
-    <div className="card-elevated p-6 sm:p-8 space-y-5 border-2 border-moss/20">
+    <div className="bg-white border border-stone/40 shadow-sm rounded-2xl p-6 sm:p-8 space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-lg font-light text-ink">
+        <h3 className="font-display text-lg font-semibold text-ink">
           {child ? 'Edit child' : 'Add a child'}
         </h3>
-        <button type="button" onClick={onCancel} className="rounded-[4px] p-1.5 hover:bg-linen transition-colors">
+        <button type="button" onClick={onCancel} className="rounded-xl p-1.5 hover:bg-stone/20 transition-colors">
           <X className="h-4 w-4 text-clay/40" />
         </button>
       </div>
@@ -214,7 +214,7 @@ function ChildForm({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="rounded-[4px] border-stone bg-parchment/30"
+              className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
               placeholder="Child's name"
             />
           </div>
@@ -225,7 +225,7 @@ function ChildForm({
               value={dateOfBirth}
               onChange={(e) => setDateOfBirth(e.target.value)}
               required
-              className="rounded-[4px] border-stone bg-parchment/30"
+              className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
             />
           </div>
           <div className="space-y-2">
@@ -233,7 +233,7 @@ function ChildForm({
             <Input
               value={interests}
               onChange={(e) => setInterests(e.target.value)}
-              className="rounded-[4px] border-stone bg-parchment/30"
+              className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
               placeholder="dinosaurs, art, football"
             />
             <p className="text-[10px] text-clay/40">Separate with commas</p>
@@ -243,7 +243,7 @@ function ChildForm({
             <select
               value={schoolStatus}
               onChange={(e) => setSchoolStatus(e.target.value)}
-              className="w-full h-10 rounded-[4px] border border-stone bg-parchment/30 px-3 text-sm"
+              className="w-full border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
             >
               {SCHOOL_STATUSES.map((s) => (
                 <option key={s.value} value={s.value}>
@@ -306,14 +306,14 @@ function PasswordChangeForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4 p-4 rounded-[4px] bg-parchment/50 border border-stone">
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4 p-4 rounded-2xl bg-stone/10 border border-stone/40">
       <div className="space-y-2">
         <Label className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">New Password</Label>
         <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded-[4px] border-stone bg-parchment/30"
+          className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
           placeholder="At least 8 characters"
           required
           minLength={8}
@@ -325,7 +325,7 @@ function PasswordChangeForm({ onClose }: { onClose: () => void }) {
           type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="rounded-[4px] border-stone bg-parchment/30"
+          className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
           placeholder="Repeat your new password"
           required
           minLength={8}
@@ -602,8 +602,8 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
     <div className="space-y-10 animate-fade-up">
       <div>
         <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50 mb-3">Account</p>
-        <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
-          <em className="text-moss italic">Settings</em>
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold text-ink tracking-tight">
+          <em className="text-moss italic font-light">Settings</em>
         </h1>
         <p className="text-clay mt-2 text-lg">
           Manage your family profile and preferences.
@@ -618,10 +618,10 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-2.5 rounded-[4px] px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all ${
+                className={`flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all ${
                   activeTab === id
-                    ? 'bg-forest text-parchment shadow-sm'
-                    : 'text-clay/60 hover:bg-linen hover:text-umber'
+                    ? 'bg-forest text-white shadow-sm'
+                    : 'bg-white border border-stone/40 text-clay/70 hover:border-stone/60 hover:text-umber'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -635,15 +635,15 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
         <div className="flex-1 min-w-0">
           {/* --- Profile Tab --- */}
           {activeTab === 'profile' && (
-            <div className="card-elevated p-6 sm:p-8 space-y-6">
-              <h2 className="font-display text-xl font-light text-ink">Family Profile</h2>
+            <div className="bg-white border border-stone/40 shadow-sm rounded-2xl p-6 sm:p-8 space-y-6">
+              <h2 className="font-display text-xl font-semibold text-ink">Family Profile</h2>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/50">Family Name</Label>
                   <Input
                     value={familyName}
                     onChange={(e) => setFamilyName(e.target.value)}
-                    className="rounded-[4px] border-stone bg-parchment/30"
+                    className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -651,7 +651,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   <Input
                     value={county}
                     onChange={(e) => setCounty(e.target.value)}
-                    className="rounded-[4px] border-stone bg-parchment/30"
+                    className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -659,7 +659,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   <Input
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    className="rounded-[4px] border-stone bg-parchment/30"
+                    className="border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -667,7 +667,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   <select
                     value={familyStyle}
                     onChange={(e) => setFamilyStyle(e.target.value)}
-                    className="w-full h-10 rounded-[4px] border border-stone bg-parchment/30 px-3 text-sm"
+                    className="w-full border border-stone/40 rounded-xl px-3 py-2.5 text-base bg-white"
                   >
                     {FAMILY_STYLES.map((s) => (
                       <option key={s.value} value={s.value}>
@@ -691,7 +691,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
           {activeTab === 'children' && (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <h2 className="font-display text-xl font-light text-ink">Children</h2>
+                <h2 className="font-display text-xl font-semibold text-ink">Children</h2>
                 {!showAddChild && (
                   <button
                     onClick={() => {
@@ -737,7 +737,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                 ) : (
                   <div key={child.id} className="card-elevated p-5">
                     <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-sage/15">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest/10">
                         <span className="text-lg font-bold text-forest">
                           {child.name[0]}
                         </span>
@@ -766,14 +766,14 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                             setShowAddChild(false);
                             setEditingChild(child);
                           }}
-                          className="rounded-[4px] p-2 hover:bg-linen transition-colors"
+                          className="rounded-xl p-2 hover:bg-stone/20 transition-colors"
                         >
                           <Pencil className="h-4 w-4 text-clay/40" />
                         </button>
                         <button
                           onClick={() => handleDeleteChild(child.id)}
                           disabled={deletingChildId === child.id}
-                          className="rounded-[4px] p-2 hover:bg-terracotta/5 transition-colors"
+                          className="rounded-xl p-2 hover:bg-terracotta/5 transition-colors"
                         >
                           {deletingChildId === child.id ? (
                             <Loader2 className="h-4 w-4 animate-spin text-clay/40" />
@@ -792,7 +792,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
           {/* --- Notifications Tab --- */}
           {activeTab === 'notifications' && (
             <div className="card-elevated p-6 sm:p-8 space-y-6">
-              <h2 className="font-display text-xl font-light text-ink">Notification Preferences</h2>
+              <h2 className="font-display text-xl font-semibold text-ink">Notification Preferences</h2>
               <div className="space-y-5">
                 {[
                   {
@@ -820,7 +820,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                     onChange: setCommunity,
                   },
                 ].map((item) => (
-                  <div key={item.label} className="flex items-center justify-between py-3 border-b border-stone last:border-0">
+                  <div key={item.label} className="flex items-center justify-between py-3 border-b border-stone/40 last:border-0">
                     <div>
                       <p className="text-sm font-medium text-ink">{item.label}</p>
                       <p className="text-xs text-clay/50 mt-0.5">{item.description}</p>
@@ -849,7 +849,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
-                      <h2 className="font-display text-xl font-light text-ink">
+                      <h2 className="font-display text-xl font-semibold text-ink">
                         {TIER_LABELS[family.subscriptionTier] || 'Free Plan'}
                       </h2>
                       <span
@@ -918,15 +918,15 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
           {activeTab === 'account' && (
             <div className="space-y-6">
               <div className="card-elevated p-6 sm:p-8 space-y-5">
-                <h2 className="font-display text-xl font-light text-ink">Account</h2>
+                <h2 className="font-display text-xl font-semibold text-ink">Account</h2>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between py-3 border-b border-stone">
+                  <div className="flex items-center justify-between py-3 border-b border-stone/40">
                     <div>
                       <p className="text-sm font-medium text-ink">Email</p>
                       <p className="text-xs text-clay/50">{user.email}</p>
                     </div>
                   </div>
-                  <div className="py-3 border-b border-stone">
+                  <div className="py-3 border-b border-stone/40">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-ink">Password</p>
@@ -964,7 +964,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                 </p>
                 <button
                   onClick={() => setActiveTab('data')}
-                  className="rounded-[4px] border border-terracotta/20 px-4 py-2 text-sm font-medium text-terracotta hover:bg-terracotta/5 transition-colors"
+                  className="rounded-xl border border-terracotta/20 px-4 py-2 text-sm font-medium text-terracotta hover:bg-terracotta/5 transition-colors"
                 >
                   Go to Your Data
                 </button>
@@ -989,11 +989,11 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
               {/* Export Data */}
               <div className="card-elevated p-6 sm:p-8 space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sage/15">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-forest/10">
                     <Download className="h-5 w-5 text-forest" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="font-display text-xl font-light text-ink">Export your data</h2>
+                    <h2 className="font-display text-xl font-semibold text-ink">Export your data</h2>
                     <p className="text-sm text-clay/60 mt-1.5">
                       Download a copy of all your data, including your profile, family details,
                       children, activity logs, education plans, and portfolio entries.
@@ -1016,7 +1016,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
 
               {/* Data Retention Policy */}
               <div className="card-elevated p-6 sm:p-8 space-y-4">
-                <h2 className="font-display text-xl font-light text-ink">Data retention policy</h2>
+                <h2 className="font-display text-xl font-semibold text-ink">Data retention policy</h2>
                 <div className="space-y-3">
                   {[
                     {
@@ -1036,7 +1036,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                       detail: 'We collect anonymous usage analytics to improve the platform. No personal data is shared with third parties.',
                     },
                   ].map((item) => (
-                    <div key={item.label} className="py-3 border-b border-stone last:border-0">
+                    <div key={item.label} className="py-3 border-b border-stone/40 last:border-0">
                       <p className="text-sm font-medium text-ink">{item.label}</p>
                       <p className="text-xs text-clay/50 mt-0.5">{item.detail}</p>
                     </div>
@@ -1051,7 +1051,7 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                     <AlertTriangle className="h-5 w-5 text-terracotta" />
                   </div>
                   <div className="flex-1">
-                    <h2 className="font-display text-xl font-light text-terracotta">Delete my account</h2>
+                    <h2 className="font-display text-xl font-semibold text-terracotta">Delete my account</h2>
                     <p className="text-sm text-clay/60 mt-1.5">
                       This will permanently delete your account and all associated data, including
                       your family profile, children, activity logs, education plans, and portfolio entries.
@@ -1063,26 +1063,26 @@ export function SettingsClient({ user, family, children: initialChildren, notifi
                 {!showDeleteConfirm ? (
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="rounded-[4px] border border-terracotta/20 px-4 py-2 text-sm font-medium text-terracotta hover:bg-terracotta/5 transition-colors"
+                    className="rounded-xl border border-terracotta/20 px-4 py-2 text-sm font-medium text-terracotta hover:bg-terracotta/5 transition-colors"
                   >
                     I want to delete my account
                   </button>
                 ) : (
-                  <div className="space-y-4 p-4 rounded-[4px] bg-terracotta/5 border border-terracotta/20">
+                  <div className="space-y-4 p-4 rounded-2xl bg-terracotta/5 border border-terracotta/20">
                     <p className="text-sm font-medium text-ink">
                       Type <strong>DELETE MY ACCOUNT</strong> to confirm:
                     </p>
                     <Input
                       value={deleteConfirmText}
                       onChange={(e) => setDeleteConfirmText(e.target.value)}
-                      className="rounded-[4px] border-terracotta/30 bg-parchment"
+                      className="border border-terracotta/30 rounded-xl px-3 py-2.5 text-base bg-white"
                       placeholder="DELETE MY ACCOUNT"
                     />
                     <div className="flex items-center gap-3">
                       <button
                         onClick={handleDeleteAccount}
                         disabled={deleteConfirmText !== 'DELETE MY ACCOUNT' || deleteLoading}
-                        className={`rounded-[4px] px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
+                        className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors flex items-center gap-2 ${
                           deleteConfirmText === 'DELETE MY ACCOUNT'
                             ? 'bg-terracotta text-parchment hover:bg-terracotta/90'
                             : 'bg-terracotta/20 text-terracotta/50 cursor-not-allowed'

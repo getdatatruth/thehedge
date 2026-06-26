@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '@/theme/colors';
+import { lightTheme } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { Button } from './Button';
 
@@ -40,9 +40,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <View style={styles.container}>
-          <Text style={styles.title}>Something went wrong</Text>
+          <Text style={styles.title}>Let's take a breath</Text>
           <Text style={styles.message}>
-            {this.state.error?.message || 'An unexpected error occurred.'}
+            Something went astray on our side, not yours.
+            {'\n'}Have another go in a moment and we'll be grand.
           </Text>
           <Button variant="secondary" size="md" onPress={this.handleReset}>
             Try again
@@ -61,17 +62,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing['3xl'],
-    backgroundColor: colors.parchment,
+    backgroundColor: lightTheme.background,
     gap: spacing.md,
   },
   title: {
     fontSize: 18,
     fontWeight: '300',
-    color: colors.ink,
+    color: lightTheme.text,
   },
   message: {
     fontSize: 14,
-    color: colors.clay,
+    color: lightTheme.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },

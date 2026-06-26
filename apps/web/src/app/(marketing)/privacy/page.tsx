@@ -79,7 +79,7 @@ export default function PrivacyPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Supabase:</strong> Database and authentication (EU region)</li>
               <li><strong>Stripe:</strong> Payment processing for subscriptions</li>
-              <li><strong>Anthropic:</strong> AI-powered activity suggestions and insights</li>
+              <li><strong>Anthropic:</strong> generates activity suggestions and insights</li>
               <li><strong>Expo:</strong> Mobile app delivery and push notifications</li>
             </ul>
           </section>

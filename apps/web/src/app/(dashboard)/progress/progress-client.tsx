@@ -107,10 +107,10 @@ export function ProgressClient({
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setSelectedChild(null)}
-            className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-all ${
+            className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
               !selectedChild
-                ? 'bg-forest text-parchment shadow-sm'
-                : 'bg-linen text-clay hover:bg-stone/30'
+                ? 'bg-forest text-parchment'
+                : 'bg-white text-clay border border-stone/40 hover:border-moss/40'
             }`}
           >
             Family
@@ -119,10 +119,10 @@ export function ProgressClient({
             <button
               key={child.id}
               onClick={() => setSelectedChild(child.id)}
-              className={`rounded-2xl px-4 py-2 text-sm font-semibold transition-all flex items-center gap-2 ${
+              className={`rounded-full px-4 py-2 text-sm font-semibold transition-all flex items-center gap-2 ${
                 selectedChild === child.id
-                  ? 'bg-forest text-parchment shadow-sm'
-                  : 'bg-linen text-clay hover:bg-stone/30'
+                  ? 'bg-forest text-parchment'
+                  : 'bg-white text-clay border border-stone/40 hover:border-moss/40'
               }`}
             >
               <div className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
@@ -161,7 +161,7 @@ export function ProgressClient({
       </div>
 
       {/* Tab navigation */}
-      <div className="flex gap-1 bg-linen rounded-2xl p-1">
+      <div className="flex gap-1 bg-white border border-stone/40 rounded-2xl p-1 shadow-sm">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -170,7 +170,7 @@ export function ProgressClient({
               onClick={() => setActiveTab(tab.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
                 activeTab === tab.id
-                  ? 'bg-parchment text-forest shadow-sm'
+                  ? 'bg-forest text-parchment'
                   : 'text-clay hover:text-umber'
               }`}
             >

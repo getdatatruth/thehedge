@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 const plans = [
   {
     name: 'Free',
-    tag: 'Just get started',
+    tag: 'A genuine welcome, not a trial',
     monthly: '€0',
     annual: '€0',
     sub: 'forever',
@@ -22,74 +22,67 @@ const plans = [
     btnTxt: 'Get started free',
     btnHref: 'https://app.thehedge.ie/signup',
     dark: false,
+    lead: 'Everything you need to start: sit down at the Kitchen Table, build your Family Framework, and get an idea every morning.',
     feats: [
-      { t:'1–2 activity ideas per day', on:true },
-      { t:'Curated activity library (limited)', on:true },
-      { t:'5 AI-personalised suggestions per week', on:true },
+      { t:'The Kitchen Table chat, free', on:true },
+      { t:'Your personalised Family Framework', on:true },
+      { t:'A fresh activity idea every day', on:true },
+      { t:'5 personalised suggestions per week', on:true },
+      { t:'Curated activity library', on:true },
       { t:'Basic weekly view', on:true },
-      { t:'iOS & Android app', on:false },
-      { t:'Weather integration', on:false },
-      { t:'Unlimited AI personalisation', on:false },
-      { t:'Full 1,200+ activity library', on:false },
-      { t:'Weekly planner', on:false },
-      { t:'Activity timeline', on:false },
-      { t:'NCCA curriculum mapping', on:false },
-      { t:'AEARS learning logs', on:false },
     ],
+    more: 'For the full week, the whole library and planning tools, move to Family any time.',
   },
   {
     name: 'Family',
-    tag: 'For families who want more',
+    tag: 'The whole week, planned around your family',
     monthly: '€6.99',
     annual: '€59.99',
     sub: '/month',
     btn: 'pcb-terra',
-    btnTxt: '14-day free trial',
+    btnTxt: 'Start 14-day free trial',
     btnHref: 'https://app.thehedge.ie/signup?plan=family',
     dark: false,
     pop: 'Most popular',
+    lead: 'Unlimited ideas, the full library and a planner that adapts to your Family Framework. Try every feature free for 14 days.',
     feats: [
       { t:'Unlimited personalised ideas daily', on:true },
-      { t:'Full 1,200+ activity library', on:true },
+      { t:'Full activity library (over 500)', on:true },
       { t:'Live weather integration', on:true },
       { t:'Weekly planner & calendar', on:true },
       { t:'Activity timeline & logging', on:true },
-      { t:'iOS & Android app', on:true },
       { t:'Share with partner / co-parent', on:true },
-      { t:'NCCA curriculum mapping', on:false },
-      { t:'AEARS learning logs', on:false },
-      { t:'PDF report export', on:false },
-      { t:'IEP support tools', on:false },
     ],
   },
   {
     name: 'Educator',
-    tag: 'Built for homeschoolers',
+    tag: 'Walk into your AEARS assessment prepared',
     monthly: '€14.99',
     annual: '€134.99',
     sub: '/month',
     btn: 'pcb-sage',
-    btnTxt: '14-day free trial',
+    btnTxt: 'Start 14-day free trial',
     btnHref: 'https://app.thehedge.ie/signup?plan=educator',
     dark: true,
+    lead: 'The dated, curriculum-tagged record keeps itself. When your AEARS assessment comes around, the evidence of a rich education is already there - mapped to the NCCA primary curriculum, ready to print.',
     feats: [
-      { t:'Everything in Family', on:true },
-      { t:'NCCA curriculum mapping (all strands)', on:true },
-      { t:'AEARS-compliant learning logs', on:true },
-      { t:'Auto-generated PDF reports', on:true },
+      { t:'Learning logs that build AEARS evidence as you go', on:true },
+      { t:'NCCA primary curriculum mapping', on:true },
+      { t:'Auto-generated PDF reports for your assessor', on:true },
+      { t:'Learning outcome tagging on every activity', on:true },
       { t:'IEP support tools', on:true },
-      { t:'Priority support', on:true },
-      { t:'Bulk activity scheduling', on:true },
       { t:'Multiple child management', on:true },
-      { t:'Learning outcome tagging', on:true },
-      { t:'Export to assessor format', on:true },
-      { t:'Community educator forums', on:true },
+      { t:'Bulk activity scheduling', on:true },
+      { t:'Priority support and educator forums', on:true },
+      { t:'Everything in Family, included', on:true },
     ],
   },
 ];
 
+const planHelper = 'Not sure which? Most home-educating families choose Educator for the AEARS peace of mind. Most other families start free and move to Family when they want the full week.';
+
 const faqs = [
-  { q:"Is there really a free plan?", a:"Yes, genuinely free - not a trial. Our free plan gives you 1–2 activity ideas per day from a curated library, and 5 AI-personalised suggestions per week. No credit card required to sign up." },
+  { q:"Is there really a free plan?", a:"Yes, genuinely free - not a trial. Our free plan gives you 1–2 activity ideas per day from a curated library, and 5 personalised suggestions per week. No credit card required to sign up." },
   { q:"What's included in the free trial?", a:"The 14-day free trial on paid plans gives you full access to every feature on your chosen plan - no restrictions. At the end of 14 days, you can continue by adding a payment method, or drop back to the free plan automatically." },
   { q:"Can I switch plans?", a:"Yes, any time. You can upgrade, downgrade, or cancel from your account settings. If you downgrade mid-cycle, you keep the current plan until the end of the billing period." },
   { q:"Do you offer annual billing?", a:"Yes - pay annually and get roughly 2 months free on both paid plans. Annual pricing: Family €59.99/year (saves €23.89), Educator €134.99/year (saves €44.89)." },
@@ -144,6 +137,7 @@ export default function Pricing() {
                     {p.monthly}<small>{p.sub}</small>
                   </div>
                   <a href={p.btnHref} className={`pc-btn ${p.btn}`}>{p.btnTxt}</a>
+                  {p.lead && <p className={p.dark ? 'ft-l' : 'ft-d'} style={{fontSize:13.5,lineHeight:1.55,margin:'4px 0 16px',opacity:p.dark?0.92:0.85}}>{p.lead}</p>}
                   <ul className="pc-feats">
                     {p.feats.map(f => (
                       <li key={f.t} className={`${p.dark ? 'ft-l' : 'ft-d'} ${!f.on ? 'ft-faded' : ''}`}>
@@ -152,9 +146,12 @@ export default function Pricing() {
                       </li>
                     ))}
                   </ul>
+                  {p.more && <p className={p.dark ? 'ft-l' : 'ft-d'} style={{fontSize:12.5,lineHeight:1.5,marginTop:16,opacity:0.7}}>{p.more}</p>}
                 </div>
               ))}
             </div>
+
+            <p style={{textAlign:'center',maxWidth:620,margin:'28px auto 0',fontSize:14,lineHeight:1.6,color:'var(--clay)'}}>{planHelper}</p>
           </div>
         </section>
 
@@ -186,14 +183,14 @@ export default function Pricing() {
                 <tbody>
                   {[
                     ['Daily activity ideas', '1–2', 'Unlimited', 'Unlimited'],
-                    ['Activity library', 'Limited', '1,200+', '1,200+'],
-                    ['AI personalisation', '5/week', '✓', '✓'],
+                    ['Activity library', 'Limited', 'Over 500', 'Over 500'],
+                    ['Personalised ideas', '5/week', '✓', '✓'],
                     ['Weather integration', '–', '✓', '✓'],
                     ['Weekly planner', '–', '✓', '✓'],
                     ['Activity timeline', '–', '✓', '✓'],
-                    ['iOS & Android app', '–', '✓', '✓'],
-                    ['NCCA curriculum mapping', '–', '–', '✓'],
-                    ['AEARS learning logs', '–', '–', '✓'],
+                    ['iOS and Android apps', '✓', '✓', '✓'],
+                    ['NCCA primary curriculum mapping', '–', '–', '✓'],
+                    ['Learning logs for AEARS evidence', '–', '–', '✓'],
                     ['PDF report export', '–', '–', '✓'],
                     ['IEP support tools', '–', '–', '✓'],
                     ['Priority support', '–', '–', '✓'],

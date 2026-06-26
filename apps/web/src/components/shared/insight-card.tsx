@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, ChevronDown } from 'lucide-react';
+import { Leaf, ChevronDown } from 'lucide-react';
 
 interface InsightCardProps {
   type: 'today' | 'plan_week' | 'activity' | 'progress';
@@ -67,9 +67,9 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-cat-nature/20 bg-cat-nature/5 overflow-hidden">
+      <div className="rounded-2xl border border-stone/40 bg-white shadow-sm overflow-hidden">
         <div className="flex items-center gap-2 px-5 py-3">
-          <Sparkles className="h-3.5 w-3.5 text-cat-nature" />
+          <Leaf className="h-3.5 w-3.5 text-cat-nature" />
           <div className="h-2.5 w-10 rounded-full bg-cat-nature/15 animate-pulse" />
           <div className="h-2.5 w-16 rounded-full bg-cat-nature/10 animate-pulse" />
         </div>
@@ -80,14 +80,14 @@ export function InsightCard({ type, context, enabled = true }: InsightCardProps)
   if (!data) return null;
 
   return (
-    <div className="rounded-2xl border border-cat-nature/20 bg-cat-nature/5 overflow-hidden animate-fade-up">
+    <div className="rounded-2xl border border-stone/40 bg-white shadow-sm overflow-hidden animate-fade-up">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex items-center gap-2 w-full px-5 py-3 text-left cursor-pointer"
       >
-        <Sparkles className="h-3.5 w-3.5 text-cat-nature shrink-0" />
+        <Leaf className="h-3.5 w-3.5 text-cat-nature shrink-0" />
         <span className="flex-1 text-[12px] font-semibold text-cat-nature uppercase tracking-wider">
-          AI Insight
+          A quiet note
         </span>
         <ChevronDown
           className={`h-3.5 w-3.5 text-sage transition-transform ${expanded ? 'rotate-180' : ''}`}

@@ -82,17 +82,19 @@ export async function GET(request: NextRequest) {
 
   // Aistear coverage by category
   const aistearThemes = ['wellbeing', 'identity', 'communicating', 'exploring'];
+  // Maps the real activity_category enum values to Aistear themes. (Previously
+  // keyed on stale category names like 'stem'/'arts', so coverage was always ~0.)
   const categoryToTheme: Record<string, string> = {
     nature: 'exploring',
-    stem: 'exploring',
-    arts: 'communicating',
+    science: 'exploring',
+    maths: 'exploring',
+    art: 'communicating',
     literacy: 'communicating',
-    music: 'communicating',
-    'physical-play': 'wellbeing',
-    cooking: 'wellbeing',
-    'social-emotional': 'identity',
-    culture: 'identity',
-    'life-skills': 'wellbeing',
+    movement: 'wellbeing',
+    kitchen: 'wellbeing',
+    calm: 'wellbeing',
+    life_skills: 'identity',
+    social: 'identity',
   };
 
   const aistearCoverage: Record<string, number> = {};

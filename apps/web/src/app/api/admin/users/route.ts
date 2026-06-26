@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent } from '@/lib/audit';
 
 // PUT: Update a family (tier, suspension, etc.)
 export async function PUT(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const body = await request.json();
     const { id, ...updates } = body;
@@ -31,6 +35,9 @@ export async function PUT(request: NextRequest) {
 
 // DELETE: Delete a family and all associated data
 export async function DELETE(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -69,6 +76,9 @@ export async function DELETE(request: NextRequest) {
 
 // POST: Bulk operations
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const body = await request.json();
     const { operation, familyIds, data } = body;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/admin-auth';
 import { logAuditEvent } from '@/lib/audit';
 
 // ─── In-memory system settings ─────────────────────────
@@ -38,7 +39,10 @@ const settings: SystemSettings = {
   },
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     // Refresh health check timestamp
     settings.systemHealth.lastChecked = new Date().toISOString();
@@ -51,6 +55,9 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth.response;
+
   try {
     const body = await request.json();
     const { action } = body;

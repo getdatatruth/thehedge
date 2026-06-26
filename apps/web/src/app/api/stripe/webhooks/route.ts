@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { capture, AnalyticsEvent } from '@/lib/analytics';
 import type Stripe from 'stripe';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -102,6 +103,12 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`Family ${familyId} subscribed to ${tier} (customer: ${customerId})`);
+
+        // Analytics: subscription activated (distinct id is the family id).
+        await capture(AnalyticsEvent.SUBSCRIPTION_ACTIVATED, familyId, {
+          tier,
+          stripe_customer_id: customerId,
+        });
         break;
       }
 

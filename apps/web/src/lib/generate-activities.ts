@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const anthropic = new Anthropic({
@@ -250,7 +251,7 @@ export async function generateActivities(count: number = 5, options: GenerationO
     const prompt = buildPrompt(existingTitles, count, options);
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: CLAUDE_MODEL,
       max_tokens: 4096,
       messages: [{ role: 'user', content: prompt }],
     });

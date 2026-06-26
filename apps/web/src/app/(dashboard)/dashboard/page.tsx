@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getWeather, getSeason } from '@/lib/weather';
 import { TodayClient } from './today-client';
 import type { MockActivity } from '@/lib/mock-data';
+import { ageInYears, computeAreaWarmth, weightActivity } from '@/lib/personalisation';
 
 export const metadata = {
   title: 'Today - The Hedge',
@@ -38,7 +39,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('name, families(name, county, latitude, longitude, family_style, subscription_tier, subscription_status, trial_ends_at)')
+    .select('name, families(name, county, latitude, longitude, family_style, approach, doorway, subscription_tier, subscription_status, trial_ends_at)')
     .eq('id', user.id)
     .single();
 
@@ -50,6 +51,8 @@ export default async function DashboardPage() {
     latitude: number | null;
     longitude: number | null;
     family_style: string | null;
+    approach: string | null;
+    doorway: string | null;
     subscription_tier: string | null;
     subscription_status: string | null;
     trial_ends_at: string | null;
@@ -71,31 +74,12 @@ export default async function DashboardPage() {
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
-  // Use real activities from the DB only (may be empty)
-  const { data: dbActivities } = await supabase
-    .from('activities')
-    .select('*')
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(20);
-
-  let activities: MockActivity[] = (dbActivities as MockActivity[] | null) || [];
-
-  // Filter for weather
   const isRaining = weather?.isRaining || false;
-  if (isRaining) {
-    activities = activities.filter(
-      (a) =>
-        a.location === 'indoor' ||
-        a.location === 'both' ||
-        a.location === 'anywhere'
-    );
-  }
-
   const familyName = family?.name || 'your family';
   const county = family?.county || 'Ireland';
+  const now = new Date();
 
-  // Get the user's family_id for stats queries
+  // Get the user's family_id
   const { data: userRow } = await supabase
     .from('users')
     .select('family_id')
@@ -104,17 +88,90 @@ export default async function DashboardPage() {
 
   const familyId = userRow?.family_id;
 
-  // Get real children from DB
+  // Real children (with the bits the personalisation engine needs)
   let childNames: string[] = [];
   let childIds: string[] = [];
+  let childCtxs: { age: number | null; interests: string[] }[] = [];
+  let childSchoolStatuses: string[] = [];
   if (familyId) {
     const { data: dbChildren } = await supabase
       .from('children')
-      .select('id, name')
+      .select('id, name, date_of_birth, interests, school_status')
       .eq('family_id', familyId);
     childNames = dbChildren?.map((c) => c.name) || [];
     childIds = dbChildren?.map((c) => c.id) || [];
+    childCtxs = (dbChildren || []).map((c) => ({
+      age: ageInYears(c.date_of_birth, now),
+      interests: (c.interests as string[] | null) || [],
+    }));
+    childSchoolStatuses = (dbChildren || [])
+      .map((c) => (c.school_status as string | null) || '')
+      .filter(Boolean);
   }
+
+  // The "open door" path: prefer the doorway the family chose at the Kitchen
+  // Table; otherwise infer it from any child's school status. (Previously this
+  // was wired to family_style, an unrelated enum, so it never matched and the
+  // homeschool/considering CTA never rendered.)
+  const learningPath =
+    family?.doorway ||
+    (childSchoolStatuses.includes('homeschool')
+      ? 'homeschool'
+      : childSchoolStatuses.includes('considering')
+        ? 'considering'
+        : null);
+
+  // Recent logs feed the invisible "rounded-childhood" warmth signal
+  let warmth = {} as ReturnType<typeof computeAreaWarmth>;
+  if (familyId) {
+    const { data: recentLogs } = await supabase
+      .from('activity_logs')
+      .select('date, activity:activity_id(category)')
+      .eq('family_id', familyId)
+      .order('date', { ascending: false })
+      .limit(200);
+    warmth = computeAreaWarmth(
+      (recentLogs || []).map((l) => ({
+        date: l.date,
+        category: Array.isArray(l.activity) ? l.activity[0]?.category : (l.activity as { category?: string } | null)?.category,
+      })),
+      now,
+    );
+  }
+
+  // Candidate pool, then rank by the personalisation engine so the hero is
+  // age-appropriate, interest-bridged, weather-aware, and gently floor-balanced.
+  const { data: dbActivities } = await supabase
+    .from('activities')
+    .select('*')
+    .eq('published', true)
+    .limit(80);
+
+  const candidates = (dbActivities as MockActivity[] | null) || [];
+  let activities: MockActivity[] = candidates
+    .map((a) => {
+      const af = {
+        category: a.category,
+        ageMin: (a as { age_min?: number }).age_min,
+        ageMax: (a as { age_max?: number }).age_max,
+        interests: (a as { interests?: string[] }).interests,
+        location: a.location,
+        season: (a as { season?: string[] }).season,
+      };
+      const w = childCtxs.length
+        ? Math.max(
+            ...childCtxs.map((cc) =>
+              weightActivity(af, { age: cc.age, childInterests: cc.interests, warmth, isRaining, season }),
+            ),
+          )
+        : weightActivity(af, { age: null, warmth, isRaining, season });
+      return { a, w };
+    })
+    // Rank age-appropriate + interest-bridged to the top (never hard-empty the
+    // day: a less-good fit still beats a blank Today).
+    .sort((x, y) => y.w - x.w)
+    .map((x) => x.a)
+    .slice(0, 24);
 
   // Fetch real weekly plan data
   const { start, end } = getWeekDates();
@@ -231,8 +288,9 @@ export default async function DashboardPage() {
       activitiesThisWeek={activitiesThisWeek}
       planActivities={planActivities}
       isFreeUser={effectiveTier === 'free'}
-      learningPath={family?.family_style}
+      learningPath={learningPath}
       activitiesLogged={activitiesLogged}
+      approach={family?.approach}
     />
   );
 }
