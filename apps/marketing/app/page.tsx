@@ -183,9 +183,11 @@ export default function Home() {
 
             <div className="phone-trio">
               {[
-                { src: '/product/today-mobile.png', t: 'Today', b: 'One gentle idea that fits your crew, the weather, and the day.' },
-                { src: '/product/ask-mobile.png', t: 'Ask', b: 'A calm companion that knows your family. Private, never used to train AI.' },
                 { src: '/product/plan-mobile.png', t: 'Plan', b: 'A timetable, or a gentle rhythm. Your week, your way.' },
+                { src: '/product/keep-mobile.png', t: 'Keep', b: 'Your record, kept for you. Journal, portfolio, and the story of your year.' },
+                { src: '/product/belong-mobile.png', t: 'Belong', b: 'Your local county group of home-educating families, near you.' },
+                { src: '/product/ask-mobile.png', t: 'Ask', b: 'A calm companion that knows your family. Private, never used to train AI.' },
+                { src: '/product/aears-mobile.png', t: 'AEARS ready', b: 'The dated, curriculum-tagged record an assessment looks for, built as you go.' },
               ].map((p) => (
                 <div key={p.t} className="phone-item">
                   <div className="device-iphone">

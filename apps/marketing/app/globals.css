@@ -470,13 +470,17 @@ details.faq-item .faq-a{padding-bottom:20px;font-size:14px;color:var(--clay);lin
 .device-iphone{position:relative;width:236px;border-radius:40px;background:#0D1F12;padding:9px;box-shadow:0 30px 60px rgba(13,31,18,0.34);flex-shrink:0}
 .device-iphone img{display:block;width:100%;height:auto;border-radius:32px}
 .device-float{position:absolute;right:26px;bottom:-34px;z-index:3}
-.phone-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:36px;align-items:start}
-.phone-item{text-align:center}
-.phone-item .device-iphone{margin:0 auto;width:100%;max-width:230px}
+.phone-trio{display:flex;flex-wrap:wrap;justify-content:center;gap:36px 26px;margin-top:42px}
+.phone-item{flex:0 1 198px;text-align:center}
+.phone-item .device-iphone{margin:0 auto;width:100%;max-width:198px}
 .phone-cap-t{margin-top:18px;font-size:15px;font-weight:700;color:var(--ink)}
 .phone-cap-b{margin-top:4px;font-size:13px;color:var(--clay);line-height:1.5}
 @media(max-width:820px){
   .showcase-stage{padding:28px 20px 40px}
   .device-float{position:static;margin:24px auto 0;display:block}
-  .phone-trio{grid-template-columns:1fr;gap:36px;max-width:300px;margin-left:auto;margin-right:auto}
+}
+@media(max-width:560px){
+  .phone-item{flex:0 1 150px}
+  .phone-cap-t{font-size:14px}
+  .phone-cap-b{font-size:12px}
 }
