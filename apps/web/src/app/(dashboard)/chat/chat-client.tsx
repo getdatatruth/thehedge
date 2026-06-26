@@ -144,7 +144,7 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
     <div className="flex flex-col h-[calc(100vh-8rem)] lg:h-[calc(100vh-3rem)]">
       {/* Header */}
       <div className="mb-8">
-        <p className="eyebrow mb-2">HedgeAI</p>
+        <p className="eyebrow mb-2">Ask</p>
         <h1 className="font-display text-3xl sm:text-4xl font-light text-ink tracking-tight">
           Ask <em className="text-moss italic">The Hedge</em>
         </h1>
