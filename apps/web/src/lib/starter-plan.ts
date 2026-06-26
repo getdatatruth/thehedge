@@ -132,15 +132,19 @@ export async function seedStarterWeek(
       // Pull a generous pool of published, age-appropriate activities, then let
       // the personalisation engine float the best fit (age + interests + season)
       // to the top. We never hard-empty the pool, so a calm few always land.
-      const { data: pool } = await supabase
+      // Note: the activities table has no `interests` column (interest fit comes
+      // through category in the weighting), so we must not select it - doing so
+      // errors the whole query and silently empties the pool.
+      const { data: pool, error: poolErr } = await supabase
         .from('activities')
         .select(
-          'id, title, category, duration_minutes, location, interests, age_min, age_max, season, energy_level',
+          'id, title, category, duration_minutes, location, age_min, age_max, season, energy_level',
         )
         .eq('published', true)
         .lte('age_min', age ?? 99)
         .gte('age_max', age ?? 0)
         .limit(120);
+      if (poolErr) console.error('starter-week: activity pool query failed:', poolErr.message);
 
       const activities = (pool || []) as ActivityRow[];
       if (activities.length === 0) continue;
