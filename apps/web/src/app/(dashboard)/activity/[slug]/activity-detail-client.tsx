@@ -92,6 +92,7 @@ export function ActivityDetailClient({
   const allStepsCompleted = instructions.steps.length > 0 && completedSteps.size === instructions.steps.length;
 
   return (
+    <>
     <div className="mx-auto max-w-2xl space-y-8 animate-fade-up pb-24">
       {/* Breadcrumb nav */}
       <div className="flex items-center gap-2 text-sm">
@@ -482,7 +483,11 @@ export function ActivityDetailClient({
         </div>
       )}
 
-      {/* Sticky log button */}
+    </div>
+
+      {/* Sticky log button - outside the animated container so position:fixed
+          pins to the viewport (not the transformed parent), keeping it always
+          visible and easy to find. */}
       {!isPremiumLocked && <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-30 lg:left-[calc(50%+130px)]">
         <LogActivityModal
           activityId={activity.id as string}
@@ -495,6 +500,6 @@ export function ActivityDetailClient({
           </button>
         </LogActivityModal>
       </div>}
-    </div>
+    </>
   );
 }

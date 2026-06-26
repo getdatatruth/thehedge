@@ -109,11 +109,15 @@ export async function GET(request: NextRequest) {
   // Candidate pool, ranked by the personalisation engine so the mobile Thread
   // hero is age-appropriate, interest-bridged and gently floor-balanced. Include
   // the fields the engine + reframe chips need (age, interests, season, location).
-  const { data: candidatePool } = await supabase
-    .from('activities')
-    .select('*')
-    .eq('published', true)
-    .limit(80);
+  // Hard-filter to activities that suit at least one child's actual age (a
+  // 10-year-old's activity should never surface for a 3 and a 7 year old). Ages
+  // are computed live from date of birth, so this tracks children as they grow.
+  const childAges = [...new Set(childCtxs.map((c) => c.age).filter((a): a is number => a != null))];
+  let poolQuery = supabase.from('activities').select('*').eq('published', true);
+  if (childAges.length > 0) {
+    poolQuery = poolQuery.or(childAges.map((a) => `and(age_min.lte.${a},age_max.gte.${a})`).join(','));
+  }
+  const { data: candidatePool } = await poolQuery.limit(120);
 
   const activities = (candidatePool || [])
     .map((a) => {

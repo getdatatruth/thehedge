@@ -56,7 +56,7 @@ export function LogActivityModal({
   const [diaryEntry, setDiaryEntry] = useState('');
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-  const [saveToPortfolio, setSaveToPortfolio] = useState(false);
+  const [saveToPortfolio, setSaveToPortfolio] = useState(true);
   const [rating, setRating] = useState<number | null>(null);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -94,7 +94,7 @@ export function LogActivityModal({
       setDiaryEntry('');
       setPhotos([]);
       setPhotoUrls([]);
-      setSaveToPortfolio(false);
+      setSaveToPortfolio(true);
       setRating(null);
       setError(null);
       setSuccess(false);
@@ -212,7 +212,7 @@ export function LogActivityModal({
               {/* Action buttons */}
               <div className="flex flex-col gap-2">
                 <DialogClose>
-                  <button className="btn-primary w-full justify-center">Grand</button>
+                  <button className="btn-primary w-full justify-center">Done</button>
                 </DialogClose>
                 <a
                   href="/settings"
@@ -474,7 +474,7 @@ export function LogActivityModal({
                   type="button"
                   onClick={() => setSaveToPortfolio(!saveToPortfolio)}
                   className={`relative h-6 w-11 rounded-full transition-colors ${
-                    saveToPortfolio ? 'bg-cat-nature' : 'bg-stone/40'
+                    saveToPortfolio ? 'bg-moss' : 'bg-stone/40'
                   }`}
                 >
                   <span

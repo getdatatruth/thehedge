@@ -141,11 +141,18 @@ export default async function DashboardPage() {
 
   // Candidate pool, then rank by the personalisation engine so the hero is
   // age-appropriate, interest-bridged, weather-aware, and gently floor-balanced.
-  const { data: dbActivities } = await supabase
-    .from('activities')
-    .select('*')
-    .eq('published', true)
-    .limit(80);
+  // Hard-filter to activities that suit at least one child's actual age, so a
+  // 10-year-old's activity never shows up for a family of, say, a 3 and a 7 year
+  // old. Ages are computed live from each child's date of birth, so this tracks
+  // them as they grow without anyone touching a setting.
+  const childAges = [...new Set(childCtxs.map((c) => c.age).filter((a): a is number => a != null))];
+  let activitiesQuery = supabase.from('activities').select('*').eq('published', true);
+  if (childAges.length > 0) {
+    activitiesQuery = activitiesQuery.or(
+      childAges.map((a) => `and(age_min.lte.${a},age_max.gte.${a})`).join(','),
+    );
+  }
+  const { data: dbActivities } = await activitiesQuery.limit(120);
 
   const candidates = (dbActivities as MockActivity[] | null) || [];
   let activities: MockActivity[] = candidates
