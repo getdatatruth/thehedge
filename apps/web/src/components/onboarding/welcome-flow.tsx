@@ -41,15 +41,15 @@ export function WelcomeFlow({ name }: { name?: string | null }) {
   }
 
   return (
-    <div className="mx-auto max-w-xl pb-16 pt-6 animate-scale-in">
+    <div className="mx-auto w-full max-w-xl px-1 pb-10 pt-1 animate-scale-in sm:pt-5">
       <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-moss">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-moss sm:text-sm">
           {hello}{firstName ? `, ${firstName}` : ''}
         </p>
-        <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">
+        <h1 className="mt-2 font-display text-[26px] font-bold leading-tight text-ink sm:mt-3 sm:text-4xl">
           Welcome to The Hedge.
         </h1>
-        <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-clay">
+        <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-clay sm:mt-4 sm:text-[15px]">
           Most apps would hand you a list of activities right now. We do something
           different. Before anything else, we sit down with you at the Kitchen
           Table and get to know your family, the way your days run, and what you
@@ -57,24 +57,24 @@ export function WelcomeFlow({ name }: { name?: string | null }) {
         </p>
       </div>
 
-      <div className="mt-9 rounded-2xl border border-stone bg-parchment/40 p-6 sm:p-7">
-        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.1em] text-umber">
+      <div className="mt-6 rounded-2xl border border-stone bg-parchment/40 p-5 sm:mt-8 sm:p-7">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-umber sm:mb-5">
           How the next few minutes go
         </p>
-        <ol className="space-y-5">
+        <ol className="space-y-4 sm:space-y-5">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
             return (
-              <li key={s.title} className="flex gap-4">
+              <li key={s.title} className="flex gap-3.5 sm:gap-4">
                 <div className="relative flex flex-col items-center">
-                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-moss/12 text-moss">
-                    <Icon className="h-5 w-5" />
+                  <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-moss/12 text-moss sm:h-10 sm:w-10">
+                    <Icon className="h-[18px] w-[18px] sm:h-5 sm:w-5" />
                   </span>
                   {i < STEPS.length - 1 && <span className="mt-1 w-px flex-1 bg-stone" />}
                 </div>
-                <div className="pb-1">
-                  <div className="font-display text-lg font-semibold text-ink">{s.title}</div>
-                  <p className="mt-1 text-sm leading-relaxed text-clay">{s.body}</p>
+                <div className="pb-0.5">
+                  <div className="font-display text-base font-semibold text-ink sm:text-lg">{s.title}</div>
+                  <p className="mt-0.5 text-[13px] leading-relaxed text-clay sm:mt-1 sm:text-sm">{s.body}</p>
                 </div>
               </li>
             );
@@ -82,10 +82,10 @@ export function WelcomeFlow({ name }: { name?: string | null }) {
         </ol>
       </div>
 
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center sm:mt-8">
         <button
           onClick={() => setStarted(true)}
-          className="btn-primary mx-auto h-12 justify-center px-7 text-sm"
+          className="btn-primary mx-auto h-12 w-full justify-center px-7 text-sm sm:w-auto"
         >
           Pull up a chair
           <ArrowRight className="h-4 w-4" />

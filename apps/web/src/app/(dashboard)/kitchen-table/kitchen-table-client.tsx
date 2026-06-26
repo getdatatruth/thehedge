@@ -9,6 +9,7 @@ const INTEREST_OPTIONS = [
   'animals', 'nature', 'art', 'building', 'stories', 'numbers',
   'music', 'sports', 'science', 'cooking', 'dinosaurs', 'space',
 ];
+const AGES = Array.from({ length: 12 }, (_, i) => i + 1); // 1..12
 
 const WHY_CHIPS = [
   { key: 'do_more', label: 'I just want to do more with them' },
@@ -42,7 +43,7 @@ const OUTDOOR_CHIPS = [
   { key: 'none', label: 'Not really' },
 ];
 const TUSLA_CHIPS = [
-  { key: 'not_registered', label: "Not registered / not sure I need to" },
+  { key: 'not_registered', label: 'Not registered / not sure I need to' },
   { key: 'registered', label: 'Registered' },
   { key: 'awaiting', label: 'Awaiting assessment' },
   { key: 'curious', label: 'Just curious about it' },
@@ -60,8 +61,8 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
   const [framework, setFramework] = useState<KTFramework | null>(null);
 
   const isHomeEdLeaning = ['considering', 'school_not_working', 'homeschool'].includes(answers.whyKey || '');
+  const totalQuestions = isHomeEdLeaning ? 7 : 6;
 
-  // Turn definitions in order. Some are special (children, place); the rest are chip turns.
   const record = (q: string, a: string) => setExchanges((e) => [...e, { q, a }]);
 
   async function finish(final: Partial<KTAnswers>) {
@@ -99,92 +100,57 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
 
   if (thinking) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center max-w-md mx-auto">
-        <Leaf className="h-8 w-8 text-moss animate-pulse" />
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center max-w-md mx-auto px-4">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-moss/12">
+          <Leaf className="h-7 w-7 text-moss animate-pulse" />
+        </span>
         <p className="font-display text-2xl font-light text-ink mt-5">Let me read that back to you...</p>
-        <p className="text-[13px] text-clay mt-2 italic">Gathering what you said into something that feels like your family.</p>
+        <p className="text-sm text-clay mt-2 italic">Gathering what you said into something that feels like your family.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto pb-16">
-      {/* Past exchanges, like handwritten notes */}
-      <div className="space-y-6 mb-8">
-        {exchanges.map((e, i) => (
-          <div key={i} className="animate-fade-up">
-            <p className="font-display text-lg font-light text-ink/80 italic">{e.q}</p>
-            <p className="text-[14px] text-moss mt-1.5 font-medium">{e.a}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Step 0: soft open */}
+    <Shell exchanges={exchanges} answered={exchanges.length} total={totalQuestions}>
       {step === 0 && (
         <Turn>
-          <h1 className="font-display text-3xl font-light text-ink leading-tight">Pull up a chair.</h1>
-          <p className="text-[15px] text-clay mt-3 leading-relaxed">
-            Before The Hedge does anything, I&apos;d love to understand your family a little. Just a few questions, and you can say as much or as little as you like.
+          <Speaker />
+          <Question>Pull up a chair.</Question>
+          <p className="mt-3 text-[15px] leading-relaxed text-clay">
+            Before The Hedge does anything, I&apos;d love to understand your family a little.
+            A few gentle questions, and you can say as much or as little as you like.
           </p>
           <PrimaryButton onClick={() => setStep(1)}>Let&apos;s begin</PrimaryButton>
         </Turn>
       )}
 
-      {/* Step 1: who's at the table */}
       {step === 1 && (
         <Turn>
-          <Question>Who are we doing this for?</Question>
-          <p className="text-[13px] text-clay mb-4">Their name, their age, and what they&apos;re mad about lately.</p>
+          <Speaker />
+          <Question>Who&apos;s at the table?</Question>
+          <p className="mt-2 mb-5 text-[14px] text-clay">Add each child, their age, and what they&apos;re mad about lately.</p>
           <div className="space-y-4">
             {children.map((c, i) => (
-              <div key={i} className="rounded-2xl bg-white border border-stone/40 p-4 space-y-3">
-                <div className="flex gap-2 items-center">
-                  <input
-                    value={c.name}
-                    onChange={(ev) => setChildren((cs) => cs.map((x, j) => j === i ? { ...x, name: ev.target.value } : x))}
-                    placeholder="Name"
-                    className="flex-1 min-w-0 rounded-xl border border-stone/50 px-3 py-2.5 text-base focus:outline-none focus:border-moss"
-                  />
-                  <input
-                    value={c.age ?? ''}
-                    onChange={(ev) => setChildren((cs) => cs.map((x, j) => j === i ? { ...x, age: ev.target.value ? parseInt(ev.target.value) : null } : x))}
-                    placeholder="Age"
-                    inputMode="numeric"
-                    className="w-16 shrink-0 rounded-xl border border-stone/50 px-3 py-2.5 text-base text-center focus:outline-none focus:border-moss"
-                  />
-                  {children.length > 1 && (
-                    <button onClick={() => setChildren((cs) => cs.filter((_, j) => j !== i))} className="text-clay/50 hover:text-terracotta">
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {INTEREST_OPTIONS.map((opt) => {
-                    const on = c.interests.includes(opt);
-                    return (
-                      <button
-                        key={opt}
-                        onClick={() => setChildren((cs) => cs.map((x, j) => j === i ? { ...x, interests: on ? x.interests.filter((t) => t !== opt) : [...x.interests, opt] } : x))}
-                        className={`rounded-full px-2.5 py-1 text-[11px] transition-all ${on ? 'bg-moss text-parchment' : 'bg-linen text-clay hover:bg-stone/30'}`}
-                      >
-                        {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <ChildCard
+                key={i}
+                child={c}
+                canRemove={children.length > 1}
+                onChange={(patch) => setChildren((cs) => cs.map((x, j) => (j === i ? { ...x, ...patch } : x)))}
+                onRemove={() => setChildren((cs) => cs.filter((_, j) => j !== i))}
+              />
             ))}
           </div>
-          <div className="mt-4">
-            <button onClick={() => setChildren((cs) => [...cs, { name: '', age: null, interests: [] }])} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-moss">
-              <Plus className="h-3.5 w-3.5" /> Add another
-            </button>
-          </div>
+          <button
+            onClick={() => setChildren((cs) => [...cs, { name: '', age: null, interests: [] }])}
+            className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-dashed border-stone py-3 text-[13px] font-medium text-moss transition-colors hover:border-moss/50 hover:bg-moss/5"
+          >
+            <Plus className="h-4 w-4" /> Add another child
+          </button>
           <PrimaryButton
             disabled={!children.some((c) => c.name.trim())}
             onClick={() => {
               const named = children.filter((c) => c.name.trim());
-              record('Who are we doing this for?', named.map((c) => c.age != null ? `${c.name} (${c.age})` : c.name).join(', '));
+              record('Who are we doing this for?', named.map((c) => (c.age != null ? `${c.name} (${c.age})` : c.name)).join(', '));
               setStep(2);
             }}
           >
@@ -247,22 +213,20 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
 
       {step === 6 && (
         <Turn>
-          <Question>Last bit, where are you, and is there outdoor space?</Question>
+          <Speaker />
+          <Question>Last bit, where are you?</Question>
+          <p className="mt-2 mb-4 text-[14px] text-clay">Your county shapes the weather and what&apos;s on near you. And is there outdoor space?</p>
           <input
             value={answers.county || ''}
             onChange={(ev) => setAnswers((a) => ({ ...a, county: ev.target.value }))}
             placeholder="Your county"
-            className="w-full rounded-xl border border-stone/50 px-3 py-3 text-base focus:outline-none focus:border-moss"
+            className="w-full rounded-2xl border border-stone bg-white px-4 py-3.5 text-base shadow-sm focus:border-moss focus:outline-none focus:ring-2 focus:ring-moss/15"
           />
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="mt-3 flex flex-wrap gap-2">
             {OUTDOOR_CHIPS.map((c) => (
-              <button
-                key={c.key}
-                onClick={() => setAnswers((a) => ({ ...a, outdoor: c.key }))}
-                className={`rounded-full px-3.5 py-1.5 text-[13px] transition-all ${answers.outdoor === c.key ? 'bg-forest text-parchment' : 'bg-linen text-clay hover:bg-stone/30'}`}
-              >
+              <Chip key={c.key} on={answers.outdoor === c.key} onClick={() => setAnswers((a) => ({ ...a, outdoor: c.key }))}>
                 {c.label}
-              </button>
+              </Chip>
             ))}
           </div>
           <PrimaryButton
@@ -289,6 +253,73 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
           submitLabel="Read me my framework"
         />
       )}
+    </Shell>
+  );
+}
+
+// ── Layout shell: a living "what I've heard" rail beside the current question ──
+function Shell({ children, exchanges, answered, total }: {
+  children: React.ReactNode;
+  exchanges: Exchange[];
+  answered: number;
+  total: number;
+}) {
+  const pct = Math.min(100, Math.round((answered / total) * 100));
+  return (
+    <div className="mx-auto w-full max-w-5xl px-4 pb-20">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-12">
+        {/* Rail */}
+        <aside className="lg:sticky lg:top-6">
+          <div className="rounded-3xl border border-stone/60 bg-white/60 p-5 backdrop-blur-sm sm:p-6">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80">The Kitchen Table</span>
+              <span className="text-[11px] font-semibold text-clay">{Math.min(answered, total)} / {total}</span>
+            </div>
+            <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-stone/40">
+              <div className="h-full rounded-full bg-moss transition-all duration-500 ease-out" style={{ width: `${pct}%` }} />
+            </div>
+
+            <div className="mt-5 hidden lg:block">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-clay/70">What I&apos;ve heard</p>
+              {exchanges.length === 0 ? (
+                <p className="mt-3 text-[13.5px] leading-relaxed text-clay/80 italic">
+                  Tell me about your family and I&apos;ll start writing it down here.
+                </p>
+              ) : (
+                <ul className="mt-3 space-y-3.5">
+                  {exchanges.map((e, i) => (
+                    <li key={i} className="flex gap-2.5 animate-fade-up">
+                      <Leaf className="mt-0.5 h-3.5 w-3.5 shrink-0 text-moss" />
+                      <div className="min-w-0">
+                        <div className="text-[10.5px] uppercase tracking-wide text-clay/60">{e.q}</div>
+                        <div className="text-[13.5px] font-medium leading-snug text-ink">{e.a}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </aside>
+
+        {/* Current step */}
+        <div className="min-w-0">
+          <div className="rounded-3xl border border-stone/50 bg-white p-6 shadow-[0_18px_50px_rgba(28,53,32,0.07)] sm:p-8">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Speaker() {
+  return (
+    <div className="mb-3 flex items-center gap-2">
+      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-moss/15">
+        <Leaf className="h-3.5 w-3.5 text-moss" />
+      </span>
+      <span className="text-[12px] font-semibold text-moss">The Hedge</span>
     </div>
   );
 }
@@ -296,18 +327,106 @@ export function KitchenTableClient({ initialStep = 0 }: { initialStep?: number }
 function Turn({ children }: { children: React.ReactNode }) {
   return <div className="animate-fade-up">{children}</div>;
 }
+
 function Question({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-display text-2xl font-light text-ink leading-snug mb-3">{children}</h2>;
+  return <h2 className="font-display text-[26px] font-light leading-snug text-ink sm:text-[30px]">{children}</h2>;
 }
+
+function Chip({ children, on, onClick }: { children: React.ReactNode; on: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full px-4 py-2 text-[13px] font-medium transition-all ${
+        on ? 'bg-forest text-parchment shadow-sm' : 'bg-linen text-clay hover:bg-stone/40'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function PrimaryButton({ children, onClick, disabled }: { children: React.ReactNode; onClick: () => void; disabled?: boolean }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex items-center gap-2 bg-forest text-parchment font-semibold text-sm rounded-2xl px-6 py-3 mt-6 hover:bg-forest/90 transition-colors disabled:opacity-40"
+      className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-6 py-3.5 text-sm font-semibold text-parchment transition-all hover:bg-forest/90 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
     >
       {children} <ArrowRight className="h-4 w-4" />
     </button>
+  );
+}
+
+// ── A warm, clearly-labelled child card with tappable age + interests ──
+function ChildCard({ child, canRemove, onChange, onRemove }: {
+  child: KTChild;
+  canRemove: boolean;
+  onChange: (patch: Partial<KTChild>) => void;
+  onRemove: () => void;
+}) {
+  const initial = child.name.trim() ? child.name.trim()[0].toUpperCase() : null;
+  return (
+    <div className="rounded-3xl border border-stone/50 bg-linen/40 p-4 sm:p-5">
+      <div className="flex items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-moss/15 font-display text-lg font-medium text-moss">
+          {initial || <Leaf className="h-5 w-5" />}
+        </span>
+        <div className="min-w-0 flex-1">
+          <label className="text-[10.5px] font-bold uppercase tracking-wide text-clay/70">Name</label>
+          <input
+            value={child.name}
+            onChange={(e) => onChange({ name: e.target.value })}
+            placeholder="Their name"
+            className="w-full bg-transparent text-lg font-medium text-ink placeholder:font-normal placeholder:text-clay/50 focus:outline-none"
+          />
+        </div>
+        {canRemove && (
+          <button onClick={onRemove} aria-label="Remove child" className="text-clay/40 transition-colors hover:text-terracotta">
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <label className="text-[10.5px] font-bold uppercase tracking-wide text-clay/70">Age</label>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {AGES.map((n) => {
+            const on = child.age === n;
+            return (
+              <button
+                key={n}
+                onClick={() => onChange({ age: on ? null : n })}
+                className={`h-9 w-9 rounded-xl text-[13px] font-semibold transition-all ${
+                  on ? 'bg-forest text-parchment shadow-sm' : 'bg-white text-clay hover:bg-stone/30'
+                }`}
+              >
+                {n}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <label className="text-[10.5px] font-bold uppercase tracking-wide text-clay/70">Mad about lately</label>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {INTEREST_OPTIONS.map((opt) => {
+            const on = child.interests.includes(opt);
+            return (
+              <button
+                key={opt}
+                onClick={() => onChange({ interests: on ? child.interests.filter((t) => t !== opt) : [...child.interests, opt] })}
+                className={`rounded-full px-3 py-1.5 text-[12px] transition-all ${
+                  on ? 'bg-moss text-parchment' : 'bg-white text-clay hover:bg-stone/30'
+                }`}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -370,14 +489,19 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
   const canGo = selected !== null || text.trim().length > 0;
   return (
     <Turn>
+      <Speaker />
       <Question>{question}</Question>
-      {note && <p className="text-[12px] text-moss/80 italic mb-3">{note}</p>}
-      <div className="flex flex-col gap-2">
+      {note && <p className="mt-2 text-[12.5px] italic text-moss/80">{note}</p>}
+      <div className="mt-5 flex flex-col gap-2.5">
         {chips.map((c) => (
           <button
             key={c.key}
             onClick={() => { setSelected(c.key); setText(''); }}
-            className={`text-left rounded-2xl px-4 py-3 text-[14px] transition-all border ${selected === c.key ? 'bg-forest text-parchment border-forest' : 'bg-white text-ink border-stone/40 hover:border-moss/40'}`}
+            className={`rounded-2xl border px-4 py-3.5 text-left text-[14.5px] transition-all ${
+              selected === c.key
+                ? 'border-forest bg-forest text-parchment shadow-sm'
+                : 'border-stone/50 bg-white text-ink hover:border-moss/50 hover:bg-moss/[0.03]'
+            }`}
           >
             {c.label}
           </button>
@@ -389,16 +513,16 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
             value={text}
             onChange={(e) => { setText(e.target.value); if (e.target.value) setSelected(null); }}
             placeholder={speech.listening ? 'Listening, just talk away...' : placeholder}
-            rows={3}
-            className="w-full rounded-2xl border border-stone/40 px-4 py-3 pr-14 text-base focus:outline-none focus:border-moss resize-none"
+            rows={2}
+            className="w-full resize-none rounded-2xl border border-stone/50 bg-white px-4 py-3 pr-14 text-base shadow-sm focus:border-moss focus:outline-none focus:ring-2 focus:ring-moss/15"
           />
           {speech.supported && (
             <button
               type="button"
               onClick={speech.toggle}
               aria-label={speech.listening ? 'Stop recording' : 'Speak your answer'}
-              className={`absolute right-3 bottom-3 flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
-                speech.listening ? 'bg-terracotta text-white animate-pulse' : 'bg-moss/10 text-moss hover:bg-moss/20'
+              className={`absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+                speech.listening ? 'animate-pulse bg-terracotta text-white' : 'bg-moss/10 text-moss hover:bg-moss/20'
               }`}
             >
               <Mic className="h-4 w-4" />
@@ -407,7 +531,7 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
         </div>
       )}
       {placeholder && speech.supported && !speech.listening && (
-        <p className="text-[12px] text-clay/70 mt-2">Prefer to talk? Tap the mic and just say it.</p>
+        <p className="mt-2 text-[12px] text-clay/70">Prefer to talk? Tap the mic and just say it.</p>
       )}
       <PrimaryButton disabled={!canGo} onClick={() => onSubmit(selected || 'other', text.trim() || undefined)}>
         {submitLabel || 'Continue'}
@@ -418,22 +542,24 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
 
 function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone: () => void }) {
   return (
-    <div className="max-w-xl mx-auto pb-16 animate-fade-up">
-      <div className="text-center mb-8">
-        <Leaf className="h-7 w-7 text-moss mx-auto" />
-        <h1 className="font-display text-3xl font-light text-ink mt-3">Your Family Framework</h1>
-        <p className="text-[14px] text-clay mt-2 italic">{framework.opening}</p>
+    <div className="mx-auto max-w-xl px-4 pb-16 animate-fade-up">
+      <div className="mb-8 text-center">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-moss/12">
+          <Leaf className="h-6 w-6 text-moss" />
+        </span>
+        <h1 className="mt-4 font-display text-3xl font-light text-ink">Your Family Framework</h1>
+        <p className="mt-2 text-[14px] italic text-clay">{framework.opening}</p>
       </div>
 
       <Section title="What you told me">
-        <p className="text-[15px] text-umber leading-relaxed">{framework.whatYouToldMe}</p>
+        <p className="text-[15px] leading-relaxed text-umber">{framework.whatYouToldMe}</p>
       </Section>
 
       <Section title="How The Hedge will work for you">
         <ul className="space-y-2.5">
           {framework.commitments.map((c, i) => (
-            <li key={i} className="flex gap-2.5 text-[15px] text-umber leading-relaxed">
-              <Leaf className="h-4 w-4 text-moss shrink-0 mt-1" />
+            <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-umber">
+              <Leaf className="mt-1 h-4 w-4 shrink-0 text-moss" />
               <span>{c}</span>
             </li>
           ))}
@@ -441,27 +567,27 @@ function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone
       </Section>
 
       <Section title="The quiet floor">
-        <p className="text-[15px] text-umber leading-relaxed">{framework.quietFloor}</p>
+        <p className="text-[15px] leading-relaxed text-umber">{framework.quietFloor}</p>
       </Section>
 
       <Section title="For your worry">
-        <p className="text-[15px] text-umber leading-relaxed">{framework.forYourWorry}</p>
+        <p className="text-[15px] leading-relaxed text-umber">{framework.forYourWorry}</p>
       </Section>
 
       <Section title="Three things you can do today">
         <ul className="space-y-2.5">
           {framework.thingsToday.map((t, i) => (
-            <li key={i} className="flex gap-2.5 text-[15px] text-umber leading-relaxed">
-              <span className="font-display text-moss font-medium">{i + 1}</span>
+            <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed text-umber">
+              <span className="font-display font-medium text-moss">{i + 1}</span>
               <span>{t}</span>
             </li>
           ))}
         </ul>
       </Section>
 
-      <p className="text-center text-[12px] text-clay/70 italic mt-8">This is yours. Tweak anything from Our Hedge whenever you like.</p>
+      <p className="mt-8 text-center text-[12px] italic text-clay/70">This is yours. Tweak anything from Our Hedge whenever you like.</p>
       <div className="text-center">
-        <button onClick={onDone} className="inline-flex items-center gap-2 bg-forest text-parchment font-semibold text-sm rounded-2xl px-7 py-3 mt-5 hover:bg-forest/90 transition-colors">
+        <button onClick={onDone} className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-forest px-7 py-3.5 text-sm font-semibold text-parchment transition-colors hover:bg-forest/90">
           This is us, into The Hedge <ArrowRight className="h-4 w-4" />
         </button>
       </div>
@@ -471,8 +597,8 @@ function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl bg-sage/8 border border-sage/15 p-5 mb-4">
-      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80 mb-2.5">{title}</p>
+    <div className="mb-4 rounded-2xl border border-sage/15 bg-sage/8 p-5">
+      <p className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80">{title}</p>
       {children}
     </div>
   );
