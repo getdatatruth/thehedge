@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
-import { createClient } from '@/lib/supabase/server';
+import { createApiClient } from '@/lib/supabase/api-client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { coordsForCounty } from '@/lib/ie-counties';
 import {
@@ -18,8 +18,10 @@ import { seedStarterWeek } from '@/lib/starter-plan';
 // Takes the kitchen-table answers, writes the Family Framework (one invisible
 // LLM pass with a deterministic fallback), persists the spine, and returns it.
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // Accept both cookie auth (web) and Bearer-token auth (mobile). The mobile app
+  // sends its Supabase access token as a Bearer header; cookie-only auth here was
+  // rejecting every mobile submit with a 401.
+  const { supabase, user } = await createApiClient(request);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   let answers: KTAnswers;
