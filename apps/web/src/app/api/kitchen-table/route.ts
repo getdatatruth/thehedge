@@ -145,9 +145,12 @@ export async function POST(request: NextRequest) {
 
   // Seed a gentle, personalised starter week so the Plan tab (and the week) feel
   // alive from minute one rather than landing empty. Best-effort and idempotent:
-  // it only seeds when the family has no daily_plans yet, and any failure is
-  // swallowed so onboarding is never blocked.
-  await seedStarterWeek(supabase, familyId, profile.approach);
+  // it only seeds when the family has no daily_plans yet. Uses the service-role
+  // client for the same reason the bootstrap above does: a brand-new family's
+  // RLS context lags within this request, so the user client cannot reliably
+  // read the rows it writes. The seeder scopes every read and write to this
+  // family's own ids, so this is safe.
+  await seedStarterWeek(createAdminClient(), familyId, profile.approach);
 
   return NextResponse.json({ framework, profile });
 }
