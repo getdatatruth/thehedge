@@ -101,3 +101,19 @@ export const apiDelete = <T>(path: string, body?: unknown) =>
 // Non-versioned API routes (e.g. /api/onboarding, /api/stripe/*)
 export const apiRootPost = <T>(path: string, body: unknown) =>
   api<T>(path, { method: 'POST', body: JSON.stringify(body) }, { useRoot: true });
+
+// Frictionless signup: create a ready-to-use, pre-confirmed account server-side
+// (mirrors the web) so there is no email-confirmation round-trip. The caller then
+// signs in with the same password. This route returns { ok } / { error } rather
+// than the { success, data } envelope, so we call it with a plain fetch.
+export async function signUpAccount(email: string, password: string, name: string): Promise<void> {
+  const res = await fetch(`${API_ROOT}/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, name }),
+  });
+  const json = (await res.json().catch(() => ({}))) as { error?: string };
+  if (!res.ok) {
+    throw new Error(json?.error || 'Could not create your account');
+  }
+}

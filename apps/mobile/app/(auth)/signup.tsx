@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Leaf } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
+import { signUpAccount } from '@/lib/api';
 import { Input } from '@/components/ui/Input';
 import { darkTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
@@ -35,18 +36,22 @@ export default function SignupScreen() {
     setLoading(true);
     setError(null);
 
-    const { error: signUpError } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        data: { name: name.trim() },
-      },
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
+    try {
+      // Create a ready-to-use, pre-confirmed account (no email-confirmation
+      // round-trip), then sign in. Mirrors the web so a new family goes straight
+      // to onboarding instead of a dead confirmation link.
+      await signUpAccount(email.trim(), password, name.trim());
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (signInError) {
+        setError(signInError.message);
+      }
+      // On success the auth state change redirects to onboarding.
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not create your account');
     }
-    // Auth state change will redirect to onboarding
     setLoading(false);
   };
 
