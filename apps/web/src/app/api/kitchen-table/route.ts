@@ -8,6 +8,7 @@ import {
   deriveProfile,
   buildFallbackFramework,
   frameworkPrompt,
+  frameworkToMarkdown,
   type KTAnswers,
   type KTFramework,
 } from '@/lib/kitchen-table';
@@ -153,21 +154,4 @@ export async function POST(request: NextRequest) {
   await seedStarterWeek(createAdminClient(), familyId, profile.approach);
 
   return NextResponse.json({ framework, profile });
-}
-
-function frameworkToMarkdown(f: KTFramework): string {
-  return [
-    `# Your Family Framework`,
-    f.opening,
-    `## What you told me`,
-    f.whatYouToldMe,
-    `## How The Hedge will work for you`,
-    ...f.commitments.map((c) => `- ${c}`),
-    `## The quiet floor`,
-    f.quietFloor,
-    `## For your worry`,
-    f.forYourWorry,
-    `## Three things you can do today`,
-    ...f.thingsToday.map((t) => `- ${t}`),
-  ].join('\n\n');
 }

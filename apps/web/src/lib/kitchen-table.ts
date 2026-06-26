@@ -190,6 +190,26 @@ function answerKeyForWorry(p: KTProfile): string {
 
 // The single invisible extraction/authoring pass: turn the answers into a warm
 // Framework in the parent's register. Returns a strict JSON shape.
+// Render a framework to the markdown we store in `rendered_markdown`, which is
+// what the AI (Ask, insights) reads as its knowledge of the family. Editing the
+// framework must re-render this so the AI stays in sync with what the parent set.
+export function frameworkToMarkdown(f: KTFramework): string {
+  return [
+    `# Your Family Framework`,
+    f.opening || '',
+    `## What you told me`,
+    f.whatYouToldMe || '',
+    `## How The Hedge will work for you`,
+    ...(f.commitments || []).map((c) => `- ${c}`),
+    `## The quiet floor`,
+    f.quietFloor || '',
+    `## For your worry`,
+    f.forYourWorry || '',
+    `## Three things you can do today`,
+    ...(f.thingsToday || []).map((t) => `- ${t}`),
+  ].join('\n\n');
+}
+
 export function frameworkPrompt(p: KTProfile): string {
   return `You are The Hedge, a warm, wise, calm companion that helps Irish families run their children's learning their own way. A parent has just had a short kitchen-table chat with you. Write their one-page "Family Framework" back to them, second person, like handwritten notes from a friend who already runs a hedge school.
 

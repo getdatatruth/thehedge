@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Leaf, RefreshCw, Users, CreditCard, ShieldCheck, ChevronRight, ArrowRight } from 'lucide-react';
+import { RefreshCw, Users, CreditCard, ShieldCheck, ChevronRight, ArrowRight } from 'lucide-react';
 import { SignOutButton } from './sign-out-button';
+import { FrameworkEditor } from './framework-editor';
 import type { KTFramework } from '@/lib/kitchen-table';
 
 export const metadata = { title: 'Our Hedge - The Hedge' };
@@ -68,22 +69,7 @@ export default async function OurHedgePage() {
         </div>
 
         {framework ? (
-          <div className="space-y-3">
-            {framework.whatYouToldMe && (
-              <FwCard title="What you told me"><p>{framework.whatYouToldMe}</p></FwCard>
-            )}
-            {framework.commitments?.length > 0 && (
-              <FwCard title="How The Hedge works for you">
-                <ul className="space-y-2.5">
-                  {framework.commitments.map((c, i) => (
-                    <li key={i} className="flex gap-2.5"><Leaf className="h-4 w-4 text-moss shrink-0 mt-1" /><span>{c}</span></li>
-                  ))}
-                </ul>
-              </FwCard>
-            )}
-            {framework.quietFloor && <FwCard title="The quiet floor"><p>{framework.quietFloor}</p></FwCard>}
-            {framework.forYourWorry && <FwCard title="For your worry"><p>{framework.forYourWorry}</p></FwCard>}
-          </div>
+          <FrameworkEditor initial={framework} />
         ) : (
           <div className="rounded-2xl bg-white border border-stone/40 shadow-sm p-6 text-center">
             <p className="text-[14px] text-umber font-medium">You have not pulled up a chair at the Kitchen Table yet.</p>
@@ -107,15 +93,6 @@ export default async function OurHedgePage() {
           <SignOutButton />
         </div>
       </section>
-    </div>
-  );
-}
-
-function FwCard({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl bg-white border border-stone/40 shadow-sm p-5">
-      <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-moss/80 mb-2.5">{title}</p>
-      <div className="text-[15px] text-umber leading-relaxed">{children}</div>
     </div>
   );
 }
