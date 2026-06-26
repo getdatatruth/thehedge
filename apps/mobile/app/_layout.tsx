@@ -32,19 +32,31 @@ function RootNavigator() {
   useEffect(() => {
     if (!isInitialized || isLoading) return;
 
-    const inOnboarding = segments.join('/').includes('onboarding');
+    // The Kitchen Table IS the onboarding flow, so it must count as "in
+    // onboarding" - otherwise the router bounces between /onboarding and
+    // /kitchen-table forever and the app appears to crash.
+    const path = segments.join('/');
+    const inOnboarding = path.includes('onboarding') || path.includes('kitchen-table');
 
-    if (!session && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (session && inAuthGroup) {
-      if (!profile || !profile.onboarding_completed) {
-        // Only redirect to onboarding index if not already in the onboarding flow
-        if (!inOnboarding) {
-          router.replace('/(auth)/onboarding');
-        }
+    if (!session) {
+      if (!inAuthGroup) router.replace('/(auth)/login');
+      return;
+    }
+
+    const notOnboarded = !profile || !profile.onboarding_completed;
+
+    if (inAuthGroup) {
+      // In the auth flow. A fresh signup (profile still loading or unset) belongs
+      // in onboarding; a returning, onboarded user belongs in the app.
+      if (notOnboarded) {
+        if (!inOnboarding) router.replace('/(auth)/onboarding');
       } else {
         router.replace('/(tabs)');
       }
+    } else if (profile && !profile.onboarding_completed && !inOnboarding) {
+      // Signed in but slipped onto the app without finishing onboarding (only
+      // act once the profile has loaded, so returning users do not flash this).
+      router.replace('/(auth)/onboarding');
     }
   }, [session, profile, isInitialized, isLoading, segments, router]);
 

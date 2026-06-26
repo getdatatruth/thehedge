@@ -87,7 +87,7 @@ export default function KitchenTableScreen() {
         onboarding_completed: (data.family as { onboarding_completed?: boolean }).onboarding_completed ?? true,
       });
       setFamily(data.family);
-      const withAges: Child[] = data.children.map((c) => {
+      const withAges: Child[] = (data.children || []).map((c) => {
         const dob = new Date(c.date_of_birth);
         const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
         return { ...c, age };
