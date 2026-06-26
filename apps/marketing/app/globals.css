@@ -104,7 +104,6 @@ footer{background:#0F1E11;padding:64px 20px 32px}
 .hero-body{font-family:var(--font-serif);font-size:clamp(16px,3vw,19px);line-height:1.65;color:var(--clay);margin-bottom:12px}
 .hero-sub{font-size:14px;color:var(--clay);line-height:1.6;margin-bottom:36px}
 .hero-sub strong{color:var(--forest)}
-.hero-cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:22px 0 30px}
 .hero-panel{background:var(--forest);padding:40px 20px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .hero-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 30%,rgba(94,139,82,0.4),transparent),radial-gradient(ellipse 60% 80% at 30% 70%,rgba(61,97,66,0.5),transparent)}
 .proof{display:flex;align-items:center;gap:12px;padding-top:24px;border-top:1px solid var(--stone);flex-wrap:wrap;row-gap:8px}
@@ -520,22 +519,26 @@ details.faq-item .faq-a{padding-bottom:20px;font-size:14px;color:var(--clay);lin
   .tour-active-cap{display:block;order:2;text-align:center;max-width:360px;margin:2px auto 0;font-size:14.5px;color:var(--clay);line-height:1.6}
 }
 
-/* Walkthrough step number sits in the tour icon slot */
-.tour-num{font-family:var(--font-display,Georgia,serif);font-weight:600;font-size:18px;line-height:1}
+/* HOW IT WORKS - interactive steps (original look) + frameless mockup */
+.hiw{display:grid;grid-template-columns:1.05fr 0.78fr;gap:56px;align-items:center}
+.hiw-left{min-width:0}
+.hiw-steps{display:flex;flex-direction:column;margin-top:8px}
+.hiw-step{display:flex;gap:20px;align-items:flex-start;text-align:left;width:100%;background:transparent;border:none;border-top:1px solid var(--stone);padding:24px 18px;border-radius:14px;cursor:pointer;transition:background .2s ease,box-shadow .28s ease,transform .28s ease}
+.hiw-steps .hiw-step:last-child{border-bottom:1px solid var(--stone)}
+.hiw-step:not(.on):hover{background:rgba(255,255,255,0.6)}
+.hiw-step.on{background:#fff;border-top-color:transparent;box-shadow:0 18px 44px rgba(28,53,32,0.12);transform:translateY(-1px)}
+.hiw-step.on + .hiw-step{border-top-color:transparent}
+.hiw-step .step-num{transition:color .2s ease}
+.hiw-step.on .step-num{color:var(--moss)}
 
-/* Hero visual: a phone showing the Family Framework on the forest panel */
-.hero-phone{position:relative;z-index:1;width:258px;border-radius:46px;background:#0D1F12;padding:10px;box-shadow:0 50px 100px rgba(0,0,0,0.42),0 0 0 1px rgba(245,240,228,0.10),inset 0 0 0 1px rgba(255,255,255,0.04)}
-.hero-phone-screen{position:relative;border-radius:36px;overflow:hidden;aspect-ratio:390/844;background:#F2F5F0}
-.hero-phone-screen img{display:block;width:100%;height:auto}
-.hero-phone-cap{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);white-space:nowrap;background:var(--parchment);color:var(--forest);font-size:12px;font-weight:600;letter-spacing:-0.01em;padding:7px 15px;border-radius:999px;box-shadow:0 12px 30px rgba(0,0,0,0.22)}
-
-/* Kitchen Table modal (CTA-triggered) */
-.kt-modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(13,31,18,0.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:20px;animation:ktFade .22s ease}
-.kt-modal{position:relative;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding:30px 26px 26px;border-radius:30px;background:radial-gradient(ellipse 80% 55% at 65% 12%,rgba(94,139,82,0.34),transparent),radial-gradient(ellipse 70% 70% at 25% 90%,rgba(61,97,66,0.42),transparent),var(--forest);box-shadow:0 50px 120px rgba(0,0,0,0.45);animation:ktRise .26s cubic-bezier(0.22,1,0.36,1);scrollbar-width:none}
-.kt-modal::-webkit-scrollbar{display:none}
-.kt-modal .kt-demo{max-width:none;margin:0}
-.kt-modal-close{position:absolute;top:13px;right:13px;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;background:rgba(245,240,228,0.13);color:var(--parchment);font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;z-index:6;transition:background .2s}
-.kt-modal-close:hover{background:rgba(245,240,228,0.26)}
-@keyframes ktFade{from{opacity:0}to{opacity:1}}
-@keyframes ktRise{from{opacity:0;transform:translateY(14px) scale(0.98)}to{opacity:1;transform:none}}
-@media(max-width:520px){.kt-modal{padding:26px 18px 20px;border-radius:24px}}
+/* The frameless mockup: a clean rounded rectangle, no device frame */
+.hiw-media-wrap{display:flex;align-items:center;justify-content:center}
+.hiw-media{position:relative;width:100%;max-width:296px;aspect-ratio:390/844;border-radius:22px;overflow:hidden;background:#F2F5F0;box-shadow:0 36px 80px rgba(28,53,32,0.22),0 0 0 1px rgba(28,53,32,0.06)}
+.hiw-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transform:scale(1.015);transition:opacity .55s ease,transform .55s ease}
+.hiw-media img.on{opacity:1;transform:scale(1)}
+@media(max-width:860px){
+  .hiw{grid-template-columns:1fr;gap:34px}
+  .hiw-media-wrap{order:0}
+  .hiw-left{order:1}
+  .hiw-media{max-width:260px}
+}

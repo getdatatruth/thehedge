@@ -4,8 +4,8 @@ import Nav from '../components/Nav';
 import FAQ from '../components/FAQ';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icons';
-import HeroDemo from '../components/HeroDemo';
-import OnboardingWalkthrough from '../components/OnboardingWalkthrough';
+import KitchenTableDemo from '../components/KitchenTableDemo';
+import HowItWorks from '../components/HowItWorks';
 import ProductTour from '../components/ProductTour';
 
 export const metadata: Metadata = {
@@ -56,16 +56,11 @@ export default function Home() {
             </h1>
             <p className="hero-body">Most apps hand every family the same list. The Hedge sits down with you at the Kitchen Table, learns your children, your values and your rhythm, then writes your family its own plan. Learning that feels like a breath, not a battle.</p>
 
-            <div className="hero-cta-row fade-up-2">
-              <HeroDemo />
-              <Link href="#how" className="btn-ghost">See how it works <Icon id="arrow-r" size={14} /></Link>
-            </div>
-
             <div className="doorways fade-up-2" role="navigation" aria-label="Choose your path">
-              <Link href="https://app.thehedge.ie/signup" className="doorway">
+              <Link href="#kitchen-table" className="doorway">
                 <span className="doorway-eyebrow"><Icon id="sun" size={11} color="currentColor" /> Everyday family life</span>
                 <span className="doorway-title">Ideas that fit your day</span>
-                <span className="doorway-body">Screen-free things to do, shaped by your children, your county and the weather.</span>
+                <span className="doorway-body">Screen-free things to do, shaped by your children, your county and the weather. See what we&apos;d write for you.</span>
               </Link>
               <Link href="/homeschool" className="doorway">
                 <span className="doorway-eyebrow"><Icon id="book" size={11} color="currentColor" /> Home education</span>
@@ -81,14 +76,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hero-panel">
-            <div className="hero-phone fade-up-2">
-              <div className="hero-phone-screen">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/product/framework-mobile.png" alt="A Family Framework written for one family by The Hedge, reading back what was shared at the Kitchen Table" />
-              </div>
-              <span className="hero-phone-cap">Written for your family</span>
-            </div>
+          <div className="hero-panel" id="kitchen-table">
+            <KitchenTableDemo />
           </div>
         </section>
 
@@ -110,18 +99,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ── HOW IT WORKS (interactive walkthrough) ── */}
+        {/* ── HOW IT WORKS (interactive steps + frameless mockup) ── */}
         <section className="section" id="how" aria-labelledby="hiw-title">
           <div className="container">
-            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">As easy as it gets</span></div>
-            <h2 className="section-title" id="hiw-title">How The Hedge <em>works</em></h2>
-            <p className="section-body" style={{maxWidth:560}}>It begins with a conversation, not a form. Then everything is shaped around what you tell it. Step through the real setup below.</p>
-
-            <OnboardingWalkthrough />
-
-            <div style={{marginTop:36,textAlign:'center'}}>
-              <Link href="/how-it-works" className="btn-ghost">See the full walkthrough <Icon id="arrow-r" size={14} /></Link>
-            </div>
+            <HowItWorks />
           </div>
         </section>
 
