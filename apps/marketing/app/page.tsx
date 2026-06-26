@@ -5,6 +5,7 @@ import FAQ from '../components/FAQ';
 import Footer from '../components/Footer';
 import { Icon } from '../components/Icons';
 import KitchenTableDemo from '../components/KitchenTableDemo';
+import ProductTour from '../components/ProductTour';
 
 export const metadata: Metadata = {
   title: 'The Hedge - Learning that fits your family',
@@ -163,42 +164,9 @@ export default function Home() {
           <div className="container">
             <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">See it for yourself</span></div>
             <h2 className="section-title" id="showcase-title">The whole product, <em>shaped around your family</em></h2>
-            <p className="section-body" style={{ maxWidth: 560 }}>One calm home for your days, your plan, your record, and your questions. On your laptop, and in your pocket.</p>
+            <p className="section-body" style={{ maxWidth: 560 }}>One calm home for your days, your plan, your record, and your questions. Have a look around.</p>
 
-            <div className="showcase-stage">
-              <div className="app-window">
-                <div className="app-window-bar">
-                  <span className="awd" style={{ background: '#E8927C' }} />
-                  <span className="awd" style={{ background: '#E8C46A' }} />
-                  <span className="awd" style={{ background: 'var(--sage)' }} />
-                </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/product/today-desktop.png" alt="The Hedge Today screen, a day shaped around your family" />
-              </div>
-              <div className="device-iphone device-float">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/product/today-mobile.png" alt="The Hedge on a phone" />
-              </div>
-            </div>
-
-            <div className="phone-trio">
-              {[
-                { src: '/product/plan-mobile.png', t: 'Plan', b: 'A timetable, or a gentle rhythm. Your week, your way.' },
-                { src: '/product/keep-mobile.png', t: 'Keep', b: 'Your record, kept for you. Journal, portfolio, and the story of your year.' },
-                { src: '/product/belong-mobile.png', t: 'Belong', b: 'Your local county group of home-educating families, near you.' },
-                { src: '/product/ask-mobile.png', t: 'Ask', b: 'A calm companion that knows your family. Private, never used to train AI.' },
-                { src: '/product/aears-mobile.png', t: 'AEARS ready', b: 'The dated, curriculum-tagged record an assessment looks for, built as you go.' },
-              ].map((p) => (
-                <div key={p.t} className="phone-item">
-                  <div className="device-iphone">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.src} alt={`The Hedge ${p.t} on a phone`} />
-                  </div>
-                  <div className="phone-cap-t">{p.t}</div>
-                  <div className="phone-cap-b">{p.b}</div>
-                </div>
-              ))}
-            </div>
+            <ProductTour />
           </div>
         </section>
 
