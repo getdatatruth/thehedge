@@ -67,15 +67,17 @@ export function AuthProvider({ children: childrenProp }: { children: React.React
   const loadUserData = useCallback(async () => {
     try {
       const { data } = await apiGet<MeResponse>('/me');
-      // onboarding_completed lives on family in the API, merge onto profile for routing
+      // onboarding_completed lives on family in the API, merge onto profile for
+      // routing. Default to false so a brand-new family (no family yet, or the
+      // flag unset) is sent to the Kitchen Table rather than skipped past it.
       setProfile({
         ...data.user,
-        onboarding_completed: (data.family as any).onboarding_completed ?? true,
+        onboarding_completed: (data.family as { onboarding_completed?: boolean } | null)?.onboarding_completed ?? false,
       });
       setFamily(data.family);
 
       // Calculate ages
-      const childrenWithAges: Child[] = data.children.map((c) => {
+      const childrenWithAges: Child[] = (data.children || []).map((c) => {
         const dob = new Date(c.date_of_birth);
         const age = Math.floor(
           (Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
