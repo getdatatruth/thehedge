@@ -20,8 +20,9 @@ import {
   FolderOpen,
   ClipboardCheck,
 } from 'lucide-react-native';
-// Note: AEARS (the Tusla assessment of education in a place other than a
-// recognised school) sets NO minimum number of hours or attendance days.
+// Note: in Ireland you register WITH Tusla, VIA AEARS (the Alternative Education
+// Assessment and Registration Service, a service within Tusla). There is no
+// required curriculum, no minimum number of hours and no attendance requirement.
 // This screen helps a family organise evidence and track their registration.
 // It is not an official Tusla product and not legal advice.
 import { Card } from '@/components/ui/Card';
@@ -178,7 +179,7 @@ function StatusTracker({
                 {next === 'in_progress'
                   ? 'Begin getting ready'
                   : next === 'submitted'
-                  ? 'Mark as sent to Tusla'
+                  ? 'Mark application as sent'
                   : 'Mark as on the register'}
               </Text>
               <ChevronRight size={16} color="#FFFFFF" />
@@ -282,7 +283,7 @@ function DeadlinesCard({ status }: { status: RegistrationStatus }) {
 
       <Text style={styles.framing}>
         A gentle rhythm to keep in mind. These are a guide, not fixed legal
-        dates. AEARS has no single deadline.
+        dates. There is no single deadline to register.
       </Text>
 
       <View style={styles.timeline}>
@@ -398,8 +399,8 @@ function ChildTusla({
       />
 
       <ChecklistCard
-        title="What an assessor tends to look for"
-        framing="An AEARS assessor looks at whether a certain minimum education is being provided. There is no minimum number of hours or days."
+        title="What an assessor tends to look at"
+        framing="Assessment has two stages: a preliminary questionnaire and a meeting with you, then, if needed, a comprehensive home visit by an assessor (an authorised person appointed by Tusla). They look at whether a certain minimum education is being provided. There is no required curriculum, no minimum number of hours and no attendance requirement."
         icon={<ClipboardCheck size={15} color={lightTheme.primary} />}
         items={assessment}
         onToggle={toggleAssessment}
@@ -539,15 +540,21 @@ export default function TuslaScreen() {
                 <Text style={styles.infoTitle}>A few honest words</Text>
                 <Text style={styles.infoBody}>
                   This is not an official Tusla product and not legal advice. It
-                  simply helps you organise the evidence an AEARS assessment
-                  tends to look for, and keep gentle track of your registration.
+                  simply helps you organise the evidence an assessment tends to
+                  look at, and keep gentle track of your registration.
                   {'\n\n'}
-                  Under Section 14 of the Education (Welfare) Act 2000, parents
-                  educating outside a recognised school register with Tusla. The
-                  assessment looks at whether a certain minimum education is
-                  being provided. There is no minimum number of hours or
-                  attendance days. For anything official, check directly with
-                  Tusla.
+                  Under Article 42 of the Constitution and Section 14 of the
+                  Education (Welfare) Act 2000, parents educating outside a
+                  recognised school apply to Tusla, via AEARS, to be entered on
+                  the Section 14 Register. You apply using Tusla’s official
+                  application form (currently the R1) with a certified copy of
+                  your child’s birth certificate or passport. The assessment
+                  looks at whether a certain minimum education suited to your
+                  child’s age, ability and aptitude is being provided. You do not
+                  have to follow the national curriculum, and there is no minimum
+                  number of hours or attendance requirement. Registration is
+                  subject to periodic review. For anything official, use Tusla’s
+                  forms and check directly with Tusla.
                 </Text>
               </View>
             </View>

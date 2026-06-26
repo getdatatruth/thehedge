@@ -67,17 +67,17 @@ export const POSTS: Post[] = [
       {
         type: 'ol',
         items: [
-          'You apply to Tusla to have your child entered on the register of children receiving education outside a recognised school. Tusla provides the application form and current guidance on its website.',
-          'Tusla acknowledges your application and, in the normal course, appoints an Authorised Person, the assessor who will carry out the assessment.',
-          'You complete a preliminary questionnaire describing your educational approach, your child, and the resources you use. This is your chance to set the tone in your own words.',
-          'An assessment meeting is arranged, usually in your home, where you talk through your approach and the assessor may meet your child. This is the AEARS assessment.',
-          'The assessor prepares a report and a recommendation. Families who are genuinely educating their children are, in the ordinary way, registered.',
+          'You make an application for registration to Tusla, via AEARS, to have your child entered on the register of children receiving education outside a recognised school. Tusla provides the application form (currently the R1 form) and current guidance on its website, and you include a certified copy of your child\'s birth certificate or passport.',
+          'Once your application is acknowledged as valid, you may begin or continue home educating while the assessment proceeds.',
+          'Tusla appoints an Authorised Person, the assessor who will carry out the assessment. The preliminary assessment is a questionnaire describing your educational approach, your child, and the resources you use, together with a meeting with you. This is your chance to set the tone in your own words.',
+          'A comprehensive assessment, where one is needed, is a home visit by the assessor, usually arranged for a time that suits you, where you talk through your approach and the assessor may meet your child.',
+          'The assessor prepares a report and a recommendation. Families who are genuinely educating their children are, in the ordinary way, registered. Registration is then subject to periodic review set by Tusla.',
         ],
       },
       {
         type: 'callout',
         title: 'A note on AEARS',
-        text: 'The assessment stage is known as AEARS, the Assessment of Education in Places other than Recognised Schools. It tends to sound more intimidating than it is. We have a separate, gentler guide to what the assessment itself is like, linked at the end.',
+        text: 'AEARS is the Alternative Education Assessment and Registration Service, the part of Tusla that handles registration and the assessment of education provided outside recognised schools. It tends to sound more intimidating than it is. We have a separate, gentler guide to what the assessment itself is like, linked at the end.',
       },
       { type: 'h2', text: 'What the application asks of you' },
       {
@@ -125,7 +125,7 @@ export const POSTS: Post[] = [
       { type: 'h2', text: 'The official sources' },
       {
         type: 'p',
-        text: 'For the binding detail, go straight to the source. Start at tusla.ie and search for home education or AEARS, where you will find the application form and the current Guidelines for the Assessment of Education in Places other than Recognised Schools. Citizens Information (citizensinformation.ie) has a clear plain-English overview of the legal position and the registration process.',
+        text: 'For the binding detail, go straight to the source. Start at tusla.ie and search for home education or AEARS, where you will find the application form (currently the R1 form) and the current Guidelines on the Assessment of Education in Places other than a Recognised School. Citizens Information (citizensinformation.ie) has a clear plain-English overview of the legal position and the registration process.',
       },
       {
         type: 'p',
@@ -164,7 +164,7 @@ export const POSTS: Post[] = [
       { type: 'h2', text: 'What AEARS is, in one breath' },
       {
         type: 'p',
-        text: 'AEARS stands for the Assessment of Education in Places other than Recognised Schools. It is the part of the Tusla registration process that confirms your child is receiving a "certain minimum education" suitable to their age, ability, and aptitude. It is not an inspection of your home, your parenting, or your tidiness. It is a check on the education, carried out by talking with you.',
+        text: 'AEARS stands for the Alternative Education Assessment and Registration Service, the part of Tusla that registers children educated outside recognised schools and assesses the education they receive. The assessment confirms your child is receiving a "certain minimum education" suitable to their age, ability, and aptitude. It is not an inspection of your home, your parenting, or your tidiness. It is a check on the education, carried out by talking with you.',
       },
       { type: 'h2', text: 'Who the assessor is' },
       {
@@ -202,7 +202,7 @@ export const POSTS: Post[] = [
       { type: 'h2', text: 'What the assessor is actually looking for' },
       {
         type: 'p',
-        text: 'Not a school in miniature. In practice it tends to come down to a handful of things:',
+        text: 'Not a school in miniature. There is no minimum number of hours, no attendance requirement, and no obligation to follow the national curriculum or a timetable. The assessment is about whether a certain minimum education is being provided. In practice it tends to come down to a handful of things:',
       },
       {
         type: 'ul',
@@ -555,7 +555,7 @@ export const POSTS: Post[] = [
       { type: 'h2', text: 'What AEARS actually is' },
       {
         type: 'p',
-        text: 'AEARS stands for the Assessment of Education in Places other than Recognised Schools. It is the process by which Tusla, the Child and Family Agency, assesses applications from parents who wish to educate their children outside the recognised school system.',
+        text: 'AEARS stands for the Alternative Education Assessment and Registration Service, the part of Tusla, the Child and Family Agency, that registers children educated outside recognised schools and assesses applications from parents who wish to educate their children outside the recognised school system.',
       },
       {
         type: 'p',
@@ -573,11 +573,11 @@ export const POSTS: Post[] = [
       {
         type: 'ol',
         items: [
-          'You apply to Tusla to have your child placed on the register of children receiving education outside a recognised school.',
-          'Tusla appoints an Authorised Person, an assessor, to carry out the AEARS assessment.',
-          'You complete a preliminary questionnaire describing your educational approach, your child, and the resources you use.',
-          'An assessment meeting is arranged, usually in your home, where you talk through your approach and the assessor may meet your child.',
-          'The assessor prepares a report and a recommendation. Most families who are genuinely educating their children are registered.',
+          'You make an application for registration to Tusla, via AEARS, to have your child placed on the register of children receiving education outside a recognised school. Once your application is acknowledged as valid, you may begin or continue home educating while the assessment proceeds.',
+          'Tusla appoints an Authorised Person, an assessor, to carry out the assessment.',
+          'The preliminary assessment is a questionnaire describing your educational approach, your child, and the resources you use, along with a meeting with you.',
+          'A comprehensive assessment, where one is needed, is a home visit, usually arranged for a time that suits you, where you talk through your approach and the assessor may meet your child.',
+          'The assessor prepares a report and a recommendation. Most families who are genuinely educating their children are registered, and registration is then subject to periodic review.',
         ],
       },
       {
@@ -638,7 +638,7 @@ export const POSTS: Post[] = [
       { type: 'h2', text: 'The official sources' },
       {
         type: 'p',
-        text: 'For anything binding, go to the source. Tusla publishes guidelines for the assessment and the application forms on its website. Start at tusla.ie and search for home education or AEARS, and read the current Guidelines for the Assessment of Education in Places other than Recognised Schools.',
+        text: 'For anything binding, go to the source. Tusla publishes guidelines for the assessment and the application form (currently the R1 form) on its website. Start at tusla.ie and search for home education or AEARS, and read the current Guidelines on the Assessment of Education in Places other than a Recognised School.',
       },
       {
         type: 'p',
@@ -676,12 +676,12 @@ export const POSTS: Post[] = [
       },
       {
         type: 'p',
-        text: 'What is required is that your child receives a certain minimum education suitable to their age, ability, and aptitude, and that they are placed on the register held by Tusla through the AEARS process. That registration is a one-time assessment, not a constant inspection.',
+        text: 'What is required is that your child receives a certain minimum education suitable to their age, ability, and aptitude, and that they are placed on the register held by Tusla through the AEARS process. Registration is not a constant inspection. There is no minimum number of hours and no attendance requirement, and once you are registered Tusla may carry out a periodic review rather than reassessing you on a fixed annual basis.',
       },
       {
         type: 'callout',
         title: 'A note on AEARS',
-        text: 'AEARS is the assessment that registers your child as receiving education outside a recognised school. It tends to sound more intimidating than it is. We have written a separate plain-English guide to it, linked at the end of this piece.',
+        text: 'AEARS is the Alternative Education Assessment and Registration Service, the part of Tusla that registers your child as receiving education outside a recognised school and assesses the education provided. It tends to sound more intimidating than it is. We have written a separate plain-English guide to it, linked at the end of this piece.',
       },
       { type: 'h2', text: 'You do not have to decide everything at once' },
       {

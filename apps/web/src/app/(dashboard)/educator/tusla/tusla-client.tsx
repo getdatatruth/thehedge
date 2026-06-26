@@ -162,17 +162,17 @@ const STATUS_STEPS: { key: RegistrationStatus; label: string }[] = [
 
 const DEFAULT_DOCUMENTS: TuslaDocument[] = [
   {
-    id: 'notification-of-intent',
-    name: 'Notification of Intent to Educate at Home',
-    description: 'Section 14 notification form sent to Tusla Education and Welfare Service informing them of your decision to home educate.',
+    id: 'application-for-registration',
+    name: 'Application for Registration (Section 14)',
+    description: 'Tusla\'s official application form (currently the R1 form), submitted via AEARS, to register your child under Section 14 of the Education (Welfare) Act 2000.',
     required: true,
     completed: false,
     category: 'registration',
   },
   {
-    id: 'preliminary-assessment-form',
-    name: 'Preliminary Assessment Statement',
-    description: 'Initial outline of your educational provision including approach, curriculum areas, and daily schedule.',
+    id: 'birth-cert-or-passport',
+    name: 'Certified copy of birth certificate or passport',
+    description: 'A certified copy of the child\'s birth certificate or passport, submitted with your application for registration.',
     required: true,
     completed: false,
     category: 'registration',
@@ -180,56 +180,48 @@ const DEFAULT_DOCUMENTS: TuslaDocument[] = [
   {
     id: 'education-plan',
     name: 'Education Plan / Philosophy Statement',
-    description: 'Detailed description of your educational philosophy, methodology, and how you plan to cover all curriculum areas.',
-    required: true,
+    description: 'A description of your educational approach and how you provide a certain minimum education suitable to the child\'s age, ability and aptitude. Helpful to have, not a fixed Tusla form.',
+    required: false,
     completed: false,
     category: 'registration',
   },
   {
     id: 'sample-timetable',
-    name: 'Sample Weekly Timetable',
-    description: 'A typical week showing how education time is structured across subjects and activities.',
-    required: true,
+    name: 'Sample Weekly Timetable (optional)',
+    description: 'A typical week, if you keep one. Optional, since there is no attendance or hours requirement and many child-led families have no set timetable.',
+    required: false,
     completed: false,
     category: 'registration',
   },
   {
-    id: 'child-birth-cert',
-    name: 'Child\'s Birth Certificate (copy)',
-    description: 'Copy of the child\'s birth certificate for identification purposes.',
-    required: true,
-    completed: false,
-    category: 'registration',
-  },
-  {
-    id: 'annual-assessment-report',
-    name: 'Annual Assessment Report',
-    description: 'Yearly report documenting educational progress, portfolio evidence, and curriculum coverage for Tusla review.',
-    required: true,
+    id: 'preliminary-assessment-notes',
+    name: 'Preliminary Assessment Notes',
+    description: 'Notes for the preliminary assessment, which is a questionnaire and a meeting with the parent or guardian. A space to gather your thoughts, not an official form.',
+    required: false,
     completed: false,
     category: 'assessment',
   },
   {
     id: 'portfolio-evidence',
     name: 'Portfolio of Child\'s Work',
-    description: 'Collection of work samples, projects, photographs, and evidence of learning across all curriculum areas.',
-    required: true,
+    description: 'A collection of work samples, projects, photographs, and evidence of learning. Useful for the comprehensive assessment home visit, not a fixed Tusla requirement.',
+    required: false,
     completed: false,
     category: 'assessment',
   },
   {
-    id: 'attendance-record',
-    name: 'Attendance Records',
-    description: 'Daily attendance log showing education days, including any absences and reasons.',
-    required: true,
+    id: 'learning-record',
+    name: 'Record of Learning (optional)',
+    description: 'A note of days you did learning together, if you like to keep one. Optional, since there is no attendance requirement in Ireland.',
+    required: false,
     completed: false,
     category: 'ongoing',
   },
   {
     id: 'curriculum-records',
-    name: 'Curriculum Coverage Records',
-    description: 'Ongoing records showing coverage across all required curriculum areas: Language, Maths, SESE, SPHE, Arts, PE.',
-    required: true,
+    name: 'Curriculum Coverage Notes (optional)',
+    description: 'Notes on the areas you cover. The NCCA areas (Language, Maths, SESE, SPHE, Arts, PE) are a helpful map, not a required curriculum. You do not have to follow the national curriculum.',
+    required: false,
     completed: false,
     category: 'ongoing',
   },
@@ -244,10 +236,10 @@ const DEFAULT_DOCUMENTS: TuslaDocument[] = [
 ];
 
 const DEFAULT_ASSESSMENT_CHECKLIST: AssessmentItem[] = [
-  { id: 'ac-1', text: 'Review and update education plan for current year', completed: false, category: 'preparation' },
-  { id: 'ac-2', text: 'Ensure attendance records are complete and up to date', completed: false, category: 'preparation' },
-  { id: 'ac-3', text: 'Review curriculum coverage across all areas', completed: false, category: 'preparation' },
-  { id: 'ac-4', text: 'Identify any curriculum gaps and plan to address them', completed: false, category: 'preparation' },
+  { id: 'ac-1', text: 'Review and update your education plan for the current year', completed: false, category: 'preparation' },
+  { id: 'ac-2', text: 'Gather any learning records you keep (optional - there is no attendance requirement)', completed: false, category: 'preparation' },
+  { id: 'ac-3', text: 'Reflect on the areas you have been covering (the NCCA areas are a helpful map, not required)', completed: false, category: 'preparation' },
+  { id: 'ac-4', text: 'Note any areas you would like to grow into next', completed: false, category: 'preparation' },
   { id: 'ac-5', text: 'Compile portfolio samples for each curriculum area', completed: false, category: 'portfolio' },
   { id: 'ac-6', text: 'Include dated work samples showing progression', completed: false, category: 'portfolio' },
   { id: 'ac-7', text: 'Add photographs of projects, field trips, and practical work', completed: false, category: 'portfolio' },
@@ -255,35 +247,43 @@ const DEFAULT_ASSESSMENT_CHECKLIST: AssessmentItem[] = [
   { id: 'ac-9', text: 'Write narrative summary of child\'s progress', completed: false, category: 'documentation' },
   { id: 'ac-10', text: 'Document any standardised test results (if applicable)', completed: false, category: 'documentation' },
   { id: 'ac-11', text: 'Prepare list of resources and materials used', completed: false, category: 'documentation' },
-  { id: 'ac-12', text: 'Document socialisation activities and group involvement', completed: false, category: 'documentation' },
-  { id: 'ac-13', text: 'Prepare child for potential interview/conversation with assessor', completed: false, category: 'review' },
-  { id: 'ac-14', text: 'Prepare the home education space for visit (if applicable)', completed: false, category: 'review' },
-  { id: 'ac-15', text: 'Review previous assessment feedback and address any concerns', completed: false, category: 'review' },
+  { id: 'ac-12', text: 'Note any social activities and group involvement', completed: false, category: 'documentation' },
+  { id: 'ac-13', text: 'Prepare your child for a gentle conversation with the assessor (an authorised person appointed by Tusla)', completed: false, category: 'review' },
+  { id: 'ac-14', text: 'Prepare the home education space for the comprehensive assessment home visit (if applicable)', completed: false, category: 'review' },
+  { id: 'ac-15', text: 'Review any previous review feedback and address any points raised', completed: false, category: 'review' },
   { id: 'ac-16', text: 'Have education plan and goals ready for discussion', completed: false, category: 'review' },
 ];
 
 const DEFAULT_DEADLINES: TuslaDeadline[] = [
   {
     id: 'dl-1',
-    title: 'Submit Notification of Intent',
+    title: 'Submit Application for Registration (Section 14)',
     date: '',
-    description: 'Notify Tusla of your intention to home educate under Section 14 of the Education (Welfare) Act 2000.',
+    description: 'Apply to Tusla, via AEARS, to register your child under Section 14 of the Education (Welfare) Act 2000.',
     completed: false,
     type: 'registration',
   },
   {
     id: 'dl-2',
-    title: 'Preliminary Assessment Visit',
+    title: 'Preliminary Assessment',
     date: '',
-    description: 'First assessment visit from Tusla Education Welfare Officer to review your educational provision.',
+    description: 'A questionnaire and a meeting with you (the parent or guardian) about your educational provision.',
     completed: false,
     type: 'assessment',
   },
   {
     id: 'dl-3',
-    title: 'Annual Assessment Due',
+    title: 'Comprehensive Assessment (home visit)',
     date: '',
-    description: 'Annual review of home education provision. Prepare portfolio, attendance records, and progress report.',
+    description: 'A home visit by an assessor (an authorised person appointed by Tusla) to look over your provision.',
+    completed: false,
+    type: 'assessment',
+  },
+  {
+    id: 'dl-4',
+    title: 'Periodic Review',
+    date: '',
+    description: 'Registration is subject to periodic review, with the timing set by Tusla. Gather any evidence you like to have to hand.',
     completed: false,
     type: 'review',
   },
@@ -558,10 +558,10 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     setNotificationForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // ─── Notification of Intent: printable export ──────────
-  // Opens a clean, print-ready document of the SAVED notification details so
-  // "print or download to submit" is finally true. Falls back gracefully if
-  // the browser blocks popups.
+  // ─── Application for Registration: printable summary ───
+  // Opens a clean, print-ready SUMMARY of the saved details to help you
+  // complete Tusla's official application (R1) form. This is not the official
+  // form itself. Falls back gracefully if the browser blocks popups.
 
   const handlePrintNotification = useCallback(() => {
     const f = notificationForm;
@@ -596,7 +596,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     const printedOn = new Date().toLocaleDateString('en-IE', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
-      <title>Notification of Intent to Educate at Home${childName ? ' - ' + esc(childName) : ''}</title>
+      <title>Application for Registration (Section 14) - Summary${childName ? ' - ' + esc(childName) : ''}</title>
       <style>
         * { box-sizing: border-box; }
         body { font-family: Georgia, 'Times New Roman', serif; color: #1f2a24; line-height: 1.6; max-width: 720px; margin: 40px auto; padding: 0 24px; }
@@ -616,9 +616,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
         .sign-line { display: inline-block; border-bottom: 1px solid #1f2a24; min-width: 240px; margin-left: 8px; }
         @media print { body { margin: 0; } }
       </style></head><body>
-      <h1>Notification of Intent to Educate at Home</h1>
+      <h1>Application for Registration (Section 14) - Summary</h1>
       <p class="sub">Prepared with The Hedge - printed ${esc(printedOn)}</p>
-      <p class="law">Under Section 14 of the Education (Welfare) Act 2000</p>
+      <p class="law">To register your child under Section 14 of the Education (Welfare) Act 2000, applied for to Tusla via AEARS. This is a summary to help you, not the official form.</p>
 
       <h2>Parent / Guardian</h2>
       <table>
@@ -654,15 +654,17 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
       </div>
 
       <p class="disclaimer">
-        This summary was prepared using The Hedge to help organise the details an AEARS assessment tends to
-        look for. The Hedge is not affiliated with Tusla and this is not an official Tusla form. Please check
-        the current requirements with your regional Tusla Education Support Service office before submitting.
+        This summary was prepared using The Hedge to help you complete Tusla's official application for
+        registration (currently the R1 form). The Hedge is not affiliated with Tusla and this is not an
+        official Tusla form, and nothing here is legal advice. Please submit Tusla's official application form,
+        along with a certified copy of your child's birth certificate or passport, and check the current
+        requirements and guidance with Tusla (AEARS) before submitting.
       </p>
       </body></html>`;
 
     const win = window.open('', '_blank');
     if (!win) {
-      setSaveMessage('Error: Allow pop-ups to print the notification');
+      setSaveMessage('Error: Allow pop-ups to print the summary');
       setTimeout(() => setSaveMessage(''), 4000);
       return;
     }
@@ -680,7 +682,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
     { key: 'overview', label: 'Overview', icon: Shield },
     { key: 'registration', label: 'Registration', icon: ClipboardCheck },
     { key: 'documents', label: 'Documents', icon: FileText },
-    { key: 'notification', label: 'Notification Form', icon: BookOpen },
+    { key: 'notification', label: 'Application Form', icon: BookOpen },
     { key: 'assessment', label: 'Assessment Prep', icon: CheckCircle },
     { key: 'deadlines', label: 'Deadlines', icon: CalendarDays },
     { key: 'resources', label: 'Resources', icon: ExternalLink },
@@ -1009,10 +1011,10 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             </h2>
             <div className="space-y-2">
               {([
-                { title: 'Annual Assessment Report', description: 'Full compliance report for Tusla assessment', reportType: 'annual' },
-                { title: 'Term Summary', description: 'Attendance, curriculum coverage, and portfolio summary', reportType: 'assessment' },
-                { title: 'Attendance Record', description: 'Day-by-day attendance log', reportType: 'attendance' },
-                { title: 'Curriculum Coverage', description: 'Detailed breakdown by subject area and strand', reportType: 'portfolio' },
+                { title: 'Assessment Summary Report', description: 'A summary to help with your Tusla assessment or review', reportType: 'annual' },
+                { title: 'Term Summary', description: 'Learning days, curriculum coverage, and portfolio summary', reportType: 'assessment' },
+                { title: 'Record of Learning Days', description: 'Day-by-day record of learning (optional, no attendance requirement)', reportType: 'attendance' },
+                { title: 'Curriculum Coverage', description: 'Breakdown by area and strand (the NCCA areas are a helpful map, not required)', reportType: 'portfolio' },
               ] as const).map((report) => {
                 const reportUrl = `/api/educator/reports?type=${report.reportType}&childId=${selectedChildId}`;
                 const disabled = !selectedChildId;
@@ -1113,13 +1115,14 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Getting Started</h3>
                       <p className="text-sm text-clay">
-                        Under Section 14 of the Education (Welfare) Act 2000, parents who wish to educate their children at home
-                        must notify Tusla. Begin by completing the Notification of Intent form and gathering the required documents.
-                        Tusla will then arrange a preliminary assessment of your educational provision.
+                        Under Section 14 of the Education (Welfare) Act 2000, parents who educate their children at home
+                        apply to Tusla, via AEARS, to register their child. Begin by gathering your details and a certified copy
+                        of the child{"'"}s birth certificate or passport for Tusla{"'"}s official application form. Once your application
+                        is acknowledged as valid, you may begin or continue home educating while the assessment proceeds.
                       </p>
                       <div className="mt-3 flex gap-2">
                         <button onClick={() => setActiveTab('notification')} className="btn-primary text-xs py-2 px-3">
-                          Fill Notification Form
+                          Fill Application Form
                         </button>
                         <button onClick={() => setActiveTab('documents')} className="btn-secondary text-xs py-2 px-3">
                           View Document Checklist
@@ -1131,9 +1134,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Application In Progress</h3>
                       <p className="text-sm text-clay">
-                        You have begun the registration process. Ensure all required documents are prepared and your notification
-                        form is complete. When ready, submit your notification to Tusla Education and Welfare Service (TESS)
-                        at your regional office.
+                        You have begun the registration process. Have your details and the certified copy of the birth certificate
+                        or passport ready, and complete Tusla{"'"}s official application form. When ready, submit your application
+                        to Tusla (AEARS), part of the Tusla Education Support Service (TESS).
                       </p>
                       <div className="mt-3 flex gap-2 flex-wrap">
                         <button onClick={() => setActiveTab('documents')} className="btn-secondary text-xs py-2 px-3">
@@ -1149,9 +1152,10 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Application Submitted</h3>
                       <p className="text-sm text-clay">
-                        Your notification has been submitted to Tusla. They will review your application and arrange a preliminary
-                        assessment visit. This typically takes 4-8 weeks. In the meantime, continue documenting your educational
-                        provision and keep attendance records.
+                        Your application has been submitted to Tusla (AEARS). Once it is acknowledged as valid, you may begin or
+                        continue home educating while the assessment proceeds. The assessment has two stages: a preliminary
+                        assessment (a questionnaire and a meeting with you), and a comprehensive assessment (a home visit by an
+                        assessor). In the meantime, keep noting your educational provision in whatever way suits you.
                       </p>
                       <div className="mt-3">
                         <button onClick={() => setActiveTab('assessment')} className="btn-secondary text-xs py-2 px-3">
@@ -1164,13 +1168,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                     <>
                       <h3 className="text-sm font-bold text-ink mb-1">Registration Approved</h3>
                       <p className="text-sm text-clay">
-                        Congratulations! Your home education provision has been approved by Tusla. You are now on the register
-                        maintained under Section 14. Annual assessments will be conducted to review your educational provision.
-                        Keep documenting learning, maintaining attendance records, and building portfolios.
+                        Your child is now on the Section 14 register maintained by Tusla. Registration is subject to periodic
+                        review, with the timing set by Tusla. Keep noting learning and gathering any evidence you like to have
+                        to hand, in whatever way suits your family.
                       </p>
                       <div className="mt-3 flex gap-2">
                         <button onClick={() => setActiveTab('assessment')} className="btn-secondary text-xs py-2 px-3">
-                          Annual Assessment Prep
+                          Review Prep
                         </button>
                         <button onClick={() => setActiveTab('deadlines')} className="btn-secondary text-xs py-2 px-3">
                           View Deadlines
@@ -1308,11 +1312,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
         <div className="space-y-6">
           <div className="card-elevated p-6">
             <h2 className="font-display text-xl font-light text-ink mb-2">
-              Notification of Intent to <em className="text-moss italic">Educate at Home</em>
+              Application for <em className="text-moss italic">Registration (Section 14)</em>
             </h2>
             <p className="text-sm text-clay mb-2">
-              Complete this form to prepare your Section 14 notification to Tusla. You can save your progress
-              and return later. When complete, print or download to submit to your regional Tusla office.
+              Use this to gather the details for your application to Tusla (AEARS) to register your child under
+              Section 14. You can save your progress and return later. When complete, print a summary to help you
+              fill in Tusla{"'"}s official application form (currently the R1 form), which you submit with a certified
+              copy of the child{"'"}s birth certificate or passport. This is a helper, not the official form.
             </p>
             <div className="flex items-center gap-2 mb-6">
               <Info className="h-3.5 w-3.5 text-clay/40" />
@@ -1430,7 +1436,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                       label="Curriculum Description"
                       value={notificationForm.curriculumDescription}
                       onChange={(v) => updateNotificationField('curriculumDescription', v)}
-                      placeholder="Describe how you will cover the main curriculum areas: Language (English/Irish), Mathematics, SESE (Science, History, Geography), Arts (Visual Arts, Music, Drama), PE, and SPHE."
+                      placeholder="Describe your approach to providing a certain minimum education. You do not have to follow the national curriculum. If it helps, the NCCA areas are a useful map: Language (English/Irish), Mathematics, SESE (Science, History, Geography), Arts (Visual Arts, Music, Drama), PE, and SPHE."
                       multiline
                       rows={4}
                     />
@@ -1460,7 +1466,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
                       label="Additional Information"
                       value={notificationForm.additionalInfo}
                       onChange={(v) => updateNotificationField('additionalInfo', v)}
-                      placeholder="Any additional information you wish to provide to the Education Welfare Officer."
+                      placeholder="Any additional information you wish to provide to Tusla (AEARS) or to the assessor."
                       multiline
                       rows={3}
                     />
@@ -1471,7 +1477,7 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
 
             <div className="mt-6 pt-6 border-t border-stone/30 flex items-center justify-between">
               <p className="text-xs text-clay/40">
-                Save your progress and return anytime. When ready, print this form for submission.
+                Save your progress and return anytime. When ready, print a summary to help you complete Tusla{"'"}s official form.
               </p>
               <div className="flex gap-3">
                 <button onClick={handlePrintNotification} className="btn-secondary text-sm flex items-center gap-2">
@@ -1497,12 +1503,13 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="flex items-start justify-between mb-6">
               <div>
                 <h2 className="font-display text-xl font-light text-ink mb-2">
-                  Annual Assessment <em className="text-moss italic">Preparation</em>
+                  Assessment <em className="text-moss italic">Preparation</em>
                 </h2>
                 <p className="text-sm text-clay">
-                  This helps you organise the evidence an AEARS assessment tends to look for. An assessment is a
-                  calm conversation about how the year went - the assessor looks over your provision, has a chat
-                  with your child, and glances through your portfolio. Tick things off as you go.
+                  This helps you organise the evidence an AEARS assessment tends to look for. The assessment has two
+                  stages: a preliminary assessment (a questionnaire and a meeting with you), and a comprehensive
+                  assessment (a home visit by an assessor, an authorised person appointed by Tusla). It is a calm
+                  conversation about how learning is going. Tick things off as you go.
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -1546,9 +1553,9 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               };
               const categoryDescriptions = {
                 preparation: 'Foundational tasks to get ready for your assessment.',
-                portfolio: 'Evidence of learning across all curriculum areas.',
-                documentation: 'Written records and reports to present.',
-                review: 'Preparation for the assessment visit itself.',
+                portfolio: 'Evidence of learning, gathered in whatever way suits your family.',
+                documentation: 'Any written notes and records you would like to present.',
+                review: 'Preparation for the comprehensive assessment home visit itself.',
               };
 
               return (
@@ -1775,16 +1782,17 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               Typical <em className="text-moss italic">Academic Year</em> Key Dates
             </h2>
             <p className="text-xs text-clay/50 mb-4">
-              These are general guideline dates. Your actual Tusla assessment schedule may vary.
+              These are general guideline dates, not Tusla requirements. There is no fixed yearly schedule; registration is
+              subject to periodic review, with the timing set by Tusla. Your own rhythm may look quite different.
             </p>
             <div className="space-y-3">
               {[
-                { month: 'September', event: 'Academic year begins. Update education plan for the new year.', icon: BookOpen },
-                { month: 'October', event: 'Submit updated education plan to Tusla if requested. Begin attendance logging.', icon: FileText },
-                { month: 'December', event: 'End of Term 1. Review curriculum coverage and portfolio progress.', icon: TrendingUp },
-                { month: 'January-March', event: 'Typical window for annual Tusla assessment visits.', icon: Shield },
-                { month: 'March', event: 'Mid-year review. Ensure all curriculum areas are being covered.', icon: ClipboardCheck },
-                { month: 'June', event: 'End of academic year. Compile annual portfolio and assessment report.', icon: CheckCircle },
+                { month: 'September', event: 'A natural point to refresh your education plan for the year ahead, if you keep one.', icon: BookOpen },
+                { month: 'October', event: 'Settle into your rhythm. Note learning in whatever way suits you (no attendance requirement).', icon: FileText },
+                { month: 'December', event: 'A gentle moment to look back over the term and tidy any portfolio you keep.', icon: TrendingUp },
+                { month: 'January-March', event: 'A common window for Tusla assessments or reviews, though timing varies and is set by Tusla.', icon: Shield },
+                { month: 'March', event: 'A mid-year pause to reflect on the areas you have been exploring.', icon: ClipboardCheck },
+                { month: 'June', event: 'A natural point to gather any portfolio and reflections from the year.', icon: CheckCircle },
               ].map((item) => {
                 const Icon = item.icon;
                 return (
@@ -1848,7 +1856,8 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
               Irish Primary <em className="text-moss italic">Curriculum Areas</em>
             </h2>
             <p className="text-xs text-clay/50 mb-4">
-              Tusla assessors will look for evidence of education across these curriculum areas as defined by the NCCA.
+              You do not have to follow the national curriculum. These NCCA areas are an optional, helpful map for thinking
+              about a rounded education, never a Tusla requirement.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {[
@@ -1900,28 +1909,32 @@ export function TuslaClient({ children: childrenProp, plans, dailyPlans, activit
             <div className="space-y-4">
               {[
                 {
-                  q: 'Do I legally have to register with Tusla?',
-                  a: 'Yes. Under the Education (Welfare) Act 2000, Section 14, parents who educate their children in a place other than a recognised school must apply to have the child registered with Tusla.',
+                  q: 'Do I have to register with Tusla?',
+                  a: 'Yes. Under Section 14 of the Education (Welfare) Act 2000, and grounded in Article 42 of the Constitution, parents who educate their children in a place other than a recognised school apply to Tusla, via AEARS, to have the child placed on the Section 14 register. This is not legal advice; always use Tusla\'s official forms and guidance.',
+                },
+                {
+                  q: 'How do I apply to register?',
+                  a: 'You make an application for registration using Tusla\'s official application form (currently the R1 form), submitted via AEARS, along with a certified copy of the child\'s birth certificate or passport. There is no "notification of intent" in Ireland; you apply to be registered. Once your application is acknowledged as valid, you may begin or continue home educating while the assessment proceeds.',
                 },
                 {
                   q: 'What happens during a Tusla assessment?',
-                  a: 'An Education Welfare Officer will visit your home (or arrange a meeting), review your education provision, examine portfolio evidence, and may speak with your child. They assess whether a minimum education is being provided.',
+                  a: 'There are two stages. A preliminary assessment is a questionnaire and a meeting with the parent or guardian. A comprehensive assessment is a home visit by an assessor (an authorised person appointed by Tusla), who looks over your provision and may have a gentle conversation with your child. They assess whether a certain minimum education is being provided.',
                 },
                 {
-                  q: 'What is considered a "minimum education"?',
-                  a: 'There is no strict definition, but Tusla looks for evidence that the child is receiving education in the core curriculum areas appropriate to their age and ability. The education should support the child\'s intellectual, social, and personal development.',
+                  q: 'What is considered a "certain minimum education"?',
+                  a: 'There is no strict definition. The standard is that the child receives a certain minimum education suitable to their age, ability and aptitude. There is no minimum number of hours and no attendance requirement, and you do not have to follow the national curriculum.',
                 },
                 {
                   q: 'How often are assessments carried out?',
-                  a: 'Typically annually, though newly registered families may have an initial preliminary assessment followed by a comprehensive assessment within the first year.',
+                  a: 'Registration is subject to periodic review, with the timing set by Tusla. There is no fixed mandatory annual assessment. Newly registered families typically have the preliminary assessment followed by the comprehensive assessment.',
                 },
                 {
                   q: 'Can my application be refused?',
-                  a: 'If Tusla determines that a minimum education is not being provided, they can refuse registration. You would then be required to send your child to a recognised school or address the concerns raised.',
+                  a: 'If Tusla determines that a certain minimum education is not being provided, registration can be refused. You would then be asked to address the points raised or send your child to a recognised school. This is not legal advice; check Tusla\'s guidance.',
                 },
                 {
-                  q: 'Do I need to follow the national curriculum exactly?',
-                  a: 'No. You are not required to follow the NCCA curriculum exactly, but Tusla will look for evidence that you are covering equivalent curriculum areas at an appropriate level for your child.',
+                  q: 'Do I need to follow the national curriculum?',
+                  a: 'No. You are not required to follow the NCCA national curriculum. The NCCA areas can be a helpful map if you find them useful, but Tusla assesses whether a certain minimum education is being provided, not whether you follow a particular curriculum.',
                 },
               ].map((faq, idx) => (
                 <div key={idx} className="rounded-[10px] p-4 bg-parchment/50 border border-stone/20">

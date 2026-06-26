@@ -25,23 +25,27 @@ export const metadata: Metadata = {
 const firstSteps: { title: string; body: string }[] = [
   {
     title: 'Apply to be placed on the register',
-    body: 'Apply to Tusla to have your child entered on the register of children receiving education outside a recognised school. This is your starting point, not an exam.',
+    body: 'Make an application for registration to Tusla, via AEARS, to have your child entered on the register of children receiving education outside a recognised school. Use the official application form (currently the R1 form) and include a certified copy of your child\'s birth certificate or passport. This is your starting point, not an exam.',
+  },
+  {
+    title: 'Begin once your application is valid',
+    body: 'Once Tusla acknowledges your application as valid, you may begin or continue home educating while the assessment proceeds. You do not have to wait for the assessment to finish.',
   },
   {
     title: 'An Authorised Person is appointed',
-    body: 'Tusla appoints an assessor (the Authorised Person) to carry out the AEARS assessment. Many are former teachers or inspectors.',
+    body: 'Tusla appoints an assessor (the Authorised Person) to carry out the assessment. Many are former teachers or inspectors.',
   },
   {
-    title: 'Complete the preliminary questionnaire',
-    body: 'You describe your educational approach, your child, and the resources you use. Write in your own words - it does not need to read like a school policy.',
+    title: 'The preliminary assessment',
+    body: 'A questionnaire describing your educational approach, your child, and the resources you use, together with a meeting. Write in your own words - it does not need to read like a school policy.',
   },
   {
-    title: 'The assessment meeting is arranged',
-    body: 'Usually in your home, at a time that suits you. You talk through your approach, and the assessor may meet your child.',
+    title: 'The comprehensive assessment, if needed',
+    body: 'A home visit by the assessor, usually at a time that suits you. You talk through your approach, and the assessor may meet your child.',
   },
   {
     title: 'The report and recommendation',
-    body: 'The assessor prepares a report. Families who are genuinely educating their children are, in the ordinary course, registered.',
+    body: 'The assessor prepares a report. Families who are genuinely educating their children are, in the ordinary course, registered. Registration is then subject to periodic review set by Tusla.',
   },
 ];
 
@@ -228,11 +232,11 @@ export default function AearsChecklist() {
               </div>
 
               <p className="aears-lede">
-                AEARS stands for the Assessment of Education in Places other than Recognised Schools. It is
-                the process by which Tusla, the Child and Family Agency, registers children educated outside
-                the recognised school system. Home education is a legitimate, constitutionally protected
-                choice in Ireland. The assessment exists to confirm a suitable education is happening, not to
-                catch you out.
+                AEARS stands for the Alternative Education Assessment and Registration Service. It is the part
+                of Tusla, the Child and Family Agency, that registers children educated outside the recognised
+                school system and assesses the education they receive. Home education is a legitimate,
+                constitutionally protected choice in Ireland. The assessment exists to confirm a suitable
+                education is happening, not to catch you out.
               </p>
 
               {/* First steps */}
@@ -303,8 +307,9 @@ export default function AearsChecklist() {
               {/* Official sources */}
               <h2 className="aears-h2">The official sources</h2>
               <p className="aears-p aears-sources">
-                For anything binding, go straight to the source. Tusla publishes the application forms and the
-                current Guidelines for the Assessment of Education in Places other than Recognised Schools at{' '}
+                For anything binding, go straight to the source. Tusla publishes the application form
+                (currently the R1 form) and the current Guidelines on the Assessment of Education in Places
+                other than a Recognised School at{' '}
                 <a href="https://www.tusla.ie" target="_blank" rel="noopener noreferrer">
                   tusla.ie
                 </a>

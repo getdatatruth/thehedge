@@ -40,7 +40,7 @@ export interface AearsTimelineInput {
   status: AearsStatus;
   /** When the family started (or intends to start) home educating. */
   educationStartDate?: string | null;
-  /** When the notification was submitted to Tusla (registration record). */
+  /** When the application for registration was submitted to Tusla (registration record). */
   submittedAt?: string | null;
   /** When Tusla confirmed the child on the register. */
   approvedAt?: string | null;
@@ -99,8 +99,8 @@ function toneFor(daysAway: number | null, done: boolean): MilestoneTone {
  * Build the AEARS guidance timeline for one child's registration.
  *
  * The shape of the timeline depends on where the family is:
- *  - Before submitting: the focus is the Notification of Intent and giving
- *    Tusla reasonable notice before starting at home.
+ *  - Before submitting: the focus is the Application for Registration and
+ *    giving Tusla reasonable notice before starting at home.
  *  - After submitting: the focus shifts to the preliminary assessment.
  *  - Once approved: a steady annual review cadence with a gentle
  *    "start gathering evidence" nudge ahead of it.
@@ -125,37 +125,37 @@ export function buildAearsTimeline(input: AearsTimelineInput): AearsMilestone[] 
     });
   };
 
-  // ── 1. Notification of Intent (Section 14) ──
-  // Guidance: families are advised to notify Tusla in good time - giving
-  // around a month's notice before beginning at home is a sensible window.
+  // ── 1. Application for Registration (Section 14) ──
+  // Guidance: families are advised to apply in good time - giving around a
+  // month before beginning at home is a sensible, unhurried window.
   if (submittedAt) {
     push({
       id: 'm-notification',
-      title: 'Notification of Intent submitted',
+      title: 'Application for Registration submitted',
       date: toIso(submittedAt),
       kind: 'notification',
-      description: 'You let Tusla know, under Section 14, that you are educating at home.',
+      description: 'You applied to Tusla (AEARS), under Section 14, to register your child as educated at home.',
       guidance: 'This is the step that opens your AEARS file. Keep a copy of what you sent.',
       done: true,
     });
   } else {
-    // Target a notification date around a month before the intended start.
+    // Target an application date around a month before the intended start.
     const target = startDate ? addDays(startDate, -30) : null;
     push({
       id: 'm-notification',
-      title: 'Send your Notification of Intent',
+      title: 'Submit your Application for Registration',
       date: target ? toIso(target) : null,
       kind: 'notification',
-      description: 'Notify Tusla under Section 14 that you intend to educate at home.',
+      description: 'Apply to Tusla (AEARS) under Section 14 to register your child as educated at home, using Tusla\'s official form and a certified copy of the birth certificate or passport.',
       guidance: startDate
-        ? 'Aiming to give Tusla around a month\'s notice before you start keeps everything unhurried.'
-        : 'Add your intended start date in the Notification Form and this date will fill itself in.',
+        ? 'Applying around a month before you start keeps everything unhurried. Once your application is acknowledged as valid, you may begin while the assessment proceeds.'
+        : 'Add your intended start date in the Application Form and this date will fill itself in.',
       done: false,
     });
   }
 
   // ── 2. Preliminary assessment window ──
-  // Guidance: after a notification is acknowledged, a preliminary assessment
+  // Guidance: after an application is acknowledged as valid, a preliminary assessment
   // is typically arranged within a couple of months. We anchor to the
   // submission date when we have it.
   if (submittedAt && !approvedAt) {
@@ -167,8 +167,8 @@ export function buildAearsTimeline(input: AearsTimelineInput): AearsMilestone[] 
       title: 'Preliminary assessment likely',
       date: toIso(openPassed ? windowClose : windowOpen),
       kind: 'assessment',
-      description: 'Tusla usually arranges a first look at your provision after your notification.',
-      guidance: 'A preliminary assessment tends to fall in the weeks after you notify. Have your plan and a few work samples to hand.',
+      description: 'A questionnaire and a meeting with you (the parent or guardian) about your provision. A comprehensive assessment, a home visit by an assessor, follows later.',
+      guidance: 'The preliminary assessment tends to fall in the weeks after you apply. Have your plan and a few work samples to hand if you like.',
       done: false,
     });
   }
@@ -180,17 +180,19 @@ export function buildAearsTimeline(input: AearsTimelineInput): AearsMilestone[] 
       title: 'On the Section 14 register',
       date: toIso(approvedAt),
       kind: 'review',
-      description: 'Tusla confirmed your child on the register of children educated at home.',
-      guidance: 'From here the rhythm is a gentle annual review. Nothing sudden.',
+      description: 'Tusla confirmed your child on the Section 14 register of children educated at home.',
+      guidance: 'From here, registration is subject to periodic review, with the timing set by Tusla. Nothing sudden.',
       done: true,
     });
   }
 
-  // ── 4. Annual review cadence + evidence nudge ──
-  // Once approved, project the next annual review (roughly a year on from
+  // ── 4. Periodic review guideline + evidence nudge ──
+  // Once approved, project a guideline review point (roughly a year on from
   // approval) and a "start gathering evidence" reminder about six weeks ahead.
-  // Before approval we still surface the first annual review off the start
-  // date so a family can see the shape of the year.
+  // This is only a gentle guideline: registration is subject to periodic
+  // review with the timing set by Tusla, not a fixed mandatory annual
+  // assessment. Before approval we still surface a first guideline review off
+  // the start date so a family can see the shape of the year.
   const anchor = approvedAt ?? startDate;
   if (anchor) {
     // Find the next anniversary of the anchor that is in the future.
@@ -215,13 +217,13 @@ export function buildAearsTimeline(input: AearsTimelineInput): AearsMilestone[] 
 
     push({
       id: 'm-annual-review',
-      title: approvedAt ? 'Annual assessment due' : 'First annual review (guideline)',
+      title: approvedAt ? 'Periodic review (guideline)' : 'First review (guideline)',
       date: toIso(nextReview),
       kind: 'review',
       description: approvedAt
-        ? 'Your yearly AEARS review - the assessor revisits your provision and evidence.'
-        : 'A guideline for when your first annual review tends to land, once registered.',
-      guidance: 'Reviews are a conversation about how the year went, not an exam. Your everyday records carry most of it.',
+        ? 'A guideline for a periodic AEARS review, where an assessor revisits your provision. The actual timing is set by Tusla.'
+        : 'A guideline for when a first review tends to land, once registered. Registration is subject to periodic review set by Tusla.',
+      guidance: 'Reviews are a conversation about how learning is going, not an exam. Your everyday records carry most of it.',
       done: false,
     });
   }

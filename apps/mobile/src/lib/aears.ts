@@ -1,12 +1,15 @@
 // aears.ts
-// Shared logic for the AEARS (Assessment of Education in a place other than a
-// Recognised School) helper screen. This is NOT an official Tusla product and
-// not legal advice. It exists to help a family organise the kind of evidence an
-// AEARS assessment tends to look for, and to keep gentle track of where they
+// Shared logic for the home-education registration helper screen. In Ireland you
+// register WITH Tusla, VIA AEARS (the Alternative Education Assessment and
+// Registration Service, a service within Tusla). This is NOT an official Tusla
+// product and not legal advice. It exists to help a family organise the kind of
+// evidence an assessment tends to look at, and to keep gentle track of where they
 // are in the registration process.
 //
-// AEARS sets NO minimum number of hours or attendance days. Nothing here should
-// imply a pass/fail threshold. Everything is framed as guidance, not a guarantee.
+// There is no required curriculum, no minimum number of hours and no attendance
+// requirement. Nothing here should imply a pass/fail threshold. Everything is
+// framed as guidance, not a guarantee. Use Tusla's official forms for anything
+// official.
 
 // ─── Registration status ───────────────────────────────────────────────
 
@@ -33,8 +36,8 @@ export const REGISTRATION_STEPS: {
   },
   {
     status: 'submitted',
-    label: 'Sent to Tusla',
-    blurb: 'Your notification is with Tusla and you are awaiting a response.',
+    label: 'Application sent',
+    blurb: 'Your application to register is with Tusla (via AEARS) and you are awaiting a response. Once it is acknowledged, you may carry on while the assessment proceeds.',
   },
   {
     status: 'approved',
@@ -74,8 +77,13 @@ export interface ChecklistItem {
 export const DEFAULT_DOCUMENT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
   {
     key: 'notification',
-    label: 'Notification to Tusla',
-    hint: 'A note letting Tusla know you are educating at home, with your child’s details.',
+    label: 'Application for Registration (Section 14)',
+    hint: 'Tusla’s official application form (currently the R1), used to apply to be entered on the Section 14 Register.',
+  },
+  {
+    key: 'birth_cert',
+    label: 'Certified copy of birth certificate or passport',
+    hint: 'A certified copy of your child’s birth certificate or passport goes with the application.',
   },
   {
     key: 'plan',
@@ -104,12 +112,13 @@ export const DEFAULT_DOCUMENT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
   },
 ];
 
-// What an assessor tends to look for during an AEARS visit or conversation.
+// What an assessor (an authorised person appointed by Tusla) tends to look at
+// during a meeting or home visit.
 export const DEFAULT_ASSESSMENT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
   {
     key: 'minimum_education',
     label: 'A certain minimum education',
-    hint: 'A broad, balanced experience suited to your child’s age and ability.',
+    hint: 'A broad experience suited to your child’s age, ability and aptitude. You do not have to follow the national curriculum.',
   },
   {
     key: 'literacy_numeracy',
@@ -195,9 +204,9 @@ export function daysBetween(from: Date, to: Date): number {
   return Math.round((b - a) / DAY_MS);
 }
 
-// Irish school year tends to run September to June, so we anchor the annual
-// cadence to 1 September. AEARS assessments commonly recur about once a year
-// once a family is registered; this is guidance, not a fixed legal date.
+// Irish school year tends to run September to June, so we anchor the yearly
+// cadence to 1 September. Once a family is registered, Tusla reviews periodically;
+// the timing is set by Tusla, so this is guidance, not a fixed legal date.
 function schoolYearStart(ref: Date): Date {
   // If we are before September, the current school year started last September.
   const year = ref.getMonth() >= 8 ? ref.getFullYear() : ref.getFullYear() - 1;
@@ -205,8 +214,9 @@ function schoolYearStart(ref: Date): Date {
 }
 
 /**
- * Build the AEARS timeline relative to today. `status` shapes which milestones
- * are relevant (e.g. once approved, we shift to the annual-review rhythm).
+ * Build the registration timeline relative to today. `status` shapes which
+ * milestones are relevant (e.g. once approved, we shift to the periodic-review
+ * rhythm).
  *
  * Returns upcoming milestones (and the most recent just-passed one) sorted by
  * date, each with a friendly daysAway count.
@@ -221,8 +231,8 @@ export function buildMilestones(
   const raw: Omit<Milestone, 'daysAway'>[] = [];
 
   if (status === 'approved') {
-    // Annual rhythm: gentle reminder to gather evidence, then the rough window
-    // when an annual assessment tends to come around again.
+    // Periodic rhythm: gentle reminder to gather evidence, then the rough window
+    // when a periodic review tends to come around again.
     raw.push({
       key: 'gather_evidence',
       title: 'Gather this year’s evidence',
@@ -231,20 +241,20 @@ export function buildMilestones(
       date: new Date(nextStart.getFullYear(), 4, 1), // 1 May
     });
     raw.push({
-      key: 'annual_window',
-      title: 'Annual assessment window',
+      key: 'review_window',
+      title: 'Periodic review window',
       detail:
-        'Assessments often come around about once a year. A rough guide, not a fixed date.',
+        'Tusla reviews registrations periodically, with the timing set by Tusla. A rough guide, not a fixed date.',
       date: nextStart,
     });
   } else {
-    // Pre-registration rhythm: a nudge to notify, then to have evidence ready
+    // Pre-registration rhythm: a nudge to apply, then to have evidence ready
     // for a first assessment.
     raw.push({
       key: 'registration_window',
-      title: 'Notify Tusla',
+      title: 'Apply to Tusla (AEARS) to register',
       detail:
-        'There is no single deadline. Families often notify before or near the start of the school year.',
+        'There is no single deadline. Families often apply before or near the start of the school year, using Tusla’s official application form.',
       date: nextStart,
     });
     raw.push({

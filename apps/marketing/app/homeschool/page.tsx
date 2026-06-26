@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const feats = [
   { id:'book', title:'NCCA Curriculum Mapping', body:'Every activity is tagged to the NCCA primary curriculum strands. Your children learn through doing - The Hedge tracks the curriculum automatically in the background.' },
-  { id:'file', title:'Learning Logs for AEARS', body:"The Tusla Assessment of Education in Places other than Recognised Schools (AEARS) process looks for evidence of learning. The Hedge auto-generates date-stamped, curriculum-tagged records of everything your child does, designed to help you organise that evidence." },
+  { id:'file', title:'Learning Logs for AEARS', body:"Tusla's Alternative Education Assessment and Registration Service (AEARS) looks for evidence of learning. The Hedge auto-generates date-stamped, curriculum-tagged records of everything your child does, designed to help you organise that evidence." },
   { id:'folder', title:'PDF Report Export', body:'Generate a formatted PDF learning report at any time - covering any date range, any subject areas, any children. A clear, organised record to bring to your AEARS assessment, with one click.' },
   { id:'cal', title:'Weekly Curriculum Planner', body:"Plan your week across the NCCA primary subject areas. The Hedge suggests activities that fit your plan, balances subjects automatically, and flags any areas that haven't been covered recently." },
   { id:'users', title:'Multi-Child Management', body:"Running a household school? Manage each child's curriculum, interests, and learning records completely separately - or together, for activities that work across ages." },
