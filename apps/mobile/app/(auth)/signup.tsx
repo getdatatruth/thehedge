@@ -7,7 +7,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -129,28 +128,6 @@ export default function SignupScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Divider */}
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* Social sign-in */}
-          <TouchableOpacity
-            style={styles.socialButton}
-            onPress={() => Alert.alert('Coming Soon', 'Apple sign-in will be available shortly.')}
-          >
-            <Text style={styles.socialText}>Sign up with Apple</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.socialButton, { marginTop: spacing.md }]}
-            onPress={() => Alert.alert('Coming Soon', 'Google sign-in will be available shortly.')}
-          >
-            <Text style={styles.socialText}>Sign up with Google</Text>
-          </TouchableOpacity>
 
           {/* Sign in link */}
           <View style={styles.footer}>

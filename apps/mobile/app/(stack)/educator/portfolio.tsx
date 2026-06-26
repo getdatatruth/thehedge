@@ -310,14 +310,6 @@ export default function PortfolioScreen() {
             ))}
           </View>
 
-          <Text style={styles.fieldLabel}>Photos</Text>
-          <View style={styles.photoPlaceholder}>
-            <Image size={20} color={`${lightTheme.textSecondary}60`} />
-            <Text style={styles.photoPlaceholderText}>
-              Photo uploads coming soon
-            </Text>
-          </View>
-
           <Button
             variant="primary"
             size="lg"

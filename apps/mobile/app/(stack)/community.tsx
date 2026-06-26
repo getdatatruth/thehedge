@@ -190,7 +190,9 @@ export default function CommunityScreen() {
         await apiPost(`/community/groups/${groupId}/join`, {});
         queryClient.invalidateQueries({ queryKey: ['community-groups'] });
         queryClient.invalidateQueries({ queryKey: ['community-posts'] });
-      } catch {}
+      } catch {
+        Alert.alert('Could not join just now', 'Please try again in a moment.');
+      }
     },
   };
 
@@ -201,7 +203,9 @@ export default function CommunityScreen() {
         const { apiDelete } = await import('@/lib/api');
         await apiDelete(`/community/groups/${groupId}/join`);
         queryClient.invalidateQueries({ queryKey: ['community-groups'] });
-      } catch {}
+      } catch {
+        Alert.alert('Could not leave just now', 'Please try again in a moment.');
+      }
     },
   };
 

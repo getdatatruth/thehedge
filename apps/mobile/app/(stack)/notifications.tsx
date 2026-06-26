@@ -28,8 +28,10 @@ function getRouteForType(type: string, data?: Record<string, unknown>): string |
     case 'tomorrow_preview':
       return '/(tabs)/plan';
     case 'activity_reminder':
-      if (data?.activityId) {
-        return `/(stack)/activity/${data.activityId}`;
+      // Activities open under browse by slug. Never route to the (nonexistent)
+      // /(stack)/activity/:id; fall back to home if no slug was sent.
+      if (typeof data?.activitySlug === 'string') {
+        return `/(tabs)/browse/${data.activitySlug}`;
       }
       return '/(tabs)';
     case 'day_review':
