@@ -19,7 +19,7 @@ const faqs = [
   { q: "How does the weather integration work?", a: "The Hedge pulls live weather data from Open-Meteo for your specific county every morning. If rain is forecast, it automatically surfaces indoor activities. If there's a rare sunny spell, it prioritises outdoor and nature activities. You never have to manually adjust for the weather." },
   { q: "Is The Hedge for homeschoolers or for mainstream families?", a: "Both, and you choose your doorway when you join. Mainstream families use The Hedge for after-school, weekends, school holidays and summer. Home-educating families use the Educator plan for NCCA curriculum mapping, learning logs and records designed to help you organise the evidence an AEARS assessment looks for. Either way, it starts at the Kitchen Table and shapes itself around your family." },
   { q: "Is my data stored in Ireland / the EU?", a: "Yes. All data is stored in the EU - specifically in Frankfurt, Germany - and we are fully GDPR compliant. We do not sell data to third parties or use it for advertising." },
-  { q: "Can I use The Hedge on my phone?", a: "Yes. The web app works beautifully on all mobile devices. A dedicated iOS and Android app is in development and coming soon." },
+  { q: "Can I use The Hedge on my phone?", a: "Yes. The Hedge works beautifully on your phone - in any browser, and with our iOS and Android apps - so a good idea is always to hand, wherever the day takes you." },
 ];
 
 export default function Home() {
@@ -158,6 +158,48 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── PRODUCT SHOWCASE ── */}
+        <section className="section" aria-labelledby="showcase-title">
+          <div className="container">
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">See it for yourself</span></div>
+            <h2 className="section-title" id="showcase-title">The whole product, <em>shaped around your family</em></h2>
+            <p className="section-body" style={{ maxWidth: 560 }}>One calm home for your days, your plan, your record, and your questions. On your laptop, and in your pocket.</p>
+
+            <div className="showcase-stage">
+              <div className="app-window">
+                <div className="app-window-bar">
+                  <span className="awd" style={{ background: '#E8927C' }} />
+                  <span className="awd" style={{ background: '#E8C46A' }} />
+                  <span className="awd" style={{ background: 'var(--sage)' }} />
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/product/today-desktop.png" alt="The Hedge Today screen, a day shaped around your family" />
+              </div>
+              <div className="device-iphone device-float">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/product/today-mobile.png" alt="The Hedge on a phone" />
+              </div>
+            </div>
+
+            <div className="phone-trio">
+              {[
+                { src: '/product/today-mobile.png', t: 'Today', b: 'One gentle idea that fits your crew, the weather, and the day.' },
+                { src: '/product/ask-mobile.png', t: 'Ask', b: 'A calm companion that knows your family. Private, never used to train AI.' },
+                { src: '/product/plan-mobile.png', t: 'Plan', b: 'A timetable, or a gentle rhythm. Your week, your way.' },
+              ].map((p) => (
+                <div key={p.t} className="phone-item">
+                  <div className="device-iphone">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.src} alt={`The Hedge ${p.t} on a phone`} />
+                  </div>
+                  <div className="phone-cap-t">{p.t}</div>
+                  <div className="phone-cap-b">{p.b}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ── FOR WHOM ── */}
         <section className="section section-linen" aria-labelledby="forwhom-title">
           <div className="container">
@@ -266,7 +308,7 @@ export default function Home() {
             <div className="price-grid" style={{marginTop:32}}>
               {[
                 { name:'Free', tag:'Just get started', price:'€0', sub:'forever', btn:'pcb-outline', btnTxt:'Get started free', btnHref:'https://app.thehedge.ie/signup', feats:['1–2 ideas per day','Activity library (limited)','5 personalised ideas per week','Basic weekly view'], dark:false },
-                { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full activity library (over 500)','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iOS & Android app (coming soon)'], dark:false, pop:'Most popular' },
+                { name:'Family', tag:'For families who want more', price:'€6.99', sub:'/month', btn:'pcb-terra', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=family', feats:['Unlimited personalised ideas','Full activity library (over 500)','Live weather integration','Weekly planner & calendar','Activity timeline & logging','iOS and Android apps'], dark:false, pop:'Most popular' },
                 { name:'Educator', tag:'Built for homeschoolers', price:'€14.99', sub:'/month', btn:'pcb-sage', btnTxt:'Start free trial', btnHref:'https://app.thehedge.ie/signup?plan=educator', feats:['Everything in Family','NCCA primary curriculum mapping','Learning logs for AEARS evidence','PDF report export','IEP support tools','Priority support'], dark:true },
               ].map(p => (
                 <div key={p.name} className={`pc ${p.dark ? 'pc-forest' : 'pc-paper'}`} style={{position:'relative'}}>

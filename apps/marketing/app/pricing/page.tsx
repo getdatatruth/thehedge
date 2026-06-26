@@ -188,7 +188,7 @@ export default function Pricing() {
                     ['Weather integration', '–', '✓', '✓'],
                     ['Weekly planner', '–', '✓', '✓'],
                     ['Activity timeline', '–', '✓', '✓'],
-                    ['iOS & Android app', 'Soon', 'Soon', 'Soon'],
+                    ['iOS and Android apps', '✓', '✓', '✓'],
                     ['NCCA primary curriculum mapping', '–', '–', '✓'],
                     ['Learning logs for AEARS evidence', '–', '–', '✓'],
                     ['PDF report export', '–', '–', '✓'],

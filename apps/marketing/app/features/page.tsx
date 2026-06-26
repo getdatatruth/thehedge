@@ -62,7 +62,7 @@ const supportingGroups = [
     sub: 'Quiet, practical, and honest about what is ready',
     features: [
       { id: 'globe', title: 'Works in your browser', body: 'The Hedge runs in any modern browser, on phone, tablet, or laptop. Everything you need is there today, no install required.' },
-      { id: 'cpu', title: 'iOS & Android apps (coming soon)', body: 'Native apps are in the works. They will land when they are genuinely ready, not before.' },
+      { id: 'cpu', title: 'iOS and Android apps', body: 'The Hedge in your pocket, with native apps for iPhone and Android, so a good idea is always to hand.' },
       { id: 'heart', title: 'Shared with your family', body: 'Bring in your partner or co-parent. You both see the same plan, the same record, the same page.' },
     ]
   },
