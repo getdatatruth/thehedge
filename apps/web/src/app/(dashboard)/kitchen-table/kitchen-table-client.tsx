@@ -542,7 +542,8 @@ function ChipTurn({ question, chips, placeholder, note, onSubmit, submitLabel }:
 
 function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone: () => void }) {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pb-20 animate-fade-up">
+    <>
+    <div className="mx-auto w-full max-w-6xl px-4 pb-28 animate-fade-up">
       {/* Header band - the keepsake cover */}
       <div className="relative overflow-hidden rounded-3xl bg-forest px-6 pb-10 pt-9 text-center sm:px-10">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_10%,rgba(94,139,82,0.45),transparent),radial-gradient(ellipse_70%_70%_at_20%_100%,rgba(61,97,66,0.5),transparent)]" />
@@ -604,13 +605,23 @@ function FrameworkReveal({ framework, onDone }: { framework: KTFramework; onDone
         </Panel>
       </div>
 
-      <div className="mt-7 text-center">
-        <button onClick={onDone} className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-7 py-4 text-sm font-semibold text-parchment transition-colors hover:bg-forest/90 sm:w-auto">
-          This is us, into The Hedge <ArrowRight className="h-4 w-4" />
-        </button>
-        <p className="mt-3 text-[12px] italic text-clay/70">This is yours. Tweak anything from Our Hedge whenever you like.</p>
-      </div>
+      <p className="mt-6 text-center text-[12px] italic text-clay/70">This is yours. Tweak anything from Our Hedge whenever you like.</p>
     </div>
+
+      {/* Always-visible action bar (outside the animated container so position:fixed
+          pins to the viewport, not the transformed parent) */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-stone/50 bg-parchment/95 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+          <p className="hidden text-[12.5px] text-clay sm:block">Your framework is saved. Step in whenever you are ready.</p>
+          <button
+            onClick={onDone}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-7 py-3 text-sm font-semibold text-parchment shadow-[0_8px_24px_rgba(13,31,18,0.18)] transition-colors hover:bg-forest/90 sm:w-auto"
+          >
+            This is us, into The Hedge <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
 
