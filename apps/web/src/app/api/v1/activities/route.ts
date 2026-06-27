@@ -33,7 +33,10 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from('activities')
     .select('*', { count: 'exact' })
-    .eq('published', true);
+    .eq('published', true)
+    // Public library only. Bespoke Spark activities (family_id set) are private
+    // to the family and reached directly by slug, not browsed here.
+    .is('family_id', null);
 
   if (category) query = query.eq('category', category);
   if (location) query = query.eq('location', location);

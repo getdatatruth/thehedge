@@ -260,6 +260,13 @@ export const activities = pgTable('activities', {
   printableUrl: text('printable_url'),
   createdBy: text('created_by').notNull().default('system'),
   published: boolean('published').notNull().default(false),
+  // Bespoke "Spark" activities are generated on demand for one family/child and
+  // are private to them. The public library has family_id null. child_id keeps
+  // the activity tied to the child it was sparked for; source_prompt stores the
+  // parent's own words ("River is mad about volcanoes") for context and history.
+  familyId: uuid('family_id').references(() => families.id, { onDelete: 'cascade' }),
+  childId: uuid('child_id').references(() => children.id, { onDelete: 'set null' }),
+  sourcePrompt: text('source_prompt'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [

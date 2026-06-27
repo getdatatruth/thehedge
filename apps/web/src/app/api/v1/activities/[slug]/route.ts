@@ -36,6 +36,7 @@ export async function GET(
     .select('id, title, slug, category, duration_minutes, age_min, age_max, energy_level, description')
     .eq('category', activity.category)
     .eq('published', true)
+    .is('family_id', null)
     .neq('id', activity.id)
     .limit(3);
 
