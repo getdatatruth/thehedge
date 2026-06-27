@@ -118,6 +118,64 @@ export function floorBoost(
   return 1;
 }
 
+// ─── The Quiet Floor: turn the invisible warmth signal into a gentle, opt-in
+// nudge toward the areas of a rounded childhood that have gone quiet. This is the
+// visible face of the floor the engine already keeps. It is never shaming and
+// never a score, and it stays silent until there is genuinely a quiet corner.
+
+// Warm, calm labels for each area, plus a default spark lean. Southern Irish
+// register, no "grand".
+export const QUIET_AREA_COPY: Record<string, { label: string; hint: string }> = {
+  nature: { label: 'nature and the outdoors', hint: 'something out in nature' },
+  science: { label: 'science and how things work', hint: 'a little science' },
+  art: { label: 'art and making', hint: 'something creative and hands-on' },
+  maths: { label: 'numbers and patterns', hint: 'something playful with numbers' },
+  literacy: { label: 'stories and words', hint: 'something with stories or words' },
+  movement: { label: 'moving about', hint: 'something active' },
+  kitchen: { label: 'the kitchen', hint: 'something to make in the kitchen' },
+  life_skills: { label: 'everyday life skills', hint: 'a practical life skill' },
+  calm: { label: 'calm and quiet', hint: 'something calm and quiet' },
+  social: { label: 'time with others', hint: 'something to do with others' },
+};
+
+export interface QuietFloorNudge {
+  areas: { category: string; label: string; hint: string }[];
+  message: string;
+}
+
+// Build the nudge from the warmth map. Returns null when there is nothing worth
+// saying: a cold-start family (empty warmth), or a nicely balanced one (no cool
+// areas). Surfaces at most the two quietest corners so it stays a whisper.
+export function buildQuietFloor(warmth: Record<string, AreaWarmth>): QuietFloorNudge | null {
+  const keys = Object.keys(warmth);
+  if (keys.length === 0) return null; // cold start: never nudge
+
+  const cool = LEARNING_AREAS.filter((a) => warmth[a]?.klass === 'cool');
+  if (cool.length === 0) return null; // genuinely rounded lately: stay quiet
+  // If almost everything is cool, the family is just getting going - not an
+  // imbalance to nudge about. Only nudge when most areas are being touched.
+  if (cool.length > LEARNING_AREAS.length - 3) return null;
+
+  const picked = cool.slice(0, 2).map((category) => ({
+    category,
+    label: QUIET_AREA_COPY[category]?.label || category,
+    hint: QUIET_AREA_COPY[category]?.hint || 'something different',
+  }));
+
+  const names =
+    picked.length === 2 ? `${picked[0].label} and ${picked[1].label}` : picked[0].label;
+  const message =
+    picked.length === 2
+      ? `You have had a lovely run lately. ${capitalise(names)} have been quiet for a while. No pressure at all, but if you fancy it I can shape a spark that leans that way.`
+      : `You have had a lovely run lately. ${capitalise(names)} has been a bit quiet. If you fancy it, I can shape a spark that leans that way.`;
+
+  return { areas: picked, message };
+}
+
+function capitalise(s: string): string {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
 export interface ActivityForWeight {
   category?: string | null;
   ageMin?: number | null;

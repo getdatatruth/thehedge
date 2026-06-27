@@ -87,10 +87,13 @@ export async function POST(request: NextRequest) {
     if (!user) return apiError(error || 'Unauthorized', 401);
 
     const body = await request.json();
-    const { childId, prompt } = body as { childId?: string; prompt?: string };
+    const { childId, prompt, lean } = body as { childId?: string; prompt?: string; lean?: string };
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return apiError('Tell me what they are curious about.', 400);
     }
+    // A balance nudge can ask for a gentle lean toward a quiet area. It is a
+    // preference, never an override: the child's curiosity still leads.
+    const leanCategory = typeof lean === 'string' && CATEGORIES.includes(lean) ? lean : null;
 
     // Family + tier
     const { data: profile } = await supabase
@@ -158,6 +161,7 @@ export async function POST(request: NextRequest) {
       familyContextText ? `What you know about this family:\n${familyContextText}` : '',
       `The child this is for: ${child.name}, age ${age ?? 'unknown'}, interests: ${(child.interests || []).join(', ') || 'still discovering'}.`,
       `What they are curious about right now (the parent's own words): "${prompt.trim()}"`,
+      leanCategory ? `Gentle balance note: this area (${leanCategory}) has been quiet for this family lately. If it fits the child's curiosity naturally, lean the activity that way to help round things out. Never force it against what they are curious about.` : '',
       `Curriculum outcomes you may choose from (id | area > strand | code: text). Pick ONLY the ids this activity genuinely touches:\n${outcomeList || '(none available for this age)'}`,
     ].filter(Boolean).join('\n\n');
 

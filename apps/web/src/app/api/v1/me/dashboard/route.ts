@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
-import { ageInYears, computeAreaWarmth, weightActivity } from '@/lib/personalisation';
+import { ageInYears, computeAreaWarmth, weightActivity, buildQuietFloor } from '@/lib/personalisation';
 
 export async function OPTIONS() {
   return apiOptions();
@@ -169,5 +169,9 @@ export async function GET(request: NextRequest) {
     activitiesThisWeek,
     todayActivities: activities || [],
     featuredCollections: collections,
+    // The visible face of the rounded-childhood floor: a gentle nudge toward a
+    // quiet area, or null when there is nothing worth saying (cold start or a
+    // nicely balanced week).
+    quietFloor: buildQuietFloor(warmth),
   });
 }

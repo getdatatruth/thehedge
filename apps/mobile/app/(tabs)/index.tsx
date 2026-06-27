@@ -59,6 +59,10 @@ interface DashboardData {
     age_max?: number;
   }>;
   familyName: string;
+  quietFloor: {
+    areas: { category: string; label: string; hint: string }[];
+    message: string;
+  } | null;
 }
 
 interface PlanDayBlock {
@@ -375,6 +379,33 @@ export default function TodayScreen() {
             <ArrowRight size={20} color={lightTheme.accent} />
           </TouchableOpacity>
         </AnimatedCard>
+
+        {/* ─── QUIET FLOOR: gentle nudge toward an area that has gone quiet ─── */}
+        {dashboard?.quietFloor && (
+          <AnimatedCard delay={50}>
+            <View style={styles.quietCard}>
+              <View style={styles.quietHeader}>
+                <Feather size={15} color={lightTheme.accent} />
+                <Text style={styles.quietTitle}>A gentle nudge</Text>
+              </View>
+              <Text style={styles.quietMessage}>{dashboard.quietFloor.message}</Text>
+              <TouchableOpacity
+                style={styles.quietCta}
+                activeOpacity={0.85}
+                onPress={() => {
+                  const a = dashboard.quietFloor!.areas[0];
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push(
+                    `/(stack)/spark?lean=${a.category}&leanLabel=${encodeURIComponent(a.label)}&leanHint=${encodeURIComponent(a.hint)}` as any,
+                  );
+                }}
+              >
+                <Text style={styles.quietCtaText}>Shape a spark that leans that way</Text>
+                <ArrowRight size={16} color={lightTheme.accent} />
+              </TouchableOpacity>
+            </View>
+          </AnimatedCard>
+        )}
 
         {/* ─── REFRAME CHIPS: re-pick the one hero, not open a list ─── */}
         {isSelectedToday && heroActivity && (
@@ -732,6 +763,19 @@ const styles = StyleSheet.create({
   sparkTextWrap: { flex: 1 },
   sparkTitle: { ...typography.uiBold, color: lightTheme.text, marginBottom: 2 },
   sparkSubtitle: { ...typography.bodySmall, color: lightTheme.textSecondary, lineHeight: 18 },
+  // Quiet Floor nudge (calm, never shaming)
+  quietCard: {
+    backgroundColor: lightTheme.surface,
+    borderRadius: 20,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: lightTheme.borderLight,
+  },
+  quietHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginBottom: spacing.sm },
+  quietTitle: { ...typography.uiSmall, color: lightTheme.accent, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.4 },
+  quietMessage: { ...typography.body, color: lightTheme.textSecondary, lineHeight: 22 },
+  quietCta: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.md },
+  quietCtaText: { ...typography.uiBold, color: lightTheme.accent },
   // Hero card
   heroCard: {
     backgroundColor: lightTheme.surface, borderRadius: 20, padding: spacing.xl,

@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useRouter } from 'expo-router';
-import { X, Sparkles, ArrowRight } from 'lucide-react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { X, Sparkles, ArrowRight, Feather } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiPost } from '@/hooks/use-api';
@@ -29,13 +29,16 @@ interface SparkResult {
 
 export default function SparkScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ lean?: string; leanLabel?: string; leanHint?: string }>();
   const { children } = useAuthStore();
   const [childId, setChildId] = useState<string | null>(children[0]?.id ?? null);
-  const [prompt, setPrompt] = useState('');
+  // Arriving from a Quiet Floor nudge pre-fills a gentle starting point toward
+  // the quiet area, which the parent can keep or rewrite in their own words.
+  const [prompt, setPrompt] = useState(params.leanHint ? String(params.leanHint) : '');
   const [error, setError] = useState<string | null>(null);
 
   const child = children.find((c) => c.id === childId) ?? children[0];
-  const spark = useApiPost<SparkResult, { childId: string; prompt: string }>('/spark');
+  const spark = useApiPost<SparkResult, { childId: string; prompt: string; lean?: string }>('/spark');
 
   const canGo = prompt.trim().length > 2 && !!childId && !spark.isPending;
 
@@ -44,7 +47,11 @@ export default function SparkScreen() {
     setError(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
-      const res = await spark.mutateAsync({ childId, prompt: prompt.trim() });
+      const res = await spark.mutateAsync({
+        childId,
+        prompt: prompt.trim(),
+        lean: typeof params.lean === 'string' ? params.lean : undefined,
+      });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // Replace this modal with the freshly-shaped activity. The existing detail
       // screen renders it, including its curriculum grounding, and the usual log
@@ -89,6 +96,15 @@ export default function SparkScreen() {
               Something caught their eye? Tell me what they are curious about right now and I will
               shape one lovely thing to do, tied quietly back to the curriculum so it counts.
             </Text>
+
+            {params.leanLabel ? (
+              <View style={styles.leanBanner}>
+                <Feather size={15} color={lightTheme.accent} />
+                <Text style={styles.leanBannerText}>
+                  Leaning toward {String(params.leanLabel)} to round things out. Tweak it however you like.
+                </Text>
+              </View>
+            ) : null}
 
             {children.length > 1 && (
               <>
@@ -162,7 +178,17 @@ const styles = StyleSheet.create({
   headerTitle: { ...typography.h3, color: lightTheme.text },
   closeBtn: { padding: spacing.xs },
   scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing['2xl'] },
-  lead: { ...typography.body, color: lightTheme.textSecondary, marginBottom: spacing.xl, lineHeight: 22 },
+  lead: { ...typography.body, color: lightTheme.textSecondary, marginBottom: spacing.lg, lineHeight: 22 },
+  leanBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    backgroundColor: lightTheme.accentLight,
+    borderRadius: 12,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  leanBannerText: { ...typography.bodySmall, color: lightTheme.text, flex: 1, lineHeight: 18 },
   label: { ...typography.uiBold, color: lightTheme.textSecondary, marginBottom: spacing.sm, marginTop: spacing.md },
   childRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   childPill: {
