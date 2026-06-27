@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { X, Sparkles, ArrowRight, Feather } from 'lucide-react-native';
+import { X, Sparkles, ArrowRight, Feather, Mic } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiPost } from '@/hooks/use-api';
@@ -27,15 +28,23 @@ interface SparkResult {
   outcomeCount: number;
 }
 
+const loadingLines = (name: string) => [
+  `Listening to what ${name} is curious about`,
+  `Shaping a hands-on, screen-free activity for ${name}`,
+  `Aligning it to Aistear and the primary curriculum`,
+  `Writing a little parent guide to follow along`,
+  `Tying it to real outcomes for ${name}'s portfolio`,
+  `Almost there, putting it all together`,
+];
+
 export default function SparkScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ lean?: string; leanLabel?: string; leanHint?: string }>();
   const { children } = useAuthStore();
   const [childId, setChildId] = useState<string | null>(children[0]?.id ?? null);
-  // Arriving from a Quiet Floor nudge pre-fills a gentle starting point toward
-  // the quiet area, which the parent can keep or rewrite in their own words.
   const [prompt, setPrompt] = useState(params.leanHint ? String(params.leanHint) : '');
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<TextInput>(null);
 
   const child = children.find((c) => c.id === childId) ?? children[0];
   const spark = useApiPost<SparkResult, { childId: string; prompt: string; lean?: string }>('/spark');
@@ -45,7 +54,7 @@ export default function SparkScreen() {
   async function follow() {
     if (!childId) return;
     setError(null);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       const res = await spark.mutateAsync({
         childId,
@@ -53,9 +62,6 @@ export default function SparkScreen() {
         lean: typeof params.lean === 'string' ? params.lean : undefined,
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      // Replace this modal with the freshly-shaped activity. The existing detail
-      // screen renders it, including its curriculum grounding, and the usual log
-      // + save-to-portfolio flow works unchanged.
       router.replace(`/(tabs)/browse/${res.slug}` as never);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'I could not shape that one just now. Have another go in a moment.');
@@ -67,12 +73,14 @@ export default function SparkScreen() {
       <StatusBar style="dark" />
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
-          <Sparkles size={20} color={lightTheme.accent} />
+          <Sparkles size={18} color={lightTheme.accent} />
           <Text style={styles.headerTitle}>Follow a spark</Text>
         </View>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.closeBtn}>
-          <X size={22} color={lightTheme.textMuted} />
-        </TouchableOpacity>
+        {!spark.isPending && (
+          <TouchableOpacity onPress={() => router.back()} hitSlop={12} style={styles.closeBtn}>
+            <X size={22} color={lightTheme.textMuted} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <KeyboardAvoidingView
@@ -80,20 +88,19 @@ export default function SparkScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {spark.isPending ? (
-          <View style={styles.loadingWrap}>
-            <ActivityIndicator size="large" color={lightTheme.accent} />
-            <Text style={styles.loadingText}>
-              Shaping something for {child?.name ?? 'them'}, and tying it back to what matters...
-            </Text>
-          </View>
+          <SparkLoading name={child?.name ?? 'them'} />
         ) : (
           <ScrollView
             contentContainerStyle={styles.scroll}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
           >
+            <View style={styles.heroIcon}>
+              <Sparkles size={30} color={lightTheme.accent} strokeWidth={1.6} />
+            </View>
+            <Text style={styles.bigTitle}>What caught their eye?</Text>
             <Text style={styles.lead}>
-              Something caught their eye? Tell me what they are curious about right now and I will
+              Tell me what {child?.name ?? 'they'} {child ? 'is' : 'are'} curious about right now and I will
               shape one lovely thing to do, tied quietly back to the curriculum so it counts.
             </Text>
 
@@ -127,22 +134,33 @@ export default function SparkScreen() {
               </>
             )}
 
-            <Text style={styles.label}>What are they curious about?</Text>
-            <TextInput
-              value={prompt}
-              onChangeText={(t) => { setPrompt(t); if (error) setError(null); }}
-              placeholder={`e.g. ${child?.name ?? 'They'} is mad about volcanoes and how they erupt`}
-              placeholderTextColor={lightTheme.textMuted}
-              multiline
-              style={styles.input}
-              autoFocus
-            />
+            <View style={styles.inputWrap}>
+              <TextInput
+                ref={inputRef}
+                value={prompt}
+                onChangeText={(t) => { setPrompt(t); if (error) setError(null); }}
+                placeholder={`e.g. ${child?.name ?? 'They'} is mad about volcanoes and how they erupt`}
+                placeholderTextColor={lightTheme.textMuted}
+                multiline
+                style={styles.input}
+                autoFocus
+              />
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.dictateRow}
+              onPress={() => { Haptics.selectionAsync(); inputRef.current?.focus(); }}
+            >
+              <View style={styles.micCircle}>
+                <Mic size={16} color={lightTheme.accent} />
+              </View>
+              <Text style={styles.dictateText}>
+                Prefer to talk? Tap the microphone on your keyboard and just say it.
+              </Text>
+            </TouchableOpacity>
 
             {error ? <Text style={styles.error}>{error}</Text> : null}
-
-            <Text style={styles.hint}>
-              I already know {child?.name ?? 'them'}, so just say it the way you would at the table.
-            </Text>
           </ScrollView>
         )}
 
@@ -154,13 +172,75 @@ export default function SparkScreen() {
               onPress={follow}
               style={[styles.cta, !canGo && styles.ctaDisabled]}
             >
-              <Text style={styles.ctaText}>Follow it</Text>
+              <Sparkles size={18} color="#FFFFFF" />
+              <Text style={styles.ctaText}>Shape it for {child?.name ?? 'them'}</Text>
               <ArrowRight size={18} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         )}
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+// ─── The alive loading state: a pulsing spark, a filling progress arc and a
+// rotating, curriculum-aware status line, so it never reads as frozen. ────────
+function SparkLoading({ name }: { name: string }) {
+  const lines = loadingLines(name);
+  const [lineIndex, setLineIndex] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+  const pulse = useRef(new Animated.Value(0)).current;
+  const progress = useRef(new Animated.Value(0)).current;
+  const fade = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // gentle pulse of the spark
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0, duration: 900, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      ]),
+    ).start();
+    // progress bar eases toward ~95% over ~16s (the real result usually lands first)
+    Animated.timing(progress, { toValue: 1, duration: 16000, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
+  }, [pulse, progress]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      // cross-fade the status line
+      Animated.timing(fade, { toValue: 0, duration: 250, useNativeDriver: true }).start(() => {
+        setLineIndex((i) => (i + 1) % lines.length);
+        Animated.timing(fade, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+      });
+    }, 2400);
+    const s = setInterval(() => setSeconds((x) => x + 1), 1000);
+    return () => { clearInterval(t); clearInterval(s); };
+  }, [fade, lines.length]);
+
+  const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.14] });
+  const glow = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.25, 0.5] });
+  const widthPct = progress.interpolate({ inputRange: [0, 1], outputRange: ['6%', '95%'] });
+
+  return (
+    <View style={styles.loadingWrap}>
+      <Animated.View style={[styles.loadGlow, { opacity: glow, transform: [{ scale }] }]} />
+      <Animated.View style={[styles.loadIcon, { transform: [{ scale }] }]}>
+        <Sparkles size={40} color={lightTheme.accent} strokeWidth={1.6} />
+      </Animated.View>
+
+      <Text style={styles.loadHeadline}>Shaping something for {name}</Text>
+
+      <Animated.Text style={[styles.loadLine, { opacity: fade }]}>
+        {lines[lineIndex]}
+      </Animated.Text>
+
+      <View style={styles.progressTrack}>
+        <Animated.View style={[styles.progressFill, { width: widthPct }]} />
+      </View>
+      <Text style={styles.loadTimer}>
+        {seconds < 18 ? 'This usually takes a few seconds' : 'Nearly there, thanks for your patience'}
+      </Text>
+    </View>
   );
 }
 
@@ -178,7 +258,14 @@ const styles = StyleSheet.create({
   headerTitle: { ...typography.h3, color: lightTheme.text },
   closeBtn: { padding: spacing.xs },
   scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing['2xl'] },
-  lead: { ...typography.body, color: lightTheme.textSecondary, marginBottom: spacing.lg, lineHeight: 22 },
+  heroIcon: {
+    width: 64, height: 64, borderRadius: 20,
+    backgroundColor: lightTheme.accentLight,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: spacing.lg,
+  },
+  bigTitle: { ...typography.h1, color: lightTheme.text, marginBottom: spacing.sm },
+  lead: { ...typography.body, color: lightTheme.textSecondary, marginBottom: spacing.lg, lineHeight: 23 },
   leanBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -190,7 +277,7 @@ const styles = StyleSheet.create({
   },
   leanBannerText: { ...typography.bodySmall, color: lightTheme.text, flex: 1, lineHeight: 18 },
   label: { ...typography.uiBold, color: lightTheme.textSecondary, marginBottom: spacing.sm, marginTop: spacing.md },
-  childRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  childRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
   childPill: {
     backgroundColor: lightTheme.surface,
     borderRadius: 999,
@@ -202,20 +289,33 @@ const styles = StyleSheet.create({
   childPillOn: { backgroundColor: lightTheme.accentLight, borderColor: lightTheme.accent },
   childPillText: { ...typography.bodySmall, color: lightTheme.textSecondary },
   childPillTextOn: { color: lightTheme.text, fontWeight: '600' },
+  inputWrap: { marginTop: spacing.xs },
   input: {
     ...typography.body,
     color: lightTheme.text,
     backgroundColor: lightTheme.surface,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: lightTheme.border,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-    minHeight: 110,
+    minHeight: 120,
     textAlignVertical: 'top',
   },
-  hint: { ...typography.bodySmall, color: lightTheme.textMuted, marginTop: spacing.md, fontStyle: 'italic' },
+  dictateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  micCircle: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: lightTheme.accentLight,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  dictateText: { ...typography.bodySmall, color: lightTheme.textSecondary, flex: 1, lineHeight: 18 },
   error: { ...typography.bodySmall, color: '#C0392B', marginTop: spacing.md },
   footer: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: spacing.md },
   cta: {
@@ -224,11 +324,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     backgroundColor: lightTheme.accent,
-    borderRadius: 14,
-    paddingVertical: 16,
+    borderRadius: 16,
+    paddingVertical: 17,
   },
   ctaDisabled: { opacity: 0.4 },
   ctaText: { ...typography.button, color: '#FFFFFF' },
-  loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xl, gap: spacing.lg },
-  loadingText: { ...typography.body, color: lightTheme.textSecondary, textAlign: 'center', lineHeight: 22 },
+
+  // Loading
+  loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.xl },
+  loadGlow: {
+    position: 'absolute',
+    width: 160, height: 160, borderRadius: 80,
+    backgroundColor: lightTheme.accent,
+    top: '32%',
+  },
+  loadIcon: {
+    width: 104, height: 104, borderRadius: 34,
+    backgroundColor: lightTheme.accentLight,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: spacing.xl,
+  },
+  loadHeadline: { ...typography.h2, color: lightTheme.text, textAlign: 'center', marginBottom: spacing.md },
+  loadLine: {
+    ...typography.body,
+    color: lightTheme.accent,
+    textAlign: 'center',
+    minHeight: 48,
+    lineHeight: 23,
+    marginBottom: spacing.lg,
+  },
+  progressTrack: {
+    width: '78%',
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: lightTheme.border,
+    overflow: 'hidden',
+  },
+  progressFill: { height: 6, borderRadius: 3, backgroundColor: lightTheme.accent },
+  loadTimer: { ...typography.bodySmall, color: lightTheme.textMuted, marginTop: spacing.md },
 });

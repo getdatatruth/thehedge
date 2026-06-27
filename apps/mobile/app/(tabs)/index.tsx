@@ -372,23 +372,28 @@ export default function TodayScreen() {
         {/* ─── SPARK: follow the child's curiosity in the moment ─── */}
         <AnimatedCard delay={0}>
           <TouchableOpacity
-            activeOpacity={0.9}
+            activeOpacity={0.92}
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               router.push('/(stack)/spark' as any);
             }}
             style={styles.sparkCard}
           >
+            <View style={styles.sparkDecor} pointerEvents="none">
+              <Sparkles size={150} color="rgba(76,175,124,0.10)" strokeWidth={1} />
+            </View>
             <View style={styles.sparkIcon}>
               <Sparkles size={22} color="#FFFFFF" />
             </View>
-            <View style={styles.sparkTextWrap}>
-              <Text style={styles.sparkTitle}>Follow a spark</Text>
-              <Text style={styles.sparkSubtitle}>
-                What are they curious about right now? I'll shape one lovely thing, tied back to what matters.
-              </Text>
+            <Text style={styles.sparkKicker}>FOLLOW A SPARK</Text>
+            <Text style={styles.sparkTitle}>What are they curious about today?</Text>
+            <Text style={styles.sparkSubtitle}>
+              Tell me in your own words and I'll shape one lovely activity around it, tied quietly to the curriculum.
+            </Text>
+            <View style={styles.sparkCtaBtn}>
+              <Text style={styles.sparkCtaText}>Shape an activity</Text>
+              <ArrowRight size={16} color={lightTheme.primary} />
             </View>
-            <ArrowRight size={20} color={lightTheme.accent} />
           </TouchableOpacity>
         </AnimatedCard>
 
@@ -758,23 +763,40 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: spacing.xl, paddingBottom: spacing['6xl'], gap: spacing.lg,
   },
-  // Spark card (follow the child's curiosity)
+  // Spark card (follow the child's curiosity) - the hero of Today
   sparkCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    backgroundColor: lightTheme.accentLight,
-    borderRadius: 20,
-    padding: spacing.lg,
+    backgroundColor: lightTheme.primary,
+    borderRadius: 24,
+    padding: spacing.xl,
+    overflow: 'hidden',
   },
+  sparkDecor: { position: 'absolute', top: -30, right: -30 },
   sparkIcon: {
-    width: 44, height: 44, borderRadius: 14,
+    width: 46, height: 46, borderRadius: 15,
     backgroundColor: lightTheme.accent,
     alignItems: 'center', justifyContent: 'center',
+    marginBottom: spacing.md,
   },
-  sparkTextWrap: { flex: 1 },
-  sparkTitle: { ...typography.uiBold, color: lightTheme.text, marginBottom: 2 },
-  sparkSubtitle: { ...typography.bodySmall, color: lightTheme.textSecondary, lineHeight: 18 },
+  sparkKicker: {
+    ...typography.uiSmall,
+    color: lightTheme.accent,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    marginBottom: spacing.xs,
+  },
+  sparkTitle: { ...typography.h2, color: '#FFFFFF', marginBottom: spacing.sm },
+  sparkSubtitle: { ...typography.bodySmall, color: 'rgba(255,255,255,0.72)', lineHeight: 20, marginBottom: spacing.lg },
+  sparkCtaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+  },
+  sparkCtaText: { ...typography.uiBold, color: lightTheme.primary },
   // Quiet Floor nudge (calm, never shaming)
   quietCard: {
     backgroundColor: lightTheme.surface,
