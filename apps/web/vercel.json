@@ -9,12 +9,8 @@
       "schedule": "0 6 * * 1"
     },
     {
-      "path": "/api/cron/notifications?type=morning_plan",
-      "schedule": "30 6 * * *"
-    },
-    {
-      "path": "/api/cron/notifications?type=week_review",
-      "schedule": "0 17 * * 0"
+      "path": "/api/cron/notifications/tick",
+      "schedule": "0 * * * *"
     }
   ]
 }
