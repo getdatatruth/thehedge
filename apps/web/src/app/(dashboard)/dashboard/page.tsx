@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getWeather, getSeason } from '@/lib/weather';
 import { TodayClient } from './today-client';
 import type { MockActivity } from '@/lib/mock-data';
-import { ageInYears, computeAreaWarmth, weightActivity } from '@/lib/personalisation';
+import { ageInYears, computeAreaWarmth, weightActivity, buildQuietFloor } from '@/lib/personalisation';
 
 export const metadata = {
   title: 'Today - The Hedge',
@@ -91,6 +91,7 @@ export default async function DashboardPage() {
   // Real children (with the bits the personalisation engine needs)
   let childNames: string[] = [];
   let childIds: string[] = [];
+  let sparkChildren: { id: string; name: string }[] = [];
   let childCtxs: { age: number | null; interests: string[] }[] = [];
   let childSchoolStatuses: string[] = [];
   if (familyId) {
@@ -99,6 +100,7 @@ export default async function DashboardPage() {
       .select('id, name, date_of_birth, interests, school_status')
       .eq('family_id', familyId);
     childNames = dbChildren?.map((c) => c.name) || [];
+    sparkChildren = (dbChildren || []).map((c) => ({ id: c.id, name: c.name }));
     childIds = dbChildren?.map((c) => c.id) || [];
     childCtxs = (dbChildren || []).map((c) => ({
       age: ageInYears(c.date_of_birth, now),
@@ -138,6 +140,10 @@ export default async function DashboardPage() {
       now,
     );
   }
+
+  // The visible face of the rounded-childhood floor (null on cold start / a
+  // balanced week), same logic the mobile dashboard uses.
+  const quietFloor = buildQuietFloor(warmth);
 
   // Candidate pool, then rank by the personalisation engine so the hero is
   // age-appropriate, interest-bridged, weather-aware, and gently floor-balanced.
@@ -298,6 +304,8 @@ export default async function DashboardPage() {
       learningPath={learningPath}
       activitiesLogged={activitiesLogged}
       approach={family?.approach}
+      sparkChildren={sparkChildren}
+      quietFloor={quietFloor}
     />
   );
 }

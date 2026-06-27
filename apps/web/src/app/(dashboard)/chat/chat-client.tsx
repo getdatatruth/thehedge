@@ -3,11 +3,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { Send, Sparkles, User, Crown } from 'lucide-react';
+import { Send, Sparkles, User, Crown, GraduationCap, ArrowRight } from 'lucide-react';
+
+interface SparkActivity {
+  slug: string;
+  title: string;
+  description?: string;
+  childName?: string;
+  outcomeCount?: number;
+}
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  activity?: SparkActivity;
 }
 
 interface ChatInterfaceProps {
@@ -84,6 +93,16 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
           setMessages([...history, { role: 'assistant', content: message }]);
         }
         return;
+      }
+
+      // A build-an-activity request comes back as JSON (an activity card), not
+      // a token stream. Render it as a card instead of streaming text.
+      if ((res.headers.get('content-type') || '').includes('application/json')) {
+        const data = await res.json();
+        if (data?.type === 'activity' && data.activity) {
+          setMessages([...history, { role: 'assistant', content: data.reply || '', activity: data.activity }]);
+          return;
+        }
       }
 
       if (!res.body) {
@@ -224,6 +243,27 @@ export function ChatInterface({ context }: ChatInterfaceProps) {
                         <span className="inline-block w-1.5 h-4 ml-0.5 align-text-bottom bg-moss/50 animate-pulse" />
                       )}
                     </p>
+                    {msg.activity && (
+                      <Link
+                        href={`/activity/${msg.activity.slug}`}
+                        className="mt-3 flex items-center gap-3 rounded-2xl border border-moss bg-white p-3 transition-colors hover:bg-moss/5"
+                      >
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-moss">
+                          <Sparkles className="h-5 w-5 text-white" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-semibold text-ink">{msg.activity.title}</span>
+                          {msg.activity.description && (
+                            <span className="block truncate text-[12.5px] text-clay">{msg.activity.description}</span>
+                          )}
+                          <span className="mt-0.5 flex items-center gap-1 text-[11px] font-semibold text-moss">
+                            <GraduationCap className="h-3 w-3" /> Curriculum-aligned
+                            {msg.activity.outcomeCount ? ` · ${msg.activity.outcomeCount} outcomes` : ''}
+                          </span>
+                        </span>
+                        <ArrowRight className="h-4 w-4 shrink-0 text-moss" />
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>

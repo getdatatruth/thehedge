@@ -355,36 +355,51 @@ export function ActivityDetailClient({
         </div>
       )}
 
-      {/* Curriculum Links */}
-      {((activity.aistear_themes as string[])?.length > 0 || (activity.ncca_areas as string[])?.length > 0) && (
-        <div className="card-elevated p-6">
-          <p className="eyebrow mb-4">Curriculum Links</p>
-          {(activity.aistear_themes as string[])?.length > 0 && (
-            <div className="mb-4">
-              <p className="text-xs font-semibold text-clay mb-2">Aistear Themes</p>
-              <div className="flex flex-wrap gap-2">
-                {(activity.aistear_themes as string[]).map((theme: string) => (
-                  <span key={theme} className="inline-flex items-center rounded-xl bg-cat-nature/10 px-3 py-1 text-xs font-medium text-cat-nature">
-                    {theme}
-                  </span>
-                ))}
+      {/* How this aligns to the curriculum (reads top-level columns for library
+          activities, and curriculum_tags for bespoke Spark activities) */}
+      {(() => {
+        const tags = (activity.curriculum_tags as {
+          aistear_themes?: string[]; ncca_areas?: string[]; outcome_codes?: string[]; rationale?: string;
+        } | null) || {};
+        const aistear = ((activity.aistear_themes as string[]) || tags.aistear_themes || []);
+        const ncca = ((activity.ncca_areas as string[]) || tags.ncca_areas || []);
+        const codes = tags.outcome_codes || [];
+        const rationale = tags.rationale;
+        if (aistear.length === 0 && ncca.length === 0) return null;
+        return (
+          <div className="card-elevated p-6">
+            <p className="eyebrow mb-4">How this aligns</p>
+            {rationale ? <p className="text-[14px] leading-relaxed text-clay mb-4">{rationale}</p> : null}
+            {aistear.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-clay mb-2">Aistear</p>
+                <div className="flex flex-wrap gap-2">
+                  {aistear.map((theme: string) => (
+                    <span key={theme} className="inline-flex items-center rounded-xl bg-cat-nature/10 px-3 py-1 text-xs font-medium text-cat-nature">
+                      {theme}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          {(activity.ncca_areas as string[])?.length > 0 && (
-            <div>
-              <p className="text-xs font-semibold text-clay mb-2">Primary Curriculum</p>
-              <div className="flex flex-wrap gap-2">
-                {(activity.ncca_areas as string[]).map((area: string) => (
-                  <span key={area} className="inline-flex items-center rounded-xl bg-cat-science/10 px-3 py-1 text-xs font-medium text-cat-science">
-                    {area}
-                  </span>
-                ))}
+            )}
+            {ncca.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-clay mb-2">Primary Curriculum</p>
+                <div className="flex flex-wrap gap-2">
+                  {ncca.map((area: string) => (
+                    <span key={area} className="inline-flex items-center rounded-xl bg-cat-science/10 px-3 py-1 text-xs font-medium text-cat-science">
+                      {area}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+            {codes.length > 0 && (
+              <p className="mt-3 text-xs text-clay/60">Outcomes touched: {codes.join(', ')}</p>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Parent Guide */}
       <div className="card-elevated p-6 space-y-5">

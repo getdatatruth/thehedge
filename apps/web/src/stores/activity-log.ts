@@ -26,6 +26,8 @@ interface LogActivityData {
   duration_minutes?: number | null;
   notes?: string | null;
   rating?: number | null;
+  diary_entry?: string | null;
+  save_to_portfolio?: boolean;
 }
 
 interface ActivityLogState {

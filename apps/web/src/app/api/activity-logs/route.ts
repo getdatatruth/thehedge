@@ -1,7 +1,20 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 import { createNotification } from '@/lib/notifications';
 import { capture, AnalyticsEvent } from '@/lib/analytics';
+
+// Pull the curriculum areas + outcome ids an activity carries, so a saved
+// portfolio entry becomes honest Tusla/AEARS evidence (mirrors the v1 route).
+function curriculumFromActivity(tags: unknown): { areas: string[]; outcomeIds: string[] } {
+  const t = (tags || {}) as Record<string, unknown>;
+  const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') as string[] : []);
+  const areas = [
+    ...arr(t.aistear_themes).map((a) => (a.startsWith('Aistear') ? a : `Aistear: ${a}`)),
+    ...arr(t.ncca_areas),
+  ];
+  return { areas: [...new Set(areas)], outcomeIds: arr(t.outcome_ids) };
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { activity_id, child_ids, date, duration_minutes, notes, rating } =
+    const { activity_id, child_ids, date, duration_minutes, notes, rating, diary_entry, save_to_portfolio } =
       body;
 
     if (!date) {
@@ -52,7 +65,7 @@ export async function POST(request: NextRequest) {
         photos: [],
         curriculum_areas_covered: [],
       })
-      .select('*, activities(title, category, slug)')
+      .select('*, activities(title, category, slug, curriculum_tags)')
       .single();
 
     if (insertError) {
@@ -61,6 +74,38 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to create activity log' },
         { status: 500 }
       );
+    }
+
+    // Save to the child's portfolio when asked, carrying the activity's
+    // curriculum outcomes through as evidence. Best-effort; never fails the log.
+    if (save_to_portfolio && Array.isArray(child_ids) && child_ids.length > 0) {
+      try {
+        const act = (log as { activities?: { title?: string; curriculum_tags?: unknown } }).activities;
+        const { areas, outcomeIds } = curriculumFromActivity(act?.curriculum_tags);
+        const { data: ownChildren } = await supabase
+          .from('children')
+          .select('id')
+          .eq('family_id', profile.family_id)
+          .in('id', child_ids);
+        const validChildIds = (ownChildren || []).map((c) => c.id);
+        if (validChildIds.length > 0) {
+          const admin = createAdminClient();
+          await admin.from('portfolio_entries').insert(
+            validChildIds.map((childId) => ({
+              child_id: childId,
+              date,
+              title: act?.title || 'A learning moment',
+              description: (diary_entry || notes || '').trim() || null,
+              curriculum_areas: areas,
+              outcome_ids: outcomeIds,
+              photos: [],
+              activity_log_id: (log as { id: string }).id,
+            }))
+          );
+        }
+      } catch (e) {
+        console.error('portfolio save threw:', e);
+      }
     }
 
     // ── Analytics: activity logged (fire-and-forget) ──

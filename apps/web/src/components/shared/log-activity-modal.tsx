@@ -139,6 +139,8 @@ export function LogActivityModal({
       duration_minutes: duration ? parseInt(duration, 10) : null,
       notes: notes || null,
       rating,
+      diary_entry: diaryEntry.trim() || null,
+      save_to_portfolio: saveToPortfolio,
     });
 
     setLoading(false);

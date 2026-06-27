@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ActivityCard, CATEGORY_CONFIG } from '@/components/shared/activity-card';
+import { SparkLauncher } from '@/components/shared/spark-launcher';
 import { InsightCard } from '@/components/shared/insight-card';
 import { NewThisWeek } from '@/components/shared/new-this-week';
 import { type MockActivity } from '@/lib/mock-data';
@@ -54,6 +55,11 @@ interface TodayClientProps {
   learningPath?: string | null;
   activitiesLogged?: number;
   approach?: string | null;
+  sparkChildren?: { id: string; name: string }[];
+  quietFloor?: {
+    areas: { category: string; label: string; hint: string }[];
+    message: string;
+  } | null;
 }
 
 // Reframe chips re-pick the single hero, they do not open a list.
@@ -89,6 +95,8 @@ export function TodayClient({
   learningPath,
   activitiesLogged = 0,
   approach,
+  sparkChildren = [],
+  quietFloor = null,
 }: TodayClientProps) {
   const [reframe, setReframe] = useState<string | null>(null);
   const [shuffle, setShuffle] = useState(0);
@@ -194,6 +202,13 @@ export function TodayClient({
           </p>
         )}
       </header>
+
+      {/* ─── Follow a spark + the Quiet Floor nudge ─── */}
+      {sparkChildren.length > 0 && (
+        <div className="space-y-4">
+          <SparkLauncher children={sparkChildren} quietFloor={quietFloor} />
+        </div>
+      )}
 
       {/* ─── The Thread: one breathing hero ─── */}
       {hero ? (
