@@ -62,7 +62,14 @@
           "color": "#1C3520"
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "The Hedge uses the microphone so you can speak what your child is curious about, instead of typing.",
+          "speechRecognitionPermission": "The Hedge uses speech recognition to turn what you say into text for sparks and learning logs."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

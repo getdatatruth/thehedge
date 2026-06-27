@@ -5,3 +5,7 @@ node_modules/
 *.tsbuildinfo
 .DS_Store
 .vercel
+
+# Session artifacts
+.claude/
+.playwright-mcp/

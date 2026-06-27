@@ -9,14 +9,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import { X, BookHeart, ArrowRight, Mic, GraduationCap, Check, Layers } from 'lucide-react-native';
+import { X, BookHeart, ArrowRight, GraduationCap, Check, Layers, ImagePlus } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { DictationButton } from '@/components/shared/DictationButton';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiPost } from '@/hooks/use-api';
+import { uploadPortfolioPhoto } from '@/lib/api';
 import { lightTheme } from '@/theme/colors';
 import { typography } from '@/theme/typography';
 import { spacing } from '@/theme/spacing';
@@ -40,13 +45,33 @@ export default function LogMomentScreen() {
   const [duration, setDuration] = useState<number | null>(30);
   const [step, setStep] = useState<'input' | 'review'>('input');
   const [draft, setDraft] = useState<MomentDraft | null>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const analyse = useApiPost<MomentDraft, { childIds: string[]; description: string }>('/moment/analyse');
   const save = useApiPost<{ portfolioSaved: number }, {
     childIds: string[]; date: string; durationMinutes: number | null;
-    title: string; summary: string; areas: string[]; outcomeIds: string[];
+    title: string; summary: string; areas: string[]; outcomeIds: string[]; photos: string[];
   }>('/moment/save');
+
+  async function pickPhotos() {
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) { Alert.alert('Photos needed', 'Allow photo access in Settings to add photos.'); return; }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsMultipleSelection: true,
+        selectionLimit: 5 - photos.length,
+        quality: 0.7,
+      });
+      if (!result.canceled && result.assets?.length) {
+        Haptics.selectionAsync();
+        setPhotos((p) => [...p, ...result.assets.map((a) => a.uri)].slice(0, 5));
+      }
+    } catch {
+      Alert.alert('Could not open photos', 'Have another go, or save without a photo.');
+    }
+  }
 
   const today = new Date().toISOString().split('T')[0];
   const canAnalyse = description.trim().length > 4 && selected.length > 0 && !analyse.isPending;
@@ -73,6 +98,13 @@ export default function LogMomentScreen() {
     setError(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
+      // Upload any photos to private portfolio storage first, then attach paths.
+      let photoPaths: string[] = [];
+      if (photos.length > 0) {
+        setUploading(true);
+        photoPaths = await Promise.all(photos.map((uri) => uploadPortfolioPhoto(uri)));
+        setUploading(false);
+      }
       await save.mutateAsync({
         childIds: selected,
         date: today,
@@ -81,10 +113,12 @@ export default function LogMomentScreen() {
         summary: draft.summary,
         areas: draft.areas,
         outcomeIds: draft.outcomeIds,
+        photos: photoPaths,
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     } catch (e) {
+      setUploading(false);
       setError(e instanceof Error ? e.message : 'I could not save that. Have another go in a moment.');
     }
   }
@@ -100,7 +134,7 @@ export default function LogMomentScreen() {
           <BookHeart size={18} color={lightTheme.accent} />
           <Text style={styles.headerTitle}>{step === 'input' ? 'Log a moment' : 'How it looks'}</Text>
         </View>
-        {!analyse.isPending && !save.isPending && (
+        {!analyse.isPending && !save.isPending && !uploading && (
           <TouchableOpacity onPress={() => (step === 'review' ? setStep('input') : router.back())} hitSlop={12}>
             <X size={22} color={lightTheme.textMuted} />
           </TouchableOpacity>
@@ -144,10 +178,10 @@ export default function LogMomentScreen() {
               style={styles.input}
               autoFocus
             />
-            <View style={styles.dictateRow}>
-              <Mic size={14} color={lightTheme.accent} />
-              <Text style={styles.dictateText}>Prefer to talk? Tap the microphone on your keyboard and just say it.</Text>
-            </View>
+            <DictationButton
+              value={description}
+              onChange={(t) => { setDescription(t); if (error) setError(null); }}
+            />
 
             <Text style={styles.label}>How long, roughly?</Text>
             <View style={styles.row}>
@@ -158,10 +192,31 @@ export default function LogMomentScreen() {
               ))}
             </View>
 
+            <Text style={styles.label}>Photos for the portfolio?</Text>
+            <View style={styles.photoRow}>
+              {photos.map((uri, i) => (
+                <View key={uri + i} style={styles.thumbWrap}>
+                  <Image source={{ uri }} style={styles.thumb} />
+                  <TouchableOpacity
+                    style={styles.thumbRemove}
+                    onPress={() => { Haptics.selectionAsync(); setPhotos((p) => p.filter((_, j) => j !== i)); }}
+                  >
+                    <X size={13} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              {photos.length < 5 && (
+                <TouchableOpacity style={styles.addPhoto} onPress={pickPhotos} activeOpacity={0.8}>
+                  <ImagePlus size={22} color={lightTheme.accent} />
+                  <Text style={styles.addPhotoText}>Add</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
             {error ? <Text style={styles.error}>{error}</Text> : null}
           </ScrollView>
-        ) : save.isPending ? (
-          <Loading text="Saving it to the portfolio..." />
+        ) : (save.isPending || uploading) ? (
+          <Loading text={uploading ? 'Adding your photos...' : 'Saving it to the portfolio...'} />
         ) : (
           <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             <Text style={styles.lead}>Here is how it reads. Tweak anything, then keep it for the portfolio.</Text>
@@ -207,7 +262,7 @@ export default function LogMomentScreen() {
           </ScrollView>
         )}
 
-        {!analyse.isPending && !save.isPending && (
+        {!analyse.isPending && !save.isPending && !uploading && (
           <View style={styles.footer}>
             {step === 'input' ? (
               <TouchableOpacity disabled={!canAnalyse} onPress={runAnalyse} style={[styles.cta, !canAnalyse && styles.ctaOff]}>
@@ -255,6 +310,22 @@ const styles = StyleSheet.create({
   dictateRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.sm },
   dictateText: { ...typography.bodySmall, color: lightTheme.textSecondary, flex: 1, lineHeight: 18 },
   error: { ...typography.bodySmall, color: '#C0392B', marginTop: spacing.md },
+  photoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  thumbWrap: { width: 72, height: 72, borderRadius: 12, overflow: 'hidden' },
+  thumb: { width: 72, height: 72, borderRadius: 12 },
+  thumbRemove: {
+    position: 'absolute', top: 3, right: 3,
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  addPhoto: {
+    width: 72, height: 72, borderRadius: 12,
+    borderWidth: 1.5, borderColor: lightTheme.border, borderStyle: 'dashed',
+    alignItems: 'center', justifyContent: 'center', gap: 2,
+    backgroundColor: lightTheme.surface,
+  },
+  addPhotoText: { ...typography.uiSmall, color: lightTheme.accent, fontWeight: '600' },
   alignCard: { backgroundColor: lightTheme.surface, borderRadius: 16, borderWidth: 1, borderColor: lightTheme.borderLight, padding: spacing.lg, marginTop: spacing.lg },
   alignTitle: { ...typography.uiBold, color: lightTheme.text, marginBottom: spacing.sm },
   rationale: { ...typography.bodySmall, color: lightTheme.textSecondary, lineHeight: 20, marginBottom: spacing.md },

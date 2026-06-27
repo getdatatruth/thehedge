@@ -117,3 +117,24 @@ export async function signUpAccount(email: string, password: string, name: strin
     throw new Error(json?.error || 'Could not create your account');
   }
 }
+
+// Upload one local image to private portfolio storage; returns the durable path
+// to attach to a portfolio entry. Multipart, so it cannot use the JSON api()
+// wrapper. Do NOT set Content-Type; the runtime sets the multipart boundary.
+export async function uploadPortfolioPhoto(uri: string): Promise<string> {
+  const authHeaders = await getAuthHeader();
+  const name = uri.split('/').pop() || 'photo.jpg';
+  const ext = (name.split('.').pop() || 'jpg').toLowerCase();
+  const form = new FormData();
+  form.append('file', { uri, name, type: `image/${ext === 'jpg' ? 'jpeg' : ext}` } as unknown as Blob);
+  const res = await fetch(`${API_BASE}/portfolio/photo`, {
+    method: 'POST',
+    headers: { ...authHeaders },
+    body: form,
+  });
+  const json = await res.json().catch(() => null);
+  if (!res.ok || !json?.data?.path) {
+    throw new Error(json?.error?.message || 'Could not upload that photo.');
+  }
+  return json.data.path as string;
+}

@@ -14,7 +14,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { X, Sparkles, ArrowRight, Feather, Mic } from 'lucide-react-native';
+import { X, Sparkles, ArrowRight, Feather } from 'lucide-react-native';
+import { DictationButton } from '@/components/shared/DictationButton';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiPost } from '@/hooks/use-api';
@@ -147,18 +148,10 @@ export default function SparkScreen() {
               />
             </View>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={styles.dictateRow}
-              onPress={() => { Haptics.selectionAsync(); inputRef.current?.focus(); }}
-            >
-              <View style={styles.micCircle}>
-                <Mic size={16} color={lightTheme.accent} />
-              </View>
-              <Text style={styles.dictateText}>
-                Prefer to talk? Tap the microphone on your keyboard and just say it.
-              </Text>
-            </TouchableOpacity>
+            <DictationButton
+              value={prompt}
+              onChange={(t) => { setPrompt(t); if (error) setError(null); }}
+            />
 
             {error ? <Text style={styles.error}>{error}</Text> : null}
           </ScrollView>
