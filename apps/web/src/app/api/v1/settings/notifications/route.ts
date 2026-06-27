@@ -15,13 +15,14 @@ export async function PUT(request: NextRequest) {
   if (!user) return apiError(error || 'Unauthorized', 401);
 
   const body = await request.json();
-  const { morning_idea, weekend_plan, weekly_summary, community } = body;
 
+  // The rhythm toggles (morning_brief / evening_recap / weekend_review) plus the
+  // legacy keys, all optional. Only keys actually passed are updated.
+  const ALLOWED = ['morning_brief', 'evening_recap', 'weekend_review', 'morning_idea', 'weekend_plan', 'weekly_summary', 'community'];
   const notificationPrefs: Record<string, boolean> = {};
-  if (morning_idea !== undefined) notificationPrefs.morning_idea = !!morning_idea;
-  if (weekend_plan !== undefined) notificationPrefs.weekend_plan = !!weekend_plan;
-  if (weekly_summary !== undefined) notificationPrefs.weekly_summary = !!weekly_summary;
-  if (community !== undefined) notificationPrefs.community = !!community;
+  for (const key of ALLOWED) {
+    if (body[key] !== undefined) notificationPrefs[key] = !!body[key];
+  }
 
   // Get current prefs and merge
   const { data: currentUser } = await supabase

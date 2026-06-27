@@ -146,6 +146,16 @@ export function AuthProvider({ children: childrenProp }: { children: React.React
         if (!data?.type) return;
 
         switch (data.type) {
+          // The daily/weekly rhythm opens its purpose-built brief pages.
+          case 'morning_brief':
+            router.push('/(stack)/brief?mode=morning' as any);
+            break;
+          case 'evening_recap':
+            router.push('/(stack)/brief?mode=evening' as any);
+            break;
+          case 'weekend_review':
+            router.push('/(stack)/weekly-review' as any);
+            break;
           case 'morning_plan':
           case 'weekly_plan':
           case 'tomorrow_preview':

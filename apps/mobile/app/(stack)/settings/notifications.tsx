@@ -22,28 +22,17 @@ import { spacing, radius } from '@/theme/spacing';
 const PREFS_STORAGE_KEY = '@thehedge/notification_prefs';
 
 interface NotificationPrefs {
-  // Essential
-  morning_plan: boolean;
-  weekly_plan: boolean;
-  achievement: boolean;
-  // Helpful
-  activity_reminder: boolean;
-  day_review: boolean;
-  tomorrow_preview: boolean;
-  // Weekly digest
-  week_review: boolean;
-  month_review: boolean;
+  morning_brief: boolean;
+  evening_recap: boolean;
+  weekend_review: boolean;
 }
 
+// Morning + weekend on by default; evening is opt-in so a family is never doubled
+// up without asking. These map exactly to the timezone-aware rhythm cron.
 const DEFAULT_PREFS: NotificationPrefs = {
-  morning_plan: true,
-  weekly_plan: true,
-  achievement: true,
-  activity_reminder: true,
-  day_review: true,
-  tomorrow_preview: true,
-  week_review: true,
-  month_review: true,
+  morning_brief: true,
+  evening_recap: false,
+  weekend_review: true,
 };
 
 interface NotificationOption {
@@ -61,68 +50,32 @@ interface NotificationSection {
 
 const SECTIONS: NotificationSection[] = [
   {
-    title: 'Essential',
-    subtitle: 'On by default',
+    title: 'Your daily rhythm',
+    subtitle: 'A calm touch, your way. Pick one, both, or none.',
     options: [
       {
-        key: 'morning_plan',
-        label: 'Morning plan reminder',
-        description: 'Start your day with a plan overview',
-        time: '8:00 AM',
+        key: 'morning_brief',
+        label: 'Morning brief',
+        description: "A gentle look at the day ahead with your children",
+        time: '~7am',
       },
       {
-        key: 'weekly_plan',
-        label: 'Weekly plan ready',
-        description: 'Your new weekly plan is ready to review',
-        time: 'Monday 8:00 AM',
-      },
-      {
-        key: 'achievement',
-        label: 'Achievement unlocked',
-        description: 'Celebrate milestones and badges',
-        time: 'Immediate',
+        key: 'evening_recap',
+        label: 'Evening recap',
+        description: 'What they did today, and a peek at tomorrow',
+        time: '~7pm',
       },
     ],
   },
   {
-    title: 'Helpful',
+    title: 'Your week',
     subtitle: 'On by default',
     options: [
       {
-        key: 'activity_reminder',
-        label: 'Activity reminder',
-        description: 'A nudge to try your planned activity',
-        time: '2:00 PM',
-      },
-      {
-        key: 'day_review',
-        label: 'Day in review',
-        description: 'See what you accomplished today',
-        time: '7:00 PM',
-      },
-      {
-        key: 'tomorrow_preview',
-        label: "Tomorrow's preview",
-        description: "A peek at tomorrow's planned activities",
-        time: '8:00 PM',
-      },
-    ],
-  },
-  {
-    title: 'Weekly digest',
-    subtitle: 'On by default',
-    options: [
-      {
-        key: 'week_review',
-        label: 'Week in review',
-        description: 'Your weekly activity summary and stats',
-        time: 'Sunday 6:00 PM',
-      },
-      {
-        key: 'month_review',
-        label: 'Month in review',
-        description: 'Monthly progress report and highlights',
-        time: '1st of month',
+        key: 'weekend_review',
+        label: 'Weekend review',
+        description: 'How the week went, and a look at the one ahead',
+        time: 'Sunday ~5pm',
       },
     ],
   },
