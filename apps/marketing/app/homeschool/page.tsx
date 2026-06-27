@@ -20,6 +20,7 @@ const feats = [
   { id:'cal', title:'Weekly Curriculum Planner', body:"Plan your week across the NCCA primary subject areas. The Hedge suggests activities that fit your plan, balances subjects automatically, and flags any areas that haven't been covered recently." },
   { id:'users', title:'Multi-Child Management', body:"Running a household school? Manage each child's curriculum, interests, and learning records completely separately - or together, for activities that work across ages." },
   { id:'spark', title:'IEP Support Tools', body:'For children with additional learning needs, The Hedge supports Individual Education Plan (IEP) goal setting, tracking, and evidence gathering alongside the main curriculum.' },
+  { id:'pen', title:'Evidence from real life', body:'Did something off-plan? Tell The Hedge what happened, by text or voice, and it reads it back, finds what it covered across Aistear and the primary curriculum, and keeps it as portfolio evidence. Following a child\'s spark becomes proof of learning, not a gap.' },
 ];
 
 const stages = [

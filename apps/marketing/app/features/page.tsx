@@ -22,7 +22,18 @@ const hero = {
     { id: 'cal', title: 'Plan', body: 'Look ahead your way. Set a gentle weekly rhythm or a fuller plan, and The Hedge fills it around your children and the days you actually have. It adapts when life moves.' },
     { id: 'book', title: 'Keep', body: 'A record that keeps itself. Every activity you mark done is logged, dated, and tagged to the NCCA strands, so your family\'s story gathers quietly in the background.' },
     { id: 'users', title: 'Belong', body: 'You are not doing this alone. Find other families near you, county groups, and the kind of company that makes home learning lighter.' },
-    { id: 'spark', title: 'Ask', body: 'A calm companion you can ask anything: an idea for a rainy afternoon, how an activity maps to the curriculum, what to try next. Honest help, grounded in your Framework. It suggests; you decide.' },
+    { id: 'spark', title: 'Ask', body: 'A calm companion you can ask anything: an idea for a rainy afternoon, how an activity maps to the curriculum, what to try next. Ask it to build a full activity and it will, ready to do and tied to the curriculum. Honest help, grounded in your Framework. It suggests; you decide.' },
+  ],
+};
+
+// The flagship: child-led in the moment, curriculum-deep underneath.
+const sparkGroup = {
+  title: 'Follow what they are curious about',
+  sub: 'Child-led on the surface, curriculum-deep underneath',
+  features: [
+    { id: 'spark', title: 'Follow a spark', body: 'Mad about volcanoes at breakfast? Tell The Hedge in your own words, by text or voice, and it shapes one lovely, screen-free activity around it in seconds. Pitched for your child\'s exact age and tied honestly to Aistear and the primary curriculum, so following your child still counts.' },
+    { id: 'leaf', title: 'A quietly rounded education', body: 'The Hedge keeps a light eye on the big areas of a rounded childhood. After a run on science and nature, it gently notices the arts have gone quiet and offers a spark that leans that way. No scores, never a red mark, just balance taking care of itself as your child grows.' },
+    { id: 'pen', title: 'Log a moment', body: 'Just did something lovely? Say what happened in your own words, by text or voice, and The Hedge reads it back, finds what it quietly covered across the curriculum, and keeps it in your portfolio as real evidence. No writing it up the night before.' },
   ],
 };
 
@@ -123,6 +134,28 @@ export default function Features() {
               <div style={{fontSize:13,color:'var(--clay)',lineHeight:1.65}}>
                 It learns your family, and your data stays yours. Everything is kept private to your account and stored in the EU. It is never sold, never used for advertising, and never used to train AI models.
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Follow a spark: the flagship child-led + curriculum-deep capability */}
+        <section className="section" aria-labelledby="fg-spark">
+          <div className="container">
+            <div className="eyebrow"><div className="eyebrow-line" /><span className="eyebrow-text">{sparkGroup.sub}</span></div>
+            <h2 className="section-title" id="fg-spark">Follow what they are <em>curious about</em></h2>
+            <p style={{margin:'14px 0 4px',fontSize:14,color:'var(--clay)',lineHeight:1.6,maxWidth:640}}>
+              The Hedge can prescribe a lovely day for you. But when your child lights up about something in the moment, you can follow that instead, and it still counts. This is the heart of how The Hedge keeps learning balanced and personal as your children grow.
+            </p>
+            <div className="feat-trio" style={{marginTop:28}}>
+              {sparkGroup.features.map(f => (
+                <div key={f.id+f.title} style={{padding:'28px 24px',background:'var(--linen)',borderRadius:16,border:'1px solid var(--stone)'}}>
+                  <div style={{width:42,height:42,borderRadius:11,background:'rgba(61,97,66,0.08)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:16}}>
+                    <Icon id={f.id} size={20} color="var(--moss)" />
+                  </div>
+                  <div style={{fontSize:16,fontWeight:700,color:'var(--ink)',marginBottom:8}}>{f.title}</div>
+                  <div style={{fontSize:13,color:'var(--clay)',lineHeight:1.65}}>{f.body}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
