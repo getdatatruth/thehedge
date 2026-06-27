@@ -19,7 +19,7 @@ const MESS = ['none', 'low', 'medium', 'high'];
 
 // Which curriculum stages to offer for a given age. Overlaps on purpose so a
 // 5-6 year old draws on both Aistear and the junior primary outcomes.
-function stagesForAge(age: number | null): string[] {
+export function stagesForAge(age: number | null): string[] {
   const a = age ?? 6;
   const stages: string[] = [];
   if (a <= 6) stages.push('early_childhood');

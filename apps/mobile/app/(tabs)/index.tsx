@@ -23,6 +23,7 @@ import {
   Feather,
   Sprout,
   Sparkles,
+  BookHeart,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
@@ -424,6 +425,25 @@ export default function TodayScreen() {
           </AnimatedCard>
         )}
 
+        {/* ─── LOG A MOMENT: capture something already done ─── */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/(stack)/log-moment' as any);
+          }}
+          style={styles.logMomentCard}
+        >
+          <View style={styles.logMomentIcon}>
+            <BookHeart size={20} color={lightTheme.accent} />
+          </View>
+          <View style={styles.logMomentTextWrap}>
+            <Text style={styles.logMomentTitle}>Log a moment</Text>
+            <Text style={styles.logMomentSub}>Did something already? I&apos;ll find what it covered and keep it.</Text>
+          </View>
+          <ArrowRight size={18} color={lightTheme.textMuted} />
+        </TouchableOpacity>
+
         {/* ─── REFRAME CHIPS: re-pick the one hero, not open a list ─── */}
         {isSelectedToday && heroActivity && (
           <ScrollView
@@ -797,6 +817,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   sparkCtaText: { ...typography.uiBold, color: lightTheme.primary },
+  // Log a moment card
+  logMomentCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 18,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: lightTheme.borderLight,
+  },
+  logMomentIcon: {
+    width: 42, height: 42, borderRadius: 13,
+    backgroundColor: lightTheme.accentLight,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  logMomentTextWrap: { flex: 1 },
+  logMomentTitle: { ...typography.uiBold, color: lightTheme.text, marginBottom: 2 },
+  logMomentSub: { ...typography.bodySmall, color: lightTheme.textSecondary, lineHeight: 18 },
   // Quiet Floor nudge (calm, never shaming)
   quietCard: {
     backgroundColor: lightTheme.surface,
