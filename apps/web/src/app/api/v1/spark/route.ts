@@ -5,6 +5,7 @@ import { createApiClient } from '@/lib/supabase/api-client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
 import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
+import { getAistearThemes, getCurriculumAreas } from '@/lib/curriculum-mapping';
 
 export const maxDuration = 60;
 
@@ -186,11 +187,19 @@ export async function POST(request: NextRequest) {
     const pick = (v: unknown, allowed: string[], dflt: string) =>
       typeof v === 'string' && allowed.includes(v) ? v : dflt;
     const title = String(gen.title || '').trim() || `Following ${child.name}'s curiosity`;
+    const category = pick(gen.category, CATEGORIES, 'science');
     const validIds = new Set((outcomes || []).map((o) => o.id));
     const chosenIds = Array.isArray(gen.outcomeIds) ? (gen.outcomeIds as unknown[]).filter((id) => typeof id === 'string' && validIds.has(id)) as string[] : [];
     const chosen = (outcomes || []).filter((o) => chosenIds.includes(o.id));
-    const aistearThemes = [...new Set(chosen.filter((o) => o.curriculum_area.startsWith('Aistear')).map((o) => o.curriculum_area.replace('Aistear:', '').trim()))];
-    const nccaAreas = [...new Set(chosen.filter((o) => !o.curriculum_area.startsWith('Aistear')).map((o) => o.curriculum_area))];
+    let aistearThemes = [...new Set(chosen.filter((o) => o.curriculum_area.startsWith('Aistear')).map((o) => o.curriculum_area.replace('Aistear:', '').trim()))];
+    let nccaAreas = [...new Set(chosen.filter((o) => !o.curriculum_area.startsWith('Aistear')).map((o) => o.curriculum_area))];
+
+    // Every spark must SHOW its alignment. If the model under-picked, fall back
+    // to the honest category->curriculum mapping: Aistear always (it underpins
+    // the early years), primary curriculum only where it is age-relevant (>= 5).
+    const childAge = age ?? 6;
+    if (aistearThemes.length === 0) aistearThemes = getAistearThemes(category) as string[];
+    if (nccaAreas.length === 0 && childAge >= 5) nccaAreas = getCurriculumAreas(category) as string[];
 
     const admin = createAdminClient();
     // Unique slug (the index is global). Spark slugs get a short random suffix.
@@ -203,7 +212,7 @@ export async function POST(request: NextRequest) {
       description: String(gen.description || '').trim() || `A little something for ${child.name}.`,
       instructions: gen.instructions && typeof gen.instructions === 'object' ? gen.instructions : { steps: [] },
       parent_guide: gen.parentGuide && typeof gen.parentGuide === 'object' ? gen.parentGuide : null,
-      category: pick(gen.category, CATEGORIES, 'science'),
+      category,
       age_min: typeof gen.ageMin === 'number' ? Math.max(0, Math.min(14, gen.ageMin)) : Math.max(0, (age ?? 5) - 1),
       age_max: typeof gen.ageMax === 'number' ? Math.max(0, Math.min(14, gen.ageMax)) : Math.min(14, (age ?? 5) + 1),
       duration_minutes: typeof gen.durationMinutes === 'number' ? Math.max(5, Math.min(120, gen.durationMinutes)) : 25,

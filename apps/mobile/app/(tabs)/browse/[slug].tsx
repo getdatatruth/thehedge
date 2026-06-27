@@ -73,6 +73,7 @@ interface ActivityDetail {
     ncca_areas: string[];
     educator_quality: string;
     quality_notes: string;
+    rationale?: string;
   } | null;
 }
 
@@ -306,11 +307,14 @@ export default function ActivityDetailScreen() {
           </View>
         )}
 
-        {/* Curriculum Links */}
+        {/* How this aligns to the curriculum */}
         {activity.curriculum_tags && (activity.curriculum_tags.aistear_themes?.length > 0 || activity.curriculum_tags.ncca_areas?.length > 0) && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Curriculum links</Text>
+            <Text style={styles.sectionTitle}>How this aligns</Text>
             <View style={styles.card}>
+              {activity.curriculum_tags.rationale ? (
+                <Text style={styles.curriculumRationale}>{activity.curriculum_tags.rationale}</Text>
+              ) : null}
               {activity.curriculum_tags.aistear_themes?.length > 0 && (
                 <View style={styles.curriculumGroup}>
                   <View style={styles.curriculumLabelRow}>
@@ -340,6 +344,11 @@ export default function ActivityDetailScreen() {
                     ))}
                   </View>
                 </View>
+              )}
+              {activity.curriculum_tags.outcome_codes?.length > 0 && (
+                <Text style={styles.outcomeCodes}>
+                  Outcomes touched: {activity.curriculum_tags.outcome_codes.join(', ')}
+                </Text>
               )}
             </View>
           </View>
@@ -627,6 +636,17 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   // Curriculum
+  curriculumRationale: {
+    ...typography.body,
+    color: lightTheme.textSecondary,
+    lineHeight: 22,
+    marginBottom: spacing.md,
+  },
+  outcomeCodes: {
+    ...typography.bodySmall,
+    color: lightTheme.textMuted,
+    marginTop: spacing.xs,
+  },
   curriculumGroup: {
     gap: spacing.sm,
     marginBottom: spacing.md,
