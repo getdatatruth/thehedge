@@ -43,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <Text style={styles.title}>Let's take a breath</Text>
           <Text style={styles.message}>
             Something went astray on our side, not yours.
-            {'\n'}Have another go in a moment and we'll be grand.
+            {'\n'}Have another go in a moment and we'll have it sorted.
           </Text>
           <Button variant="secondary" size="md" onPress={this.handleReset}>
             Try again

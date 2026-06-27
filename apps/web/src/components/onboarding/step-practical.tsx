@@ -133,7 +133,7 @@ export function StepPractical() {
               <SelectItem value="none">Keep it clean, please</SelectItem>
               <SelectItem value="low">A small bit is fine</SelectItem>
               <SelectItem value="medium">
-                Sure, a bit of mess is grand
+                Sure, a bit of mess is no bother
               </SelectItem>
               <SelectItem value="high">
                 Go wild - the messier the better

@@ -93,7 +93,7 @@ export const DEFAULT_DOCUMENT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
   {
     key: 'samples',
     label: 'Examples of your child’s work',
-    hint: 'A handful of things that show learning over time. Photos are grand.',
+    hint: 'A handful of things that show learning over time. Photos are perfect.',
   },
   {
     key: 'reading',

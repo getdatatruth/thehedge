@@ -38,7 +38,7 @@ const STYLES: {
   {
     value: 'balanced',
     label: 'A bit of everything',
-    description: 'Mix it up - variety is grand.',
+    description: 'Mix it up - variety is lovely.',
     icon: Scale,
   },
 ];

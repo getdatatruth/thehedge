@@ -259,7 +259,7 @@ export function buildLocalFramework(a: KTAnswers): KTFramework {
   const approachEnum = APPROACH_KEY_TO_ENUM[a.approachKey] || 'blended';
 
   return {
-    opening: 'Grand. Here is how I will work for your family.',
+    opening: 'Welcome to The Hedge. This is your Family Framework: gentle ideas matched to your children day by day, a record that keeps itself as you live, and your whole year as a calm path rather than a syllabus. Here is how it will work for your family.',
     whatYouToldMe: `You came to The Hedge ${WHY_LABEL[a.whyKey] || 'wanting more for your family'}. The thing on your mind is ${WORRY_LABEL[a.worryKey] || 'doing right by them'}. When learning happens for you, it tends to be ${RHYTHM_LABEL[a.rhythmKey || ''] || 'whenever there is space'}.`,
     commitments: COMMITMENTS_BY_ENUM[approachEnum] || COMMITMENTS_BY_ENUM.blended,
     quietFloor: 'And underneath all of it, I will keep a light eye on the big areas of a rounded childhood, so nothing important goes untouched. No scores, no red marks, just a gentle nudge now and again if a corner has been quiet for a while.',

@@ -126,7 +126,7 @@ function buildPrompt(existingTitles: string[], count: number, options: Generatio
 IMPORTANT CONTEXT:
 - It is currently ${month} (${season}) in Ireland
 - Activities should be seasonally appropriate
-- Use Irish English: "grand" not "great", "mam" not "mom", "jumper" not "sweater"
+- Use Irish English: "lovely" not "great", "mam" not "mom", "jumper" not "sweater". Never use the word "grand".
 - All activities must be screen-free
 - Only use household materials - nothing families would need to buy
 - Activities should be rooted in Irish culture, nature, and geography where appropriate
