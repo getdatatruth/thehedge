@@ -53,24 +53,36 @@ export async function GET(request: NextRequest) {
   const now = new Date();
   const admin = createAdminClient();
 
-  // Active tokens, with the user's prefs and the family's timezone + children.
+  // Active tokens. push_tokens.user_id references auth.users (not public.users),
+  // so we fetch the user prefs and the family timezone/children separately and
+  // join in code rather than via a PostgREST relationship.
   const { data: tokens } = await admin
     .from('push_tokens')
-    .select('token, user_id, family_id, users(notification_prefs), families(name, timezone, children(name))')
+    .select('token, user_id, family_id')
     .eq('active', true);
+  type Row = { token: string; user_id: string; family_id: string };
+  const rows = (tokens || []) as Row[];
 
-  type Row = {
-    token: string; user_id: string; family_id: string;
-    users: { notification_prefs: NotificationPrefs | null } | { notification_prefs: NotificationPrefs | null }[] | null;
-    families: { name: string; timezone: string | null; children: { name: string }[] } | { name: string; timezone: string | null; children: { name: string }[] }[] | null;
-  };
-  const rows = (tokens || []) as unknown as Row[];
+  const familyIds = [...new Set(rows.map((r) => r.family_id).filter(Boolean))];
+  const userIds = [...new Set(rows.map((r) => r.user_id).filter(Boolean))];
 
-  // Group by family.
+  const { data: famData } = familyIds.length
+    ? await admin.from('families').select('id, name, timezone, children(name)').in('id', familyIds)
+    : { data: [] as { id: string; name: string; timezone: string | null; children: { name: string }[] }[] };
+  const { data: userData } = userIds.length
+    ? await admin.from('users').select('id, notification_prefs').in('id', userIds)
+    : { data: [] as { id: string; notification_prefs: NotificationPrefs | null }[] };
+
+  const famById = new Map((famData || []).map((f) => [f.id, f]));
+  const prefsByUser = new Map((userData || []).map((u) => [u.id, u.notification_prefs as NotificationPrefs | null]));
+
+  // Group tokens by family.
   const byFamily = new Map<string, Row[]>();
   for (const r of rows) {
     if (!r.family_id) continue;
-    (byFamily.get(r.family_id) || byFamily.set(r.family_id, []).get(r.family_id)!).push(r);
+    const arr = byFamily.get(r.family_id) || [];
+    arr.push(r);
+    byFamily.set(r.family_id, arr);
   }
 
   const pushes: { to: string; title: string; body: string; sound: string; data: Record<string, unknown> }[] = [];
@@ -80,7 +92,7 @@ export async function GET(request: NextRequest) {
 
   for (const [familyId, frows] of byFamily) {
     evaluated++;
-    const fam = (Array.isArray(frows[0].families) ? frows[0].families[0] : frows[0].families) || null;
+    const fam = famById.get(familyId) || null;
     const touch = slotNow(fam?.timezone, now);
     if (!touch) continue;
     due++;
@@ -101,8 +113,7 @@ export async function GET(request: NextRequest) {
     // Push to each parent-token in the family whose prefs allow this touch.
     let any = false;
     for (const r of frows) {
-      const u = Array.isArray(r.users) ? r.users[0] : r.users;
-      if (!prefAllows(u?.notification_prefs, touch)) continue;
+      if (!prefAllows(prefsByUser.get(r.user_id), touch)) continue;
       pushes.push({ to: r.token, title, body, sound: 'default', data: { type: meta.type, url: meta.actionUrl } });
       any = true;
     }
