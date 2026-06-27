@@ -22,6 +22,7 @@ import {
   Leaf,
   Feather,
   Sprout,
+  Sparkles,
 } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
@@ -352,6 +353,29 @@ export default function TodayScreen() {
           <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} tintColor={lightTheme.accent} />
         }
       >
+        {/* ─── SPARK: follow the child's curiosity in the moment ─── */}
+        <AnimatedCard delay={0}>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/(stack)/spark' as any);
+            }}
+            style={styles.sparkCard}
+          >
+            <View style={styles.sparkIcon}>
+              <Sparkles size={22} color="#FFFFFF" />
+            </View>
+            <View style={styles.sparkTextWrap}>
+              <Text style={styles.sparkTitle}>Follow a spark</Text>
+              <Text style={styles.sparkSubtitle}>
+                What are they curious about right now? I'll shape one lovely thing, tied back to what matters.
+              </Text>
+            </View>
+            <ArrowRight size={20} color={lightTheme.accent} />
+          </TouchableOpacity>
+        </AnimatedCard>
+
         {/* ─── REFRAME CHIPS: re-pick the one hero, not open a list ─── */}
         {isSelectedToday && heroActivity && (
           <ScrollView
@@ -691,6 +715,23 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: spacing.xl, paddingBottom: spacing['6xl'], gap: spacing.lg,
   },
+  // Spark card (follow the child's curiosity)
+  sparkCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: lightTheme.accentLight,
+    borderRadius: 20,
+    padding: spacing.lg,
+  },
+  sparkIcon: {
+    width: 44, height: 44, borderRadius: 14,
+    backgroundColor: lightTheme.accent,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  sparkTextWrap: { flex: 1 },
+  sparkTitle: { ...typography.uiBold, color: lightTheme.text, marginBottom: 2 },
+  sparkSubtitle: { ...typography.bodySmall, color: lightTheme.textSecondary, lineHeight: 18 },
   // Hero card
   heroCard: {
     backgroundColor: lightTheme.surface, borderRadius: 20, padding: spacing.xl,

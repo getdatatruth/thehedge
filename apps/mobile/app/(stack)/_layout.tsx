@@ -10,6 +10,7 @@ export default function StackLayout() {
         animation: 'slide_from_right',
       }}
     >
+      <Stack.Screen name="spark" options={{ animation: 'slide_from_bottom' }} />
       <Stack.Screen name="favourites" />
       <Stack.Screen name="framework" />
       <Stack.Screen name="timeline" />
