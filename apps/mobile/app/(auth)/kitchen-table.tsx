@@ -420,7 +420,11 @@ export default function KitchenTableScreen() {
 
               <PrimaryButton
                 label="That's our crew"
-                disabled={!children.some((c) => c.name.trim())}
+                // Every child needs a name AND an age before we move on.
+                disabled={
+                  children.filter((c) => c.name.trim()).length === 0 ||
+                  children.some((c) => c.name.trim() && c.age == null)
+                }
                 onPress={() => {
                   const named = children.filter((c) => c.name.trim());
                   record(
@@ -521,6 +525,8 @@ export default function KitchenTableScreen() {
               </View>
               <PrimaryButton
                 label={isHomeEdLeaning ? 'Nearly there' : 'Read me my framework'}
+                // Both county and outdoor space must be chosen before continuing.
+                disabled={!answers.county || !answers.outdoor}
                 onPress={() => {
                   const outdoorLabel = chipLabel(OUTDOOR_CHIPS, answers.outdoor);
                   record(
