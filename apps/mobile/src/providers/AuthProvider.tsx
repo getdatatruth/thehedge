@@ -4,7 +4,7 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
-import { apiGet, apiPost } from '@/lib/api';
+import { apiGet, apiPost, ApiError } from '@/lib/api';
 import { useAuthStore, type UserProfile, type Family, type Child } from '@/stores/auth-store';
 
 // Configure how notifications are handled when the app is in the foreground
@@ -85,8 +85,16 @@ export function AuthProvider({ children: childrenProp }: { children: React.React
         return { ...c, age };
       });
       setChildren(childrenWithAges);
-    } catch {
-      // User data load failed - might be a new user without profile
+    } catch (e) {
+      // A 404 means a brand-new user with no profile row yet: that is expected
+      // right after signup, so we leave them in onboarding. But a 401/403 means
+      // the stored session is dead (e.g. the account was removed server-side):
+      // sign out so the router lands them on a clean login instead of trapping
+      // them in onboarding with a token every authed call will reject.
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        await supabase.auth.signOut();
+      }
+      // Any other failure (offline, 404) is non-fatal here.
     }
   }, [setProfile, setFamily, setChildren]);
 

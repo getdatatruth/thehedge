@@ -15,7 +15,8 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { StatusBar } from 'expo-status-bar';
 import { Leaf, ArrowRight, Plus, X } from 'lucide-react-native';
-import { apiRootPost, apiGet } from '@/lib/api';
+import { apiRootPost, apiGet, ApiError } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 import {
   WHY_CHIPS,
   WORRY_CHIPS,
@@ -141,11 +142,39 @@ export default function KitchenTableScreen() {
     // 1. Bootstrap the family + children. This is the ONLY call that may block:
     // if it fails, nothing was created, the family is not onboarded, and the
     // user safely stays here to retry. A 200 means they are genuinely set up.
+    //
+    // Make sure we hold a LIVE token first. getSession() returns the in-memory
+    // session, but if it is stale (e.g. the account was removed server-side) the
+    // bootstrap 401s. We refresh, and on a hard auth failure we sign out so the
+    // router lands the user on a clean signup instead of trapping them here.
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      let token = sessionData.session?.access_token;
+      if (token) {
+        // Proactively refresh so a borderline-expired token never 401s mid-setup.
+        const { data: refreshed } = await supabase.auth.refreshSession();
+        token = refreshed.session?.access_token ?? token;
+      }
+      if (!token) {
+        await supabase.auth.signOut();
+        setError('Your session expired. Please sign in again to finish setting up.');
+        setThinking(false);
+        return;
+      }
+
       await apiRootPost('/onboarding', answersToOnboardingPayload(full, familyName));
     } catch (e) {
       console.error('[kitchen-table] bootstrap failed:', e);
-      setError('We could not reach The Hedge just now. Check your connection and tap again.');
+      const status = e instanceof ApiError ? e.status : undefined;
+      if (status === 401 || status === 403) {
+        // Dead session: the token is structurally valid but the user no longer
+        // exists / is not authorised. Escape the trap with a fresh sign-in.
+        await supabase.auth.signOut();
+        setError('Your session is no longer valid. Please sign in again to finish setting up.');
+      } else {
+        const detail = e instanceof Error ? e.message : String(e);
+        setError(`We could not reach The Hedge (${status ?? 'no response'}: ${detail}). Tap to try again.`);
+      }
       setThinking(false);
       return;
     }
