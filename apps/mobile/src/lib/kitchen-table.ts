@@ -176,10 +176,101 @@ export function answersToOnboardingPayload(
     outdoorSpace: a.outdoor || '',
     learningGoals: [],
     activitiesPerWeek: '',
-    // The Kitchen Table framework step marks onboarding complete, so do not let
-    // this bootstrap mark it - otherwise a failed framework leaves a family
-    // "onboarded" with no framework and they land on Today.
-    completeOnboarding: false,
+    // Once this bootstrap returns 200 the family and children genuinely exist,
+    // so the family IS onboarded and may enter the app. The framework that
+    // follows is cosmetic (it falls back to an on-device version if the server
+    // call hiccups), so it must never gate entry. If THIS call fails, nothing
+    // was created and the user safely stays in onboarding to retry.
+    completeOnboarding: true,
+  };
+}
+
+// ─── On-device fallback framework ────────────────────────────────────────────
+//
+// The server authors the framework with an LLM pass and its own deterministic
+// fallback, so a 2xx always carries one. But a fresh family must NEVER be
+// blocked from entering the app by a network blip, a cold function, or a slow
+// LLM. If the server call fails for any reason, we build the same warm,
+// deterministic framework here, on the device, from the answers we already hold.
+// This mirrors buildFallbackFramework in apps/web/src/lib/kitchen-table.ts.
+
+const WHY_LABEL: Record<string, string> = {
+  do_more: 'wanting to do more with them',
+  considering: 'wondering about home-educating',
+  school_not_working: 'because school is not quite working for them',
+  homeschool: 'already home-educating',
+};
+const WORRY_LABEL: Record<string, string> = {
+  enough: 'whether you are doing enough',
+  social: 'whether they will miss out socially',
+  not_teacher: 'not being a teacher',
+  tusla: 'the Tusla and legal side',
+  none: 'nothing in particular, you just want good days',
+};
+const RHYTHM_LABEL: Record<string, string> = {
+  after_school: 'after school and at weekends',
+  mornings: 'mostly in the mornings',
+  all_day: 'all day, it is just life',
+  grab_it: 'whenever you can grab it',
+};
+
+const COMMITMENTS_BY_ENUM: Record<string, string[]> = {
+  structured: [
+    'I will give you a real, balanced week you can follow, mapped to the curriculum.',
+    'I will keep the planning off your plate so you can teach, not assemble timetables.',
+    'I will show you, honestly, what is being covered, without inventing a single target.',
+  ],
+  blended: [
+    'I will offer a loose rhythm, never a rigid clock, that you can shape day to day.',
+    'I will balance things gently in the background so the week feels rounded.',
+    'I will follow your lead on the busy days and pick the thread back up after.',
+  ],
+  child_led: [
+    'I will never hand you a timetable. I will follow your children and keep ideas flowing.',
+    'I will notice what is being learned as you live, so coverage takes care of itself.',
+    'I will keep the lightest possible eye on the big areas, and only ever whisper.',
+  ],
+  relaxed: [
+    'I will keep it to good ideas when you want them, no schedules and no pressure.',
+    'I will quietly remember what you do, so there is a record without any data entry.',
+    'I will trust your way, and only nudge if a whole corner has gone quiet for ages.',
+  ],
+  exploratory: [
+    'I will lead with nature and the seasons, the way your family already learns.',
+    'I will let one obsession wander into the next rather than break the day into subjects.',
+    'I will keep a soft eye on breadth so following their curiosity never costs them.',
+  ],
+};
+
+const FORYOURWORRY_BY_KEY: Record<string, string> = {
+  enough: 'You are almost certainly doing more than you think. I will reflect it back to you in plain sight, the maths in the baking, the science in the garden, so "am I doing enough" turns into "look at all we did".',
+  social: 'This is the one I hear most, and it is the most solvable. I will surface real families and gatherings near you, so the friendships are there from the start, not an afterthought.',
+  not_teacher: 'You do not need to be a teacher. Your job is to be curious alongside them, and I will carry the curriculum, the structure and the evidence so you never have to be the expert.',
+  tusla: 'I will keep the Tusla side calm and honest. AEARS sets no minimum hours and no attendance bar, and I will never pretend it does. When a review comes, the record will already be written.',
+  none: 'No worry, just good days, is a lovely place to start. I will keep it simple and let it deepen only if and when you want it to.',
+};
+
+export function buildLocalFramework(a: KTAnswers): KTFramework {
+  const kids = a.children.map((c) => c.name.trim()).filter(Boolean);
+  const kidList =
+    kids.length === 0 ? 'your children' :
+    kids.length === 1 ? kids[0] :
+    `${kids.slice(0, -1).join(', ')} and ${kids[kids.length - 1]}`;
+  const approachEnum = APPROACH_KEY_TO_ENUM[a.approachKey] || 'blended';
+
+  return {
+    opening: 'Grand. Here is how I will work for your family.',
+    whatYouToldMe: `You came to The Hedge ${WHY_LABEL[a.whyKey] || 'wanting more for your family'}. The thing on your mind is ${WORRY_LABEL[a.worryKey] || 'doing right by them'}. When learning happens for you, it tends to be ${RHYTHM_LABEL[a.rhythmKey || ''] || 'whenever there is space'}.`,
+    commitments: COMMITMENTS_BY_ENUM[approachEnum] || COMMITMENTS_BY_ENUM.blended,
+    quietFloor: 'And underneath all of it, I will keep a light eye on the big areas of a rounded childhood, so nothing important goes untouched. No scores, no red marks, just a gentle nudge now and again if a corner has been quiet for a while.',
+    forYourWorry: FORYOURWORRY_BY_KEY[a.worryKey] || FORYOURWORRY_BY_KEY.enough,
+    thingsToday: [
+      kids.length > 0
+        ? `Try one lovely thing with ${kidList} today, picked for their age and what they love.`
+        : 'Try one lovely thing today, picked for your family.',
+      'Tap "we did this" when you are done, and your family\'s record starts keeping itself.',
+      'Have a look at your year as a gentle path, not a syllabus.',
+    ],
   };
 }
 

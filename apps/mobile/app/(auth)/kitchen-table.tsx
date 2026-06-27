@@ -28,6 +28,7 @@ import {
   chipLabel,
   answersToOnboardingPayload,
   postKitchenTable,
+  buildLocalFramework,
   type KTChild,
   type KTAnswers,
   type KTFramework,
@@ -137,30 +138,37 @@ export default function KitchenTableScreen() {
       tuslaKey: final.tuslaKey || answers.tuslaKey,
     };
 
+    // 1. Bootstrap the family + children. This is the ONLY call that may block:
+    // if it fails, nothing was created, the family is not onboarded, and the
+    // user safely stays here to retry. A 200 means they are genuinely set up.
     try {
-      // 1. Bootstrap the family + children. A fresh mobile signup has no family
-      // yet, and /api/kitchen-table requires one. The existing onboarding route
-      // creates the family, links the user, and marks onboarding complete.
       await apiRootPost('/onboarding', answersToOnboardingPayload(full, familyName));
-
-      // 2. Author the Family Framework (deterministic fallback server-side, so a
-      // 2xx always returns something warm to show).
-      const { framework: fw } = await postKitchenTable(full, exchanges as KTTranscript);
-
-      // 3. Refresh the auth store so the root navigator knows onboarding is done.
-      await refreshAuth();
-
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setFramework(fw);
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? 'Something went sideways setting things up. Have another go in a moment.'
-          : 'Something went sideways. Have another go in a moment.',
-      );
-    } finally {
+      console.error('[kitchen-table] bootstrap failed:', e);
+      setError('We could not reach The Hedge just now. Check your connection and tap again.');
       setThinking(false);
+      return;
     }
+
+    // 2. Author the Family Framework. The server has its own warm fallback, but
+    // a fresh family must never be stranded by a slow function or a network
+    // blip, so if the server call fails for ANY reason we build the same warm
+    // framework on-device from the answers we already hold. This step cannot
+    // fail the flow.
+    let fw: KTFramework;
+    try {
+      fw = (await postKitchenTable(full, exchanges as KTTranscript)).framework;
+    } catch (e) {
+      console.warn('[kitchen-table] framework server call failed, using local fallback:', e);
+      fw = buildLocalFramework(full);
+    }
+
+    // 3. Refresh the auth store so the root navigator knows onboarding is done,
+    // then reveal the framework. The family is onboarded either way now.
+    await refreshAuth();
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setFramework(fw);
+    setThinking(false);
   }
 
   // ── Framework reveal ──────────────────────────────────────────────────────

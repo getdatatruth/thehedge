@@ -91,11 +91,20 @@ export async function POST(request: NextRequest) {
   try {
     if (process.env.ANTHROPIC_API_KEY) {
       const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-      const msg = await client.messages.create({
-        model: CLAUDE_MODEL,
-        max_tokens: 900,
-        messages: [{ role: 'user', content: frameworkPrompt(profile) }],
-      });
+      // Cap the authoring pass. A slow or hanging LLM call must never let the
+      // serverless function run to its timeout and return a 504 (HTML the
+      // mobile client cannot parse). If we do not have a framework in time, the
+      // warm deterministic fallback already in `framework` is returned instead.
+      const msg = await Promise.race([
+        client.messages.create({
+          model: CLAUDE_MODEL,
+          max_tokens: 900,
+          messages: [{ role: 'user', content: frameworkPrompt(profile) }],
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('framework authoring timed out')), 12_000),
+        ),
+      ]);
       const text = msg.content.find((c) => c.type === 'text');
       if (text && 'text' in text) {
         const raw = text.text.trim().replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
