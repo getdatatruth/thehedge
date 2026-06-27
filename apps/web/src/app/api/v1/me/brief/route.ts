@@ -67,11 +67,10 @@ export async function GET(request: NextRequest) {
     // plan to lead with (so we never crowd the page).
     let idea: { slug: string; title: string; category: string; duration_minutes: number } | null = null;
     if (todayPlan.length === 0 && age != null) {
-      let q = supabase.from('activities')
+      const { data: pool } = await supabase.from('activities')
         .select('slug, title, category, duration_minutes')
         .eq('published', true).is('family_id', null)
         .lte('age_min', age).gte('age_max', age).limit(8);
-      const { data: pool } = await q;
       const interests = (c.interests as string[] | null) || [];
       const liked = (pool || []).find((a) => interests.includes(a.category)) || (pool || [])[0] || null;
       idea = liked;
