@@ -11,6 +11,7 @@ export default function StackLayout() {
       }}
     >
       <Stack.Screen name="spark" options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="walkthrough" options={{ animation: 'fade', gestureEnabled: false }} />
       <Stack.Screen name="favourites" />
       <Stack.Screen name="framework" />
       <Stack.Screen name="timeline" />

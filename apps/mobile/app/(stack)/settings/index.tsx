@@ -21,6 +21,7 @@ import {
   Lock,
   Shield,
   Leaf,
+  Compass,
 } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
@@ -79,6 +80,12 @@ export default function SettingsScreen() {
           label: 'Your Family Framework',
           detail: '',
           onPress: () => router.push('/(stack)/framework' as any),
+        },
+        {
+          icon: Compass,
+          label: 'Take the tour again',
+          detail: '',
+          onPress: () => router.push('/(stack)/walkthrough' as any),
         },
       ],
     },

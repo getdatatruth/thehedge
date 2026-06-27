@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { MobileBottomNav } from '@/components/dashboard/mobile-nav';
+import { FirstRunWalkthrough } from '@/components/walkthrough/first-run-walkthrough';
 import type { SubscriptionTier } from '@/types/database';
 
 export default async function DashboardLayout({
@@ -88,6 +89,7 @@ export default async function DashboardLayout({
         </div>
       </main>
       <MobileBottomNav subscriptionTier={subscriptionTier} />
+      <FirstRunWalkthrough />
     </div>
   );
 }

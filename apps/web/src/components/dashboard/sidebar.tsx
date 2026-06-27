@@ -18,6 +18,7 @@ import {
   ChevronDown,
   HelpCircle,
   Lock,
+  Compass,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { createClient } from '@/lib/supabase/client';
@@ -295,6 +296,13 @@ function SidebarContent({
               <HelpCircle className="h-3.5 w-3.5" />
               Help &amp; Support
             </a>
+            <button
+              onClick={() => { setUserMenuOpen(false); window.dispatchEvent(new Event('hedge:start-walkthrough')); }}
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-[12px] text-parchment/60 hover:bg-parchment/6 hover:text-parchment/90 transition-colors"
+            >
+              <Compass className="h-3.5 w-3.5" />
+              Take the tour again
+            </button>
             <div className="h-px bg-parchment/6 my-1 mx-2" />
             <button
               onClick={() => { setUserMenuOpen(false); onSignOut(); }}

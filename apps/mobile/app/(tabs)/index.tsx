@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { useAuthStore } from '@/stores/auth-store';
 import { useApiQuery } from '@/hooks/use-api';
+import { hasSeenWalkthrough } from '@/lib/walkthrough';
 import { TodaySkeleton } from '@/components/ui/ScreenSkeletons';
 import { WeekStrip } from '@/components/today/WeekStrip';
 import { ActivityCard } from '@/components/today/ActivityCard';
@@ -165,6 +166,17 @@ export default function TodayScreen() {
 
   const [selectedDay, setSelectedDay] = useState<number>(todayDow);
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
+
+  // First-run: the guided walkthrough auto-starts once, the first time a family
+  // lands on Today. Exitable any time; replayable from Settings.
+  const walkthroughChecked = useRef(false);
+  useEffect(() => {
+    if (walkthroughChecked.current) return;
+    walkthroughChecked.current = true;
+    hasSeenWalkthrough().then((seen) => {
+      if (!seen) router.push('/(stack)/walkthrough' as any);
+    });
+  }, [router]);
   const [heroShuffle, setHeroShuffle] = useState(0);
   const [reframe, setReframe] = useState<ReframeId | null>(null);
 
