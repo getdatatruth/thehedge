@@ -11,8 +11,9 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Send, Sparkles, Clock, User } from 'lucide-react-native';
+import { Send, Sparkles, Clock, User, ArrowRight, GraduationCap } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/stores/auth-store';
 import { apiPost } from '@/lib/api';
 import { lightTheme } from '@/theme/colors';
@@ -27,10 +28,19 @@ interface Suggestion {
   why_today: string;
 }
 
+interface SparkActivity {
+  slug: string;
+  title: string;
+  description?: string;
+  childName?: string;
+  outcomeCount?: number;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   suggestions?: Suggestion[];
+  activity?: SparkActivity;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -41,6 +51,7 @@ const EXAMPLE_PROMPTS = [
 ];
 
 export default function ChatScreen() {
+  const router = useRouter();
   const { children, family } = useAuthStore();
   const effectiveTier = useAuthStore((s) => s.effectiveTier());
   const [messages, setMessages] = useState<Message[]>([]);
@@ -99,13 +110,23 @@ export default function ChatScreen() {
 
       const { data } = await apiPost<{
         text: string;
-        suggestions: Suggestion[];
+        suggestions: Suggestion[] | null;
+        activity?: SparkActivity;
       }>('/ai/suggest', { prompt: text, context });
 
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: data.text, suggestions: data.suggestions },
-      ]);
+      // If they asked me to build an activity, I hand back a real one as a card.
+      if (data.activity) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: data.text, activity: data.activity },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: data.text, suggestions: data.suggestions || undefined },
+        ]);
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -203,6 +224,35 @@ export default function ChatScreen() {
               >
                 {msg.role === 'user' ? (
                   <Text style={styles.userText}>{msg.content}</Text>
+                ) : msg.activity ? (
+                  <View>
+                    <Text style={styles.assistantText}>{msg.content}</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      style={styles.activityCard}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        router.push(`/(tabs)/browse/${msg.activity!.slug}` as any);
+                      }}
+                    >
+                      <View style={styles.activityIcon}>
+                        <Sparkles size={18} color="#FFFFFF" />
+                      </View>
+                      <View style={styles.activityBody}>
+                        <Text style={styles.activityTitle}>{msg.activity.title}</Text>
+                        {msg.activity.description ? (
+                          <Text style={styles.activityDesc} numberOfLines={2}>{msg.activity.description}</Text>
+                        ) : null}
+                        <View style={styles.activityMetaRow}>
+                          <GraduationCap size={12} color={lightTheme.accent} />
+                          <Text style={styles.activityMeta}>
+                            Curriculum-aligned{msg.activity.outcomeCount ? ` · ${msg.activity.outcomeCount} outcomes` : ''}
+                          </Text>
+                        </View>
+                      </View>
+                      <ArrowRight size={18} color={lightTheme.accent} />
+                    </TouchableOpacity>
+                  </View>
                 ) : msg.suggestions ? (
                   <View style={styles.suggestions}>
                     {msg.suggestions.map((s, j) => (
@@ -438,6 +488,27 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     overflow: 'hidden',
   },
+  activityCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: lightTheme.accent,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+  },
+  activityIcon: {
+    width: 40, height: 40, borderRadius: 12,
+    backgroundColor: lightTheme.accent,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  activityBody: { flex: 1 },
+  activityTitle: { ...typography.uiBold, color: lightTheme.text, marginBottom: 2 },
+  activityDesc: { ...typography.bodySmall, color: lightTheme.textSecondary, lineHeight: 18, marginBottom: 6 },
+  activityMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  activityMeta: { ...typography.uiSmall, color: lightTheme.accent, fontWeight: '600' },
   suggestions: {
     gap: spacing.md,
   },

@@ -4,6 +4,7 @@ import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiError, apiOptions } from '@/lib/api-response';
 import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
+import { generateSparkActivity, BUILD_INTENT, pickChildFromText } from '@/lib/spark';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -109,6 +110,33 @@ export async function POST(request: NextRequest) {
 
     if (conversation.length === 0 || conversation[conversation.length - 1].role !== 'user') {
       return apiError('The conversation must end with a user message', 400);
+    }
+
+    // ── Spark in Ask: if the parent asks to build a specific activity, generate
+    // one with the same curriculum-grounded logic and hand it back as a card,
+    // instead of a chat reply. Falls through to a normal reply if it cannot. ──
+    const lastUser = conversation[conversation.length - 1].content;
+    if (familyId && BUILD_INTENT.test(lastUser)) {
+      const { data: kids } = await supabase
+        .from('children')
+        .select('id, name, date_of_birth, interests, school_status')
+        .eq('family_id', familyId);
+      const children = kids || [];
+      const child = pickChildFromText(children, lastUser);
+      if (child) {
+        const result = await generateSparkActivity(supabase, { familyId, child, prompt: lastUser });
+        if (result) {
+          // Counts as this family's AI turn (the normal path below would
+          // otherwise charge it; we return before reaching it).
+          await supabase.from('ai_usage').insert({ family_id: familyId, feature: 'ai_chat' });
+          void recordAiMemory(familyId, `Asked to build an activity: ${lastUser}`);
+          const reply = `Here is something for ${result.childName}, ready to go and tied to the curriculum. Tap it to open, have a go, and log it whenever you like.`;
+          return new Response(JSON.stringify({ type: 'activity', reply, activity: result }), {
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+          });
+        }
+        // generation failed: fall through to a normal conversational reply below.
+      }
     }
 
     // Assemble a rich, personalised picture of THIS family from their own real

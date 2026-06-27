@@ -4,6 +4,7 @@ import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
 import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
+import { generateSparkActivity, BUILD_INTENT, pickChildFromText } from '@/lib/spark';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -92,6 +93,31 @@ export async function POST(request: NextRequest) {
 
     if (!prompt || typeof prompt !== 'string') {
       return apiError('Missing prompt', 400);
+    }
+
+    // ── Spark in Ask: a parent asking to BUILD an activity gets a real, saved,
+    // curriculum-grounded one back as a card, not just loose ideas. ──
+    if (familyId && BUILD_INTENT.test(prompt)) {
+      const { data: kids } = await supabase
+        .from('children')
+        .select('id, name, date_of_birth, interests, school_status')
+        .eq('family_id', familyId);
+      const child = pickChildFromText(kids || [], prompt);
+      if (child) {
+        const activity = await generateSparkActivity(supabase, { familyId, child, prompt });
+        if (activity) {
+          await supabase.from('ai_usage').insert({ family_id: familyId, feature: 'ai_suggestions' });
+          return apiSuccess({
+            activity,
+            text: `Here is something for ${activity.childName}, ready to go and tied to the curriculum. Tap it to open, have a go, and log it whenever you like.`,
+            suggestions: null,
+            tier,
+            weeklyLimit,
+            used: used + 1,
+          });
+        }
+        // generation failed: fall through to ordinary suggestions below.
+      }
     }
 
     // Build a rich picture of THIS family from their own real data so the ideas
