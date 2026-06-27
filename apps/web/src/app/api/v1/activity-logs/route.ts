@@ -1,6 +1,20 @@
 import { NextRequest } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { apiSuccess, apiError, apiPaginated, apiOptions } from '@/lib/api-response';
+
+// Pull the curriculum areas + real outcome ids an activity carries, so a saved
+// portfolio entry becomes honest Tusla/AEARS evidence rather than a bare note.
+// Spark activities populate these; library activities may not, which is fine.
+function curriculumFromActivity(tags: unknown): { areas: string[]; outcomeIds: string[] } {
+  const t = (tags || {}) as Record<string, unknown>;
+  const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') as string[] : []);
+  const areas = [
+    ...arr(t.aistear_themes).map((a) => (a.startsWith('Aistear') ? a : `Aistear: ${a}`)),
+    ...arr(t.ncca_areas),
+  ];
+  return { areas: [...new Set(areas)], outcomeIds: arr(t.outcome_ids) };
+}
 
 export async function OPTIONS() {
   return apiOptions();
@@ -69,7 +83,7 @@ export async function POST(request: NextRequest) {
   if (!profile?.family_id) return apiError('No family found', 400);
 
   const body = await request.json();
-  const { activity_id, child_ids, date, duration_minutes, notes, rating } = body;
+  const { activity_id, child_ids, date, duration_minutes, notes, rating, diary_entry, save_to_portfolio } = body;
 
   if (!date) return apiError('Date is required', 422, 'VALIDATION_ERROR');
 
@@ -84,14 +98,51 @@ export async function POST(request: NextRequest) {
       notes: notes || null,
       rating: rating || null,
     })
-    .select()
+    .select('*, activities(title, curriculum_tags)')
     .single();
 
   if (insertError) {
     return apiError('Failed to log activity', 500);
   }
 
-  return apiSuccess(log, undefined, 201);
+  // Save to the child's portfolio when asked, carrying the activity's curriculum
+  // outcomes through as evidence. Best-effort: a failure here never fails the log.
+  let portfolioSaved = 0;
+  if (save_to_portfolio && Array.isArray(child_ids) && child_ids.length > 0) {
+    try {
+      const act = (log as { activities?: { title?: string; curriculum_tags?: unknown } }).activities;
+      const { areas, outcomeIds } = curriculumFromActivity(act?.curriculum_tags);
+      // Only create entries for children that genuinely belong to this family.
+      const { data: ownChildren } = await supabase
+        .from('children')
+        .select('id')
+        .eq('family_id', profile.family_id)
+        .in('id', child_ids);
+      const validChildIds = (ownChildren || []).map((c) => c.id);
+      if (validChildIds.length > 0) {
+        const admin = createAdminClient();
+        const entries = validChildIds.map((childId) => ({
+          child_id: childId,
+          date,
+          title: act?.title || 'A learning moment',
+          description: (diary_entry || notes || '').trim() || null,
+          curriculum_areas: areas,
+          outcome_ids: outcomeIds,
+          photos: [],
+          activity_log_id: (log as { id: string }).id,
+        }));
+        const { error: pErr, count } = await admin
+          .from('portfolio_entries')
+          .insert(entries, { count: 'exact' });
+        if (pErr) console.error('portfolio save error:', pErr);
+        else portfolioSaved = count || entries.length;
+      }
+    } catch (e) {
+      console.error('portfolio save threw:', e);
+    }
+  }
+
+  return apiSuccess({ ...log, portfolio_saved: portfolioSaved }, undefined, 201);
 }
 
 /**
