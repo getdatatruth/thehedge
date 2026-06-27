@@ -138,6 +138,17 @@ export async function POST(request: NextRequest) {
       familyId = family.id;
     }
 
+    // Clear any stale profile row holding this email. Supabase auth enforces a
+    // unique email, so any public.users row with this email and a DIFFERENT id
+    // is an orphan left behind when an old account was deleted without its
+    // profile row cascading. Without this, the upsert below hits the unique
+    // email index (users_email_idx) and the whole onboarding 500s. Needs the
+    // service-role client: RLS forbids a user touching a row that is not theirs.
+    if (user.email) {
+      const adminCleanup = createAdminClient();
+      await adminCleanup.from('users').delete().eq('email', user.email).neq('id', user.id);
+    }
+
     // Upsert user record with family link and preferences
     const { error: userError } = await supabase.from('users').upsert({
       id: user.id,
