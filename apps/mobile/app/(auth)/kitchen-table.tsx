@@ -192,9 +192,11 @@ export default function KitchenTableScreen() {
       fw = buildLocalFramework(full);
     }
 
-    // 3. Refresh the auth store so the root navigator knows onboarding is done,
-    // then reveal the framework. The family is onboarded either way now.
-    await refreshAuth();
+    // 3. Reveal the framework. We deliberately do NOT refresh the auth store
+    // here: doing so flips onboarding_completed in the store and the root
+    // navigator would immediately replace this screen with the tabs, skipping
+    // the welcome entirely. The store is refreshed only when the parent taps
+    // through from the reveal (see the CTA below).
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setFramework(fw);
     setThinking(false);
@@ -216,7 +218,11 @@ export default function KitchenTableScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             style={styles.primaryCta}
-            onPress={() => router.replace('/(tabs)')}
+            onPress={async () => {
+              // Now sync the store (onboarding is complete) and enter the app.
+              await refreshAuth();
+              router.replace('/(tabs)');
+            }}
           >
             <Text style={styles.primaryCtaText}>This is us, into The Hedge</Text>
             <ArrowRight size={18} color="#FFFFFF" />
