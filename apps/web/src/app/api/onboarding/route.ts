@@ -212,14 +212,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, data: { familyId } });
   } catch (error) {
     console.error('POST /api/onboarding error:', error);
+    // Surface the real cause. Supabase/Postgres errors are plain objects (not
+    // Error instances), so the old `instanceof Error` check hid them behind a
+    // generic line. Pull message + code + details/hint from whatever shape.
+    const e = error as { message?: string; code?: string; details?: string; hint?: string } | null;
+    const message = e?.message || (error instanceof Error ? error.message : 'Something went wrong. Please try again.');
+    const code = e?.code;
+    const extra = [e?.details, e?.hint].filter(Boolean).join(' ');
     return NextResponse.json(
       {
         success: false,
         error: {
-          message: error instanceof Error
-            ? error.message
-            : 'Something went wrong. Please try again.',
-          code: 'SERVER_ERROR',
+          message: [message, code ? `[${code}]` : '', extra].filter(Boolean).join(' ').trim(),
+          code: code || 'SERVER_ERROR',
         },
       },
       { status: 500 }
