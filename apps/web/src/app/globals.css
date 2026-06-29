@@ -51,9 +51,9 @@
   /* ─── Brand Colors (v2 modern sage palette) ─── */
 
   /* Green Scale */
-  --color-forest: #1C3520;
-  --color-moss: #4CAF7C;
-  --color-fern: #2E7D32;
+  --color-forest: #062922;
+  --color-moss: #55753F;
+  --color-fern: #698441;
   --color-sage: #8A9B8E;
   --color-mist: #BDD4B0;
 
@@ -61,38 +61,38 @@
   --color-parchment: #F2F5F0;
   --color-linen: #FFFFFF;
   --color-stone: #D8DDD5;
-  --color-umber: #1A2E1E;
+  --color-umber: #062922;
   --color-clay: #5A6B5E;
-  --color-ink: #1A2E1E;
+  --color-ink: #062922;
 
   /* Accents */
-  --color-terracotta: #4CAF7C;
+  --color-terracotta: #55753F;
   --color-amber: #F5A623;
 
   /* Legacy aliases */
-  --color-green-deep: #1C3520;
-  --color-green-mid: #4CAF7C;
-  --color-green-light: #2E7D32;
+  --color-green-deep: #062922;
+  --color-green-mid: #55753F;
+  --color-green-light: #698441;
   --color-cream: #F2F5F0;
   --color-cream-dark: #FFFFFF;
-  --color-bark: #1A2E1E;
+  --color-bark: #062922;
   --color-bark-light: #5A6B5E;
   --color-gold: #F5A623;
   --color-gold-light: #F5A623;
   --color-moss-old: #8A9B8E;
   --color-sky: #5BBDD4;
   --color-berry: #E85BAD;
-  --color-rust: #4CAF7C;
+  --color-rust: #55753F;
 
   /* Category Colors */
-  --color-cat-nature: #4CAF7C;
+  --color-cat-nature: #55753F;
   --color-cat-science: #5B8DEF;
   --color-cat-art: #E8735A;
   --color-cat-maths: #9B7BD4;
   --color-cat-literacy: #5BBDD4;
   --color-cat-movement: #F5A623;
   --color-cat-kitchen: #D4845B;
-  --color-cat-life-skills: #2E7D32;
+  --color-cat-life-skills: #698441;
   --color-cat-calm: #8A9B8E;
   --color-cat-social: #E85BAD;
 
@@ -144,37 +144,37 @@
 
 :root {
   --background: #F2F5F0;
-  --foreground: #1A2E1E;
+  --foreground: #062922;
   --card: #FFFFFF;
-  --card-foreground: #1A2E1E;
+  --card-foreground: #062922;
   --popover: #F2F5F0;
-  --popover-foreground: #1A2E1E;
-  --primary: #1C3520;
+  --popover-foreground: #062922;
+  --primary: #062922;
   --primary-foreground: #F2F5F0;
   --secondary: #FFFFFF;
-  --secondary-foreground: #1A2E1E;
+  --secondary-foreground: #062922;
   --muted: #E8EDE6;
   --muted-foreground: #8A9B8E;
   --accent: #E8EDE6;
-  --accent-foreground: #1A2E1E;
+  --accent-foreground: #062922;
   --destructive: #DC3545;
   --border: #D8DDD5;
   --input: #D8DDD5;
-  --ring: #4CAF7C;
-  --chart-1: #4CAF7C;
+  --ring: #55753F;
+  --chart-1: #55753F;
   --chart-2: #5B8DEF;
   --chart-3: #E8735A;
   --chart-4: #9B7BD4;
   --chart-5: #F5A623;
   --radius: 1rem;
-  --sidebar: #1C3520;
+  --sidebar: #062922;
   --sidebar-foreground: #F2F5F0;
-  --sidebar-primary: #4CAF7C;
-  --sidebar-primary-foreground: #F2F5F0;
+  --sidebar-primary: #9DB86E;
+  --sidebar-primary-foreground: #062922;
   --sidebar-accent: #2A4A2E;
   --sidebar-accent-foreground: #F2F5F0;
   --sidebar-border: #2A4A2E;
-  --sidebar-ring: #4CAF7C;
+  --sidebar-ring: #9DB86E;
 }
 
 @layer base {
@@ -483,14 +483,14 @@
   right: 0;
   height: 3px;
 }
-.category-strip[data-category="nature"]::before { background: linear-gradient(90deg, #4CAF7C, #6BC898); }
+.category-strip[data-category="nature"]::before { background: linear-gradient(90deg, #55753F, #9DB86E); }
 .category-strip[data-category="kitchen"]::before { background: linear-gradient(90deg, #D4845B, #DFA07E); }
 .category-strip[data-category="science"]::before { background: linear-gradient(90deg, #5B8DEF, #7BA8F5); }
 .category-strip[data-category="art"]::before { background: linear-gradient(90deg, #E8735A, #EE9580); }
 .category-strip[data-category="movement"]::before { background: linear-gradient(90deg, #F5A623, #F7BC5C); }
 .category-strip[data-category="literacy"]::before { background: linear-gradient(90deg, #5BBDD4, #7CCEE0); }
 .category-strip[data-category="maths"]::before { background: linear-gradient(90deg, #9B7BD4, #B39AE0); }
-.category-strip[data-category="life_skills"]::before { background: linear-gradient(90deg, #2E7D32, #4CAF50); }
+.category-strip[data-category="life_skills"]::before { background: linear-gradient(90deg, #698441, #9DB86E); }
 .category-strip[data-category="calm"]::before { background: linear-gradient(90deg, #8A9B8E, #A5B3A9); }
 .category-strip[data-category="social"]::before { background: linear-gradient(90deg, #E85BAD, #EE82C2); }
 
@@ -646,14 +646,14 @@ input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
   --color-umber: #F2F5F0;
   --color-clay: #8A9B8E;
   --color-ink: #F2F5F0;
-  --color-terracotta: #4CAF7C;
+  --color-terracotta: #9DB86E;
   --background: #0D1F12;
   --foreground: #F2F5F0;
   --card: #162A1B;
   --card-foreground: #F2F5F0;
   --popover: #162A1B;
   --popover-foreground: #F2F5F0;
-  --primary: #4CAF7C;
+  --primary: #9DB86E;
   --primary-foreground: #0D1F12;
   --secondary: #1E3A24;
   --secondary-foreground: #F2F5F0;
@@ -663,7 +663,7 @@ input:focus, textarea:focus, select:focus, [role="combobox"]:focus {
   --accent-foreground: #F2F5F0;
   --border: #1E3A24;
   --input: #1E3A24;
-  --ring: #4CAF7C;
+  --ring: #9DB86E;
 }
 
 /* The auth card itself renders light (Tailwind @theme inline keeps literal

@@ -27,7 +27,7 @@ interface CelebrationOverlayProps {
 
 function ConfettiDot({ delay, startX }: { delay: number; startX: number }) {
   const anim = useRef(new Animated.Value(0)).current;
-  const colors = ['#4CAF7C', '#5B8DEF', '#E8735A', '#F5A623', '#9B7BD4', '#E85BAD'];
+  const colors = ['#55753F', '#5B8DEF', '#E8735A', '#F5A623', '#9B7BD4', '#E85BAD'];
   const color = colors[Math.floor(Math.random() * colors.length)];
   const size = 6 + Math.random() * 6;
 

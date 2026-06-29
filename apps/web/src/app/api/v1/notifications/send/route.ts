@@ -656,7 +656,7 @@ function buildMorningEmail(input: MorningEmailInput): {
     .filter((l) => l !== null)
     .join('\n');
 
-  const accent = '#4CAF7C';
+  const accent = '#55753F';
   const ink = '#1F2A22';
   const muted = '#5B6B5F';
   const bg = '#F2F5F0';

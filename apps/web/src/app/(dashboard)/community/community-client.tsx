@@ -128,7 +128,7 @@ const GROUP_EMOJI: Record<string, string> = {
 };
 
 const POST_TYPE_COLORS: Record<string, string> = {
-  discussion: '#4CAF7C',
+  discussion: '#55753F',
   question: '#F5A623',
   resource: '#5BBDD4',
   event: '#E8735A',

@@ -3,23 +3,23 @@
 
 // ── Brand colors (unchanged identity) ──────────────────────────
 export const brand = {
-  forest: '#1C3520',
-  moss: '#3D6142',
-  sage: '#8FAF7E',
+  forest: '#062922',
+  moss: '#55753F',
+  sage: '#9DB86E',
 } as const;
 
 // ── Base palette ───────────────────────────────────────────────
 export const colors = {
   // Brand
-  forest: '#1C3520',
-  moss: '#3D6142',
-  sage: '#8FAF7E',
+  forest: '#062922',
+  moss: '#55753F',
+  sage: '#9DB86E',
 
   // Modernized neutrals
   parchment: '#F2F5F0',  // was #F5F0E4 - now light sage
   linen: '#FFFFFF',       // was #EDE6D3 - now white (card surfaces)
   stone: '#D8DDD5',       // was #D5C9B0 - now gray-green
-  ink: '#1A2E1E',         // was #1A1612 - now dark forest
+  ink: '#062922',         // was #1A1612 - now dark forest
 
   // Legacy compat (aliased)
   terracotta: '#E8735A',  // modernized coral
@@ -30,7 +30,7 @@ export const colors = {
   transparent: 'transparent',
 
   // New accent
-  accent: '#4CAF7C',      // bright natural green
+  accent: '#55753F',      // bright natural green
 } as const;
 
 export type ColorName = keyof typeof colors;
@@ -61,13 +61,13 @@ export const darkTheme = {
   text: '#F2F5F0',
   textSecondary: '#8A9B8E',
   textMuted: '#5A6B5E',
-  accent: '#4CAF7C',
-  accentLight: '#4CAF7C20',
-  accentHover: '#5BC98E',
-  primary: '#4CAF7C',
+  accent: '#9DB86E',
+  accentLight: '#9DB86E20',
+  accentHover: '#B6CB8C',
+  primary: '#9DB86E',
   error: '#E57373',
   warning: '#F5A623',
-  success: '#4CAF7C',
+  success: '#9DB86E',
 } as const;
 
 // ── Light theme (main app) ─────────────────────────────────────
@@ -77,16 +77,16 @@ export const lightTheme = {
   surfaceElevated: '#FFFFFF',
   border: '#D8DDD5',
   borderLight: '#E8ECE6',
-  text: '#1A2E1E',
+  text: '#062922',
   textSecondary: '#5A6B5E',
   textMuted: '#8A9B8E',
-  accent: '#4CAF7C',
-  accentLight: '#4CAF7C15',
-  accentHover: '#3D9A6B',
-  primary: '#1C3520',
+  accent: '#55753F',
+  accentLight: '#55753F15',
+  accentHover: '#406130',
+  primary: '#062922',
   error: '#E57373',
   warning: '#F5A623',
-  success: '#4CAF7C',
+  success: '#55753F',
 } as const;
 
 // Theme type uses string for color values so both dark and light themes are assignable
@@ -97,14 +97,14 @@ export type Theme = {
 // ── Activity category colors ───────────────────────────────────
 // Keys MUST match the database category enum exactly
 export const categoryColors = {
-  nature: '#4CAF7C',
+  nature: '#55753F',
   science: '#5B8DEF',
   art: '#E8735A',
   maths: '#9B7BD4',
   literacy: '#5BBDD4',
   movement: '#F5A623',
   kitchen: '#D4845B',
-  life_skills: '#2E7D32',
+  life_skills: '#698441',
   calm: '#8A9B8E',
   social: '#E85BAD',
   // Fallback
