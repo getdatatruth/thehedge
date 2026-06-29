@@ -208,11 +208,9 @@ function SidebarContent({
       {/* ─── Logo + Collapse ─── */}
       <div className={`flex items-center gap-2.5 px-3 pt-4 pb-3 ${collapsed ? 'justify-center' : ''}`}>
         <Link href="/dashboard" className="flex items-center gap-2.5 group min-w-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-parchment/8 transition-colors group-hover:bg-parchment/12">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 text-sage" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 3c-1.5 2-4 4-4 8s4 10 4 10 4-6 4-10-2.5-6-4-8z" />
-              <circle cx="12" cy="10" r="1.5" />
-            </svg>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white transition-transform group-hover:scale-105">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-mark.svg" alt="The Hedge" className="h-5 w-auto" />
           </div>
           {!collapsed && (
             <span className="font-display text-[16px] font-semibold text-parchment tracking-tight truncate">
@@ -403,10 +401,9 @@ export function Sidebar({ subscriptionTier = 'free', familyName = '', userName =
             </SheetContent>
           </Sheet>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-forest">
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-sage" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 3c-1.5 2-4 4-4 8s4 10 4 10 4-6 4-10-2.5-6-4-8z" />
-              </svg>
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-stone/50">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-mark.svg" alt="The Hedge" className="h-4 w-auto" />
             </div>
             <span className="font-display text-[16px] font-semibold text-ink">The Hedge</span>
           </Link>

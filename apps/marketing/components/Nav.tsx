@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { SVGDefs, Icon } from './Icons';
+import { SVGDefs } from './Icons';
 
 const links = [
   { href: '/how-it-works', label: 'How it works' },
@@ -34,7 +34,8 @@ export default function Nav({ active = '' }: { active?: string }) {
       <nav className={`nav${scrolled ? ' scrolled' : ''}`} role="navigation" aria-label="Main navigation">
         <Link href="/" className="nav-logo" onClick={() => setOpen(false)}>
           <div className="logo-mark" aria-hidden="true">
-            <Icon id="clover" size={16} color="var(--sage)" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-mark.svg" alt="" />
           </div>
           <div>
             <div className="nav-name">The Hedge</div>

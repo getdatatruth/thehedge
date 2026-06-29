@@ -17,7 +17,8 @@ button{cursor:pointer;font-family:var(--font-heading)}
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(245,240,228,0.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(107,79,53,0.08);transition:padding .3s,box-shadow .3s}
 .nav.scrolled{padding:12px 20px;box-shadow:0 2px 20px rgba(28,53,32,0.08)}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo-mark{width:34px;height:34px;background:var(--forest);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark{width:34px;height:34px;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-mark img{height:32px;width:auto;display:block}
 .nav-name{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--forest);letter-spacing:-0.01em;line-height:1}
 .nav-domain{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);margin-top:1px}
 .nav-links{display:none}
