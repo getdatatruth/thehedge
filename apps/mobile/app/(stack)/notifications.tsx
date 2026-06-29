@@ -23,6 +23,13 @@ interface Notification {
 // Map notification types to the screen they should open
 function getRouteForType(type: string, data?: Record<string, unknown>): string | null {
   switch (type) {
+    // The daily/weekly rhythm opens its own brief pages (matches the push tap).
+    case 'morning_brief':
+      return '/(stack)/brief?mode=morning';
+    case 'evening_recap':
+      return '/(stack)/brief?mode=evening';
+    case 'weekend_review':
+      return '/(stack)/weekly-review';
     case 'morning_plan':
     case 'weekly_plan':
     case 'tomorrow_preview':
