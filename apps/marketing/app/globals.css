@@ -19,6 +19,7 @@ button{cursor:pointer;font-family:var(--font-heading)}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .logo-mark{width:34px;height:34px;background:transparent;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-mark img{height:32px;width:auto;display:block}
+.nav-logo-img{height:34px;width:auto;display:block}
 .nav-name{font-family:var(--font-display);font-size:18px;font-weight:600;color:var(--forest);letter-spacing:-0.01em;line-height:1}
 .nav-domain{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--clay);margin-top:1px}
 .nav-links{display:none}

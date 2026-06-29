@@ -33,14 +33,8 @@ export default function Nav({ active = '' }: { active?: string }) {
       <SVGDefs />
       <nav className={`nav${scrolled ? ' scrolled' : ''}`} role="navigation" aria-label="Main navigation">
         <Link href="/" className="nav-logo" onClick={() => setOpen(false)}>
-          <div className="logo-mark" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-mark.svg" alt="" />
-          </div>
-          <div>
-            <div className="nav-name">The Hedge</div>
-            <div className="nav-domain">THEHEDGE.IE</div>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-full.svg" alt="The Hedge" className="nav-logo-img" />
         </Link>
 
         <ul className="nav-links" role="list">

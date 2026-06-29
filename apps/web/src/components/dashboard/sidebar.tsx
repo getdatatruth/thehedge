@@ -208,14 +208,15 @@ function SidebarContent({
       {/* ─── Logo + Collapse ─── */}
       <div className={`flex items-center gap-2.5 px-3 pt-4 pb-3 ${collapsed ? 'justify-center' : ''}`}>
         <Link href="/dashboard" className="flex items-center gap-2.5 group min-w-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white transition-transform group-hover:scale-105">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-mark.svg" alt="The Hedge" className="h-5 w-auto" />
-          </div>
-          {!collapsed && (
-            <span className="font-display text-[16px] font-semibold text-parchment tracking-tight truncate">
-              The Hedge
-            </span>
+          {collapsed ? (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white transition-transform group-hover:scale-105">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-mark.svg" alt="The Hedge" className="h-5 w-auto" />
+            </div>
+          ) : (
+            // Full wordmark, light variant so it reads on the dark sidebar.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src="/logo-full-light.svg" alt="The Hedge" className="h-6 w-auto" />
           )}
         </Link>
         {!collapsed && (
@@ -401,11 +402,9 @@ export function Sidebar({ subscriptionTier = 'free', familyName = '', userName =
             </SheetContent>
           </Sheet>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-stone/50">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo-mark.svg" alt="The Hedge" className="h-4 w-auto" />
-            </div>
-            <span className="font-display text-[16px] font-semibold text-ink">The Hedge</span>
+            {/* Light header bar -> the dark full wordmark. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-full.svg" alt="The Hedge" className="h-6 w-auto" />
           </Link>
         </div>
         <Link href="/notifications" className="relative p-2">
