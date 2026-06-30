@@ -4,6 +4,7 @@ import { getWeather, getSeason } from '@/lib/weather';
 import { TodayClient } from './today-client';
 import type { MockActivity } from '@/lib/mock-data';
 import { ageInYears, computeAreaWarmth, weightActivity, buildQuietFloor } from '@/lib/personalisation';
+import { buildReassurance } from '@/lib/reassurance';
 
 export const metadata = {
   title: 'Today - The Hedge',
@@ -144,6 +145,10 @@ export default async function DashboardPage() {
   // The visible face of the rounded-childhood floor (null on cold start / a
   // balanced week), same logic the mobile dashboard uses.
   const quietFloor = buildQuietFloor(warmth);
+
+  // The reassurance card: a calm "you are doing enough", cold-start aware and
+  // never a score (gap analysis #1; wellbeing §14).
+  const reassurance = familyId ? await buildReassurance(supabase, { familyId }) : null;
 
   // Candidate pool, then rank by the personalisation engine so the hero is
   // age-appropriate, interest-bridged, weather-aware, and gently floor-balanced.
@@ -306,6 +311,7 @@ export default async function DashboardPage() {
       approach={family?.approach}
       sparkChildren={sparkChildren}
       quietFloor={quietFloor}
+      reassurance={reassurance}
     />
   );
 }

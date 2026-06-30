@@ -89,11 +89,14 @@ export async function buildReassurance(
     };
   }
 
-  // Doing well, with one gentle corner to lean into if they fancy it.
+  // Doing well, with one gentle corner to lean into if they fancy it. The card
+  // stays a brief affirmation; the actionable nudge (nextStep) is surfaced by
+  // the Spark launcher, so we do not repeat the full message here.
   return {
     tone: 'gentle',
     headline: 'You are doing plenty.',
-    body: quiet.message,
+    body:
+      'You have had a lovely run lately. There is a quiet corner or two you could lean into if you fancy it, but there is no pressure at all.',
     nextStep: quiet,
     recentCount,
   };

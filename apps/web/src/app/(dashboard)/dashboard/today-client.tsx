@@ -60,6 +60,11 @@ interface TodayClientProps {
     areas: { category: string; label: string; hint: string }[];
     message: string;
   } | null;
+  reassurance?: {
+    tone: 'settling' | 'rounded' | 'gentle';
+    headline: string;
+    body: string;
+  } | null;
 }
 
 // Reframe chips re-pick the single hero, they do not open a list.
@@ -97,6 +102,7 @@ export function TodayClient({
   approach,
   sparkChildren = [],
   quietFloor = null,
+  reassurance = null,
 }: TodayClientProps) {
   const [reframe, setReframe] = useState<string | null>(null);
   const [shuffle, setShuffle] = useState(0);
@@ -202,6 +208,17 @@ export function TodayClient({
           </p>
         )}
       </header>
+
+      {/* ─── Reassurance: a calm answer to "am I doing enough?" (never a score) ─── */}
+      {reassurance && (
+        <section
+          className="rounded-2xl bg-white p-5 shadow-sm border-l-2 border-moss/40"
+          aria-label="How you are doing"
+        >
+          <p className="text-[15px] font-semibold text-forest leading-snug">{reassurance.headline}</p>
+          <p className="text-[13px] text-clay mt-1.5 leading-relaxed">{reassurance.body}</p>
+        </section>
+      )}
 
       {/* ─── Follow a spark + the Quiet Floor nudge ─── */}
       {sparkChildren.length > 0 && (
