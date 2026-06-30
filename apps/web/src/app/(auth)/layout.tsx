@@ -1,4 +1,3 @@
-import { TreePine } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AuthLayout({
@@ -13,13 +12,13 @@ export default function AuthLayout({
       <div className="absolute bottom-20 right-[15%] h-48 w-48 rounded-full bg-[#5B8DEF]/5 blur-3xl" />
 
       <div className="relative w-full max-w-md space-y-6">
-        <Link href="/" className="flex items-center justify-center gap-3 group">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#55753F] transition-transform group-hover:scale-105">
-            <TreePine className="h-6 w-6 text-[#0D1F12]" />
-          </div>
-          <span className="font-display text-2xl font-bold text-[#F2F5F0]">
-            The Hedge
-          </span>
+        <Link href="/" className="flex items-center justify-center group">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-full-light.svg"
+            alt="The Hedge"
+            className="h-9 w-auto transition-transform group-hover:scale-105"
+          />
         </Link>
         {children}
       </div>

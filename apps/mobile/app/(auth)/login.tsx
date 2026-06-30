@@ -7,10 +7,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Leaf } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/Input';
 import { darkTheme } from '@/theme/colors';
@@ -60,7 +60,11 @@ export default function LoginScreen() {
           {/* Logo */}
           <View style={styles.logoContainer}>
             <View style={styles.logoCircle}>
-              <Leaf size={36} color={darkTheme.accent} strokeWidth={1.5} />
+              <Image
+                source={require('../../assets/icon.png')}
+                style={styles.logoMark}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.logoText}>The Hedge</Text>
             <Text style={styles.tagline}>
@@ -158,13 +162,16 @@ const styles = StyleSheet.create({
   logoCircle: {
     width: 72,
     height: 72,
-    borderRadius: 36,
-    backgroundColor: darkTheme.surface,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
-    borderWidth: 1.5,
-    borderColor: darkTheme.accent,
+    overflow: 'hidden',
+  },
+  logoMark: {
+    width: 72,
+    height: 72,
   },
   logoText: {
     fontSize: 32,

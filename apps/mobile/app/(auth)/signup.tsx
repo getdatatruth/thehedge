@@ -7,10 +7,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Leaf } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 import { signUpAccount } from '@/lib/api';
 import { Input } from '@/components/ui/Input';
@@ -70,7 +70,11 @@ export default function SignupScreen() {
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoCircle}>
-              <Leaf size={28} color={darkTheme.accent} strokeWidth={1.5} />
+              <Image
+                source={require('../../assets/icon.png')}
+                style={styles.logoMark}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.title}>Sign up to The Hedge</Text>
           </View>
@@ -162,11 +166,16 @@ const styles = StyleSheet.create({
   logoCircle: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: darkTheme.surface,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
+    overflow: 'hidden',
+  },
+  logoMark: {
+    width: 48,
+    height: 48,
   },
   title: {
     ...typography.onboardingTitle,
