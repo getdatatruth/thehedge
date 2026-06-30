@@ -57,7 +57,7 @@ const TIERS = [
       { text: 'Tusla compliance dashboard', included: true },
       { text: 'Downloadable PDF reports', included: true },
       { text: 'Portfolio with curriculum tagging', included: true },
-      { text: 'Attendance tracking', included: true },
+      { text: 'A record of learning days', included: true },
       { text: 'Year-at-a-glance view', included: true },
     ],
   },

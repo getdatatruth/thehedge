@@ -7,7 +7,6 @@ import {
   FolderOpen,
   BookOpen,
   ChevronRight,
-  AlertTriangle,
   TrendingUp,
   Clock,
   Sparkles,
@@ -123,9 +122,9 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
     activityLogs.reduce((sum, log) => sum + (log.duration_minutes || 0), 0) / 60 * 10
   ) / 10;
 
-  // Calculate attendance days this week
+  // Days where a planned day was marked done. Framed as "days of learning",
+  // never as attendance against a required number of school days.
   const attendanceDays = dailyPlans.filter((dp) => dp.attendance_logged).length;
-  const totalSchoolDays = firstPlan ? firstPlan.days_per_week : 5;
 
   // Calculate unique curriculum areas covered
   const allAreasCovered = new Set<string>();
@@ -139,11 +138,8 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
   const totalAreas = planAreaNames.length || 7;
   const coveredAreas = planAreaNames.filter((a) => allAreasCovered.has(a)).length;
 
-  // Tusla compliance from plan
+  // Tusla registration status from plan.
   const tuslaStatus = firstPlan?.tusla_status || 'not_applied';
-  const attendancePercentage = dailyPlans.length > 0
-    ? Math.round((attendanceDays / dailyPlans.length) * 100)
-    : 0;
 
   // Recent activity feed (last 5 activity logs)
   const recentActivity = activityLogs.slice(0, 8);
@@ -209,22 +205,6 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
         ))}
       </div>
 
-      {/* Tusla compliance alert */}
-      {attendancePercentage > 0 && attendancePercentage < 90 && (
-        <div className="flex items-center gap-3 rounded-2xl bg-amber/8 border border-amber/15 px-5 py-3.5">
-          <AlertTriangle className="h-5 w-5 text-amber shrink-0" />
-          <div>
-            <p className="text-sm font-semibold text-amber">Attendance tracking</p>
-            <p className="text-xs text-clay/60">
-              Current attendance: {attendancePercentage}% this week
-            </p>
-          </div>
-          <Link href="/educator/tusla" className="ml-auto text-xs font-medium text-amber hover:text-amber/80 transition-colors">
-            View details
-          </Link>
-        </div>
-      )}
-
       {/* Stats row */}
       <div className="grid gap-4 sm:grid-cols-4">
         <div className="card-elevated p-5 flex items-center gap-4">
@@ -242,7 +222,7 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
           </div>
           <div>
             <p className="text-2xl font-light text-ink">{attendanceDays}</p>
-            <p className="text-xs text-clay/50">Days / {totalSchoolDays} this week</p>
+            <p className="text-xs text-clay/50">days of learning this week</p>
           </div>
         </div>
         <div className="card-elevated p-5 flex items-center gap-4">
@@ -550,8 +530,8 @@ export function EducatorDashboardClient({ children, plans, dailyPlans, activityL
               <p className="text-sm font-medium text-umber capitalize">{tuslaStatus.replace('_', ' ')}</p>
             </div>
             <div className="rounded-2xl bg-parchment/50 p-4">
-              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Attendance</p>
-              <p className="text-sm font-medium text-umber">{attendancePercentage}%</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Days of learning</p>
+              <p className="text-sm font-medium text-umber">{attendanceDays}</p>
             </div>
             <div className="rounded-2xl bg-parchment/50 p-4">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-clay/40 mb-1">Hours This Week</p>

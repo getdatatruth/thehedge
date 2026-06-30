@@ -1477,8 +1477,6 @@ export function renderAssessmentHtml(data: AssessmentReportData, framework: Fram
       <div class="info-grid">
         <div class="info-row"><span class="info-label">Academic Year</span><span class="info-value">${educationPlan.academicYear}</span></div>
         <div class="info-row"><span class="info-label">Approach</span><span class="info-value">${formatApproach(educationPlan.approach)}</span></div>
-        <div class="info-row"><span class="info-label">Hours per Day</span><span class="info-value">${educationPlan.hoursPerDay}</span></div>
-        <div class="info-row"><span class="info-label">Days per Week</span><span class="info-value">${educationPlan.daysPerWeek}</span></div>
         ${framing.showTuslaStatus ? `<div class="info-row"><span class="info-label">Tusla Status</span><span class="info-value">${formatTuslaStatus(educationPlan.tuslaStatus)}</span></div>` : ''}
       </div>
     </div>`;

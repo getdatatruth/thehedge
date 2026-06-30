@@ -87,20 +87,16 @@ export async function GET(request: NextRequest) {
     const portfolioCount = portfolioByChild[plan.child_id] || 0;
     const attendanceDays = attendanceByChild[plan.child_id] || 0;
 
-    // Build compliance checklist
-    const checklist = {
+    // An honest picture of the evidence this family has gathered. AEARS sets no
+    // required curriculum, no minimum hours, no attendance bar and no portfolio
+    // count, so we never invent thresholds or a "compliance score" - we just
+    // reflect what is there as gentle reassurance.
+    const evidence = {
       has_education_plan: true,
       has_approach: !!plan.approach,
       has_curriculum_areas: !!(plan.curriculum_areas && Object.keys(plan.curriculum_areas).length > 0),
-      has_schedule: !!(plan.hours_per_day && plan.days_per_week),
       has_portfolio_entries: portfolioCount >= 1,
-      has_sufficient_portfolio: portfolioCount >= 10,
-      has_attendance_records: attendanceDays >= 1,
-      has_minimum_attendance: attendanceDays >= 80,
     };
-
-    const completedItems = Object.values(checklist).filter(Boolean).length;
-    const totalItems = Object.keys(checklist).length;
 
     return {
       plan_id: plan.id,
@@ -109,9 +105,8 @@ export async function GET(request: NextRequest) {
       academic_year: plan.academic_year,
       tusla_status: plan.tusla_status,
       portfolio_count: portfolioCount,
-      attendance_days: attendanceDays,
-      checklist,
-      compliance_score: Math.round((completedItems / totalItems) * 100),
+      days_of_learning: attendanceDays,
+      evidence,
     };
   });
 

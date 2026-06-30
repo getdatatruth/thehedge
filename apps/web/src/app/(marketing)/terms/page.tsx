@@ -37,7 +37,7 @@ export default function TermsPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Free:</strong> Core activity browsing, limited AI suggestions, basic progress tracking</li>
               <li><strong>Family:</strong> Weekly planner, unlimited AI, favourites, full progress tracking</li>
-              <li><strong>Educator:</strong> Everything in Family plus curriculum planning, Tusla compliance tools, portfolio management, and attendance tracking</li>
+              <li><strong>Educator:</strong> Everything in Family plus curriculum planning, assessment-prep tools, portfolio management, and a record of learning</li>
             </ul>
             <p>Paid subscriptions are billed monthly or annually through Stripe. You can cancel at any time from your account settings. Refunds are handled on a case-by-case basis.</p>
           </section>
