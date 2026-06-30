@@ -4,6 +4,7 @@ import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { buildFamilyContext, recordAiMemory } from '@/lib/family-context';
 import { getAistearThemes, getCurriculumAreas } from '@/lib/curriculum-mapping';
+import { getFramework, stagesForAge as stagesForFramework, canonicalForCategory } from '@/lib/territory';
 
 // ─── Spark: the shared bespoke-activity generator ────────────────────────────
 // Used by POST /api/v1/spark (the Today "Follow a spark" flow) and by Ask Hedge
@@ -17,15 +18,11 @@ const LOCATIONS = ['indoor', 'outdoor', 'both', 'car', 'anywhere'];
 const ENERGY = ['calm', 'moderate', 'active'];
 const MESS = ['none', 'low', 'medium', 'high'];
 
-// Which curriculum stages to offer for a given age. Overlaps on purpose so a
-// 5-6 year old draws on both Aistear and the junior primary outcomes.
+// Which curriculum stages to offer for a given age, in Ireland. Kept for
+// backward compatibility; delegates to the territory layer (the IE framework's
+// stage age-ranges reproduce the original overlapping bands exactly).
 export function stagesForAge(age: number | null): string[] {
-  const a = age ?? 6;
-  const stages: string[] = [];
-  if (a <= 6) stages.push('early_childhood');
-  if (a >= 5 && a <= 8) stages.push('primary_junior');
-  if (a >= 8) stages.push('primary_senior');
-  return stages.length ? stages : ['primary_junior'];
+  return stagesForFramework(getFramework('IE'), age);
 }
 
 export function ageFromDob(dob: string | null | undefined): number | null {
@@ -97,6 +94,7 @@ export interface SparkChild {
   date_of_birth: string;
   interests: string[] | null;
   school_status?: string;
+  territory?: string | null;
 }
 
 export interface SparkActivityResult {
@@ -120,11 +118,14 @@ export async function generateSparkActivity(
   const leanCategory = opts.lean && SPARK_CATEGORIES.includes(opts.lean) ? opts.lean : null;
   const age = ageFromDob(child.date_of_birth);
 
+  // Resolve the child's territory (defaults to IE) and query that framework's
+  // curriculum outcomes for the child's stage(s).
+  const framework = getFramework(child.territory);
   const { data: outcomes } = await supabase
     .from('curriculum_outcomes')
     .select('id, curriculum_area, strand, outcome_code, outcome_text')
-    .eq('country', 'IE')
-    .in('stage', stagesForAge(age));
+    .eq('country', framework.outcomesCountry)
+    .in('stage', stagesForFramework(framework, age));
   const outcomeList = (outcomes || [])
     .map((o) => `${o.id} | ${o.curriculum_area} > ${o.strand} | ${o.outcome_code}: ${o.outcome_text}`)
     .join('\n');
@@ -198,6 +199,7 @@ export async function generateSparkActivity(
       ncca_areas: nccaAreas,
       rationale: String(gen.curriculumRationale || '').trim(),
     },
+    canonical_dimensions: canonicalForCategory(category),
     energy_level: pick(gen.energyLevel, ENERGY, 'moderate'),
     mess_level: pick(gen.messLevel, MESS, 'low'),
     screen_free: true,

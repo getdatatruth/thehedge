@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     let query = supabase
       .from('children')
-      .select('id, name, date_of_birth')
+      .select('id, name, date_of_birth, territory')
       .eq('family_id', profile.family_id);
     if (Array.isArray(childIds) && childIds.length > 0) query = query.in('id', childIds);
     const { data: children } = await query;

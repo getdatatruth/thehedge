@@ -1,7 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
-import { ageFromDob, stagesForAge } from '@/lib/spark';
+import { ageFromDob } from '@/lib/spark';
+import { getFramework, stagesForAge as stagesForFramework, canonicalForAreas } from '@/lib/territory';
 
 // ─── Log a moment: analyse what a family already did ─────────────────────────
 // The inverse of Spark. A parent describes (in their own words, by text or
@@ -14,6 +15,7 @@ export interface MomentChild {
   id: string;
   name: string;
   date_of_birth: string;
+  territory?: string | null;
 }
 
 export interface MomentDraft {
@@ -22,6 +24,7 @@ export interface MomentDraft {
   areas: string[];          // human area names (Aistear: X, or NCCA area)
   outcomeIds: string[];     // real curriculum_outcomes ids genuinely evidenced
   outcomeCodes: string[];
+  canonicalDimensions: string[]; // territory-neutral dimensions this evidences
   rationale: string;        // warm, parent-voice: what this evidenced
 }
 
@@ -46,13 +49,16 @@ export async function analyseMoment(
   opts: { children: MomentChild[]; description: string },
 ): Promise<MomentDraft | null> {
   const { children, description } = opts;
+  // Resolve the family's territory from the children (one family, one territory
+  // today; defaults to IE). Query that framework's outcomes for their stages.
+  const framework = getFramework(children[0]?.territory);
   const ages = children.map((c) => ageFromDob(c.date_of_birth));
-  const stages = [...new Set(ages.flatMap((a) => stagesForAge(a)))];
+  const stages = [...new Set(ages.flatMap((a) => stagesForFramework(framework, a)))];
 
   const { data: outcomes } = await supabase
     .from('curriculum_outcomes')
     .select('id, curriculum_area, strand, outcome_code, outcome_text')
-    .eq('country', 'IE')
+    .eq('country', framework.outcomesCountry)
     .in('stage', stages.length ? stages : ['primary_junior']);
 
   const outcomeList = (outcomes || [])
@@ -91,6 +97,7 @@ export async function analyseMoment(
     areas,
     outcomeIds,
     outcomeCodes: chosen.map((o) => o.outcome_code),
+    canonicalDimensions: canonicalForAreas(framework, areas),
     rationale: String(gen.rationale || '').trim(),
   };
 }

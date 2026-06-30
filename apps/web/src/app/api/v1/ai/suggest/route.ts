@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     if (familyId && BUILD_INTENT.test(prompt)) {
       const { data: kids } = await supabase
         .from('children')
-        .select('id, name, date_of_birth, interests, school_status')
+        .select('id, name, date_of_birth, interests, school_status, territory')
         .eq('family_id', familyId);
       const child = pickChildFromText(kids || [], prompt);
       if (child) {

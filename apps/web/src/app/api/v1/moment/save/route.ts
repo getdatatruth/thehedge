@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { apiSuccess, apiError, apiOptions } from '@/lib/api-response';
+import { getFramework, canonicalForAreas } from '@/lib/territory';
 
 export async function OPTIONS() {
   return apiOptions();
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
     // Verify the children belong to this family.
     const { data: ownChildren } = await supabase
       .from('children')
-      .select('id')
+      .select('id, territory')
       .eq('family_id', profile.family_id)
       .in('id', childIds);
     const validChildIds = (ownChildren || []).map((c) => c.id);
@@ -50,6 +51,11 @@ export async function POST(request: NextRequest) {
     const cleanAreas = Array.isArray(areas) ? areas.filter((a) => typeof a === 'string') : [];
     const cleanOutcomeIds = Array.isArray(outcomeIds) ? outcomeIds.filter((o) => typeof o === 'string') : [];
     const cleanPhotos = Array.isArray(photos) ? photos.filter((p) => typeof p === 'string') : [];
+
+    // Derive territory-neutral canonical dimensions from the confirmed areas,
+    // server-side, via the family's territory framework (defaults to IE).
+    const framework = getFramework((ownChildren || [])[0]?.territory);
+    const canonicalDimensions = canonicalForAreas(framework, cleanAreas);
 
     // One activity_log so the moment feeds the timeline + the rounded-childhood
     // warmth signal (curriculum_areas_covered drives coverage).
@@ -79,6 +85,7 @@ export async function POST(request: NextRequest) {
           description: summary.trim(),
           curriculum_areas: cleanAreas,
           outcome_ids: cleanOutcomeIds,
+          canonical_dimensions: canonicalDimensions,
           photos: cleanPhotos,
           activity_log_id: log?.id || null,
         })),

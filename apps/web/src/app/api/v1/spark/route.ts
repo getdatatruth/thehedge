@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (childId) {
       const { data: c } = await supabase
         .from('children')
-        .select('id, name, date_of_birth, interests, school_status')
+        .select('id, name, date_of_birth, interests, school_status, territory')
         .eq('id', childId)
         .eq('family_id', familyId)
         .single();
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     if (!child) {
       const { data: first } = await supabase
         .from('children')
-        .select('id, name, date_of_birth, interests, school_status')
+        .select('id, name, date_of_birth, interests, school_status, territory')
         .eq('family_id', familyId)
         .limit(1)
         .single();

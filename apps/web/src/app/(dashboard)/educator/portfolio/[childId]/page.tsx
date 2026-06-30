@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { signPortfolioPhotos } from '@/lib/storage';
+import { getFramework } from '@/lib/territory';
 import { PortfolioClient } from './portfolio-client';
 
 export const metadata = {
@@ -31,7 +32,7 @@ export default async function PortfolioPage({ params }: { params: Promise<{ chil
   // Fetch the child (verify belongs to family)
   const { data: child } = await supabase
     .from('children')
-    .select('id, name, date_of_birth')
+    .select('id, name, date_of_birth, territory')
     .eq('id', childId)
     .eq('family_id', profile.family_id)
     .single();
@@ -75,11 +76,11 @@ export default async function PortfolioPage({ params }: { params: Promise<{ chil
     .gte('date', fromDate)
     .order('date', { ascending: false });
 
-  // Fetch curriculum outcomes for linking
+  // Fetch curriculum outcomes for linking, in this child's territory (defaults IE).
   const { data: outcomes } = await supabase
     .from('curriculum_outcomes')
     .select('id, curriculum_area, stage, strand, outcome_code, outcome_text')
-    .eq('country', 'IE')
+    .eq('country', getFramework(child.territory).outcomesCountry)
     .order('curriculum_area', { ascending: true });
 
   return (

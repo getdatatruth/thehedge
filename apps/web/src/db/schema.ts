@@ -225,6 +225,12 @@ export const children = pgTable('children', {
   learningStyle: learningStyleEnum('learning_style'),
   schoolStatus: schoolStatusEnum('school_status').notNull().default('mainstream'),
   curriculumStage: text('curriculum_stage'),
+  // Territory is an attribute of the child's education context (brief §3.1):
+  // the regulatory + curricular regime (IE | ENG | SCO | WAL | NIR). Defaults
+  // to IE; backfilled from the family's country. adminArea is the sub-territory
+  // (England/Wales LA, Scotland council, NI EA region, IE county - informational).
+  territory: text('territory').notNull().default('IE'),
+  adminArea: text('admin_area'),
   avatarUrl: text('avatar_url'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -251,6 +257,9 @@ export const activities = pgTable('activities', {
   materials: jsonb('materials').$type<{ name: string; household_common: boolean }[]>().notNull().default([]),
   learningOutcomes: text('learning_outcomes').array().notNull().default([]),
   curriculumTags: jsonb('curriculum_tags'),
+  // Territory-neutral curriculum alignment: the canonical learning dimensions
+  // this activity evidences, so it projects into any territory's areas (brief §4).
+  canonicalDimensions: text('canonical_dimensions').array(),
   energyLevel: energyLevelEnum('energy_level').notNull().default('moderate'),
   messLevel: messLevelEnum('mess_level').notNull().default('low'),
   screenFree: boolean('screen_free').notNull().default(true),
@@ -343,6 +352,9 @@ export const portfolioEntries = pgTable('portfolio_entries', {
   description: text('description'),
   curriculumAreas: text('curriculum_areas').array().notNull().default([]),
   outcomeIds: uuid('outcome_ids').array().notNull().default([]),
+  // Canonical learning dimensions this evidence touches (brief §4), so a
+  // portfolio entry remains valid evidence in any territory's vocabulary.
+  canonicalDimensions: text('canonical_dimensions').array(),
   photos: text('photos').array().notNull().default([]),
   activityLogId: uuid('activity_log_id').references(() => activityLogs.id, { onDelete: 'set null' }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
