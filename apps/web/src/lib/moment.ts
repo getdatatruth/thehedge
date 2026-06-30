@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
 import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { ageFromDob } from '@/lib/spark';
-import { getFramework, stagesForAge as stagesForFramework, canonicalForAreas } from '@/lib/territory';
+import { getFramework, stagesForAge as stagesForFramework, canonicalForAreas, momentSystemPrompt } from '@/lib/territory';
 
 // ─── Log a moment: analyse what a family already did ─────────────────────────
 // The inverse of Spark. A parent describes (in their own words, by text or
@@ -27,22 +27,6 @@ export interface MomentDraft {
   canonicalDimensions: string[]; // territory-neutral dimensions this evidences
   rationale: string;        // warm, parent-voice: what this evidenced
 }
-
-const SYSTEM = `You are The Hedge, a warm, calm companion for Irish home-educating families. A parent has described, in their own words, something their child or children already did. Your job is to read it back honestly and map it to the Irish curriculum so it becomes good portfolio evidence, never to inflate it.
-
-Rules:
-- Be honest and specific. Only claim what the description genuinely shows. Do not stretch or invent learning that is not there.
-- Warm southern Irish-English. NEVER use the word "grand" or "wee". No em dashes (use ordinary hyphens or commas). No emojis. Never mention AI.
-- From the curriculum outcomes provided, choose ONLY the ids this genuinely evidences (usually 1 to 4). If it evidences none well, return an empty list rather than reaching.
-- Be honest about Tusla/AEARS: no minimum hours, no invented thresholds.
-
-Return ONLY strict JSON (no fences):
-{
-  "title": "a short, warm title for this portfolio entry",
-  "summary": "1-2 tidy sentences describing what they did, in the parent's register",
-  "outcomeIds": ["ids from the provided list that this genuinely evidences"],
-  "rationale": "2-3 warm sentences naming what this quietly evidenced across the curriculum, honest and specific"
-}`;
 
 export async function analyseMoment(
   supabase: SupabaseClient,
@@ -75,7 +59,7 @@ export async function analyseMoment(
   const message = await anthropic.messages.create({
     model: CLAUDE_MODEL,
     max_tokens: 900,
-    system: SYSTEM,
+    system: momentSystemPrompt(framework),
     messages: [{ role: 'user', content: userMessage }],
   });
   const raw = message.content[0]?.type === 'text' ? message.content[0].text : '';

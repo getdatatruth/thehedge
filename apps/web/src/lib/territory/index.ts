@@ -7,13 +7,18 @@ import type { Framework, TerritoryKey, Stage } from './types';
 import type { CanonicalDimension } from './canonical';
 import { TERRITORY_KEYS } from './types';
 import { IE_FRAMEWORK } from './frameworks/ie';
+import { ENG_FRAMEWORK } from './frameworks/eng';
 
 export * from './types';
 export * from './canonical';
+export * from './prompts';
 
-// Registered frameworks. Ireland is live; UK nations land in later phases.
+// Registered frameworks. Ireland is live; England is built and verified but
+// gated behind onboarding (no UI exposes ENG selection until the legal content
+// is human-reviewed). Scotland/Wales/NI land in later phases.
 const FRAMEWORKS: Partial<Record<TerritoryKey, Framework>> = {
   IE: IE_FRAMEWORK,
+  ENG: ENG_FRAMEWORK,
 };
 
 export const DEFAULT_TERRITORY: TerritoryKey = 'IE';
