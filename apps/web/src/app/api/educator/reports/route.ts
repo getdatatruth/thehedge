@@ -12,6 +12,7 @@ import {
   renderPortfolioHtml,
   renderAnnualHtml,
 } from '@/lib/reports';
+import { getFramework } from '@/lib/territory';
 import {
   assessmentToCsv,
   attendanceToCsv,
@@ -86,10 +87,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Verify child belongs to this family
+    // Verify child belongs to this family, and resolve its territory framework
+    // so reports render in the right vocabulary and framing.
     const { data: child } = await supabase
       .from('children')
-      .select('id')
+      .select('id, territory')
       .eq('id', childId)
       .eq('family_id', profile.family_id)
       .single();
@@ -97,6 +99,8 @@ export async function GET(request: NextRequest) {
     if (!child) {
       return NextResponse.json({ error: 'Child not found in your family' }, { status: 404 });
     }
+
+    const framework = getFramework(child.territory);
 
     // Date range defaults to current academic year (Sep-Jun)
     const defaults = getAcademicYearDates();
@@ -133,7 +137,7 @@ export async function GET(request: NextRequest) {
         if (format === 'pdf') {
           return pdfResponse('term-summary', 'Term Summary', data.child.name, startDate, endDate, assessmentToCsv(data));
         }
-        return new NextResponse(renderAssessmentHtml(data), {
+        return new NextResponse(renderAssessmentHtml(data, framework), {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
             'Content-Disposition': `inline; filename="assessment-report-${childId}.html"`,
@@ -152,7 +156,7 @@ export async function GET(request: NextRequest) {
         if (format === 'pdf') {
           return pdfResponse('attendance-record', 'Attendance Record', data.child.name, startDate, endDate, attendanceToCsv(data));
         }
-        return new NextResponse(renderAttendanceHtml(data), {
+        return new NextResponse(renderAttendanceHtml(data, framework), {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
             'Content-Disposition': `inline; filename="attendance-report-${childId}.html"`,
@@ -190,7 +194,7 @@ export async function GET(request: NextRequest) {
         if (format === 'pdf') {
           return pdfResponse('annual-summary', 'Annual Activity Summary', data.assessment.child.name, startDate, endDate, annualToCsv(data));
         }
-        return new NextResponse(renderAnnualHtml(data), {
+        return new NextResponse(renderAnnualHtml(data, framework), {
           headers: {
             'Content-Type': 'text/html; charset=utf-8',
             'Content-Disposition': `inline; filename="annual-report-${childId}.html"`,

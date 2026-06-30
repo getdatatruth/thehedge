@@ -1,9 +1,86 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { signPortfolioPhotos } from '@/lib/storage';
+import { getFramework, type Framework } from '@/lib/territory';
 
 // ─── Types ────────────────────────────────────────────────
 
 export type ReportType = 'assessment' | 'attendance' | 'portfolio' | 'annual';
+
+// ─── Territory-specific report framing ──────────────────────
+// Titles, disclaimers and which compliance-specific sections to show, sourced
+// from the resolved framework. Ireland keeps its exact wording (parity); other
+// territories get evidence framing with NO Tusla/AEARS/Aistear vocabulary
+// (brief §11, §12). Default IE so any direct caller is unchanged.
+
+interface ReportFraming {
+  assessmentTitle: string;
+  coverTitle: string;
+  coverEyebrow: string;
+  coverNote: string;
+  coverageHeading: string;
+  coverageIntro: (childName: string) => string;
+  areaLabel: string; // 'County' (IE) | 'Local authority' (UK)
+  areasTouchedLabel: string; // stat label on the annual cover figures
+  showTuslaStatus: boolean;
+  showAistear: boolean;
+}
+
+function framingFor(framework: Framework): ReportFraming {
+  if (framework.territory === 'IE') {
+    return {
+      assessmentTitle: 'Assessment Report',
+      coverTitle: 'Assessment Pack',
+      coverEyebrow: 'Home Education Portfolio',
+      coverNote:
+        'Prepared by the family using The Hedge. Not affiliated with Tusla. A portfolio assembled to support an application or review under the Alternative Education Assessment and Registration Service (AEARS).',
+      coverageHeading: 'Curriculum Coverage',
+      coverageIntro: (childName: string) =>
+        `Home education in Ireland is assessed on whether a child is receiving <em>a certain minimum education suitable to their age, ability and aptitude</em>. The national curriculum is <strong>not</strong> required. The areas below are used here only as a familiar map, to show the breadth of ${childName}&rsquo;s learning across the year.`,
+      areaLabel: 'County',
+      areasTouchedLabel: 'NCCA Areas Touched',
+      showTuslaStatus: true,
+      showAistear: true,
+    };
+  }
+  // England (and value-add territories): evidence framing, no Irish vocabulary.
+  const curriculum = framework.terminology.curriculum;
+  return {
+    assessmentTitle: 'Learning Summary',
+    coverTitle: 'Evidence of a Suitable Education',
+    coverEyebrow: 'Home Education Record',
+    coverNote: `Prepared by the family using The Hedge. This is the family's own record of the education their child is receiving. It is not affiliated with, or endorsed by, any local authority or government body.`,
+    coverageHeading: 'Breadth of Learning',
+    coverageIntro: (childName: string) =>
+      `Home education here does not require following ${curriculum}. The areas below are used only as a familiar map, to show the breadth of ${childName}&rsquo;s learning. They are not a checklist and nothing here is required.`,
+    areaLabel: 'Local authority',
+    areasTouchedLabel: 'Subjects Touched',
+    showTuslaStatus: false,
+    showAistear: false,
+  };
+}
+
+// The "About this pack" disclaimer. Ireland keeps its exact Tusla/AEARS/Section
+// 14 wording (parity). Other territories build an honest, dated disclaimer from
+// the compliance profile, with "expected" rules clearly flagged as not yet in
+// force (brief §16). esc() is hoisted, so it is safe to call here.
+function aboutPackHtml(framework: Framework): string {
+  if (framework.territory === 'IE') {
+    return `<p style="margin-bottom:10px;"><strong>About this pack.</strong> It was assembled by the family using The Hedge from the learning they recorded over the year. <strong>The Hedge is not affiliated with Tusla</strong> and this is not an official Tusla document.</p>
+        <p style="margin-bottom:10px;">In Ireland, a parent <strong>applies to Tusla via AEARS</strong> (the Alternative Education Assessment and Registration Service) to register a child on the Section 14 Register under the Education (Welfare) Act 2000. An <strong>authorised person</strong> carries out the assessment. The standard is whether the child is receiving <strong>a certain minimum education</strong> suitable to their age, ability and aptitude. There is <strong>no required curriculum, no minimum hours, and no attendance requirement</strong>. Registration is subject to <strong>periodic review</strong>.</p>
+        <p>Please use Tusla&rsquo;s official application (currently the R1 form) and current guidance when you apply. Nothing here is legal advice.</p>`;
+  }
+  const c = framework.compliance;
+  const facts = c.facts
+    .map(
+      (f) =>
+        `<li><strong>${esc(f.label)}:</strong> ${esc(f.value)}${f.status === 'expected' ? ' <em>(expected - not yet in force)</em>' : ''}</li>`,
+    )
+    .join('');
+  return `<p style="margin-bottom:10px;"><strong>About this pack.</strong> It was assembled by the family using The Hedge from the learning they recorded. <strong>It is the family&rsquo;s own record</strong> and is not affiliated with, or endorsed by, any local authority or government body.</p>
+        <p style="margin-bottom:10px;">${esc(c.summary)}</p>
+        <ul style="margin:0 0 10px 18px; padding:0; font-size:13px; line-height:1.7;">${facts}</ul>
+        <p style="font-size:12px; color: var(--clay);">This reflects the position as last reviewed on ${esc(c.lastReviewed)}. Anything marked &ldquo;expected&rdquo; is not yet in force and may change, so always check current guidance. Nothing here is legal advice.</p>`;
+}
 
 interface ReportParams {
   supabase: SupabaseClient;
@@ -27,6 +104,7 @@ interface ChildDetails {
   interests: string[];
   schoolStatus: string;
   learningStyle: string | null;
+  territory: string;
 }
 
 interface EducationPlanSummary {
@@ -155,6 +233,42 @@ const NCCA_AREAS = [
   'Social, Personal & Health Education',
 ] as const;
 
+// England (National Curriculum) equivalent of the NCCA map: activity category
+// to NC subjects, used only as a familiar coverage map (never a requirement).
+const ENG_SUBJECT_MAP: Record<string, string[]> = {
+  nature: ['Science', 'Geography'],
+  science: ['Science'],
+  art: ['Art and design'],
+  literacy: ['English'],
+  maths: ['Mathematics'],
+  movement: ['Physical education'],
+  kitchen: ['Design and technology', 'Science'],
+  life_skills: ['PSHE'],
+  calm: ['PSHE'],
+  social: ['PSHE', 'English'],
+};
+
+const ENG_AREAS = [
+  'English',
+  'Mathematics',
+  'Science',
+  'History',
+  'Geography',
+  'Art and design',
+  'Design and technology',
+  'Physical education',
+  'PSHE',
+] as const;
+
+// The coverage model (area list + category-to-area map) for a territory. Ireland
+// keeps the exact NCCA constants (parity); England uses the NC subjects above.
+function coverageModel(framework: Framework): { areas: readonly string[]; map: Record<string, string[]>; areasNoun: string } {
+  if (framework.territory === 'IE') {
+    return { areas: NCCA_AREAS, map: NCCA_AREA_MAP, areasNoun: 'NCCA primary curriculum areas' };
+  }
+  return { areas: ENG_AREAS, map: ENG_SUBJECT_MAP, areasNoun: 'National Curriculum subjects' };
+}
+
 function formatTuslaStatus(status: string): string {
   const labels: Record<string, string> = {
     not_applied: 'Not Yet Applied',
@@ -185,7 +299,7 @@ async function fetchFamilyDetails(supabase: SupabaseClient, familyId: string): P
 async function fetchChildDetails(supabase: SupabaseClient, childId: string): Promise<ChildDetails> {
   const { data } = await supabase
     .from('children')
-    .select('id, name, date_of_birth, interests, school_status, learning_style')
+    .select('id, name, date_of_birth, interests, school_status, learning_style, territory')
     .eq('id', childId)
     .single();
 
@@ -199,6 +313,7 @@ async function fetchChildDetails(supabase: SupabaseClient, childId: string): Pro
     interests: data.interests || [],
     schoolStatus: data.school_status,
     learningStyle: data.learning_style,
+    territory: data.territory || 'IE',
   };
 }
 
@@ -658,7 +773,8 @@ export interface AnnualReportData {
 function buildAnnualNarrative(
   assessment: AssessmentReportData,
   portfolio: PortfolioReportData,
-  nccaCoverage: NccaAreaCoverage[]
+  nccaCoverage: NccaAreaCoverage[],
+  framework: Framework
 ): string {
   const child = assessment.child;
   const total = assessment.activitySummary.totalActivities;
@@ -684,9 +800,16 @@ function buildAnnualNarrative(
   );
 
   if (areasTouched > 0) {
-    parts.push(
-      `This learning touched ${areasTouched} of the six NCCA primary curriculum areas, a breadth that reflects a rounded, everyday education suited to ${child.name}'s age, ability and aptitude.`
-    );
+    if (framework.territory === 'IE') {
+      parts.push(
+        `This learning touched ${areasTouched} of the six NCCA primary curriculum areas, a breadth that reflects a rounded, everyday education suited to ${child.name}'s age, ability and aptitude.`
+      );
+    } else {
+      const noun = coverageModel(framework).areasNoun;
+      parts.push(
+        `This learning touched ${areasTouched} of the ${nccaCoverage.length} ${noun} used here as a map, a breadth that reflects a rounded, everyday education for ${child.name}.`
+      );
+    }
   }
 
   if (standout.length > 0) {
@@ -719,24 +842,27 @@ export async function buildAnnualReport(params: ReportParams): Promise<AnnualRep
     buildPortfolioReport(params),
   ]);
 
-  // ── NCCA area coverage (a helpful map, not a requirement) ──
-  // Count activities per NCCA area via the category mapping, and fold in any
-  // portfolio entries tagged to those underlying categories.
+  // ── Curriculum area coverage (a helpful map, not a requirement) ──
+  // Count activities per area via the territory's category mapping, and fold in
+  // any portfolio entries tagged to those underlying categories. Ireland uses
+  // the NCCA areas; England uses the National Curriculum subjects.
+  const framework = getFramework(assessment.child.territory);
+  const { areas: coverageAreas, map: coverageMap } = coverageModel(framework);
   const nccaCounts: Record<string, number> = {};
-  for (const area of NCCA_AREAS) nccaCounts[area] = 0;
+  for (const area of coverageAreas) nccaCounts[area] = 0;
   for (const [cat, count] of Object.entries(assessment.activitySummary.categoryCounts)) {
-    for (const area of NCCA_AREA_MAP[cat] || []) {
+    for (const area of coverageMap[cat] || []) {
       nccaCounts[area] = (nccaCounts[area] || 0) + count;
     }
   }
   for (const entry of portfolio.entries) {
     for (const cat of entry.curriculumAreas) {
-      for (const area of NCCA_AREA_MAP[cat] || []) {
+      for (const area of coverageMap[cat] || []) {
         nccaCounts[area] = (nccaCounts[area] || 0) + 1;
       }
     }
   }
-  const nccaCoverage: NccaAreaCoverage[] = NCCA_AREAS.map((area) => ({
+  const nccaCoverage: NccaAreaCoverage[] = coverageAreas.map((area) => ({
     area,
     activityCount: nccaCounts[area] || 0,
     covered: (nccaCounts[area] || 0) > 0,
@@ -752,7 +878,7 @@ export async function buildAnnualReport(params: ReportParams): Promise<AnnualRep
     }))
   );
 
-  const narrative = buildAnnualNarrative(assessment, portfolio, nccaCoverage);
+  const narrative = buildAnnualNarrative(assessment, portfolio, nccaCoverage, framework);
 
   return {
     type: 'annual',
@@ -1034,7 +1160,7 @@ function htmlStyleBlock(): string {
       .no-print { display: none !important; }
     }
 
-    /* ── AEARS pack: cover page ── */
+    /* ── Evidence pack: cover page ── */
     .cover {
       min-height: 92vh;
       display: flex;
@@ -1113,7 +1239,7 @@ function htmlStyleBlock(): string {
       color: var(--ink);
     }
 
-    /* ── NCCA coverage grid ── */
+    /* ── Curriculum coverage grid ── */
     .coverage-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1304,8 +1430,9 @@ function progressBar(percentage: number): string {
 
 // ─── Assessment HTML ──────────────────────────────────────
 
-export function renderAssessmentHtml(data: AssessmentReportData): string {
+export function renderAssessmentHtml(data: AssessmentReportData, framework: Framework = getFramework('IE')): string {
   const { family, child, educationPlan, activitySummary, recentActivities, curriculumCoverage, dateRange, generatedAt } = data;
+  const framing = framingFor(framework);
 
   let body = '';
 
@@ -1315,7 +1442,7 @@ export function renderAssessmentHtml(data: AssessmentReportData): string {
       <h3 class="section-title">Child &amp; Family Details</h3>
       <div class="info-grid">
         <div class="info-row"><span class="info-label">Family Name</span><span class="info-value">${family.name}</span></div>
-        <div class="info-row"><span class="info-label">County</span><span class="info-value">${family.county || 'Not specified'}</span></div>
+        <div class="info-row"><span class="info-label">${framing.areaLabel}</span><span class="info-value">${family.county || 'Not specified'}</span></div>
         <div class="info-row"><span class="info-label">Child&rsquo;s Name</span><span class="info-value">${child.name}</span></div>
         <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-value">${formatDateDisplay(child.dateOfBirth)}</span></div>
         <div class="info-row"><span class="info-label">Age</span><span class="info-value">${child.age} years</span></div>
@@ -1333,7 +1460,7 @@ export function renderAssessmentHtml(data: AssessmentReportData): string {
         <div class="info-row"><span class="info-label">Approach</span><span class="info-value">${formatApproach(educationPlan.approach)}</span></div>
         <div class="info-row"><span class="info-label">Hours per Day</span><span class="info-value">${educationPlan.hoursPerDay}</span></div>
         <div class="info-row"><span class="info-label">Days per Week</span><span class="info-value">${educationPlan.daysPerWeek}</span></div>
-        <div class="info-row"><span class="info-label">Tusla Status</span><span class="info-value">${formatTuslaStatus(educationPlan.tuslaStatus)}</span></div>
+        ${framing.showTuslaStatus ? `<div class="info-row"><span class="info-label">Tusla Status</span><span class="info-value">${formatTuslaStatus(educationPlan.tuslaStatus)}</span></div>` : ''}
       </div>
     </div>`;
   }
@@ -1374,8 +1501,8 @@ export function renderAssessmentHtml(data: AssessmentReportData): string {
     body += `</tbody></table></div>`;
   }
 
-  // Aistear Theme Coverage
-  if (Object.keys(activitySummary.aistearThemes).length > 0) {
+  // Aistear Theme Coverage (Ireland only)
+  if (framing.showAistear && Object.keys(activitySummary.aistearThemes).length > 0) {
     body += `
     <div class="section">
       <h3 class="section-title">Aistear Theme Coverage</h3>
@@ -1421,13 +1548,17 @@ export function renderAssessmentHtml(data: AssessmentReportData): string {
     body += `</tbody></table></div>`;
   }
 
-  return htmlShell('Assessment Report', child.name, formatDateRange(dateRange.start, dateRange.end), generatedAt, body);
+  return htmlShell(framing.assessmentTitle, child.name, formatDateRange(dateRange.start, dateRange.end), generatedAt, body);
 }
 
 // ─── Attendance HTML ──────────────────────────────────────
 
-export function renderAttendanceHtml(data: AttendanceReportData): string {
+export function renderAttendanceHtml(data: AttendanceReportData, framework: Framework = getFramework('IE')): string {
   const { family, child, monthlyBreakdown, totals, dateRange, generatedAt } = data;
+  const rhythmCaveat =
+    framework.territory === 'IE'
+      ? 'This is a descriptive record of the learning you chose to log over this period, not a measure of attendance. AEARS sets no minimum number of hours or days; a home education is assessed on whether a certain minimum education is being provided, not on attendance.'
+      : 'This is a descriptive record of the learning you chose to log over this period, not a measure of attendance. There is no minimum number of hours or days for home education, and it is not assessed on attendance.';
 
   let body = '';
 
@@ -1457,7 +1588,7 @@ export function renderAttendanceHtml(data: AttendanceReportData): string {
           <div class="stat-label">Hours Logged</div>
         </div>
       </div>
-      <p style="font-size: 11px; color: #888; margin-top: 8px;">This is a descriptive record of the learning you chose to log over this period, not a measure of attendance. AEARS sets no minimum number of hours or days; a home education is assessed on whether a certain minimum education is being provided, not on attendance.</p>
+      <p style="font-size: 11px; color: #888; margin-top: 8px;">${rhythmCaveat}</p>
     </div>`;
 
   // Month by month - days of learning and hours logged only.
@@ -1559,13 +1690,13 @@ export function renderPortfolioHtml(data: PortfolioReportData): string {
 
 // A dedicated shell for the AEARS pack: it leads with a full cover page and
 // closes with the honest Tusla disclaimer, reusing the shared report styling.
-function aearsShell(childName: string, body: string): string {
+function aearsShell(title: string, childName: string, body: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AEARS Pack - ${esc(childName)}</title>
+  <title>${esc(title)} - ${esc(childName)}</title>
   ${htmlStyleBlock()}
 </head>
 <body>
@@ -1577,8 +1708,9 @@ function aearsShell(childName: string, body: string): string {
 </html>`;
 }
 
-export function renderAnnualHtml(data: AnnualReportData): string {
+export function renderAnnualHtml(data: AnnualReportData, framework: Framework = getFramework('IE')): string {
   const { assessment, attendance, portfolio, narrative, nccaCoverage, portfolioWithPhotos, academicYear } = data;
+  const framing = framingFor(framework);
   const child = assessment.child;
   const family = assessment.family;
   const dateRange = assessment.dateRange;
@@ -1599,21 +1731,17 @@ export function renderAnnualHtml(data: AnnualReportData): string {
   body += `
     <div class="cover">
       <div class="cover-brand">The Hedge</div>
-      <div class="cover-eyebrow">Home Education Portfolio</div>
-      <div class="cover-title">Assessment Pack</div>
+      <div class="cover-eyebrow">${framing.coverEyebrow}</div>
+      <div class="cover-title">${framing.coverTitle}</div>
       <div class="cover-child">${esc(child.name)} &middot; age ${child.age}</div>
       <div class="cover-meta">
         <div><strong>Family</strong> ${esc(family.name)}</div>
         <div><strong>Child</strong> ${esc(child.name)} (${formatDateDisplay(child.dateOfBirth)})</div>
         <div><strong>Period</strong> ${periodLabel}</div>
-        ${family.county ? `<div><strong>County</strong> ${esc(family.county)}</div>` : ''}
+        ${family.county ? `<div><strong>${framing.areaLabel}</strong> ${esc(family.county)}</div>` : ''}
         <div><strong>Prepared</strong> ${genDate}</div>
       </div>
-      <p class="cover-note">
-        Prepared by the family using The Hedge. Not affiliated with Tusla.
-        A portfolio assembled to support an application or review under the
-        Alternative Education Assessment and Registration Service (AEARS).
-      </p>
+      <p class="cover-note">${framing.coverNote}</p>
     </div>`;
 
   // ── Narrative summary of the year ───────────────────────
@@ -1629,7 +1757,7 @@ export function renderAnnualHtml(data: AnnualReportData): string {
       <h3 class="section-title">Child &amp; Family</h3>
       <div class="info-grid">
         <div class="info-row"><span class="info-label">Family Name</span><span class="info-value">${esc(family.name)}</span></div>
-        <div class="info-row"><span class="info-label">County</span><span class="info-value">${family.county ? esc(family.county) : 'Not specified'}</span></div>
+        <div class="info-row"><span class="info-label">${framing.areaLabel}</span><span class="info-value">${family.county ? esc(family.county) : 'Not specified'}</span></div>
         <div class="info-row"><span class="info-label">Child&rsquo;s Name</span><span class="info-value">${esc(child.name)}</span></div>
         <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-value">${formatDateDisplay(child.dateOfBirth)}</span></div>
         <div class="info-row"><span class="info-label">Age</span><span class="info-value">${child.age} years</span></div>
@@ -1646,8 +1774,8 @@ export function renderAnnualHtml(data: AnnualReportData): string {
           <div class="stat-label">Activities Recorded</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${nccaCoverage.filter((a) => a.covered).length}<span style="font-size:18px;">/6</span></div>
-          <div class="stat-label">NCCA Areas Touched</div>
+          <div class="stat-value">${nccaCoverage.filter((a) => a.covered).length}<span style="font-size:18px;">/${nccaCoverage.length}</span></div>
+          <div class="stat-label">${framing.areasTouchedLabel}</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">${attendance.totals.totalDaysAttended}</div>
@@ -1663,12 +1791,9 @@ export function renderAnnualHtml(data: AnnualReportData): string {
   // ── Curriculum coverage (NCCA / Aistear), correctly framed ──
   body += `
     <div class="section page-break">
-      <h3 class="section-title">Curriculum Coverage</h3>
+      <h3 class="section-title">${framing.coverageHeading}</h3>
       <p style="font-size:13px; color: var(--clay); margin-bottom:16px; line-height:1.7;">
-        Home education in Ireland is assessed on whether a child is receiving
-        <em>a certain minimum education suitable to their age, ability and aptitude</em>.
-        The national curriculum is <strong>not</strong> required. The six NCCA primary areas below
-        are used here only as a familiar map, to show the breadth of ${esc(child.name)}&rsquo;s learning across the year.
+        ${framing.coverageIntro(esc(child.name))}
       </p>
       <div class="coverage-grid">`;
   for (const area of nccaCoverage) {
@@ -1685,8 +1810,8 @@ export function renderAnnualHtml(data: AnnualReportData): string {
       </div>
     </div>`;
 
-  // Aistear early-years themes (a gentle complement for younger children).
-  if (Object.keys(assessment.activitySummary.aistearThemes).length > 0) {
+  // Aistear early-years themes (a gentle complement for younger children) - IE only.
+  if (framing.showAistear && Object.keys(assessment.activitySummary.aistearThemes).length > 0) {
     body += `
     <div class="section">
       <h3 class="section-title">Aistear Themes (early years)</h3>
@@ -1764,14 +1889,12 @@ export function renderAnnualHtml(data: AnnualReportData): string {
   body += `
     <div class="section page-break">
       <div class="disclaimer-panel">
-        <p style="margin-bottom:10px;"><strong>About this pack.</strong> It was assembled by the family using The Hedge from the learning they recorded over the year. <strong>The Hedge is not affiliated with Tusla</strong> and this is not an official Tusla document.</p>
-        <p style="margin-bottom:10px;">In Ireland, a parent <strong>applies to Tusla via AEARS</strong> (the Alternative Education Assessment and Registration Service) to register a child on the Section 14 Register under the Education (Welfare) Act 2000. An <strong>authorised person</strong> carries out the assessment. The standard is whether the child is receiving <strong>a certain minimum education</strong> suitable to their age, ability and aptitude. There is <strong>no required curriculum, no minimum hours, and no attendance requirement</strong>. Registration is subject to <strong>periodic review</strong>.</p>
-        <p>Please use Tusla&rsquo;s official application (currently the R1 form) and current guidance when you apply. Nothing here is legal advice.</p>
+        ${aboutPackHtml(framework)}
       </div>
       <div class="report-footer" style="margin-top:24px;">
         <div class="generated">Prepared ${genDate} with The Hedge &middot; thehedge.ie</div>
       </div>
     </div>`;
 
-  return aearsShell(child.name, body);
+  return aearsShell(framing.coverTitle, child.name, body);
 }
