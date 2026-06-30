@@ -8,6 +8,7 @@ import type { CanonicalDimension } from './canonical';
 import { TERRITORY_KEYS } from './types';
 import { IE_FRAMEWORK } from './frameworks/ie';
 import { ENG_FRAMEWORK } from './frameworks/eng';
+import { SCO_FRAMEWORK } from './frameworks/sco';
 
 export * from './types';
 export * from './canonical';
@@ -20,6 +21,7 @@ export * from './roadmap';
 const FRAMEWORKS: Partial<Record<TerritoryKey, Framework>> = {
   IE: IE_FRAMEWORK,
   ENG: ENG_FRAMEWORK,
+  SCO: SCO_FRAMEWORK,
 };
 
 export const DEFAULT_TERRITORY: TerritoryKey = 'IE';

@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { signPortfolioPhotos } from '@/lib/storage';
-import { getFramework, type Framework } from '@/lib/territory';
+import { getFramework, type Framework, CATEGORY_TO_CANONICAL } from '@/lib/territory';
 
 // ─── Types ────────────────────────────────────────────────
 
@@ -42,18 +42,23 @@ function framingFor(framework: Framework): ReportFraming {
       showAistear: true,
     };
   }
-  // England (and value-add territories): evidence framing, no Irish vocabulary.
+  // Other territories: evidence/confidence framing, no Irish vocabulary.
+  // Value-add territories (no register) lead with a confident record; soft-
+  // compliance territories (England/Wales) lead with evidence of suitability.
   const curriculum = framework.terminology.curriculum;
+  const valueAdd = framework.compliance.framing === 'value_add';
+  const areaLabel =
+    framework.territory === 'NIR' ? 'Education Authority region' : framework.territory === 'SCO' ? 'Local council' : 'Local authority';
   return {
     assessmentTitle: 'Learning Summary',
-    coverTitle: 'Evidence of a Suitable Education',
+    coverTitle: valueAdd ? 'A Record of Learning' : 'Evidence of a Suitable Education',
     coverEyebrow: 'Home Education Record',
     coverNote: `Prepared by the family using The Hedge. This is the family's own record of the education their child is receiving. It is not affiliated with, or endorsed by, any local authority or government body.`,
     coverageHeading: 'Breadth of Learning',
     coverageIntro: (childName: string) =>
       `Home education here does not require following ${curriculum}. The areas below are used only as a familiar map, to show the breadth of ${childName}&rsquo;s learning. They are not a checklist and nothing here is required.`,
-    areaLabel: 'Local authority',
-    areasTouchedLabel: 'Subjects Touched',
+    areaLabel,
+    areasTouchedLabel: framework.territory === 'ENG' ? 'Subjects Touched' : 'Areas Touched',
     showTuslaStatus: false,
     showAistear: false,
   };
@@ -261,12 +266,26 @@ const ENG_AREAS = [
 ] as const;
 
 // The coverage model (area list + category-to-area map) for a territory. Ireland
-// keeps the exact NCCA constants (parity); England uses the NC subjects above.
+// keeps the exact NCCA constants (parity); England uses the hand-tuned NC
+// subject map; other territories derive their map generically from the
+// framework's own areas via the canonical dimensions (activity category ->
+// canonical dimensions -> the framework's native areas).
 function coverageModel(framework: Framework): { areas: readonly string[]; map: Record<string, string[]>; areasNoun: string } {
   if (framework.territory === 'IE') {
     return { areas: NCCA_AREAS, map: NCCA_AREA_MAP, areasNoun: 'NCCA primary curriculum areas' };
   }
-  return { areas: ENG_AREAS, map: ENG_SUBJECT_MAP, areasNoun: 'National Curriculum subjects' };
+  if (framework.territory === 'ENG') {
+    return { areas: ENG_AREAS, map: ENG_SUBJECT_MAP, areasNoun: 'National Curriculum subjects' };
+  }
+  const areas = framework.areas.map((a) => a.name);
+  const map: Record<string, string[]> = {};
+  for (const [cat, dims] of Object.entries(CATEGORY_TO_CANONICAL)) {
+    const matched = framework.areas
+      .filter((a) => a.canonical.some((c) => dims.includes(c)))
+      .map((a) => a.name);
+    if (matched.length) map[cat] = matched;
+  }
+  return { areas, map, areasNoun: framework.terminology.areasWord };
 }
 
 function formatTuslaStatus(status: string): string {
