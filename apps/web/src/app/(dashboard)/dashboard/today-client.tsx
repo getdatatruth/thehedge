@@ -48,7 +48,6 @@ interface TodayClientProps {
   isRaining: boolean;
   temperature?: number | null;
   weatherDescription?: string | null;
-  streak?: number;
   activitiesThisWeek: number;
   planActivities?: PlanActivity[];
   isFreeUser?: boolean;

@@ -525,7 +525,7 @@ export function ScheduleClient({
             <div className="flex items-center gap-3">
               <CheckCircle className={`h-5 w-5 ${dayPlan.attendance_logged ? 'text-moss' : 'text-clay/30'}`} />
               <div>
-                <p className="text-sm font-medium text-umber">Attendance</p>
+                <p className="text-sm font-medium text-umber">Today&rsquo;s learning</p>
                 <p className="text-xs text-clay/50">
                   {dayPlan.attendance_logged ? 'Logged for today' : 'Not logged yet'}
                 </p>
@@ -540,7 +540,7 @@ export function ScheduleClient({
                   : 'bg-linen text-clay/50 hover:bg-parchment'
               }`}
             >
-              {togglingAttendance ? 'Saving...' : dayPlan.attendance_logged ? 'Attended' : 'Mark attended'}
+              {togglingAttendance ? 'Saving...' : dayPlan.attendance_logged ? 'Done' : 'Mark as done'}
             </button>
           </div>
         )}
@@ -815,7 +815,7 @@ export function ScheduleClient({
                       />
                     </div>
                     {plan.attendance_logged && (
-                      <span className="text-[9px] text-moss mt-1 block">Attended</span>
+                      <span className="text-[9px] text-moss mt-1 block">Done</span>
                     )}
                   </>
                 ) : (

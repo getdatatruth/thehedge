@@ -147,7 +147,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
           </div>
           <h3 className="text-lg font-semibold text-ink/70 mb-1">No notifications yet</h3>
           <p className="text-sm text-clay/50 max-w-sm">
-            When you log activities, hit streak milestones, or get plan updates, they will appear here.
+            When you log a moment, follow a spark, or get a gentle nudge, they will appear here.
           </p>
         </div>
       ) : (

@@ -222,7 +222,7 @@ export default function ScheduleScreen() {
               <UserX size={18} color={lightTheme.error} />
             )}
             <Text style={styles.attendanceText}>
-              {isAttending ? 'Attending' : 'Not attending'}
+              {isAttending ? 'Done' : 'Mark as done'}
             </Text>
             <View
               style={[
