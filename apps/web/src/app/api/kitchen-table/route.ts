@@ -4,6 +4,7 @@ import { CLAUDE_MODEL } from '@/lib/ai-model';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { coordsForCounty } from '@/lib/ie-counties';
+import { isTerritoryLive, resolveTerritory } from '@/lib/territory';
 import {
   deriveProfile,
   buildFallbackFramework,
@@ -35,6 +36,12 @@ export async function POST(request: NextRequest) {
 
   const profile = deriveProfile(answers);
 
+  // Resolve the family's territory. Only territories that are switched on (their
+  // legal content reviewed) are accepted; anything else falls back to Ireland,
+  // so a client cannot opt into a gated territory early.
+  const territory = isTerritoryLive(answers.territory) ? resolveTerritory(answers.territory) : 'IE';
+  const adminArea = answers.adminArea?.trim() || answers.county?.trim() || null;
+
   const { data: profileRow } = await supabase
     .from('users')
     .select('family_id')
@@ -63,7 +70,7 @@ export async function POST(request: NextRequest) {
       .from('families')
       .insert({
         name: familyName,
-        country: 'IE',
+        country: territory,
         subscription_tier: isHomeEd ? 'educator' : 'family',
         subscription_status: 'trialing',
         trial_ends_at: trialEnds.toISOString(),
@@ -144,6 +151,8 @@ export async function POST(request: NextRequest) {
           name: c.name.trim(),
           date_of_birth: `${c.age != null ? thisYear - c.age : thisYear - 6}-01-01`,
           interests: c.interests || [],
+          territory,
+          admin_area: adminArea,
         })),
     );
   }

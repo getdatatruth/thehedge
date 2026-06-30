@@ -30,6 +30,22 @@ const FRAMEWORKS: Partial<Record<TerritoryKey, Framework>> = {
 
 export const DEFAULT_TERRITORY: TerritoryKey = 'IE';
 
+// Which territories are switched ON for selection in onboarding. All five
+// frameworks are built and verified, but a territory stays gated until its
+// compliance/legal content has been human-reviewed (brief §16). To launch a
+// territory, add its key here after review - nothing else needs to change.
+export const LIVE_TERRITORIES: TerritoryKey[] = ['IE'];
+
+export function isTerritoryLive(value: string | null | undefined): boolean {
+  return (LIVE_TERRITORIES as string[]).includes(resolveTerritory(value));
+}
+
+// The territories a family can pick in onboarding, with display names. When this
+// is a single entry, onboarding can skip the choice entirely.
+export function liveTerritories(): { key: TerritoryKey; name: string; framework: Framework }[] {
+  return LIVE_TERRITORIES.map((key) => ({ key, name: getFramework(key).name, framework: getFramework(key) }));
+}
+
 // Coerce any stored/incoming value to a known territory key, defaulting to IE.
 // Children created before the territory column existed resolve to IE.
 export function resolveTerritory(value: string | null | undefined): TerritoryKey {

@@ -27,6 +27,12 @@ export interface KTAnswers {
   county?: string;
   outdoor?: string;
   tuslaKey?: string;
+  // The territory (regulatory + curricular regime) the family home-educates in.
+  // Optional; defaults to Ireland. Only live territories are accepted server-side.
+  territory?: string | null;
+  // The administrative sub-territory (England/Wales LA, Scotland council, NI EA
+  // region). Informational for Ireland (county).
+  adminArea?: string | null;
   // Free-text the family adds when refining a framework that was not quite right.
   notes?: string;
 }
