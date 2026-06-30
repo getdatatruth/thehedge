@@ -207,6 +207,13 @@ export default function TodayScreen() {
     milestones: Array<{ id: string; name: string; emoji: string; achieved: boolean; achievedDate?: string; progress?: number; target?: number }>;
   }>(['milestones'], '/milestones', { staleTime: 600000 });
 
+  // Reassurance: a calm "you are doing enough", never a score (gap analysis #1).
+  const { data: reassurance } = useApiQuery<{
+    tone: 'settling' | 'rounded' | 'gentle';
+    headline: string;
+    body: string;
+  }>(['reassurance'], '/me/reassurance', { staleTime: 600000 });
+
   const isLoading = dashLoading || planLoading;
   const isRefetching = dashRefetching || planRefetching;
   const handleRefresh = () => { refetchDash(); refetchPlan(); };
@@ -370,8 +377,18 @@ export default function TodayScreen() {
           <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} tintColor={lightTheme.accent} />
         }
       >
+        {/* ─── Reassurance: a calm "you are doing enough", never a score ─── */}
+        {reassurance && (
+          <AnimatedCard delay={0}>
+            <View style={styles.reassureCard}>
+              <Text style={styles.reassureHeadline}>{reassurance.headline}</Text>
+              <Text style={styles.reassureBody}>{reassurance.body}</Text>
+            </View>
+          </AnimatedCard>
+        )}
+
         {/* ─── SPARK: follow the child's curiosity in the moment ─── */}
-        <AnimatedCard delay={0}>
+        <AnimatedCard delay={reassurance ? 50 : 0}>
           <TouchableOpacity
             activeOpacity={0.92}
             onPress={() => {
@@ -789,6 +806,23 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: spacing.xl,
     overflow: 'hidden',
+  },
+  reassureCard: {
+    backgroundColor: lightTheme.surface,
+    borderRadius: 16,
+    padding: spacing.lg,
+    borderLeftWidth: 3,
+    borderLeftColor: lightTheme.accent,
+  },
+  reassureHeadline: {
+    ...typography.uiBold,
+    color: lightTheme.text,
+  },
+  reassureBody: {
+    ...typography.bodySmall,
+    color: lightTheme.textSecondary,
+    marginTop: 6,
+    lineHeight: 20,
   },
   sparkDecor: { position: 'absolute', top: -30, right: -30 },
   sparkIcon: {
