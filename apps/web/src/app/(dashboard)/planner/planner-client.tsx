@@ -436,7 +436,7 @@ export function PlannerClient({
     const isRainy = weatherCondition === 'rain' || weatherCondition === 'drizzle';
     const childAge = selectedChildAge;
 
-    let suitable = activities.filter(
+    const suitable = activities.filter(
       (a) => a.age_min <= childAge && a.age_max >= childAge
     );
 
@@ -885,9 +885,9 @@ export function PlannerClient({
         </div>
       )}
 
-      {/* Weekly Summary Stats */}
+      {/* Weekly summary - gentle counts, never a completion score */}
       {hasPlans && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <div className="card-elevated p-4 text-center">
             <p className="font-display text-2xl font-light text-ink">
               {stats.total}
@@ -901,73 +901,32 @@ export function PlannerClient({
               {stats.completed}
             </p>
             <p className="text-[11px] text-clay font-medium mt-1">
-              completed
-            </p>
-          </div>
-          <div className="card-elevated p-4 text-center">
-            <p className="font-display text-2xl font-light text-ink">
-              {stats.total > 0
-                ? Math.round((stats.completed / stats.total) * 100)
-                : 0}
-              %
-            </p>
-            <p className="text-[11px] text-clay font-medium mt-1">
-              completion
-            </p>
-          </div>
-          <div className="card-elevated p-4 text-center">
-            <p className="font-display text-2xl font-light text-ink">
-              {Math.round(stats.completedMinutes / 60 * 10) / 10}h
-            </p>
-            <p className="text-[11px] text-clay font-medium mt-1">
-              learning time
+              done so far
             </p>
           </div>
         </div>
       )}
 
-      {/* Progress bar */}
+      {/* Your week - a calm overview of what is in it, never a completion score */}
       {hasPlans && (
         <div className="card-elevated p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-moss/10">
-                <Sparkles className="h-5 w-5 text-moss" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-ink">
-                  This week&apos;s progress
-                </p>
-                <p className="text-xs text-clay/60">
-                  {stats.completed} of {stats.total} activities completed
-                  {stats.completedMinutes > 0 && (
-                    <span>
-                      {' '}
-                      &middot; {stats.completedMinutes} min learned
-                    </span>
-                  )}
-                </p>
-              </div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-moss/10">
+              <Sparkles className="h-5 w-5 text-moss" />
             </div>
-            <span className="text-2xl font-light text-ink">
-              {stats.total > 0
-                ? Math.round((stats.completed / stats.total) * 100)
-                : 0}
-              %
-            </span>
-          </div>
-          <div className="h-2.5 w-full rounded-full bg-stone/20">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-forest to-fern transition-all duration-500"
-              style={{
-                width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%`,
-              }}
-            />
+            <div>
+              <p className="text-sm font-semibold text-ink">
+                Your week
+              </p>
+              <p className="text-xs text-clay/60">
+                {stats.total} {stats.total === 1 ? 'idea' : 'ideas'} to follow, whenever they happen. No rush at all.
+              </p>
+            </div>
           </div>
 
-          {/* Category breakdown */}
+          {/* Breadth: the areas this week gently touches (not a target) */}
           {Object.keys(stats.categoryBreakdown).length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="flex flex-wrap gap-2">
               {Object.entries(stats.categoryBreakdown).map(([cat, data]) => (
                 <span
                   key={cat}
@@ -975,7 +934,7 @@ export function PlannerClient({
                     CATEGORY_COLORS[cat] || 'bg-stone/10 text-clay border-stone/20'
                   }`}
                 >
-                  {CATEGORY_LABELS[cat] || cat}: {data.completed}/{data.total}
+                  {CATEGORY_LABELS[cat] || cat}{data.total > 1 ? ` ${data.total}` : ''}
                 </span>
               ))}
             </div>
