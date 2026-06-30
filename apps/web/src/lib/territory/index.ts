@@ -12,6 +12,7 @@ import { ENG_FRAMEWORK } from './frameworks/eng';
 export * from './types';
 export * from './canonical';
 export * from './prompts';
+export * from './roadmap';
 
 // Registered frameworks. Ireland is live; England is built and verified but
 // gated behind onboarding (no UI exposes ENG selection until the legal content
