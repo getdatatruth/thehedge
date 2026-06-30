@@ -9,6 +9,8 @@ import { TERRITORY_KEYS } from './types';
 import { IE_FRAMEWORK } from './frameworks/ie';
 import { ENG_FRAMEWORK } from './frameworks/eng';
 import { SCO_FRAMEWORK } from './frameworks/sco';
+import { NIR_FRAMEWORK } from './frameworks/nir';
+import { WAL_FRAMEWORK } from './frameworks/wal';
 
 export * from './types';
 export * from './canonical';
@@ -22,6 +24,8 @@ const FRAMEWORKS: Partial<Record<TerritoryKey, Framework>> = {
   IE: IE_FRAMEWORK,
   ENG: ENG_FRAMEWORK,
   SCO: SCO_FRAMEWORK,
+  NIR: NIR_FRAMEWORK,
+  WAL: WAL_FRAMEWORK,
 };
 
 export const DEFAULT_TERRITORY: TerritoryKey = 'IE';
