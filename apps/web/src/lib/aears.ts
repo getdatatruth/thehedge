@@ -1,7 +1,8 @@
 // ─── AEARS / Irish home-education timeline helpers ───────────────────────
 //
-// The Assessment of Education in a Place other than a Recognised School
-// (AEARS) process runs under Section 14 of the Education (Welfare) Act 2000.
+// The Alternative Education Assessment and Registration Service (AEARS) is the
+// Tusla service that assesses and registers children educated outside a
+// recognised school, under Section 14 of the Education (Welfare) Act 2000.
 // These helpers turn a family's registration status and dates into a calm,
 // computed set of guidance milestones - so the dates shown are real and
 // move with the calendar, not hardcoded blanks.

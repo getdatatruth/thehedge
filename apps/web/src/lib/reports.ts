@@ -1427,7 +1427,7 @@ export function renderAssessmentHtml(data: AssessmentReportData): string {
 // ─── Attendance HTML ──────────────────────────────────────
 
 export function renderAttendanceHtml(data: AttendanceReportData): string {
-  const { family, child, educationPlan, monthlyBreakdown, totals, dailyPlanStats, dateRange, generatedAt } = data;
+  const { family, child, monthlyBreakdown, totals, dateRange, generatedAt } = data;
 
   let body = '';
 
@@ -1443,20 +1443,7 @@ export function renderAttendanceHtml(data: AttendanceReportData): string {
       </div>
     </div>`;
 
-  // Education Plan Requirements
-  if (educationPlan) {
-    body += `
-    <div class="section">
-      <h3 class="section-title">Education Requirements</h3>
-      <div class="info-grid">
-        <div class="info-row"><span class="info-label">Planned Hours/Day</span><span class="info-value">${educationPlan.hoursPerDay}</span></div>
-        <div class="info-row"><span class="info-label">Planned Days/Week</span><span class="info-value">${educationPlan.daysPerWeek}</span></div>
-        <div class="info-row"><span class="info-label">Approach</span><span class="info-value">${formatApproach(educationPlan.approach)}</span></div>
-      </div>
-    </div>`;
-  }
-
-  // Overall Stats
+  // Overall record - descriptive, never framed as attendance against a requirement.
   body += `
     <div class="section">
       <h3 class="section-title">Overall Record of Learning</h3>
@@ -1469,50 +1456,29 @@ export function renderAttendanceHtml(data: AttendanceReportData): string {
           <div class="stat-value">${totals.totalHoursLogged}</div>
           <div class="stat-label">Hours Logged</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value">${totals.totalDaysRequired}</div>
-          <div class="stat-label">Days in Your Plan</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${totals.planCompletionRate}%</div>
-          <div class="stat-label">Of Your Own Plan</div>
-        </div>
       </div>
-      <p style="font-size: 11px; color: #888; margin-top: 8px;">These figures reflect your own education plan and what you chose to record. AEARS does not set a minimum number of hours or days; a home education is assessed on whether a certain minimum education is being provided, not on attendance.</p>
+      <p style="font-size: 11px; color: #888; margin-top: 8px;">This is a descriptive record of the learning you chose to log over this period, not a measure of attendance. AEARS sets no minimum number of hours or days; a home education is assessed on whether a certain minimum education is being provided, not on attendance.</p>
     </div>`;
 
-  // Monthly Breakdown
+  // Month by month - days of learning and hours logged only.
   if (monthlyBreakdown.length > 0) {
     body += `
     <div class="section">
-      <h3 class="section-title">Monthly Learning Record</h3>
+      <h3 class="section-title">Month by Month</h3>
       <table>
-        <thead><tr><th>Month</th><th>Days of Learning</th><th>Days in Your Plan</th><th>Hours Logged</th><th>Of Your Own Plan</th></tr></thead>
+        <thead><tr><th>Month</th><th>Days of Learning</th><th>Hours Logged</th></tr></thead>
         <tbody>`;
     for (const month of monthlyBreakdown) {
       body += `<tr>
         <td>${month.month}</td>
         <td>${month.daysAttended}</td>
-        <td>${month.daysPlanned}</td>
         <td>${month.hoursLogged}</td>
-        <td>${month.completionRate}%</td>
       </tr>`;
     }
     body += `</tbody></table></div>`;
   }
 
-  // Daily Plan Stats
-  body += `
-    <div class="section">
-      <h3 class="section-title">Daily Plan Statistics</h3>
-      <div class="info-grid">
-        <div class="info-row"><span class="info-label">Total Plans Created</span><span class="info-value">${dailyPlanStats.totalPlans}</span></div>
-        <div class="info-row"><span class="info-label">Plans Completed</span><span class="info-value">${dailyPlanStats.completedPlans}</span></div>
-        <div class="info-row"><span class="info-label">Completion Rate</span><span class="info-value">${dailyPlanStats.completionRate}%</span></div>
-      </div>
-    </div>`;
-
-  return htmlShell('Attendance Report', child.name, formatDateRange(dateRange.start, dateRange.end), generatedAt, body);
+  return htmlShell('Learning Rhythm', child.name, formatDateRange(dateRange.start, dateRange.end), generatedAt, body);
 }
 
 // ─── Portfolio HTML ───────────────────────────────────────
