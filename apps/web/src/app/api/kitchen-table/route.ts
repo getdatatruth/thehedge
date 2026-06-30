@@ -5,6 +5,7 @@ import { createApiClient } from '@/lib/supabase/api-client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { coordsForCounty } from '@/lib/ie-counties';
 import { isTerritoryLive, resolveTerritory } from '@/lib/territory';
+import { geocodeArea, geocodeCountryFor, timezoneFor } from '@/lib/geocode';
 import {
   deriveProfile,
   buildFallbackFramework,
@@ -125,11 +126,22 @@ export async function POST(request: NextRequest) {
 
   // Persist the spine + finish onboarding. approach maps to the existing
   // education_approach enum; geocode the county so weather works from day one.
-  const coords = coordsForCounty(profile.county);
+  // Geocode the family's place so weather works from day one. Ireland uses the
+  // instant county-centroid table; other territories geocode their admin area
+  // (England/Wales LA, Scotland council, NI region) via the weather provider's
+  // geocoder. Both return { lat, lng } or null (fail-soft).
+  const coords =
+    territory === 'IE'
+      ? coordsForCounty(profile.county)
+      : adminArea
+        ? await geocodeArea(adminArea, geocodeCountryFor(territory))
+        : null;
   const familyUpdate: Record<string, unknown> = {
     approach: profile.approach,
     doorway: profile.doorway,
     onboarding_completed: true,
+    // Sets the notification-rhythm timezone correctly per territory.
+    timezone: timezoneFor(territory),
   };
   if (profile.county) familyUpdate.county = profile.county;
   if (coords) { familyUpdate.latitude = coords.lat; familyUpdate.longitude = coords.lng; }
