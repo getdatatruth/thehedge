@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/admin-auth';
+import { requireAdminCapability } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent } from '@/lib/audit';
 
 // PUT: Update a family (tier, suspension, etc.)
 export async function PUT(request: NextRequest) {
-  const auth = await requireAdmin(request);
+  const auth = await requireAdminCapability(request, 'write');
   if (!auth.authorized) return auth.response;
 
   try {
@@ -35,7 +35,7 @@ export async function PUT(request: NextRequest) {
 
 // DELETE: Delete a family and all associated data
 export async function DELETE(request: NextRequest) {
-  const auth = await requireAdmin(request);
+  const auth = await requireAdminCapability(request, 'delete');
   if (!auth.authorized) return auth.response;
 
   try {
@@ -100,7 +100,7 @@ export async function DELETE(request: NextRequest) {
 
 // POST: Bulk operations
 export async function POST(request: NextRequest) {
-  const auth = await requireAdmin(request);
+  const auth = await requireAdminCapability(request, 'write');
   if (!auth.authorized) return auth.response;
 
   try {

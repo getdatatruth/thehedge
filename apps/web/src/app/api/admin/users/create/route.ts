@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/admin-auth';
+import { requireAdminCapability } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -18,7 +18,7 @@ function generatePassword(): string {
 // chosen tier, and the users row linking the two. Returns a Family-shaped object
 // so the admin table can prepend it, plus the password to pass on.
 export async function POST(request: NextRequest) {
-  const auth = await requireAdmin(request);
+  const auth = await requireAdminCapability(request, 'write');
   if (!auth.authorized) return auth.response;
 
   try {

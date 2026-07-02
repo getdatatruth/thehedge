@@ -1,11 +1,22 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getAdminEmails } from '@/lib/admin-emails';
+import { getAdminEmails, getAdminRole, type AdminRole } from '@/lib/admin-emails';
 
 export interface AdminUser {
   id: string;
   email: string;
   familyId: string | null;
+  role: AdminRole;
+}
+
+function forbid(message: string): { authorized: false; response: NextResponse } {
+  return {
+    authorized: false,
+    response: NextResponse.json(
+      { success: false, error: { message, code: 'FORBIDDEN' } },
+      { status: 403 }
+    ),
+  };
 }
 
 export type AdminAuthResult =
@@ -70,6 +81,29 @@ export async function requireAdmin(
       id: user.id,
       email: user.email,
       familyId: profile?.family_id ?? null,
+      role: getAdminRole(user.email) ?? 'readonly',
     },
   };
+}
+
+/**
+ * Like requireAdmin, but also enforces a minimum capability. Use for mutating
+ * or destructive admin endpoints:
+ *   const auth = await requireAdmin(request, 'write');   // support+ can proceed
+ *   const auth = await requireAdmin(request, 'delete');  // superadmin only
+ */
+export async function requireAdminCapability(
+  request: Request,
+  capability: 'write' | 'delete'
+): Promise<AdminAuthResult> {
+  const auth = await requireAdmin(request);
+  if (!auth.authorized) return auth;
+  const { role } = auth.user;
+  if (capability === 'delete' && role !== 'superadmin') {
+    return forbid('This action requires a superadmin.');
+  }
+  if (capability === 'write' && role === 'readonly') {
+    return forbid('Your admin role is read-only.');
+  }
+  return auth;
 }

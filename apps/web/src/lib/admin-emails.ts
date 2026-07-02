@@ -28,3 +28,34 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false;
   return getAdminEmails().includes(email.toLowerCase());
 }
+
+// ─── Roles / RBAC ───────────────────────────────────────
+// superadmin: full control incl. destructive actions (delete). support: manage
+// users (create, reset password, tier, suspend, impersonate) but not delete.
+// readonly: view only. Founders are superadmin; anyone added via ADMIN_EMAILS is
+// support by default; put them in ADMIN_READONLY_EMAILS or ADMIN_SUPERADMIN_EMAILS
+// to change that.
+export type AdminRole = 'superadmin' | 'support' | 'readonly';
+
+function envList(name: string): string[] {
+  return (process.env[name] || '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function getAdminRole(email: string | null | undefined): AdminRole | null {
+  if (!isAdminEmail(email)) return null;
+  const e = email!.toLowerCase();
+  if (DEFAULT_ADMIN_EMAILS.includes(e) || envList('ADMIN_SUPERADMIN_EMAILS').includes(e)) return 'superadmin';
+  if (envList('ADMIN_READONLY_EMAILS').includes(e)) return 'readonly';
+  return 'support';
+}
+
+export function canWrite(role: AdminRole | null): boolean {
+  return role === 'superadmin' || role === 'support';
+}
+
+export function canDelete(role: AdminRole | null): boolean {
+  return role === 'superadmin';
+}

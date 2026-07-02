@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/admin-auth';
+import { requireAdminCapability } from '@/lib/admin-auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAuditEvent } from '@/lib/audit';
 
@@ -15,7 +15,7 @@ function generatePassword(): string {
 // tester). Identify the member by familyId (uses the family's primary member)
 // or directly by email. Returns the new temporary password to pass on.
 export async function POST(request: NextRequest) {
-  const auth = await requireAdmin(request);
+  const auth = await requireAdminCapability(request, 'write');
   if (!auth.authorized) return auth.response;
 
   try {

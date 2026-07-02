@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getFamilyDetail } from '@/lib/admin/queries';
+import { UserActions } from './user-actions';
 import {
   ArrowLeft,
   Users,
@@ -85,6 +86,13 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           </div>
         </div>
       </div>
+
+      {/* Support actions */}
+      <UserActions
+        familyId={family.id}
+        tier={family.subscription_tier || 'free'}
+        suspended={family.subscription_status === 'cancelled'}
+      />
 
       {/* Family info */}
       <div className="grid gap-4 sm:grid-cols-3">
