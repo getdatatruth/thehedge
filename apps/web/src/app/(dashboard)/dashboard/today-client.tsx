@@ -64,6 +64,12 @@ interface TodayClientProps {
     headline: string;
     body: string;
   } | null;
+  firstSpark?: {
+    slug: string;
+    title: string;
+    description: string;
+    childName: string;
+  } | null;
 }
 
 // Reframe chips re-pick the single hero, they do not open a list.
@@ -102,6 +108,7 @@ export function TodayClient({
   sparkChildren = [],
   quietFloor = null,
   reassurance = null,
+  firstSpark = null,
 }: TodayClientProps) {
   const [reframe, setReframe] = useState<string | null>(null);
   const [shuffle, setShuffle] = useState(0);
@@ -217,6 +224,24 @@ export function TodayClient({
           <p className="text-[15px] font-semibold text-forest leading-snug">{reassurance.headline}</p>
           <p className="text-[13px] text-clay mt-1.5 leading-relaxed">{reassurance.body}</p>
         </section>
+      )}
+
+      {/* ─── The bespoke first Spark, made from what they told us at onboarding ─── */}
+      {firstSpark && (
+        <Link
+          href={`/activity/${firstSpark.slug}`}
+          className="block rounded-2xl bg-forest p-5 text-parchment transition-transform hover:scale-[1.01]"
+        >
+          <div className="flex items-center gap-2 mb-1.5">
+            <Sparkles className="h-4 w-4 text-parchment/80" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-parchment/70">
+              Made for {firstSpark.childName}
+            </span>
+          </div>
+          <p className="text-[16px] font-semibold leading-snug">{firstSpark.title}</p>
+          <p className="text-[13px] text-parchment/80 mt-1 leading-relaxed line-clamp-2">{firstSpark.description}</p>
+          <p className="text-[12px] text-parchment/70 mt-3 font-medium">Have a look &rarr;</p>
+        </Link>
       )}
 
       {/* ─── Follow a spark + the Quiet Floor nudge ─── */}

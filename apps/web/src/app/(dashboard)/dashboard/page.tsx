@@ -166,7 +166,7 @@ export default async function DashboardPage() {
   const { data: dbActivities } = await activitiesQuery.limit(120);
 
   const candidates = (dbActivities as MockActivity[] | null) || [];
-  let activities: MockActivity[] = candidates
+  const activities: MockActivity[] = candidates
     .map((a) => {
       const af = {
         category: a.category,
@@ -291,8 +291,29 @@ export default async function DashboardPage() {
     activitiesLogged = totalResult.count || 0;
   }
 
+  // The bespoke first Spark generated at onboarding, surfaced for a still-new
+  // family so Today opens with something made for their child. Fades once they
+  // are logging regularly.
+  let firstSpark: { slug: string; title: string; description: string; childName: string } | null = null;
+  if (familyId && activitiesLogged < 5) {
+    const { data: sp } = await supabase
+      .from('activities')
+      .select('slug, title, description, child_id')
+      .eq('family_id', familyId)
+      .eq('created_by', 'ai-spark')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    const spark = sp?.[0];
+    if (spark) {
+      const childName =
+        sparkChildren.find((c) => c.id === spark.child_id)?.name || childNames[0] || 'your child';
+      firstSpark = { slug: spark.slug, title: spark.title, description: spark.description, childName };
+    }
+  }
+
   return (
     <TodayClient
+      firstSpark={firstSpark}
       activities={activities}
       season={season}
       greeting={greeting}
