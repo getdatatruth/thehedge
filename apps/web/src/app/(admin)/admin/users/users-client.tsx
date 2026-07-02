@@ -18,6 +18,8 @@ import {
   CheckCircle,
   ChevronDown,
   AlertTriangle,
+  UserPlus,
+  Copy,
 } from 'lucide-react';
 
 interface Family {
@@ -55,6 +57,11 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
   const [editingTier, setEditingTier] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [createForm, setCreateForm] = useState({ email: '', name: '', tier: 'educator' });
+  const [createResult, setCreateResult] = useState<{ email: string; password: string } | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
 
   const filtered = families.filter((f) => {
     if (search.trim()) {
@@ -109,6 +116,27 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
       setEditingTier(null);
     }
   }, []);
+
+  const handleCreate = useCallback(async () => {
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const res = await fetch('/api/admin/users/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createForm),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to create user');
+      setFamilies((prev) => [json.family as Family, ...prev]);
+      setCreateResult({ email: createForm.email, password: json.password });
+      setCreateForm({ email: '', name: '', tier: 'educator' });
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : 'Failed to create user');
+    } finally {
+      setCreating(false);
+    }
+  }, [createForm]);
 
   const handleDelete = useCallback(async (id: string) => {
     setLoading(id);
@@ -224,10 +252,19 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
             {families.length} families registered.
           </p>
         </div>
-        <button onClick={handleExportCSV} className="btn-secondary flex items-center gap-2 text-sm">
-          <Download className="h-3.5 w-3.5" />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={handleExportCSV} className="btn-secondary flex items-center gap-2 text-sm">
+            <Download className="h-3.5 w-3.5" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => { setCreateResult(null); setCreateError(null); setShowCreate(true); }}
+            className="btn-primary flex items-center gap-2 text-sm"
+          >
+            <UserPlus className="h-3.5 w-3.5" />
+            Add user
+          </button>
+        </div>
       </div>
 
       {/* Summary cards */}
@@ -395,6 +432,124 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
                 {loading === deleteConfirm ? 'Deleting...' : 'Delete permanently'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create user modal */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40">
+          <div className="card-elevated p-6 max-w-md w-full mx-4">
+            {createResult ? (
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-moss/10">
+                    <CheckCircle2 className="h-5 w-5 text-moss" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-forest">Account created</h3>
+                    <p className="text-xs text-clay/50">Share these details with your tester.</p>
+                  </div>
+                </div>
+                <div className="space-y-2 mb-6">
+                  <div className="rounded-lg border border-stone bg-parchment/50 p-3">
+                    <p className="text-[11px] uppercase tracking-wider text-clay/40">Email</p>
+                    <p className="text-sm font-semibold text-forest">{createResult.email}</p>
+                  </div>
+                  <div className="rounded-lg border border-stone bg-parchment/50 p-3 flex items-center justify-between gap-2">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider text-clay/40">Temporary password</p>
+                      <p className="text-sm font-semibold text-forest font-mono">{createResult.password}</p>
+                    </div>
+                    <button
+                      onClick={() => navigator.clipboard?.writeText(`Email: ${createResult.email}\nPassword: ${createResult.password}`)}
+                      className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-2.5"
+                      title="Copy email + password"
+                    >
+                      <Copy className="h-3 w-3" />
+                      Copy
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-clay/40">
+                    They can sign in with these straight away (no email confirmation needed) and go through onboarding.
+                  </p>
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <button onClick={() => { setCreateResult(null); }} className="btn-secondary text-sm py-2 px-4">
+                    Add another
+                  </button>
+                  <button onClick={() => { setShowCreate(false); setCreateResult(null); }} className="btn-primary text-sm py-2 px-4">
+                    Done
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-moss/10">
+                    <UserPlus className="h-5 w-5 text-moss" />
+                  </div>
+                  <div>
+                    <h3 className="font-display text-lg font-bold text-forest">Add a user</h3>
+                    <p className="text-xs text-clay/50">Creates a ready-to-use account with a family.</p>
+                  </div>
+                </div>
+                <div className="space-y-3 mb-6">
+                  <div>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider text-clay/40">Email</label>
+                    <Input
+                      type="email"
+                      placeholder="tester@example.com"
+                      value={createForm.email}
+                      onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
+                      className="h-10 mt-1 rounded-lg border-stone bg-parchment"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider text-clay/40">Name (optional)</label>
+                    <Input
+                      placeholder="Joanne"
+                      value={createForm.name}
+                      onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
+                      className="h-10 mt-1 rounded-lg border-stone bg-parchment"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold uppercase tracking-wider text-clay/40">Tier</label>
+                    <select
+                      value={createForm.tier}
+                      onChange={(e) => setCreateForm((f) => ({ ...f, tier: e.target.value }))}
+                      className="h-10 mt-1 w-full rounded-lg border border-stone bg-parchment px-3 text-sm text-forest"
+                    >
+                      <option value="educator">Educator (full access)</option>
+                      <option value="family">Family</option>
+                      <option value="free">Free</option>
+                    </select>
+                  </div>
+                  {createError && (
+                    <p className="text-xs text-rust flex items-center gap-1.5">
+                      <AlertTriangle className="h-3 w-3" />
+                      {createError}
+                    </p>
+                  )}
+                  <p className="text-[11px] text-clay/40">
+                    A temporary password is generated for you to share (or the tester can reset it).
+                  </p>
+                </div>
+                <div className="flex gap-3 justify-end">
+                  <button onClick={() => setShowCreate(false)} className="btn-secondary text-sm py-2 px-4">
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreate}
+                    disabled={creating || !createForm.email.trim()}
+                    className="btn-primary text-sm py-2 px-4"
+                  >
+                    {creating ? 'Creating...' : 'Create account'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

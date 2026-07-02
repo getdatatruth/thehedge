@@ -48,12 +48,22 @@ export async function DELETE(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Get family name before deleting for audit log
+    // Get family name + its members before deleting. We need the member ids so
+    // we can remove their actual Supabase Auth logins too: deleting the family
+    // cascades the DB rows (public.users, children, activity_logs, ...) but NOT
+    // the auth.users accounts, which would otherwise be orphaned and still able
+    // to sign in into an empty state.
     const { data: family } = await supabase
       .from('families')
       .select('name')
       .eq('id', id)
       .single();
+
+    const { data: members } = await supabase
+      .from('users')
+      .select('id')
+      .eq('family_id', id);
+    const memberIds = (members || []).map((m) => m.id as string);
 
     // Delete family (cascades to users, children, activity_logs, etc.)
     const { error } = await supabase
@@ -63,11 +73,25 @@ export async function DELETE(request: NextRequest) {
 
     if (error) throw error;
 
+    // Now remove the auth logins for every member. Best-effort per user so one
+    // failure does not leave the rest behind; the family data is already gone.
+    let authDeleted = 0;
+    for (const uid of memberIds) {
+      const { error: authErr } = await supabase.auth.admin.deleteUser(uid);
+      if (authErr) {
+        console.error(`Failed to delete auth user ${uid}:`, authErr.message);
+      } else {
+        authDeleted += 1;
+      }
+    }
+
     logAuditEvent('admin', 'delete_family', 'family', id, {
       familyName: family?.name || 'Unknown',
+      authAccountsDeleted: authDeleted,
+      memberCount: memberIds.length,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, authAccountsDeleted: authDeleted });
   } catch (error) {
     console.error('DELETE /api/admin/users error:', error);
     return NextResponse.json({ error: 'Failed to delete family' }, { status: 500 });
