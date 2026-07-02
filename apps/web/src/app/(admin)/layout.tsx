@@ -43,6 +43,12 @@ const adminNav = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
+  // The admin login page is a standalone, full-screen entry point with no
+  // sidebar/nav chrome around it.
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex min-h-screen bg-parchment">
       {/* Admin sidebar */}

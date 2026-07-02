@@ -58,22 +58,50 @@ export async function updateSession(request: NextRequest) {
     return supabaseResponse;
   }
 
-  // Admin area: require an authenticated admin (ADMIN_EMAILS allowlist). This
-  // was previously public, which let anyone open the admin UI.
+  const isAdmin = !!user?.email && isAdminEmail(user.email);
+
+  // The admin world is entirely separate from the member/educator app. It has
+  // its own login page (/admin/login), and admins never touch onboarding, the
+  // dashboard, or any member route.
+
+  // 1. The dedicated admin login page is a public entry point. An already
+  //    signed-in admin skips it and goes straight to the panel.
+  if (pathname === '/admin/login') {
+    if (isAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin';
+      url.search = '';
+      return NextResponse.redirect(url);
+    }
+    return supabaseResponse;
+  }
+
+  // 2. The admin panel: admins only. Non-authenticated -> admin login;
+  //    authenticated non-admins (real members) -> their own dashboard.
   if (pathname.startsWith('/admin')) {
     if (!user || !user.email) {
       const url = request.nextUrl.clone();
-      url.pathname = '/login';
+      url.pathname = '/admin/login';
       url.searchParams.set('redirect', pathname);
       return NextResponse.redirect(url);
     }
-    if (!isAdminEmail(user.email)) {
+    if (!isAdmin) {
       const url = request.nextUrl.clone();
       url.pathname = '/dashboard';
       return NextResponse.redirect(url);
     }
     // Admins bypass the onboarding/tier gating below.
     return supabaseResponse;
+  }
+
+  // 3. An admin anywhere OUTSIDE /admin is in the wrong world. Keep the two
+  //    fully separate by sending them back to their panel (the auth callback is
+  //    left alone so the sign-in exchange can complete).
+  if (isAdmin && pathname !== '/auth/callback') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin';
+    url.search = '';
+    return NextResponse.redirect(url);
   }
 
   // Public pages that don't require auth
