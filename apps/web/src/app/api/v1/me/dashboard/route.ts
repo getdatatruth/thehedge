@@ -160,7 +160,30 @@ export async function GET(request: NextRequest) {
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
+  // The bespoke first Spark generated at onboarding, surfaced for a still-new
+  // family (few logs) so Today opens with something made for their child. Fades
+  // once they are logging regularly.
+  let firstSpark: { slug: string; title: string; description: string; childName: string } | null = null;
+  if (allLogs.length < 5) {
+    const { data: sp } = await supabase
+      .from('activities')
+      .select('slug, title, description, child_id')
+      .eq('family_id', profile.family_id)
+      .eq('created_by', 'ai-spark')
+      .order('created_at', { ascending: false })
+      .limit(1);
+    const spark = sp?.[0];
+    if (spark) {
+      const childName =
+        (dbChildren || []).find((c) => c.id === spark.child_id)?.name ||
+        (dbChildren || [])[0]?.name ||
+        'your child';
+      firstSpark = { slug: spark.slug, title: spark.title, description: spark.description, childName };
+    }
+  }
+
   return apiSuccess({
+    firstSpark,
     greeting,
     firstName: profile.name?.split(' ')[0] || 'there',
     familyName: (family as any)?.name || 'Your family',

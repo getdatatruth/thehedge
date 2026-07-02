@@ -65,6 +65,12 @@ interface DashboardData {
     areas: { category: string; label: string; hint: string }[];
     message: string;
   } | null;
+  firstSpark: {
+    slug: string;
+    title: string;
+    description: string;
+    childName: string;
+  } | null;
 }
 
 interface PlanDayBlock {
@@ -387,8 +393,32 @@ export default function TodayScreen() {
           </AnimatedCard>
         )}
 
+        {/* ─── The bespoke first Spark, made from what they told us at onboarding ─── */}
+        {dashboard?.firstSpark && (
+          <AnimatedCard delay={reassurance ? 40 : 0}>
+            <TouchableOpacity
+              activeOpacity={0.92}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push(`/(tabs)/browse/${dashboard.firstSpark!.slug}` as any);
+              }}
+              style={styles.firstSparkCard}
+            >
+              <View style={styles.firstSparkLabel}>
+                <Sparkles size={14} color={lightTheme.background} />
+                <Text style={styles.firstSparkEyebrow}>Made for {dashboard.firstSpark.childName}</Text>
+              </View>
+              <Text style={styles.firstSparkTitle}>{dashboard.firstSpark.title}</Text>
+              <Text style={styles.firstSparkBody} numberOfLines={2}>
+                {dashboard.firstSpark.description}
+              </Text>
+              <Text style={styles.firstSparkCta}>Have a look →</Text>
+            </TouchableOpacity>
+          </AnimatedCard>
+        )}
+
         {/* ─── SPARK: follow the child's curiosity in the moment ─── */}
-        <AnimatedCard delay={reassurance ? 50 : 0}>
+        <AnimatedCard delay={reassurance ? 60 : 0}>
           <TouchableOpacity
             activeOpacity={0.92}
             onPress={() => {
@@ -813,6 +843,43 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     borderLeftWidth: 3,
     borderLeftColor: lightTheme.accent,
+  },
+  // The bespoke first Spark card - deep forest, made-for-this-child framing
+  firstSparkCard: {
+    backgroundColor: lightTheme.primary,
+    borderRadius: 16,
+    padding: spacing.lg,
+  },
+  firstSparkLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  firstSparkEyebrow: {
+    ...typography.uiSmall,
+    color: `${lightTheme.background}CC`,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    fontSize: 11,
+  },
+  firstSparkTitle: {
+    ...typography.uiBold,
+    color: lightTheme.background,
+    fontSize: 16,
+  },
+  firstSparkBody: {
+    ...typography.bodySmall,
+    color: `${lightTheme.background}CC`,
+    marginTop: 4,
+    lineHeight: 19,
+  },
+  firstSparkCta: {
+    ...typography.uiSmall,
+    color: `${lightTheme.background}B3`,
+    marginTop: 12,
+    fontWeight: '600',
   },
   reassureHeadline: {
     ...typography.uiBold,
