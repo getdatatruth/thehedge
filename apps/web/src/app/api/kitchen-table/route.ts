@@ -15,6 +15,46 @@ import {
   type KTFramework,
 } from '@/lib/kitchen-table';
 import { seedStarterWeek } from '@/lib/starter-plan';
+import { generateSparkActivity } from '@/lib/spark';
+
+// Best-effort first Spark for a brand-new family: pick the first child with a
+// stated interest and generate one bespoke, curriculum-grounded activity from
+// it, so Today opens with something made for THIS child rather than only the
+// generic seeded week. Capped so it can never hang onboarding; never throws.
+async function generateFirstSpark(
+  admin: ReturnType<typeof createAdminClient>,
+  familyId: string,
+): Promise<void> {
+  try {
+    const { data: kids } = await admin
+      .from('children')
+      .select('id, name, date_of_birth, interests, territory')
+      .eq('family_id', familyId)
+      .order('date_of_birth', { ascending: true });
+    const child = (kids || []).find(
+      (c) => Array.isArray(c.interests) && c.interests.length > 0,
+    );
+    if (!child) return;
+    const interest = String(child.interests[0]).trim();
+    if (!interest) return;
+    await Promise.race([
+      generateSparkActivity(admin, {
+        familyId,
+        child: {
+          id: child.id,
+          name: child.name,
+          date_of_birth: child.date_of_birth,
+          interests: child.interests as string[],
+          territory: child.territory as string,
+        },
+        prompt: `${child.name} is curious about ${interest} right now.`,
+      }),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 12_000)),
+    ]);
+  } catch (e) {
+    console.warn('[kitchen-table] first-spark generation failed (non-fatal):', e);
+  }
+}
 
 // POST /api/kitchen-table
 // Takes the kitchen-table answers, writes the Family Framework (one invisible
@@ -183,7 +223,15 @@ export async function POST(request: NextRequest) {
   // RLS context lags within this request, so the user client cannot reliably
   // read the rows it writes. The seeder scopes every read and write to this
   // family's own ids, so this is safe.
-  await seedStarterWeek(createAdminClient(), familyId, profile.approach);
+  // Seed a gentle starter week AND generate one bespoke first Spark from a
+  // child's stated interest, in parallel, so Today opens both populated and
+  // personal. Both best-effort and fail-soft; the family always lands on a real
+  // week even if the spark can't be generated.
+  const admin = createAdminClient();
+  await Promise.all([
+    seedStarterWeek(admin, familyId, profile.approach),
+    generateFirstSpark(admin, familyId),
+  ]);
 
   return NextResponse.json({ framework, profile });
 }
