@@ -93,9 +93,12 @@ export default function ActivityDetailScreen() {
   const [logged, setLogged] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
 
-  const { data: activity, isLoading } = useApiQuery<ActivityDetail>(
+  const { data: activity, isLoading, isError, refetch, isFetching } = useApiQuery<ActivityDetail>(
     ['activity', slug],
-    `/activities/${slug}`
+    `/activities/${slug}`,
+    // One quiet retry for a transient blip, then surface the recoverable error
+    // state rather than spinning through the default backoff for a minute.
+    { retry: 1 }
   );
 
   const { data: favIds } = useApiQuery<{ activity_ids: string[] }>(
@@ -144,6 +147,36 @@ export default function ActivityDetailScreen() {
   const handleLog = () => {
     bottomSheetRef.current?.expand();
   };
+
+  // A failed or timed-out load must never leave the screen stuck on an endless
+  // skeleton with no way out. Show what happened and let them try again.
+  if (isError && !activity) {
+    return (
+      <SafeAreaView style={styles.safe} edges={['top']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
+            <ChevronLeft size={24} color={lightTheme.text} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.errorState}>
+          <Text style={styles.errorTitle}>That didn&apos;t load</Text>
+          <Text style={styles.errorBody}>
+            We couldn&apos;t open this activity just now. It&apos;s usually a wobbly
+            connection.
+          </Text>
+          <TouchableOpacity
+            style={styles.errorBtn}
+            onPress={() => refetch()}
+            disabled={isFetching}
+          >
+            <Text style={styles.errorBtnText}>
+              {isFetching ? 'Trying...' : 'Try again'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (isLoading || !activity) return <ActivityDetailSkeleton />;
 
@@ -488,6 +521,34 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: spacing.xl,
     paddingBottom: spacing['3xl'],
+  },
+  errorState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xl,
+    gap: spacing.sm,
+  },
+  errorTitle: {
+    ...typography.h3,
+    color: lightTheme.text,
+    textAlign: 'center',
+  },
+  errorBody: {
+    ...typography.body,
+    color: lightTheme.textMuted,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  errorBtn: {
+    backgroundColor: lightTheme.accent,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    borderRadius: radius.md,
+  },
+  errorBtnText: {
+    ...typography.button,
+    color: '#FFFFFF',
   },
   // Title
   titleSection: {

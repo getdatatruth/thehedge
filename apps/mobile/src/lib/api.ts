@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase, getCachedAccessToken } from './supabase';
 
 // API base URL. In dev, override via EXPO_PUBLIC_API_URL (e.g. http://192.168.x.x:3000)
 // so it is not machine-specific. Production always uses the hosted platform.
@@ -41,10 +41,27 @@ export class ApiError extends Error {
 }
 
 async function getAuthHeader(): Promise<Record<string, string>> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token) return {};
-  return { Authorization: `Bearer ${token}` };
+  // Fast path: the live token is held in memory (kept current by the auth
+  // listener in ./supabase) so the common case adds no latency at all.
+  const cached = getCachedAccessToken();
+  if (cached) return { Authorization: `Bearer ${cached}` };
+
+  // Cold path only (very first call before the auth listener has fired, or a
+  // sign-out/in edge). Fall back to getSession(), but never let it hang the
+  // request: on iOS this call reads the keychain and can trigger a blocking
+  // token refresh, which was making the first tap after opening the app spin
+  // forever. Cap it so a slow/stuck refresh degrades to an unauthed attempt
+  // (which fails fast and cleanly) rather than an endless skeleton.
+  try {
+    const token = await Promise.race([
+      supabase.auth.getSession().then(({ data }) => data.session?.access_token ?? null),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000)),
+    ]);
+    if (token) return { Authorization: `Bearer ${token}` };
+  } catch {
+    // fall through to no auth header
+  }
+  return {};
 }
 
 export async function api<T>(
@@ -55,14 +72,30 @@ export async function api<T>(
   const authHeaders = await getAuthHeader();
   const base = useRoot ? API_ROOT : API_BASE;
 
-  const res = await fetch(`${base}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders,
-      ...options.headers,
-    },
-  });
+  // Never let a stalled request spin forever behind a loading skeleton. Abort
+  // after 20s so React Query surfaces an error (and can retry) instead of the
+  // screen hanging indefinitely with no way out.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  let res: Response;
+  try {
+    res = await fetch(`${base}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders,
+        ...options.headers,
+      },
+    });
+  } catch (e) {
+    clearTimeout(timeout);
+    if (e instanceof Error && e.name === 'AbortError') {
+      throw new ApiError('The connection timed out. Please try again.', 'TIMEOUT', 0);
+    }
+    throw new ApiError('Could not reach The Hedge. Check your connection.', 'NETWORK', 0);
+  }
+  clearTimeout(timeout);
 
   const json = await res.json();
 
