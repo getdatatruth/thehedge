@@ -16,6 +16,7 @@ import {
 } from '@/lib/kitchen-table';
 import { seedStarterWeek } from '@/lib/starter-plan';
 import { generateSparkActivity } from '@/lib/spark';
+import { BETA_FULL_ACCESS } from '@/lib/subscription';
 
 // Best-effort first Spark for a brand-new family: pick the first child with a
 // stated interest and generate one bespoke, curriculum-grounded activity from
@@ -107,14 +108,18 @@ export async function POST(request: NextRequest) {
     const isHomeEd = profile.doorway === 'homeschool' || profile.doorway === 'considering';
     const trialEnds = new Date();
     trialEnds.setDate(trialEnds.getDate() + 14);
+    // BETA: TestFlight/closed testers get the full Educator tier with no expiry
+    // (see BETA_FULL_ACCESS) so they can test the whole app; otherwise the usual
+    // doorway-based 14-day trial applies.
+    const beta = BETA_FULL_ACCESS;
     const { data: fam, error: famErr } = await admin
       .from('families')
       .insert({
         name: familyName,
         country: territory,
-        subscription_tier: isHomeEd ? 'educator' : 'family',
-        subscription_status: 'trialing',
-        trial_ends_at: trialEnds.toISOString(),
+        subscription_tier: beta ? 'educator' : isHomeEd ? 'educator' : 'family',
+        subscription_status: beta ? 'active' : 'trialing',
+        trial_ends_at: beta ? null : trialEnds.toISOString(),
       })
       .select('id')
       .single();

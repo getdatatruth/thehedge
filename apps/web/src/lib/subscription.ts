@@ -1,6 +1,13 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { SubscriptionTier } from '@/types/database';
 
+// BETA: while the app is in closed TestFlight testing, every family that signs
+// up is a tester, so grant them the full Educator tier (all features, no trial
+// expiry) rather than a 14-day trial that lapses to free mid-test. This makes
+// onboarding write subscription_tier='educator', subscription_status='active'.
+// TURN THIS OFF before paid tiers / public launch so real billing applies.
+export const BETA_FULL_ACCESS = true;
+
 // Feature definitions by tier
 const TIER_FEATURES: Record<SubscriptionTier, Set<string>> = {
   free: new Set([

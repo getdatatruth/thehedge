@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createApiClient } from '@/lib/supabase/api-client';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { BETA_FULL_ACCESS } from '@/lib/subscription';
 
 export async function POST(request: NextRequest) {
   try {
@@ -90,6 +91,17 @@ export async function POST(request: NextRequest) {
       trialEndsAt = trialEnd.toISOString();
     }
     // Otherwise stays free (no trial needed)
+
+    // BETA: every TestFlight tester is exactly that, a tester, so give them the
+    // full Educator tier with no trial expiry the moment they finish the real
+    // onboarding, regardless of the doorway they chose. Lets them exercise the
+    // whole app (planner, AEARS/Tusla suite, portfolio, reports). Flip
+    // BETA_FULL_ACCESS off before paid tiers / public launch.
+    if (BETA_FULL_ACCESS) {
+      initialTier = 'educator';
+      initialStatus = 'active';
+      trialEndsAt = null;
+    }
 
     if (existingUser?.family_id) {
       // Update existing family
