@@ -1,27 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-
-/**
- * Founder emails that always have admin access, even if ADMIN_EMAILS is not
- * configured in the environment, so the owner can never be locked out of
- * /admin. Extend for a deployment via the ADMIN_EMAILS env var (comma-
- * separated), e.g. ADMIN_EMAILS=teammate@thehedge.ie,ops@thehedge.ie
- */
-const DEFAULT_ADMIN_EMAILS = [
-  'adam@thehedge.ie',
-  'adam@ofmm.ie',
-  'info@ofmm.ie',
-  'adam@getdatatruth.com',
-];
-
-function getAdminEmails(): string[] {
-  const fromEnv = (process.env.ADMIN_EMAILS || '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  // Built-in founder list plus any env-configured admins, deduped.
-  return Array.from(new Set([...DEFAULT_ADMIN_EMAILS, ...fromEnv]));
-}
+import { getAdminEmails } from '@/lib/admin-emails';
 
 export interface AdminUser {
   id: string;
