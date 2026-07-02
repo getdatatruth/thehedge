@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   UserPlus,
   Copy,
+  KeyRound,
 } from 'lucide-react';
 
 interface Family {
@@ -62,6 +63,7 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
   const [createResult, setCreateResult] = useState<{ email: string; password: string } | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [resetResult, setResetResult] = useState<{ email: string; password: string } | null>(null);
 
   const filtered = families.filter((f) => {
     if (search.trim()) {
@@ -137,6 +139,24 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
       setCreating(false);
     }
   }, [createForm]);
+
+  const handleResetPassword = useCallback(async (id: string) => {
+    setLoading(id);
+    try {
+      const res = await fetch('/api/admin/users/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ familyId: id }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to reset password');
+      setResetResult({ email: json.email, password: json.password });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to reset password');
+    } finally {
+      setLoading(null);
+    }
+  }, []);
 
   const handleDelete = useCallback(async (id: string) => {
     setLoading(id);
@@ -436,6 +456,41 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
         </div>
       )}
 
+      {/* Reset password result modal */}
+      {resetResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40">
+          <div className="card-elevated p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-forest/10">
+                <KeyRound className="h-5 w-5 text-forest" />
+              </div>
+              <div>
+                <h3 className="font-display text-lg font-bold text-forest">Password reset</h3>
+                <p className="text-xs text-clay/50">Share the new password with the user.</p>
+              </div>
+            </div>
+            <div className="rounded-lg border border-stone bg-parchment/50 p-3 flex items-center justify-between gap-2 mb-6">
+              <div>
+                <p className="text-[11px] uppercase tracking-wider text-clay/40">{resetResult.email}</p>
+                <p className="text-sm font-semibold text-forest font-mono">{resetResult.password}</p>
+              </div>
+              <button
+                onClick={() => navigator.clipboard?.writeText(`Email: ${resetResult.email}\nPassword: ${resetResult.password}`)}
+                className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-2.5"
+              >
+                <Copy className="h-3 w-3" />
+                Copy
+              </button>
+            </div>
+            <div className="flex justify-end">
+              <button onClick={() => setResetResult(null)} className="btn-primary text-sm py-2 px-4">
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create user modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40">
@@ -672,6 +727,14 @@ export function AdminUsersClient({ initialFamilies }: { initialFamilies: Family[
                           title={isSuspended ? 'Unsuspend' : 'Suspend'}
                         >
                           {isSuspended ? <CheckCircle className="h-3.5 w-3.5" /> : <Ban className="h-3.5 w-3.5" />}
+                        </button>
+                        <button
+                          onClick={() => handleResetPassword(family.id)}
+                          disabled={loading === family.id}
+                          className="rounded-lg p-1.5 text-xs text-clay/30 hover:bg-forest/10 hover:text-forest transition-all"
+                          title="Reset password"
+                        >
+                          <KeyRound className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(family.id)}
